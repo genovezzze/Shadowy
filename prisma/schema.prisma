@@ -1,0 +1,257 @@
+// Shadowy — multi-tenant invisible-work platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum EntryStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+}
+
+enum PeriodType {
+  WEEK
+  TWO_WEEKS
+  MONTH
+  QUARTER
+}
+
+enum RewardType {
+  PAID_DAY_OFF
+  FLEXIBLE_HOURS
+  REMOTE_DAY
+  OFFICIAL_RECOGNITION
+  THANK_YOU_MESSAGE
+  GIFT_CARD
+  WORKLOAD_REVIEW
+}
+
+enum BonusRequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  RETURNED
+}
+
+model Organization {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  trialEndsAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  users            User[]
+  entries          InvisibleWorkEntry[]
+  categories       Category[]
+  workRoles        WorkRole[]
+  recognitionRules RecognitionRule[]
+  bonusRequests    BonusRequest[]
+}
+
+model User {
+  id             String  @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name         String
+  email        String  @unique
+  passwordHash String
+  role         Role
+  title        String?
+
+  managerId String?
+  manager   User?   @relation("ManagerEmployees", fields: [managerId], references: [id], onDelete: SetNull)
+  employees User[]  @relation("ManagerEmployees")
+
+  workRoleId      String?
+  workRole        WorkRole? @relation("EmployeeWorkRole", fields: [workRoleId], references: [id], onDelete: SetNull)
+  managedWorkRoles WorkRole[] @relation("ManagerWorkRoles")
+
+  submittedEntries InvisibleWorkEntry[] @relation("EntryEmployee")
+  reviewedEntries  InvisibleWorkEntry[] @relation("EntryManager")
+
+  managedRecognitionRules RecognitionRule[] @relation("ManagerRecognitionRules")
+  employeeBonusRequests   BonusRequest[]    @relation("EmployeeBonusRequests")
+  managerBonusRequests    BonusRequest[]    @relation("ManagerBonusRequests")
+  passwordResetTokens     PasswordResetToken[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([managerId])
+  @@index([workRoleId])
+}
+
+model WorkRole {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  managerId      String
+  manager        User         @relation("ManagerWorkRoles", fields: [managerId], references: [id])
+
+  name        String        @db.VarChar(100)
+  description String?       @db.VarChar(500)
+
+  duties    WorkRoleDuty[]
+  employees User[]         @relation("EmployeeWorkRole")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([managerId])
+}
+
+model WorkRoleDuty {
+  id         String   @id @default(cuid())
+  workRoleId String
+  workRole   WorkRole @relation(fields: [workRoleId], references: [id], onDelete: Cascade)
+  text       String   @db.VarChar(300)
+  createdAt  DateTime @default(now())
+
+  @@index([workRoleId])
+}
+
+model InvisibleWorkEntry {
+  id             String  @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  employeeId String
+  employee   User   @relation("EntryEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
+
+  managerId String?
+  manager   User?  @relation("EntryManager", fields: [managerId], references: [id], onDelete: SetNull)
+
+  title           String
+  category        String
+  description     String
+  workDate        DateTime
+  durationMinutes Int
+
+  status         EntryStatus @default(PENDING)
+  managerComment String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([employeeId])
+  @@index([managerId])
+  @@index([status])
+}
+
+// Tracks failed login attempts for brute-force / password-spray rate limiting.
+// Not tenant-scoped: login happens before the organization is known.
+model LoginAttempt {
+  id        String   @id @default(cuid())
+  ip        String
+  email     String
+  createdAt DateTime @default(now())
+
+  @@index([ip, createdAt])
+  @@index([ip, email, createdAt])
+}
+
+// Single-use, time-limited password reset tokens. Only a SHA-256 hash of the
+// token is stored; the raw token lives only in the emailed reset link.
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Category {
+  id             String   @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name      String
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, name])
+}
+
+model RecognitionRule {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  managerId      String
+  manager        User         @relation("ManagerRecognitionRules", fields: [managerId], references: [id])
+
+  name             String     @db.VarChar(100)
+  description      String?    @db.VarChar(500)
+  minimumHours     Float
+  periodType       PeriodType
+  rewardType       RewardType
+  categories       String[]
+  workRoleIds      String[]
+  oneTimePerPeriod Boolean    @default(true)
+  isActive         Boolean    @default(true)
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  bonusRequests BonusRequest[]
+
+  @@index([organizationId])
+  @@index([managerId])
+}
+
+model PilotLead {
+  id        String   @id @default(cuid())
+  name      String
+  company   String
+  email     String
+  teamSize  String
+  comment   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model BonusRequest {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  employeeId     String
+  employee       User         @relation("EmployeeBonusRequests", fields: [employeeId], references: [id], onDelete: Cascade)
+  managerId      String
+  manager        User         @relation("ManagerBonusRequests", fields: [managerId], references: [id], onDelete: Cascade)
+  ruleId         String
+  rule           RecognitionRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+
+  rewardType       RewardType
+  status           BonusRequestStatus @default(PENDING)
+  hoursAccumulated Float
+  employeeComment  String?    @db.VarChar(1000)
+  managerComment   String?    @db.VarChar(1000)
+
+  requestedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([employeeId])
+  @@index([managerId])
+  @@index([ruleId])
+}

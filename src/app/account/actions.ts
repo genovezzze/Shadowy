@@ -1,0 +1,54 @@
+"use server";
+
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { requireUser, hashPassword, verifyPassword } from "@/lib/auth";
+
+const schema = z
+  .object({
+    currentPassword: z.string().min(1, "Lūdzu, ievadiet pašreizējo paroli."),
+    newPassword: z
+      .string()
+      .min(8, "Jaunajai parolei jābūt vismaz 8 simbolus garai.")
+      .max(200),
+    confirmPassword: z.string().min(1, "Lūdzu, atkārtojiet jauno paroli."),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Jaunās paroles nesakrīt.",
+    path: ["confirmPassword"],
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    message: "Jaunā parole nedrīkst sakrist ar pašreizējo.",
+    path: ["newPassword"],
+  });
+
+export async function changeOwnPassword(formData: FormData) {
+  const session = await requireUser();
+
+  const parsed = schema.safeParse({
+    currentPassword: formData.get("currentPassword"),
+    newPassword: formData.get("newPassword"),
+    confirmPassword: formData.get("confirmPassword"),
+  });
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0].message };
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: session.userId } });
+  if (!user) {
+    return { ok: false as const, error: "Lietotājs nav atrasts." };
+  }
+
+  const valid = await verifyPassword(parsed.data.currentPassword, user.passwordHash);
+  if (!valid) {
+    return { ok: false as const, error: "Pašreizējā parole nav pareiza." };
+  }
+
+  const passwordHash = await hashPassword(parsed.data.newPassword);
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { passwordHash },
+  });
+
+  return { ok: true as const };
+}
