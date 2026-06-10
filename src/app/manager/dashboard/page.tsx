@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { WorkTypeChart } from "@/components/dashboard/work-type-chart";
@@ -9,10 +8,11 @@ import { HoursChart } from "@/components/dashboard/hours-chart";
 import { EntryCard } from "@/components/entries/entry-card";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Clock, Users, CheckCircle2, FileText, Timer, TrendingUp, AlertTriangle } from "lucide-react";
 import { classifyWorkType } from "@/lib/work-type";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { SectionDivider } from "@/components/dashboard/section-divider";
 
 function getPeriodStart(period: string): Date | undefined {
   const now = new Date();
@@ -159,20 +159,30 @@ export default async function ManagerDashboard({
 
   const totalApproved = approvedDetailed.length;
 
+  const glassInner = "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden";
+
   return (
     <>
-      <PageHeader
-        title={`Sveiks, ${session.name.split(" ")[0]}!`}
-        description="Šeit redzat savas komandas neredzamā darba pārskatu. Lūdzu, izskatiet ierakstus, kas gaida apstiprinājumu."
-        actions={
-          <div className="flex items-center gap-3 flex-wrap">
-            <PeriodTabs current={period} />
-            <Button asChild>
-              <Link href="/manager/entries">Skatīt visus ierakstus</Link>
-            </Button>
+      {/* ── Header ── */}
+      <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+            Pārskats
           </div>
-        }
-      />
+          <h1 className="text-3xl font-bold tracking-tight">
+            Sveiks, <span className="text-gradient-emerald">{session.name.split(" ")[0]}</span>!
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
+            Šeit redzat savas komandas neredzamā darba pārskatu. Lūdzu, izskatiet ierakstus, kas gaida apstiprinājumu.
+          </p>
+        </div>
+        <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+          <PeriodTabs current={period} className="w-full sm:w-auto" />
+          <Button asChild className="w-full whitespace-nowrap sm:w-auto">
+            <Link href="/manager/entries">Skatīt visus ierakstus</Link>
+          </Button>
+        </div>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
         <KpiCard label="Komandā darbinieku" value={team} icon={<Users className="h-5 w-5" />} />
@@ -188,50 +198,53 @@ export default async function ManagerDashboard({
           tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
         />
-        <KpiCard label="Ieraksti kopā" value={totalEntries} icon={<FileText className="h-5 w-5" />} />
+        <KpiCard label="Ieraksti kopā" value={totalEntries} tone="accent" icon={<FileText className="h-5 w-5" />} />
         <KpiCard
           label="Vid. izskatīšanas laiks"
           value={avgReviewDays !== null ? `${avgReviewDays} d.` : "—"}
           hint={reviewHint}
           icon={<Timer className="h-5 w-5" />}
-          tone={avgReviewDays !== null && avgReviewDays <= 1 ? "success" : avgReviewDays !== null && avgReviewDays > 3 ? "warning" : "default"}
+          tone={avgReviewDays !== null && avgReviewDays <= 1 ? "success" : avgReviewDays !== null && avgReviewDays > 3 ? "warning" : "info"}
         />
       </div>
+
+      <SectionDivider label="Aktivitāte" />
 
       <div className="mb-8">
         <ActivityChart title="Aktivitāte (pēdējās 8 nedēļas)" data={weeklyData} />
       </div>
+
+      <SectionDivider label="Analītika" />
 
       <div className="grid gap-4 sm:grid-cols-2 mb-8">
         <WorkTypeChart title="Darba veids (apstiprinātie ieraksti)" data={workTypeData} />
         <HoursChart title="Apstiprinātās stundas pa darbiniekiem" data={hoursData} />
       </div>
 
-      {/* Team performance table */}
+      {/* Team performance */}
       {teamData.length > 0 && (
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
+        <>
+          <SectionDivider label="Komanda" />
+          <Card className="relative mb-8 overflow-hidden p-0">
+            <div className={glassInner} />
+            <div className="px-6 py-4 flex items-center justify-between border-b border-border dark:border-white/[0.07]">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
                 Komandas sniegums
-              </CardTitle>
+              </div>
               {period !== "all" && (
                 <span className="text-xs text-muted-foreground">
                   {period === "7d" ? "Pēdējās 7 dienas" : period === "30d" ? "Pēdējās 30 dienas" : "Pēdējās 90 dienas"}
                 </span>
               )}
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-white/[0.04]">
               {teamData.map(({ name, entries, hours }, i) => {
                 const isOverloaded = hours > teamAvgHours * 1.8 && teamAvgHours > 0;
-                const approvalRate = totalApproved > 0 ? Math.round((hours / (totalApproved || 1)) * 10) / 10 : 0;
                 return (
-                  <div key={i} className="flex items-center justify-between gap-4 px-6 py-3">
+                  <div key={i} className="flex items-center justify-between gap-4 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent text-xs font-semibold">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/[0.08] text-xs font-semibold">
                         {i + 1}
                       </div>
                       <div className="min-w-0">
@@ -245,7 +258,7 @@ export default async function ManagerDashboard({
                         <div className="text-xs text-muted-foreground">apstiprinātās</div>
                       </div>
                       {isOverloaded && (
-                        <div className="flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/30 dark:text-amber-400">
+                        <div className="flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20 px-2.5 py-0.5 text-xs font-semibold">
                           <AlertTriangle className="h-3 w-3" />
                           Pārslodze
                         </div>
@@ -255,51 +268,41 @@ export default async function ManagerDashboard({
                 );
               })}
             </div>
-            <div className="flex items-center justify-between px-6 py-3 border-t border-border bg-muted/20 text-xs text-muted-foreground">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-border dark:border-white/[0.07] bg-white/[0.02] text-xs text-muted-foreground">
               <span>Vidēji uz darbinieku</span>
               <span className="font-medium tabular-nums">{Math.round(teamAvgHours * 10) / 10}h</span>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </>
       )}
 
       {/* Top categories */}
       {topCategories.length > 0 && (
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Populārākās kategorijas (apstiprinātie)
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {topCategories.map(([cat, count], i) => {
-                const pct = totalApproved > 0 ? Math.round((count / totalApproved) * 100) : 0;
-                return (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className="w-36 truncate text-xs text-muted-foreground shrink-0">{cat}</div>
-                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${pct}%` }} />
-                    </div>
-                    <div className="text-xs text-muted-foreground w-16 text-right tabular-nums">
-                      {count} · {pct}%
-                    </div>
+        <Card className="relative mb-8 overflow-hidden p-0">
+          <div className={glassInner} />
+          <div className="px-6 py-4 border-b border-border dark:border-white/[0.07]">
+            <div className="text-sm font-semibold">Populārākās kategorijas (apstiprinātie)</div>
+          </div>
+          <div className="px-6 py-5 space-y-3">
+            {topCategories.map(([cat, count], i) => {
+              const pct = totalApproved > 0 ? Math.round((count / totalApproved) * 100) : 0;
+              return (
+                <div key={i} className="flex items-center gap-3">
+                  <div className="w-36 truncate text-xs text-muted-foreground shrink-0">{cat}</div>
+                  <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
+                  <div className="text-xs text-muted-foreground w-16 text-right tabular-nums">
+                    {count} · {pct}%
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </Card>
       )}
 
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Gaida jūsu izskatīšanu</h2>
-          <p className="text-sm text-muted-foreground">
-            Šie ieraksti ir iesniegti, bet vēl nav izskatīti.
-          </p>
-        </div>
-      </div>
+      <SectionDivider label="Gaida jūsu izskatīšanu" />
 
       {recentPending.length === 0 ? (
         <EmptyState

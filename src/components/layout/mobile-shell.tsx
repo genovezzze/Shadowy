@@ -27,6 +27,16 @@ export function MobileShell({
 
   return (
     <div className="flex h-screen bg-background">
+      {/* Background glow blobs — dark mode only */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden dark:block">
+        <div className="absolute left-[5%] top-[8%] h-[480px] w-[560px] rounded-full opacity-70"
+          style={{ background: "radial-gradient(circle, hsl(160 60% 20% / 0.18), transparent 70%)" }} />
+        <div className="absolute right-[8%] top-[30%] h-[360px] w-[440px] rounded-full opacity-50"
+          style={{ background: "radial-gradient(circle, hsl(220 80% 35% / 0.12), transparent 70%)" }} />
+        <div className="absolute left-[30%] bottom-[5%] h-[300px] w-[400px] rounded-full opacity-40"
+          style={{ background: "radial-gradient(circle, hsl(160 70% 15% / 0.14), transparent 70%)" }} />
+      </div>
+
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div

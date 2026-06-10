@@ -1,16 +1,16 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { WorkTypeChart } from "@/components/dashboard/work-type-chart";
+import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
 import { Button } from "@/components/ui/button";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer, TrendingUp } from "lucide-react";
+import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer } from "lucide-react";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
+import { SectionDivider } from "@/components/dashboard/section-divider";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -123,18 +123,26 @@ export default async function EmployeeDashboard() {
 
   return (
     <>
-      <PageHeader
-        title={`Sveiks, ${session.name.split(" ")[0]}!`}
-        description="Šeit jūs varat iesniegt neredzamo darbu un sekot līdzi savu ierakstu statusam."
-        actions={
-          <Button asChild>
-            <Link href="/employee/new-entry">
-              <PlusCircle className="h-4 w-4" />
-              Jauns ieraksts
-            </Link>
-          </Button>
-        }
-      />
+      {/* ── Header ── */}
+      <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+            Pārskats
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Sveiks, <span className="text-gradient-emerald">{session.name.split(" ")[0]}</span>!
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
+            Šeit jūs varat iesniegt neredzamo darbu un sekot līdzi savu ierakstu statusam.
+          </p>
+        </div>
+        <Button asChild>
+          <Link href="/employee/new-entry">
+            <PlusCircle className="h-4 w-4" />
+            Jauns ieraksts
+          </Link>
+        </Button>
+      </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <KpiCard
@@ -154,7 +162,7 @@ export default async function EmployeeDashboard() {
           label="Apstiprinātās stundas"
           value={`${approvedHours}h`}
           hint={hoursHint}
-          tone="success"
+          tone="info"
           icon={<Timer className="h-5 w-5" />}
         />
         <KpiCard
@@ -164,6 +172,8 @@ export default async function EmployeeDashboard() {
         />
       </div>
 
+      <SectionDivider label="Aktivitāte" />
+
       <div className="grid gap-4 sm:grid-cols-2 mb-8">
         <ActivityChart title="Mana aktivitāte (pēdējie 6 mēneši)" data={monthlyData} />
         <WorkTypeChart title="Apstiprinātie ieraksti pēc kategorijas" data={categoryData} />
@@ -171,56 +181,24 @@ export default async function EmployeeDashboard() {
 
       {/* Monthly hours trend */}
       {approvedHours > 0 && (
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
-                Apstiprinātās stundas pa mēnešiem
-              </CardTitle>
-              {bestMonth.value > 0 && (
-                <span className="text-xs text-muted-foreground">
+        <div className="mb-8">
+          <HoursTrendChart
+            title="Apstiprinātās stundas pa mēnešiem"
+            data={monthlyHours}
+            badge={
+              bestMonth.value > 0 ? (
+                <>
                   Labākais mēnesis: <span className="font-medium text-foreground">{bestMonth.label} ({bestMonth.value}h)</span>
-                </span>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-end gap-2 h-20">
-              {monthlyHours.map(({ label, value }, i) => {
-                const maxVal = Math.max(...monthlyHours.map((m) => m.value), 1);
-                const heightPct = (value / maxVal) * 100;
-                const isCurrent = i === monthlyHours.length - 1;
-                return (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                    <div className="w-full flex items-end" style={{ height: "60px" }}>
-                      <div
-                        className={`w-full rounded-sm transition-all ${isCurrent ? "bg-emerald-500" : "bg-muted-foreground/20"}`}
-                        style={{ height: `${Math.max(heightPct, value > 0 ? 4 : 0)}%` }}
-                        title={`${value}h`}
-                      />
-                    </div>
-                    <div className="text-[10px] text-muted-foreground">{label}</div>
-                    {value > 0 && (
-                      <div className={`text-[10px] font-medium tabular-nums ${isCurrent ? "text-emerald-500" : "text-muted-foreground"}`}>
-                        {value}h
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+                </>
+              ) : undefined
+            }
+          />
+        </div>
       )}
 
-      <div className="mb-4 flex items-end justify-between">
-        <div>
-          <h2 className="text-lg font-semibold">Pēdējie ieraksti</h2>
-          <p className="text-sm text-muted-foreground">
-            Pēdējās izmaiņas jūsu iesniegtajos ierakstos.
-          </p>
-        </div>
+      <SectionDivider label="Pēdējie ieraksti" />
+
+      <div className="mb-4 flex items-center justify-end">
         <Link
           href="/employee/history"
           className="text-sm font-medium underline-offset-4 hover:underline"

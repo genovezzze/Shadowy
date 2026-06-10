@@ -10,7 +10,7 @@ const PERIODS = [
   { label: "Viss", value: "all" },
 ];
 
-export function PeriodTabs({ current }: { current: string }) {
+export function PeriodTabs({ current, className }: { current: string; className?: string }) {
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -26,16 +26,22 @@ export function PeriodTabs({ current }: { current: string }) {
   const active = current || "all";
 
   return (
-    <div className="flex items-center gap-0.5 rounded-lg border border-border bg-muted/40 p-0.5">
+    <div
+      className={cn(
+        "flex items-center gap-0.5 rounded-xl border border-white/[0.09] bg-white/[0.04] p-1 backdrop-blur-md",
+        className
+      )}
+      style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}
+    >
       {PERIODS.map(({ label, value }) => (
         <button
           key={value}
           onClick={() => navigate(value)}
           className={cn(
-            "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
+            "flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 sm:flex-initial sm:px-4 sm:text-xs",
             active === value
-              ? "bg-background text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+              : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
           )}
         >
           {label}

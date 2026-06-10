@@ -16,7 +16,7 @@ export default function AuthLayout({
           </Link>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground hidden sm:block">
-              Dari neredzamo darbu redzamu
+              Padariet neredzamo darbu redzamu
             </span>
             <ThemeToggle />
           </div>

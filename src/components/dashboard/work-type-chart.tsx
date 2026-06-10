@@ -49,8 +49,8 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
 
   const isDark = resolvedTheme === "dark";
   const textColor = isDark ? "#9ca3af" : "#6b7280";
-  const tooltipBg = isDark ? "#1c1c1e" : "#ffffff";
-  const tooltipBorder = isDark ? "#374151" : "#e5e7eb";
+  const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
+  const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
 
   return (
     <Card>

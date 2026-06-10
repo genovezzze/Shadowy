@@ -1,15 +1,15 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/entries/status-badge";
 import { formatDateTimeLV, formatDurationLV } from "@/lib/utils";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FileText, UserCog, Users, Clock, Timer, TrendingUp } from "lucide-react";
 import { GettingStarted } from "@/components/dashboard/getting-started";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { SectionDivider } from "@/components/dashboard/section-divider";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -114,13 +114,26 @@ export default async function AdminDashboard({
 
   const monthlyData = buildMonthlyData(allEntries);
 
+  const glassInner = "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden";
+
   return (
     <>
-      <PageHeader
-        title="Organizācijas pārskats"
-        description="Galvenie rādītāji par jūsu organizāciju."
-        actions={<PeriodTabs current={period} />}
-      />
+      {/* ── Header ── */}
+      <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+            Pārskats
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Organizācijas{" "}
+            <span className="text-gradient-emerald">pārskats</span>
+          </h1>
+          <p className="mt-1.5 text-sm text-muted-foreground">
+            Galvenie rādītāji par jūsu organizāciju.
+          </p>
+        </div>
+        <PeriodTabs current={period} />
+      </div>
 
       <GettingStarted
         hasManagers={managers > 0}
@@ -128,12 +141,14 @@ export default async function AdminDashboard({
         hasEntries={totalEntries > 0}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+      {/* ── KPI grid ── */}
+      <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label="Vadītāji" value={managers} icon={<UserCog className="h-5 w-5" />} />
-        <KpiCard label="Darbinieki" value={employees} icon={<Users className="h-5 w-5" />} />
+        <KpiCard label="Darbinieki" value={employees} tone="info" icon={<Users className="h-5 w-5" />} />
         <KpiCard
           label={period === "all" ? "Visi ieraksti" : "Ieraksti periodā"}
           value={totalEntries}
+          tone="accent"
           icon={<FileText className="h-5 w-5" />}
         />
         <KpiCard
@@ -144,73 +159,77 @@ export default async function AdminDashboard({
         />
       </div>
 
-      {/* Org-wide trend chart */}
+      {/* ── Section divider ── */}
+      <SectionDivider label="Aktivitāte" />
+
+      {/* ── Activity chart ── */}
       <div className="mb-8">
-        <ActivityChart title="Organizācijas aktivitāte (pēdējie 12 mēneši)" data={monthlyData} />
+        <ActivityChart
+          title="Organizācijas aktivitāte (pēdējie 12 mēneši)"
+          data={monthlyData}
+        />
       </div>
 
-      {/* Manager performance table */}
+      {/* ── Manager performance ── */}
       {managerStats.length > 0 && (
-        <Card className="mb-8">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-                <TrendingUp className="h-4 w-4" />
+        <>
+          <SectionDivider label="Komanda" />
+          <Card className="relative mb-8 overflow-hidden p-0">
+            <div className={glassInner} />
+            <div className="px-6 py-4 flex items-center justify-between border-b border-border dark:border-white/[0.07]">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
                 Vadītāju sniegums
-              </CardTitle>
+              </div>
               {period !== "all" && (
                 <span className="text-xs text-muted-foreground">
                   {period === "7d" ? "Pēdējās 7 dienas" : period === "30d" ? "Pēdējās 30 dienas" : "Pēdējās 90 dienas"}
                 </span>
               )}
             </div>
-          </CardHeader>
-          <CardContent className="p-0">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="px-6 py-2.5 text-left text-xs font-medium text-muted-foreground">Vadītājs</th>
-                    <th className="px-4 py-2.5 text-center text-xs font-medium text-muted-foreground">Komanda</th>
-                    <th className="px-4 py-2.5 text-center text-xs font-medium text-muted-foreground">Gaida</th>
-                    <th className="px-4 py-2.5 text-center text-xs font-medium text-muted-foreground">Izskatīti</th>
-                    <th className="px-6 py-2.5 text-right text-xs font-medium text-muted-foreground flex items-center justify-end gap-1">
+                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                    <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Vadītājs</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Komanda</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Gaida</th>
+                    <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Izskatīti</th>
+                    <th className="px-6 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60 flex items-center justify-end gap-1">
                       <Timer className="h-3 w-3" /> Vid. izskatīšana
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border">
+                <tbody className="divide-y divide-white/[0.04]">
                   {managerStats
                     .sort((a, b) => (a.avgReviewDays ?? 999) - (b.avgReviewDays ?? 999))
                     .map((m, i) => (
-                      <tr key={i} className="hover:bg-muted/20 transition-colors">
-                        <td className="px-6 py-3 font-medium">{m.name}</td>
-                        <td className="px-4 py-3 text-center text-muted-foreground">{m.teamSize}</td>
-                        <td className="px-4 py-3 text-center">
+                      <tr key={i} className="group hover:bg-white/[0.03] transition-colors">
+                        <td className="px-6 py-3.5 font-medium">{m.name}</td>
+                        <td className="px-4 py-3.5 text-center tabular-nums text-muted-foreground">{m.teamSize}</td>
+                        <td className="px-4 py-3.5 text-center">
                           {m.pending > 0 ? (
-                            <span className="inline-flex items-center rounded-full bg-warning/10 text-warning px-2 py-0.5 text-xs font-medium">
+                            <span className="inline-flex items-center rounded-full bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20 px-2.5 py-0.5 text-xs font-semibold">
                               {m.pending}
                             </span>
                           ) : (
-                            <span className="text-muted-foreground">0</span>
+                            <span className="text-muted-foreground/50">—</span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center text-muted-foreground tabular-nums">{m.reviewed}</td>
-                        <td className="px-6 py-3 text-right">
+                        <td className="px-4 py-3.5 text-center tabular-nums text-muted-foreground">{m.reviewed}</td>
+                        <td className="px-6 py-3.5 text-right tabular-nums">
                           {m.avgReviewDays !== null ? (
-                            <span
-                              className={
-                                m.avgReviewDays <= 1
-                                  ? "text-success font-medium tabular-nums"
-                                  : m.avgReviewDays <= 3
-                                  ? "text-foreground tabular-nums"
-                                  : "text-warning font-medium tabular-nums"
-                              }
-                            >
+                            <span className={
+                              m.avgReviewDays <= 1
+                                ? "font-semibold text-emerald-400"
+                                : m.avgReviewDays <= 3
+                                ? "text-foreground"
+                                : "font-semibold text-amber-400"
+                            }>
                               {m.avgReviewDays} d.
                             </span>
                           ) : (
-                            <span className="text-muted-foreground">—</span>
+                            <span className="text-muted-foreground/50">—</span>
                           )}
                         </td>
                       </tr>
@@ -218,40 +237,40 @@ export default async function AdminDashboard({
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
+          </Card>
+        </>
       )}
 
-      {/* Recent activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Nesenā aktivitāte</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          {recent.length === 0 ? (
-            <div className="p-6">
-              <EmptyState
-                title="Pagaidām nav aktivitātes"
-                description="Kad darbinieki iesniegs neredzamā darba ierakstus, tie parādīsies šeit."
-              />
-            </div>
-          ) : (
-            <div className="divide-y divide-border">
-              {recent.map((e) => (
-                <div key={e.id} className="flex items-center justify-between gap-4 px-6 py-4">
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium truncate">{e.title}</div>
-                    <div className="text-xs text-muted-foreground mt-0.5">
-                      {e.employee.name} · {e.category} · {formatDurationLV(e.durationMinutes)} ·{" "}
-                      {formatDateTimeLV(e.updatedAt)}
-                    </div>
+      {/* ── Recent activity ── */}
+      <SectionDivider label="Nesenie ieraksti" />
+      <Card className="relative overflow-hidden p-0">
+        <div className={glassInner} />
+        <div className="px-6 py-4 border-b border-border dark:border-white/[0.07]">
+          <div className="text-sm font-semibold">Nesenā aktivitāte</div>
+        </div>
+        {recent.length === 0 ? (
+          <div className="p-8">
+            <EmptyState
+              title="Pagaidām nav aktivitātes"
+              description="Kad darbinieki iesniegs neredzamā darba ierakstus, tie parādīsies šeit."
+            />
+          </div>
+        ) : (
+          <div className="divide-y divide-white/[0.04]">
+            {recent.map((e) => (
+              <div key={e.id} className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-medium">{e.title}</div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    {e.employee.name} · {e.category} · {formatDurationLV(e.durationMinutes)} ·{" "}
+                    {formatDateTimeLV(e.updatedAt)}
                   </div>
-                  <StatusBadge status={e.status} />
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
+                <StatusBadge status={e.status} />
+              </div>
+            ))}
+          </div>
+        )}
       </Card>
     </>
   );

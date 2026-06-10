@@ -15,9 +15,9 @@ const buttonVariants = cva(
         success:
           "btn-shimmer text-white",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground dark:border-white/[0.10] dark:bg-white/[0.03] dark:backdrop-blur-md dark:hover:bg-white/[0.07] dark:hover:border-white/[0.16]",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-white/[0.05] dark:hover:bg-white/[0.08] dark:backdrop-blur-md",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
       },
