@@ -13,7 +13,7 @@ const inter = Inter({
 const neueHaas = localFont({
   src: [
     {
-      path: "../../public/fonts/NeueHaasDisplayMediu.ttf",
+      path: "../../public/fonts/NeueHaasDisplayBold.ttf",
       weight: "500",
       style: "normal",
     },
@@ -29,7 +29,7 @@ const neueHaas = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Shadowy — neredzamais darbs",
+  title: "Shadowy - Padariet neredzamo darbu redzamu",
   description:
     "Shadowy palīdz padarīt neredzamo darbu redzamu: strukturēta darba iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība.",
 };

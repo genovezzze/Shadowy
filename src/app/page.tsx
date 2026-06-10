@@ -103,7 +103,7 @@ export default function HomePage() {
               <div data-reveal="up" data-delay="300" className="mt-8">
                 <Link
                   href="/register"
-                  className="btn-hero-glow inline-flex items-center rounded-full px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-transform duration-150 hover:-translate-y-[1px] active:translate-y-[0.5px]"
+                  className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_8px_30px_-8px_rgba(16,185,129,0.6)] transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.25)_inset,0_10px_36px_-6px_rgba(16,185,129,0.75)] hover:-translate-y-[1px] active:translate-y-[0.5px]"
                 >
                   Izmēģināt bezmaksas
                 </Link>
@@ -546,7 +546,7 @@ export default function HomePage() {
               <div data-reveal="up" data-delay="400" className="mt-8">
                 <a
                   href="#pilots"
-                  className="btn-hero-glow inline-flex items-center gap-2.5 rounded-full px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-transform duration-150 hover:-translate-y-[1px] active:translate-y-[0.5px]"
+                  className="inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] transition-transform duration-150 hover:-translate-y-[1px] hover:bg-white/90 active:translate-y-[0.5px]"
                 >
                   Pieteikt pilotu
                 </a>
@@ -865,7 +865,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="btn-hero-glow inline-flex items-center gap-2.5 rounded-full px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-transform duration-150 hover:-translate-y-[1px] active:translate-y-[0.5px]"
+              className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_8px_30px_-8px_rgba(16,185,129,0.6)] transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.25)_inset,0_10px_36px_-6px_rgba(16,185,129,0.75)] hover:-translate-y-[1px] active:translate-y-[0.5px]"
             >
               Izmēģināt bezmaksas
             </Link>
