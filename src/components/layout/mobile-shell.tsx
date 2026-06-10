@@ -79,7 +79,7 @@ export function MobileShell({
 
         {trialDaysLeft != null && <TrialBanner daysLeft={trialDaysLeft} />}
 
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="mx-auto max-w-6xl px-4 py-4 sm:px-8 sm:py-8">{children}</div>
         </main>
       </div>

@@ -2,8 +2,9 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/layout/page-header";
 import { KpiCard } from "@/components/dashboard/kpi-card";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { SectionDivider } from "@/components/dashboard/section-divider";
 import { EmptyState } from "@/components/ui/empty-state";
 import {
   REWARD_LABELS,
@@ -78,80 +79,80 @@ export default async function AdminBonusesPage() {
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Visi noteikumi</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            {allRules.length === 0 ? (
-              <div className="p-6">
-                <EmptyState
-                  title="Nav noteikumu"
-                  description="Vadītāji vēl nav izveidojuši bonusu noteikumus."
-                />
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {allRules.map((rule: any) => (
-                  <div key={rule.id} className="flex items-start justify-between gap-3 px-5 py-3">
-                    <div className="min-w-0">
-                      <div className="text-sm font-medium truncate">{rule.name}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">
-                        {rule.manager.name} · {rule.minimumHours}h /{" "}
-                        {PERIOD_LABELS[rule.periodType as PeriodType]} ·{" "}
-                        {rule._count.bonusRequests} pieprasījumi
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1.5 shrink-0">
-                      <Badge variant="success" className="text-xs">
-                        {REWARD_LABELS[rule.rewardType as RewardType]}
-                      </Badge>
-                      {!rule.isActive && <Badge variant="muted">Neaktīvs</Badge>}
+      <SectionDivider label="Pārskats" />
+
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Card className="relative overflow-hidden p-0">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
+          <div className="px-6 py-4 border-b border-border dark:border-white/[0.07]">
+            <div className="text-sm font-semibold">Visi noteikumi</div>
+          </div>
+          {allRules.length === 0 ? (
+            <div className="p-6">
+              <EmptyState
+                title="Nav noteikumu"
+                description="Vadītāji vēl nav izveidojuši bonusu noteikumus."
+              />
+            </div>
+          ) : (
+            <div className="divide-y divide-white/[0.04]">
+              {allRules.map((rule: any) => (
+                <div key={rule.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium truncate">{rule.name}</div>
+                    <div className="text-xs text-muted-foreground mt-0.5">
+                      {rule.manager.name} · {rule.minimumHours}h /{" "}
+                      {PERIOD_LABELS[rule.periodType as PeriodType]} ·{" "}
+                      {rule._count.bonusRequests} pieprasījumi
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <Badge variant="success" className="text-xs">
+                      {REWARD_LABELS[rule.rewardType as RewardType]}
+                    </Badge>
+                    {!rule.isActive && <Badge variant="muted">Neaktīvs</Badge>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium">Jaunākie pieprasījumi</CardTitle>
-          </CardHeader>
-          <CardContent className="p-0">
-            {recentRequests.length === 0 ? (
-              <div className="p-6">
-                <EmptyState
-                  title="Nav pieprasījumu"
-                  description="Darbinieki vēl nav iesnieguši bonusu pieprasījumus."
-                />
-              </div>
-            ) : (
-              <div className="divide-y divide-border">
-                {recentRequests.map((req: any) => {
-                  const status = req.status as BonusRequestStatus;
-                  return (
-                    <div key={req.id} className="flex items-start justify-between gap-3 px-5 py-3">
-                      <div className="min-w-0">
-                        <div className="text-sm font-medium truncate">
-                          {req.employee.name}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-0.5">
-                          {req.rule.name} · {req.manager.name} ·{" "}
-                          {formatDateLV(req.requestedAt)}
-                        </div>
+        <Card className="relative overflow-hidden p-0">
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
+          <div className="px-6 py-4 border-b border-border dark:border-white/[0.07]">
+            <div className="text-sm font-semibold">Jaunākie pieprasījumi</div>
+          </div>
+          {recentRequests.length === 0 ? (
+            <div className="p-6">
+              <EmptyState
+                title="Nav pieprasījumu"
+                description="Darbinieki vēl nav iesnieguši bonusu pieprasījumus."
+              />
+            </div>
+          ) : (
+            <div className="divide-y divide-white/[0.04]">
+              {recentRequests.map((req: any) => {
+                const status = req.status as BonusRequestStatus;
+                return (
+                  <div key={req.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
+                    <div className="min-w-0">
+                      <div className="text-sm font-medium truncate">
+                        {req.employee.name}
                       </div>
-                      <Badge variant={BONUS_STATUS_TONE[status]} className="shrink-0 text-xs">
-                        {BONUS_STATUS_LABELS[status]}
-                      </Badge>
+                      <div className="text-xs text-muted-foreground mt-0.5">
+                        {req.rule.name} · {req.manager.name} ·{" "}
+                        {formatDateLV(req.requestedAt)}
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </CardContent>
+                    <Badge variant={BONUS_STATUS_TONE[status]} className="shrink-0 text-xs">
+                      {BONUS_STATUS_LABELS[status]}
+                    </Badge>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
       </div>
     </>

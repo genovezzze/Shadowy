@@ -140,7 +140,7 @@ export function PendingEntriesList({ entries }: { entries: PendingEntry[] }) {
       {/* Floating bulk action bar */}
       {selected.size > 0 && (
         <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 pointer-events-none">
-          <div className="rounded-2xl border border-border bg-background/95 backdrop-blur-xl shadow-2xl p-4 pointer-events-auto">
+          <div className="rounded-2xl border border-border bg-background/95 backdrop-blur-md shadow-2xl p-4 pointer-events-auto">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm font-semibold">
                 {selected.size} {selected.size === 1 ? "ieraksts" : "ieraksti"} atlasīti

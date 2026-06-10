@@ -10,6 +10,15 @@ import { Label } from "@/components/ui/label";
 import { updateEmployee, deleteEmployee } from "./actions";
 import { Pencil, Trash2, X, Check } from "lucide-react";
 
+function initials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase())
+    .join("");
+}
+
 interface EmployeeCardProps {
   id: string;
   name: string;
@@ -44,7 +53,8 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
 
   if (mode === "edit") {
     return (
-      <Card>
+      <Card className="relative overflow-hidden p-0">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
         <CardContent className="p-5">
           <form action={handleEdit} className="space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -81,9 +91,13 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
   }
 
   return (
-    <Card>
-      <CardContent className="p-5 flex items-center justify-between gap-4">
-        <div className="min-w-0">
+    <Card className="relative overflow-hidden p-0">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
+      <CardContent className="flex items-center gap-4 p-5">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-semibold text-emerald-400 ring-1 ring-emerald-500/20">
+          {initials(name)}
+        </div>
+        <div className="min-w-0 flex-1">
           <Link
             href={`/manager/employee/${id}`}
             className="text-sm font-semibold hover:underline underline-offset-4"
@@ -96,6 +110,7 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
           <div className="text-xs text-muted-foreground mt-0.5">
             Ieraksti: {entryCount}
           </div>
+          {error && mode === "view" && <div className="text-xs text-destructive mt-1">{error}</div>}
         </div>
         {mode === "delete" ? (
           <div className="flex items-center gap-2 shrink-0">
@@ -112,12 +127,11 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
             <Button size="icon" variant="ghost" onClick={() => setMode("edit")} title="Rediģēt">
               <Pencil className="h-4 w-4" />
             </Button>
-            <Button size="icon" variant="ghost" onClick={() => setMode("delete")} title="Dzēst" className="text-destructive hover:text-destructive">
+            <Button size="icon" variant="ghost" onClick={() => setMode("delete")} title="Dzēst" className="text-destructive hover:text-destructive dark:hover:bg-red-500/10">
               <Trash2 className="h-4 w-4" />
             </Button>
           </div>
         )}
-        {error && mode === "view" && <div className="text-xs text-destructive">{error}</div>}
       </CardContent>
     </Card>
   );

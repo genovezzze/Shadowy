@@ -334,8 +334,6 @@
 @layer components {
   .dark .btn-shimmer {
     background: linear-gradient(160deg, hsl(160 70% 45% / 0.16) 0%, hsl(158 60% 35% / 0.10) 100%);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     box-shadow:
       0 0 0 1px hsl(160 70% 45% / 0.28),
       0 4px 20px hsl(160 84% 39% / 0.18),

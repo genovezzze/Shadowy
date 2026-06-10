@@ -84,7 +84,7 @@ export function Sidebar({ role, userName, organizationName, pendingCount, onClos
   const items = navFor(role);
 
   return (
-    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-white/[0.07] bg-white/[0.03] backdrop-blur-2xl"
+    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-white/[0.07] bg-white/[0.03] backdrop-blur-md"
       style={{ boxShadow: "inset -1px 0 0 rgba(255,255,255,0.04), 1px 0 40px rgba(0,0,0,0.35)" }}
     >
       {/* Emerald glow blob — top center */}
@@ -133,17 +133,15 @@ export function Sidebar({ role, userName, organizationName, pendingCount, onClos
               href={item.href}
               onClick={onClose}
               className={cn(
-                "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-all duration-150",
+                "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors duration-150",
                 active
-                  ? "bg-white/[0.09] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.09),inset_0_-1px_0_rgba(0,0,0,0.12)]"
+                  ? "bg-white/[0.09] text-foreground"
                   : "text-muted-foreground hover:bg-white/[0.05] hover:text-foreground"
               )}
             >
               {/* Active left accent bar */}
               {active && (
-                <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-emerald-400/90"
-                  style={{ boxShadow: "0 0 8px hsl(160 84% 50% / 0.6)" }}
-                />
+                <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-emerald-400/90" />
               )}
               <Icon
                 className={cn(
