@@ -45,7 +45,7 @@ export default function HomePage() {
           style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.07) inset, 0 1px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)" }}
         >
           <a href="#" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Shadowy" width={28} height={28} className="rounded-lg" />
+            <img src="/logo.png" alt="Shadowy" width={28} height={28} />
             <span className="text-sm font-semibold tracking-tight text-white">Shadowy</span>
           </a>
           <nav className="hidden items-center gap-0.5 md:flex">

@@ -6,7 +6,7 @@ export default function NotFound() {
     <div className="min-h-screen bg-background flex flex-col items-center justify-center px-6">
       <div className="max-w-md w-full text-center space-y-6">
         <div className="flex justify-center">
-          <img src="/logo.png" alt="Shadowy" width={56} height={56} className="rounded-xl" />
+          <img src="/logo.png" alt="Shadowy" width={56} height={56} />
         </div>
 
         <div>

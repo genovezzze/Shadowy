@@ -34,7 +34,7 @@ export default async function SuperAdminPilotLeadsPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border px-8 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="Shadowy" width={32} height={32} className="rounded-lg" />
+          <img src="/logo.png" alt="Shadowy" width={32} height={32} />
           <span className="font-semibold">Shadowy</span>
           <span className="text-xs bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 px-2 py-0.5 rounded-full font-medium">
             Super Admin

@@ -73,7 +73,7 @@ export function MobileShell({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <img src="/logo.png" alt="Shadowy" width={28} height={28} className="rounded-lg" />
+          <img src="/logo.png" alt="Shadowy" width={22} height={22} className="shrink-0" />
           <span className="text-sm font-semibold">Shadowy</span>
         </div>
 
