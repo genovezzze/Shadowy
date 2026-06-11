@@ -40,12 +40,19 @@ export default function HomePage() {
       {/* ── Header ───────────────────────────────────────────────────── */}
       <header className="sticky top-0 z-50 px-4 pt-3 pb-0 bg-transparent">
         <div
-          className="mx-auto flex max-w-6xl items-center justify-between rounded-2xl border border-white/[0.09] bg-white/[0.02] px-4 py-2.5 backdrop-blur-2xl"
-          style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.07) inset, 0 1px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)" }}
+          className="relative mx-auto flex max-w-6xl items-center justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.015] px-4 py-2.5 backdrop-blur-2xl"
+          style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.06) inset, 0 1px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)" }}
         >
-          <a href="#" className="flex items-center gap-2.5">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: "radial-gradient(120% 100% at 50% -40%, hsl(265 70% 55% / 0.18) 0%, transparent 60%)",
+            }}
+          />
+          <a href="#" className="relative flex items-center gap-2.5">
             <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
-            <span className="text-sm font-semibold tracking-tight text-white">Shadowy</span>
+            <span className="text-base font-semibold tracking-tight text-white">Shadowy</span>
           </a>
           <nav className="hidden items-center gap-0.5 md:flex">
             <a href="#ka-tas-darbojas" className="rounded-lg px-3 py-1.5 text-[13px] text-white/45 transition-colors hover:text-white/80">Kā tas darbojas</a>
@@ -106,7 +113,7 @@ export default function HomePage() {
               <div data-reveal="up" data-delay="300" className="mt-8">
                 <Link
                   href="/register"
-                  className="glass inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
+                  className="glass inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-6 py-3 font-display font-black text-base tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
                 >
                   Izmēģināt bezmaksas
                 </Link>
@@ -917,7 +924,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="glass inline-flex items-center gap-2.5 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
+              className="glass inline-flex items-center gap-2.5 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-6 py-3 font-display font-black text-base tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
             >
               Izmēģināt bezmaksas
             </Link>
