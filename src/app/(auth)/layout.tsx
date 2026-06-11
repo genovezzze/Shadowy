@@ -11,7 +11,7 @@ export default function AuthLayout({
       <header className="border-b border-border">
         <div className="mx-auto max-w-6xl px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <img src="/logo.png" alt="Shadowy" width={40} height={40} />
+            <img src="/shadowy.svg" alt="Shadowy" width={40} height={40} />
             <span className="font-semibold">Shadowy</span>
           </Link>
           <div className="flex items-center gap-2">

@@ -13,7 +13,6 @@ import {
   Settings,
   Zap,
   ShieldCheck,
-  Sparkles,
   Mail,
   Phone,
   MessageSquare,
@@ -45,7 +44,7 @@ export default function HomePage() {
           style={{ boxShadow: "0 1px 0 rgba(255,255,255,0.07) inset, 0 1px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)" }}
         >
           <a href="#" className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Shadowy" width={28} height={28} />
+            <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
             <span className="text-sm font-semibold tracking-tight text-white">Shadowy</span>
           </a>
           <nav className="hidden items-center gap-0.5 md:flex">
@@ -59,7 +58,7 @@ export default function HomePage() {
             </Button>
             <Link
               href="#pilots"
-              className="inline-flex items-center rounded-full bg-white px-4 py-1.5 text-[13px] font-semibold text-[#060d1c] transition-all duration-150 hover:bg-white/90 active:scale-[0.97]"
+              className="glass inline-flex items-center rounded-full border border-white/[0.14] bg-white/[0.06] px-4 py-1.5 text-[13px] font-semibold text-white transition-all duration-150 hover:bg-white/[0.1] hover:border-white/[0.22] active:scale-[0.97]"
             >
               Pieteikt pilotu
             </Link>
@@ -77,12 +76,16 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-6 pb-24 pt-8 lg:pb-32 lg:pt-12">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div className="max-w-lg">
-              <div data-reveal="scale" className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-medium text-emerald-400">
+              <div data-reveal="scale" className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-medium text-emerald-400">
                 <span className="relative flex h-1.5 w-1.5 shrink-0">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
                   <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 </span>
-                30 dienu bezmaksas pilots komandām
+                <span className="relative z-10">30 dienu bezmaksas pilots komandām</span>
+                <span
+                  aria-hidden
+                  className="animate-badge-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-emerald-200/30 to-transparent"
+                />
               </div>
 
               <h1 data-reveal="left" data-delay="80" className="mt-5 font-display font-black text-5xl leading-[1.08] tracking-tight text-white sm:text-6xl">
@@ -103,7 +106,7 @@ export default function HomePage() {
               <div data-reveal="up" data-delay="300" className="mt-8">
                 <Link
                   href="/register"
-                  className="inline-flex items-center rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_8px_30px_-8px_rgba(16,185,129,0.6)] transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.25)_inset,0_10px_36px_-6px_rgba(16,185,129,0.75)] hover:-translate-y-[1px] active:translate-y-[0.5px]"
+                  className="glass inline-flex items-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
                 >
                   Izmēģināt bezmaksas
                 </Link>
@@ -546,7 +549,7 @@ export default function HomePage() {
               <div data-reveal="up" data-delay="400" className="mt-8">
                 <a
                   href="#pilots"
-                  className="inline-flex items-center gap-2.5 rounded-full bg-white px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] transition-transform duration-150 hover:-translate-y-[1px] hover:bg-white/90 active:translate-y-[0.5px]"
+                  className="glass inline-flex items-center gap-2.5 rounded-full border border-white/[0.14] bg-white/[0.06] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-white/[0.1] hover:border-white/[0.22] hover:-translate-y-[1px] active:translate-y-[0.5px]"
                 >
                   Pieteikt pilotu
                 </a>
@@ -852,10 +855,59 @@ export default function HomePage() {
           <div className="absolute bottom-[-30%] left-1/2 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-[hsl(160_60%_20%_/_0.12)] blur-[100px]" />
         </div>
         <div className="relative mx-auto max-w-2xl px-6 py-24 text-center">
-          <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-full border border-emerald-500/25 bg-emerald-500/10">
-            <Sparkles className="h-5 w-5 text-emerald-400" />
+          <div className="relative mx-auto h-56 w-56 sm:h-72 sm:w-72">
+            <div
+              aria-hidden
+              className="animate-cta-glow-1 absolute -top-10 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-violet-500/30 blur-[60px]"
+            />
+            <div
+              aria-hidden
+              className="animate-cta-glow-2 absolute -bottom-10 -right-6 h-36 w-36 rounded-full bg-emerald-400/25 blur-[60px]"
+            />
+            <div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                maskImage: "linear-gradient(to bottom, black 0%, black 35%, transparent 75%)",
+                WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 35%, transparent 75%)",
+              }}
+            >
+              <div
+                aria-hidden
+                className="animate-cta-logo-spin absolute inset-0 opacity-90"
+                style={{
+                  maskImage: "url(/shadowy.svg)",
+                  WebkitMaskImage: "url(/shadowy.svg)",
+                  maskSize: "contain",
+                  WebkitMaskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  WebkitMaskPosition: "center",
+                  backgroundSize: "220% 220%",
+                  background:
+                    "linear-gradient(135deg, hsl(265 75% 68% / 0.85) 0%, hsl(225 80% 60% / 0.55) 45%, hsl(170 80% 50% / 0.55) 75%, hsl(160 84% 45% / 0.65) 100%)",
+                }}
+              />
+              <div
+                aria-hidden
+                className="absolute inset-0 opacity-60 mix-blend-overlay"
+                style={{
+                  maskImage: "url(/shadowy.svg)",
+                  WebkitMaskImage: "url(/shadowy.svg)",
+                  maskSize: "contain",
+                  WebkitMaskSize: "contain",
+                  maskRepeat: "no-repeat",
+                  WebkitMaskRepeat: "no-repeat",
+                  maskPosition: "center",
+                  WebkitMaskPosition: "center",
+                  background:
+                    "radial-gradient(circle at 30% 20%, rgba(255,255,255,0.9), transparent 55%)",
+                }}
+              />
+            </div>
           </div>
-          <h2 className="font-display font-black text-3xl tracking-wide text-white sm:text-4xl">
+          <h2 className="relative z-10 -mt-14 font-display font-black text-3xl tracking-wide text-white sm:text-4xl">
             Gatavi pārbaudīt Shadowy<br />savā komandā?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/50">
@@ -865,7 +917,7 @@ export default function HomePage() {
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2.5 rounded-full bg-gradient-to-r from-emerald-400 to-teal-300 px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-[#040b14] shadow-[0_0_0_1px_rgba(255,255,255,0.15)_inset,0_8px_30px_-8px_rgba(16,185,129,0.6)] transition-all duration-150 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.25)_inset,0_10px_36px_-6px_rgba(16,185,129,0.75)] hover:-translate-y-[1px] active:translate-y-[0.5px]"
+              className="glass inline-flex items-center gap-2.5 rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px]"
             >
               Izmēģināt bezmaksas
             </Link>

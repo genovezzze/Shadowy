@@ -229,39 +229,6 @@
   transition: opacity 0.3s ease;
 }
 
-@keyframes btn-border-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 0 1.5px hsl(162 65% 36% / 0.50),
-      0 0 16px hsl(162 60% 26% / 0.30),
-      0 0 40px hsl(162 55% 20% / 0.12),
-      inset 0 1px 0 hsl(162 70% 48% / 0.10);
-  }
-  50% {
-    box-shadow:
-      0 0 0 1.5px hsl(162 65% 44% / 0.80),
-      0 0 28px hsl(162 60% 32% / 0.55),
-      0 0 65px hsl(162 55% 26% / 0.22),
-      inset 0 1px 0 hsl(162 70% 55% / 0.18);
-  }
-}
-
-.btn-hero-glow {
-  background: rgba(4, 11, 20, 0.55);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  animation: btn-border-pulse 2.5s ease-in-out infinite;
-}
-
-.btn-hero-glow:hover {
-  animation-play-state: paused;
-  box-shadow:
-    0 0 0 1.5px hsl(162 65% 44% / 0.85),
-    0 0 30px hsl(162 60% 32% / 0.60),
-    0 0 70px hsl(162 55% 26% / 0.25),
-    inset 0 1px 0 hsl(162 70% 55% / 0.18) !important;
-}
-
 /* Step circle sequential glow */
 @keyframes circle-glow-in {
   0%, 8%, 38%, 100% {
@@ -360,4 +327,68 @@
       inset 0 1px 0 hsl(160 70% 70% / 0.12);
     transform: translateY(0.5px);
   }
+}
+
+@keyframes badge-sheen {
+  0%, 25% {
+    transform: translateX(-100%);
+  }
+  75%, 100% {
+    transform: translateX(400%);
+  }
+}
+
+.animate-badge-sheen {
+  animation: badge-sheen 3.5s ease-in-out infinite;
+}
+
+@keyframes cta-glow-1 {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate(-50%, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(-50%, 10px) scale(1.15);
+  }
+}
+
+.animate-cta-glow-1 {
+  animation: cta-glow-1 5s ease-in-out infinite;
+}
+
+@keyframes cta-glow-2 {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translate(-8px, -10px) scale(1.2);
+  }
+}
+
+.animate-cta-glow-2 {
+  animation: cta-glow-2 6.5s ease-in-out infinite;
+}
+
+@keyframes cta-logo-spin {
+  0%   { background-position: 50% 50%; }
+  25%  { background-position: 80% 30%; }
+  50%  { background-position: 50% 80%; }
+  75%  { background-position: 20% 30%; }
+  100% { background-position: 50% 50%; }
+}
+
+.animate-cta-logo-spin {
+  animation: cta-logo-spin 14s ease-in-out infinite;
+}
+
+@keyframes cta-logo-rotate {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+.animate-cta-logo-rotate {
+  animation: cta-logo-rotate 120s linear infinite;
 }

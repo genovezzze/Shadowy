@@ -116,7 +116,7 @@ export function Sidebar({ role, userName, organizationName, pendingCount, onClos
         href="/"
         className="relative z-10 flex items-center gap-2.5 border-b border-white/[0.07] px-5 py-5 transition-opacity hover:opacity-75"
       >
-        <img src="/logo.png" alt="Shadowy" width={30} height={30} className="shrink-0" />
+        <img src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0" />
         <div className="text-lg font-semibold leading-none tracking-tight">Shadowy</div>
       </Link>
 
