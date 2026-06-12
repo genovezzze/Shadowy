@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { sendEntrySubmittedEmail } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
 
 const schema = z.object({
   title: z.string().min(3, "Nosaukums ir pārāk īss.").max(120),
@@ -57,6 +58,14 @@ export async function createEntry(formData: FormData) {
   });
 
   if (employee?.managerId) {
+    await createNotification({
+      organizationId: session.organizationId,
+      userId: employee.managerId,
+      title: "Jauns darba ieraksts",
+      body: `${employee.name} iesniedza: ${entryTitle}`,
+      link: "/manager/entries",
+    });
+
     try {
       const manager = await prisma.user.findUnique({
         where: { id: employee.managerId },

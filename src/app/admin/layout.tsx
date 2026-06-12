@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { AppShell } from "@/components/layout/app-shell";
 import { isTrialExpired, getTrialDaysLeft } from "@/lib/trial";
 import { isSuperAdmin } from "@/lib/superadmin";
+import { getUnreadNotificationCount } from "@/lib/notifications";
 
 export default async function AdminLayout({
   children,
@@ -14,9 +15,10 @@ export default async function AdminLayout({
 
   if (isSuperAdmin(session.email)) redirect("/superadmin");
 
-  const org = await prisma.organization.findUnique({
-    where: { id: session.organizationId },
-  });
+  const [org, unreadNotificationCount] = await Promise.all([
+    prisma.organization.findUnique({ where: { id: session.organizationId } }),
+    getUnreadNotificationCount(session.userId),
+  ]);
 
   if (isTrialExpired(org?.trialEndsAt)) redirect("/trial-expired");
 
@@ -26,6 +28,7 @@ export default async function AdminLayout({
       userName={session.name}
       organizationName={org?.name ?? "Organizācija"}
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}
+      unreadNotificationCount={unreadNotificationCount}
     >
       {children}
     </AppShell>

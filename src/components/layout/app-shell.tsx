@@ -8,6 +8,7 @@ interface AppShellProps {
   organizationName: string;
   trialDaysLeft?: number | null;
   pendingCount?: number;
+  unreadNotificationCount?: number;
   children: ReactNode;
 }
 

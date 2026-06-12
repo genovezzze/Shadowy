@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { TrialBanner } from "./trial-banner";
+import { NotificationBell } from "./notification-bell";
 import type { Role } from "@prisma/client";
 
 interface MobileShellProps {
@@ -12,6 +13,7 @@ interface MobileShellProps {
   organizationName: string;
   trialDaysLeft?: number | null;
   pendingCount?: number;
+  unreadNotificationCount?: number;
   children: React.ReactNode;
 }
 
@@ -21,6 +23,7 @@ export function MobileShell({
   organizationName,
   trialDaysLeft,
   pendingCount,
+  unreadNotificationCount,
   children,
 }: MobileShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,7 +77,13 @@ export function MobileShell({
             <Menu className="h-5 w-5" />
           </button>
           <img src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0 invert dark:invert-0" />
-          <span className="text-sm font-semibold">Shadowy</span>
+          <span className="flex-1 text-sm font-semibold">Shadowy</span>
+          <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
+        </div>
+
+        {/* Desktop top bar */}
+        <div className="hidden items-center justify-end border-b border-border bg-background px-6 py-2.5 md:flex">
+          <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
         </div>
 
         {trialDaysLeft != null && <TrialBanner daysLeft={trialDaysLeft} />}

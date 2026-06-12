@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { sendBonusRequestEmail } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
 
 const requestSchema = z.object({
   ruleId: z.string().min(1),
@@ -68,6 +69,14 @@ export async function submitBonusRequest(formData: FormData) {
       hoursAccumulated: parsed.data.hoursAccumulated,
       employeeComment: parsed.data.employeeComment?.trim(),
     },
+  });
+
+  await createNotification({
+    organizationId: session.organizationId,
+    userId: rule.managerId,
+    title: "Jauns bonusa pieprasījums",
+    body: `${employee.name} pieprasa: ${rule.name}`,
+    link: "/manager/bonus-requests",
   });
 
   try {

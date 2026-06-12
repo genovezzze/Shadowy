@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { sendEntryReviewedEmail } from "@/lib/email";
+import { createNotification } from "@/lib/notifications";
+import { statusLabel } from "@/lib/i18n";
 
 const schema = z.object({
   entryId: z.string().min(1),
@@ -30,7 +32,7 @@ export async function reviewEntry(input: {
       organizationId: session.organizationId,
       managerId: session.userId,
     },
-    include: { employee: { select: { name: true, email: true } } },
+    include: { employee: { select: { id: true, name: true, email: true } } },
   });
   if (!entry) {
     return { ok: false as const, error: "Ieraksts nav atrasts." };
@@ -57,6 +59,16 @@ export async function reviewEntry(input: {
       managerComment: action === "APPROVE" ? null : comment.trim(),
     },
   });
+
+  if (entry.employee) {
+    await createNotification({
+      organizationId: session.organizationId,
+      userId: entry.employee.id,
+      title: `Ieraksts ${statusLabel[status as keyof typeof statusLabel].toLowerCase()}`,
+      body: entry.title,
+      link: "/employee/history",
+    });
+  }
 
   try {
     if (entry.employee?.email) {
@@ -109,7 +121,7 @@ export async function bulkReviewEntries(input: {
       managerId: session.userId,
       status: "PENDING",
     },
-    include: { employee: { select: { name: true, email: true } } },
+    include: { employee: { select: { id: true, name: true, email: true } } },
   });
 
   await prisma.invisibleWorkEntry.updateMany({
@@ -124,6 +136,20 @@ export async function bulkReviewEntries(input: {
       managerComment: action === "APPROVE" ? null : comment.trim(),
     },
   });
+
+  await Promise.all(
+    entries
+      .filter((e) => e.employee)
+      .map((e) =>
+        createNotification({
+          organizationId: session.organizationId,
+          userId: e.employee!.id,
+          title: `Ieraksts ${statusLabel[status as keyof typeof statusLabel].toLowerCase()}`,
+          body: e.title,
+          link: "/employee/history",
+        })
+      )
+  );
 
   try {
     await Promise.all(
