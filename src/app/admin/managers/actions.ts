@@ -78,7 +78,7 @@ export async function updateManager(managerId: string, formData: FormData) {
 
   const email = parsed.data.email.toLowerCase().trim();
   const conflict = await prisma.user.findFirst({
-    where: { email, NOT: { id: managerId } },
+    where: { email, organizationId: session.organizationId, NOT: { id: managerId } },
   });
   if (conflict) return { ok: false as const, error: "Šāds e-pasts jau tiek izmantots." };
 

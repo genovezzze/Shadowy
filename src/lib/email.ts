@@ -34,6 +34,16 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   }
 }
 
+/** Escape user-controlled text before interpolating it into an HTML email. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 export function generatePassword(length = 12): string {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
   return Array.from(
@@ -53,10 +63,10 @@ export async function sendWelcomeEmail(
   const subject = "Shadowy — jūsu pieslēgšanās dati";
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
-      <h2 style="margin-bottom:4px">Sveiks, ${name}!</h2>
+      <h2 style="margin-bottom:4px">Sveiks, ${escapeHtml(name)}!</h2>
       <p style="color:#555;margin-top:0">Jūs esat pievienots Shadowy kā <strong>${roleLabel}</strong>.</p>
       <table style="background:#f5f5f5;border-radius:8px;padding:16px 20px;margin:20px 0;width:100%;border-collapse:collapse">
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">E-pasts</td><td style="font-weight:600;padding:4px 0">${to}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">E-pasts</td><td style="font-weight:600;padding:4px 0">${escapeHtml(to)}</td></tr>
         <tr><td style="color:#888;font-size:13px;padding:4px 0">Parole</td><td style="font-weight:600;padding:4px 0;font-family:monospace">${password}</td></tr>
       </table>
       <p>
@@ -84,15 +94,19 @@ export async function sendPilotInquiry(data: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <h2 style="margin-bottom:16px">Jauns pilota pieteikums</h2>
       <table style="border-collapse:collapse;width:100%">
-        <tr><td style="color:#888;font-size:13px;padding:6px 0;width:140px">Vārds</td><td style="font-weight:600">${data.name}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:6px 0">Uzņēmums</td><td style="font-weight:600">${data.company}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:6px 0">E-pasts</td><td><a href="mailto:${data.email}">${data.email}</a></td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:6px 0">Komandas lielums</td><td>${data.teamSize}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:6px 0;vertical-align:top">Komentārs</td><td style="white-space:pre-wrap">${data.comment || "—"}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0;width:140px">Vārds</td><td style="font-weight:600">${escapeHtml(data.name)}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0">Uzņēmums</td><td style="font-weight:600">${escapeHtml(data.company)}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0">E-pasts</td><td><a href="mailto:${encodeURIComponent(data.email)}">${escapeHtml(data.email)}</a></td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0">Komandas lielums</td><td>${escapeHtml(data.teamSize)}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0;vertical-align:top">Komentārs</td><td style="white-space:pre-wrap">${data.comment ? escapeHtml(data.comment) : "—"}</td></tr>
       </table>
     </div>
   `;
-  const adminEmail = process.env.SUPERADMIN_EMAIL ?? "artemijlucin@gmail.com";
+  const adminEmail = process.env.SUPERADMIN_EMAIL;
+  if (!adminEmail) {
+    console.log("[email] SUPERADMIN_EMAIL not set, skipping pilot inquiry notification");
+    return;
+  }
   await sendEmail(adminEmail, subject, html);
 }
 
@@ -107,10 +121,10 @@ export async function sendEntrySubmittedEmail(opts: {
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Jauns ieraksts gaida izskatīšanu</h2>
-      <p style="color:#555;margin-top:0">Sveiks, ${opts.managerName}!</p>
+      <p style="color:#555;margin-top:0">Sveiks, ${escapeHtml(opts.managerName)}!</p>
       <table style="background:#f5f5f5;border-radius:8px;padding:16px 20px;margin:20px 0;width:100%;border-collapse:collapse">
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">Darbinieks</td><td style="font-weight:600;padding:4px 0">${opts.employeeName}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">Ieraksts</td><td style="font-weight:600;padding:4px 0">${opts.entryTitle}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">Darbinieks</td><td style="font-weight:600;padding:4px 0">${escapeHtml(opts.employeeName)}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">Ieraksts</td><td style="font-weight:600;padding:4px 0">${escapeHtml(opts.entryTitle)}</td></tr>
       </table>
       <p>
         <a href="${appUrl}/manager/entries" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
@@ -140,11 +154,11 @@ export async function sendEntryReviewedEmail(opts: {
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Ieraksts izskatīts</h2>
-      <p style="color:#555;margin-top:0">Sveiks, ${opts.employeeName}!</p>
+      <p style="color:#555;margin-top:0">Sveiks, ${escapeHtml(opts.employeeName)}!</p>
       <table style="background:#f5f5f5;border-radius:8px;padding:16px 20px;margin:20px 0;width:100%;border-collapse:collapse">
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">Ieraksts</td><td style="font-weight:600;padding:4px 0">${opts.entryTitle}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">Ieraksts</td><td style="font-weight:600;padding:4px 0">${escapeHtml(opts.entryTitle)}</td></tr>
         <tr><td style="color:#888;font-size:13px;padding:4px 0">Statuss</td><td style="font-weight:600;padding:4px 0;color:${statusColor}">${statusLabel.charAt(0).toUpperCase() + statusLabel.slice(1)}</td></tr>
-        ${opts.comment ? `<tr><td style="color:#888;font-size:13px;padding:4px 0;vertical-align:top">Komentārs</td><td style="padding:4px 0;white-space:pre-wrap">${opts.comment}</td></tr>` : ""}
+        ${opts.comment ? `<tr><td style="color:#888;font-size:13px;padding:4px 0;vertical-align:top">Komentārs</td><td style="padding:4px 0;white-space:pre-wrap">${escapeHtml(opts.comment)}</td></tr>` : ""}
       </table>
       <p>
         <a href="${appUrl}/employee/history" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
@@ -167,10 +181,10 @@ export async function sendBonusRequestEmail(opts: {
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Jauns bonusa pieprasījums</h2>
-      <p style="color:#555;margin-top:0">Sveiks, ${opts.managerName}!</p>
+      <p style="color:#555;margin-top:0">Sveiks, ${escapeHtml(opts.managerName)}!</p>
       <table style="background:#f5f5f5;border-radius:8px;padding:16px 20px;margin:20px 0;width:100%;border-collapse:collapse">
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">Darbinieks</td><td style="font-weight:600;padding:4px 0">${opts.employeeName}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:4px 0">Noteikums</td><td style="font-weight:600;padding:4px 0">${opts.ruleName}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">Darbinieks</td><td style="font-weight:600;padding:4px 0">${escapeHtml(opts.employeeName)}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:4px 0">Noteikums</td><td style="font-weight:600;padding:4px 0">${escapeHtml(opts.ruleName)}</td></tr>
       </table>
       <p>
         <a href="${appUrl}/manager/bonus-requests" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
@@ -197,7 +211,7 @@ export async function sendWeeklyManagerReport(opts: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <div style="margin-bottom:24px">
         <h2 style="margin:0 0 4px">Iknedēļas pārskats</h2>
-        <p style="color:#888;margin:0;font-size:14px">${opts.orgName} · Sveiks, ${opts.managerName}!</p>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · Sveiks, ${escapeHtml(opts.managerName)}!</p>
       </div>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:24px">

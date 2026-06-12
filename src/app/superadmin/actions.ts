@@ -3,13 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/session";
-
-const SUPERADMIN_EMAIL =
-  process.env.SUPERADMIN_EMAIL ?? "artemijlucin@gmail.com";
+import { isSuperAdmin } from "@/lib/superadmin";
 
 async function requireSuperAdmin() {
   const session = await getSession();
-  if (!session || session.email !== SUPERADMIN_EMAIL) {
+  if (!session || !isSuperAdmin(session.email)) {
     throw new Error("Unauthorized");
   }
   return session;

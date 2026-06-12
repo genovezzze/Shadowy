@@ -51,3 +51,33 @@ export async function clearLoginAttempts(ip: string, email: string): Promise<voi
 
 export const RATE_LIMIT_MESSAGE =
   "Pārāk daudz neveiksmīgu mēģinājumu. Lūdzu, mēģiniet vēlreiz pēc 15 minūtēm.";
+
+/**
+ * Generic IP-based rate limit for public, unauthenticated actions
+ * (registration, password reset requests, pilot lead form).
+ * Returns true if the caller has exceeded `max` hits for `key` within `windowMinutes`.
+ */
+export async function isActionRateLimited(
+  key: string,
+  ip: string,
+  max: number,
+  windowMinutes: number
+): Promise<boolean> {
+  const windowStart = new Date(Date.now() - windowMinutes * 60_000);
+  const count = await prisma.rateLimitHit.count({
+    where: { key, ip, createdAt: { gte: windowStart } },
+  });
+  return count >= max;
+}
+
+/** Record a hit and opportunistically prune stale rows for this key/ip. */
+export async function recordActionHit(key: string, ip: string, windowMinutes: number): Promise<void> {
+  const staleBefore = new Date(Date.now() - windowMinutes * 60_000);
+  await prisma.$transaction([
+    prisma.rateLimitHit.create({ data: { key, ip } }),
+    prisma.rateLimitHit.deleteMany({ where: { key, ip, createdAt: { lt: staleBefore } } }),
+  ]);
+}
+
+export const ACTION_RATE_LIMIT_MESSAGE =
+  "Pārāk daudz pieprasījumu. Lūdzu, mēģiniet vēlreiz vēlāk.";

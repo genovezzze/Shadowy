@@ -168,6 +168,17 @@ model LoginAttempt {
   @@index([ip, email, createdAt])
 }
 
+// Generic IP-based rate limiting for public, unauthenticated actions
+// (registration, password reset requests, pilot lead form).
+model RateLimitHit {
+  id        String   @id @default(cuid())
+  key       String
+  ip        String
+  createdAt DateTime @default(now())
+
+  @@index([key, ip, createdAt])
+}
+
 // Single-use, time-limited password reset tokens. Only a SHA-256 hash of the
 // token is stored; the raw token lives only in the emailed reset link.
 model PasswordResetToken {

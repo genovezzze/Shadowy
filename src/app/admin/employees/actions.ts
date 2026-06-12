@@ -90,7 +90,9 @@ export async function updateEmployee(employeeId: string, formData: FormData) {
   if (!employee) return { ok: false as const, error: "Darbinieks nav atrasts." };
 
   const email = parsed.data.email.toLowerCase().trim();
-  const conflict = await prisma.user.findFirst({ where: { email, NOT: { id: employeeId } } });
+  const conflict = await prisma.user.findFirst({
+    where: { email, organizationId: session.organizationId, NOT: { id: employeeId } },
+  });
   if (conflict) return { ok: false as const, error: "Šāds e-pasts jau tiek izmantots." };
 
   if (parsed.data.managerId) {

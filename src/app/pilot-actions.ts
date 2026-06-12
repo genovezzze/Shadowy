@@ -3,6 +3,11 @@
 import { z } from "zod";
 import { sendPilotInquiry } from "@/lib/email";
 import { prisma } from "@/lib/db";
+import { getClientIp, isActionRateLimited, recordActionHit, ACTION_RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
+
+const RATE_LIMIT_KEY = "pilot-lead";
+const RATE_LIMIT_WINDOW_MINUTES = 60;
+const RATE_LIMIT_MAX = 3;
 
 const schema = z.object({
   name: z.string().min(2, "Lūdzu, ievadiet vārdu.").max(100),
@@ -13,6 +18,12 @@ const schema = z.object({
 });
 
 export async function submitPilotApplication(formData: FormData) {
+  const ip = getClientIp();
+  if (await isActionRateLimited(RATE_LIMIT_KEY, ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
+    return { ok: false as const, error: ACTION_RATE_LIMIT_MESSAGE };
+  }
+  await recordActionHit(RATE_LIMIT_KEY, ip, RATE_LIMIT_WINDOW_MINUTES);
+
   const parsed = schema.safeParse({
     name: formData.get("name"),
     company: formData.get("company"),

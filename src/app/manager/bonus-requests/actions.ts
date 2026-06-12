@@ -13,8 +13,10 @@ function revalidate() {
 export async function approveRequest(id: string) {
   const session = await requireUser(["MANAGER"]);
 
-  const req = await prisma.bonusRequest.findUnique({ where: { id } });
-  if (!req || req.managerId !== session.userId) return;
+  const req = await prisma.bonusRequest.findFirst({
+    where: { id, managerId: session.userId, status: { in: ["PENDING", "RETURNED"] } },
+  });
+  if (!req) return;
 
   await prisma.bonusRequest.update({
     where: { id },
@@ -27,8 +29,10 @@ export async function approveRequest(id: string) {
 export async function rejectRequest(id: string) {
   const session = await requireUser(["MANAGER"]);
 
-  const req = await prisma.bonusRequest.findUnique({ where: { id } });
-  if (!req || req.managerId !== session.userId) return;
+  const req = await prisma.bonusRequest.findFirst({
+    where: { id, managerId: session.userId, status: { in: ["PENDING", "RETURNED"] } },
+  });
+  if (!req) return;
 
   await prisma.bonusRequest.update({
     where: { id },
@@ -45,8 +49,10 @@ export async function returnRequest(id: string, comment: string) {
     return { ok: false as const, error: "Komentārs ir obligāts, nosūtot atpakaļ." };
   }
 
-  const req = await prisma.bonusRequest.findUnique({ where: { id } });
-  if (!req || req.managerId !== session.userId) return;
+  const req = await prisma.bonusRequest.findFirst({
+    where: { id, managerId: session.userId, status: "PENDING" },
+  });
+  if (!req) return;
 
   await prisma.bonusRequest.update({
     where: { id },

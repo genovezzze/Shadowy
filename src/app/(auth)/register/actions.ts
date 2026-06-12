@@ -6,6 +6,11 @@ import { hashPassword, roleHome } from "@/lib/auth";
 import { createSession } from "@/lib/session";
 import { slugify } from "@/lib/utils";
 import { trialEndsAtDate } from "@/lib/trial";
+import { getClientIp, isActionRateLimited, recordActionHit, ACTION_RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
+
+const RATE_LIMIT_KEY = "register";
+const RATE_LIMIT_WINDOW_MINUTES = 15;
+const RATE_LIMIT_MAX = 5;
 
 const schema = z.object({
   organizationName: z
@@ -33,6 +38,12 @@ const DEFAULT_CATEGORIES = [
 ];
 
 export async function registerAction(formData: FormData) {
+  const ip = getClientIp();
+  if (await isActionRateLimited(RATE_LIMIT_KEY, ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
+    return { ok: false as const, error: ACTION_RATE_LIMIT_MESSAGE };
+  }
+  await recordActionHit(RATE_LIMIT_KEY, ip, RATE_LIMIT_WINDOW_MINUTES);
+
   const parsed = schema.safeParse({
     organizationName: formData.get("organizationName"),
     name: formData.get("name"),

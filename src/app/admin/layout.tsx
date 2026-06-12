@@ -3,8 +3,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { AppShell } from "@/components/layout/app-shell";
 import { isTrialExpired, getTrialDaysLeft } from "@/lib/trial";
-
-const SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL ?? "artemijlucin@gmail.com";
+import { isSuperAdmin } from "@/lib/superadmin";
 
 export default async function AdminLayout({
   children,
@@ -13,7 +12,7 @@ export default async function AdminLayout({
 }) {
   const session = await requireUser(["ADMIN"]);
 
-  if (session.email === SUPERADMIN_EMAIL) redirect("/superadmin");
+  if (isSuperAdmin(session.email)) redirect("/superadmin");
 
   const org = await prisma.organization.findUnique({
     where: { id: session.organizationId },

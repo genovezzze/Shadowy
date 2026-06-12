@@ -3,13 +3,11 @@ import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { getTrialDaysLeft, isTrialExpired } from "@/lib/trial";
 import { OrgRow } from "./org-row";
-
-const SUPERADMIN_EMAIL =
-  process.env.SUPERADMIN_EMAIL ?? "artemijlucin@gmail.com";
+import { isSuperAdmin } from "@/lib/superadmin";
 
 export default async function SuperAdminPage() {
   const session = await getSession();
-  if (!session || session.email !== SUPERADMIN_EMAIL) redirect("/login");
+  if (!session || !isSuperAdmin(session.email)) redirect("/login");
 
   const orgs = await prisma.organization.findMany({
     orderBy: { createdAt: "desc" },

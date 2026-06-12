@@ -26,11 +26,12 @@ function roleHome(role: string) {
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // Allow Next internals and static
+  // Allow Next internals, static assets, and routes with their own auth
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
-    pathname.startsWith("/api/auth/")
+    pathname.startsWith("/api/auth/") ||
+    pathname.startsWith("/api/cron/")
   ) {
     return NextResponse.next();
   }

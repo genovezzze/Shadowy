@@ -2,8 +2,7 @@ import { redirect } from "next/navigation";
 import { getSession } from "@/lib/session";
 import { prisma } from "@/lib/db";
 import { Mail, Users, Calendar, ClipboardList } from "lucide-react";
-
-const SUPERADMIN_EMAIL = process.env.SUPERADMIN_EMAIL ?? "artemijlucin@gmail.com";
+import { isSuperAdmin } from "@/lib/superadmin";
 
 function fmtDate(d: Date) {
   return d.toLocaleDateString("lv-LV", {
@@ -24,7 +23,7 @@ const TEAM_SIZE_LABELS: Record<string, string> = {
 
 export default async function SuperAdminPilotLeadsPage() {
   const session = await getSession();
-  if (!session || session.email !== SUPERADMIN_EMAIL) redirect("/login");
+  if (!session || !isSuperAdmin(session.email)) redirect("/login");
 
   const leads = await prisma.pilotLead.findMany({
     orderBy: { createdAt: "desc" },
