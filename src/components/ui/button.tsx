@@ -10,6 +10,10 @@ const buttonVariants = cva(
       variant: {
         default:
           "btn-shimmer text-white",
+        solid:
+          "bg-emerald-600 text-white hover:bg-emerald-500",
+        glass:
+          "glass rounded-full border border-white/[0.14] bg-white/[0.06] text-white hover:bg-white/[0.1] hover:border-white/[0.22] active:scale-[0.97]",
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90 shadow-sm rounded-md",
         success:

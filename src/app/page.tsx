@@ -26,7 +26,7 @@ import { ScrollRevealInit } from "./scroll-reveal";
 
 export default function HomePage() {
   return (
-    <div className="relative min-h-screen bg-[#060d1c]">
+    <div className="dark relative min-h-screen bg-[#060d1c] text-foreground">
       {/* Fixed dot-grid — painted once, zero scroll cost */}
       <div
         aria-hidden
@@ -80,22 +80,10 @@ export default function HomePage() {
           <div className="absolute right-[0%] top-[0%] h-[350px] w-[450px] rounded-full bg-[hsl(220_80%_30%_/_0.07)] blur-[110px]" />
         </div>
 
-        <div className="mx-auto max-w-6xl px-6 pb-24 pt-8 lg:pb-32 lg:pt-12">
+        <div className="mx-auto flex max-w-6xl flex-col px-6 py-12 lg:min-h-[calc(100vh-88px)] lg:justify-center lg:py-16">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-center">
             <div className="max-w-lg">
-              <div data-reveal="scale" className="relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-medium text-emerald-400">
-                <span className="relative flex h-1.5 w-1.5 shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                </span>
-                <span className="relative z-10">30 dienu bezmaksas pilots komandām</span>
-                <span
-                  aria-hidden
-                  className="animate-badge-sheen pointer-events-none absolute inset-y-0 left-0 w-1/3 -translate-x-full bg-gradient-to-r from-transparent via-emerald-200/30 to-transparent"
-                />
-              </div>
-
-              <h1 data-reveal="left" data-delay="80" className="mt-5 font-display font-black text-5xl leading-[1.08] tracking-tight text-white sm:text-6xl">
+              <h1 data-reveal="left" data-delay="80" className="font-display font-black text-5xl leading-[1.08] tracking-tight text-white sm:text-6xl">
                 Padariet{" "}
                 <span className="text-gradient-emerald">neredzamo<br />darbu</span>
                 {" "}redzamu.
@@ -124,33 +112,9 @@ export default function HomePage() {
                 Bez kredītkartes. Bez saistībām. Iestatīšana līdz 10 minūtēm.
               </p>
 
-              <div data-reveal="up" data-delay="500" className="mt-8 grid grid-cols-3 gap-2.5 border-t border-white/[0.1] pt-6">
-                {[
-                  { value: "30 d.",  label: "bezmaksas pilots", bar: "bg-emerald-500/50" },
-                  { value: "< 10′", label: "iestatīšana",       bar: "bg-sky-400/50"    },
-                  { value: "100%",  label: "employee-first",    bar: "bg-violet-400/50" },
-                ].map(({ value, label, bar }) => (
-                  <TiltCard
-                    key={label}
-                    maxTilt={14}
-                    scale={1.04}
-                    className="rounded-xl border border-white/[0.07] px-3 py-3.5 text-center"
-                    style={{
-                      background: "rgba(255,255,255,0.025)",
-                      backdropFilter: "blur(20px)",
-                      WebkitBackdropFilter: "blur(20px)",
-                      boxShadow: "inset 0 1px 0 rgba(255,255,255,0.07), 0 4px 24px rgba(0,0,0,0.25)",
-                    }}
-                  >
-                    <div className={`mx-auto mb-2 h-[2px] w-6 rounded-full ${bar}`} />
-                    <div className="text-xl font-bold text-white">{value}</div>
-                    <div className="mt-0.5 text-[10px] tracking-wide text-white/30">{label}</div>
-                  </TiltCard>
-                ))}
-              </div>
             </div>
 
-            <div className="relative lg:pl-4 lg:-mt-36">
+            <div className="relative lg:pl-4 lg:-mt-12">
               <div
                 aria-hidden
                 className="absolute inset-0 rounded-2xl"
@@ -169,7 +133,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Tag strip ────────────────────────────────────────────────── */}
-      <div className="border-y border-white/[0.1] overflow-hidden py-3">
+      <div className="mt-6 border-y border-white/[0.1] overflow-hidden py-3">
         <div className="animate-marquee flex whitespace-nowrap">
           {[...Array(2)].flatMap((_, pass) =>
             ["Employee-first", "Bez novērošanas", "30 dienu pilots", "GDPR-draudzīgs", "Darbinieku privātums"].map((t) => (

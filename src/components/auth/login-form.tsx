@@ -71,7 +71,7 @@ export function LoginForm() {
           {error}
         </div>
       ) : null}
-      <Button type="submit" className="w-full" disabled={pending}>
+      <Button type="submit" variant="glass" className="w-full rounded-[10px] bg-white/[0.12] hover:bg-white/[0.18]" disabled={pending}>
         {pending ? "Pārbauda..." : "Pieslēgties"}
       </Button>
 
