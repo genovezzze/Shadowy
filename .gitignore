@@ -31,3 +31,4 @@ dev.log
 
 # typescript
 *.tsbuildinfo
+.vercel

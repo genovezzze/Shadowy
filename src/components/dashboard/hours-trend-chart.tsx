@@ -43,9 +43,9 @@ export function HoursTrendChart({ title, data, badge, className }: HoursTrendCha
   }
 
   const isDark = resolvedTheme === "dark";
-  const textColor = isDark ? "#9ca3af" : "#6b7280";
-  const gridColor = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.07)";
-  const lineColor = isDark ? "#34d399" : "#10b981";
+  const textColor = isDark ? "#9ca3af" : "#8a94a6";
+  const gridColor = isDark ? "rgba(255,255,255,0.06)" : "#e5e8ec";
+  const lineColor = isDark ? "#34d399" : "#1f2933";
   const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
   const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
 

@@ -126,7 +126,7 @@ export default async function EmployeeDashboard() {
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">

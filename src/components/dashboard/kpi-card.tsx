@@ -16,21 +16,21 @@ const TONE_STYLES: Record<
   { line: string; icon: string; iconGlow: string; cornerGlow: string }
 > = {
   default: {
-    line: "via-emerald-400/50",
-    icon: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
-    iconGlow: "hsl(160 84% 45% / 0.15)",
+    line: "via-foreground/30 dark:via-emerald-400/50",
+    icon: "bg-foreground/[0.06] text-foreground ring-foreground/10 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20",
+    iconGlow: "var(--kpi-default-glow)",
     cornerGlow: "radial-gradient(circle, hsl(160 84% 45% / 0.35), transparent 70%)",
   },
   success: {
-    line: "via-emerald-400/50",
-    icon: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
-    iconGlow: "hsl(160 84% 45% / 0.15)",
+    line: "via-foreground/30 dark:via-emerald-400/50",
+    icon: "bg-foreground/[0.06] text-foreground ring-foreground/10 dark:bg-emerald-500/10 dark:text-emerald-400 dark:ring-emerald-500/20",
+    iconGlow: "var(--kpi-default-glow)",
     cornerGlow: "radial-gradient(circle, hsl(160 84% 45% / 0.35), transparent 70%)",
   },
   warning: {
-    line: "via-amber-400/50",
-    icon: "bg-amber-500/10 text-amber-400 ring-amber-500/20",
-    iconGlow: "hsl(38 92% 50% / 0.15)",
+    line: "via-foreground/30 dark:via-amber-400/50",
+    icon: "bg-foreground/[0.06] text-foreground ring-foreground/10 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20",
+    iconGlow: "var(--kpi-warning-glow)",
     cornerGlow: "radial-gradient(circle, hsl(38 92% 50% / 0.35), transparent 70%)",
   },
   destructive: {
@@ -40,15 +40,15 @@ const TONE_STYLES: Record<
     cornerGlow: "radial-gradient(circle, hsl(0 84% 55% / 0.35), transparent 70%)",
   },
   info: {
-    line: "via-sky-400/50",
-    icon: "bg-sky-500/10 text-sky-400 ring-sky-500/20",
-    iconGlow: "hsl(200 84% 45% / 0.15)",
+    line: "via-foreground/30 dark:via-sky-400/50",
+    icon: "bg-foreground/[0.06] text-foreground ring-foreground/10 dark:bg-sky-500/10 dark:text-sky-400 dark:ring-sky-500/20",
+    iconGlow: "var(--kpi-info-glow)",
     cornerGlow: "radial-gradient(circle, hsl(200 84% 45% / 0.35), transparent 70%)",
   },
   accent: {
-    line: "via-violet-400/50",
-    icon: "bg-violet-500/10 text-violet-400 ring-violet-500/20",
-    iconGlow: "hsl(270 84% 45% / 0.13)",
+    line: "via-foreground/30 dark:via-violet-400/50",
+    icon: "bg-foreground/[0.06] text-foreground ring-foreground/10 dark:bg-violet-500/10 dark:text-violet-400 dark:ring-violet-500/20",
+    iconGlow: "var(--kpi-accent-glow)",
     cornerGlow: "radial-gradient(circle, hsl(270 84% 45% / 0.32), transparent 70%)",
   },
 };

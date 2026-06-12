@@ -95,9 +95,9 @@ export default async function AdminBonusesPage() {
               />
             </div>
           ) : (
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-border dark:divide-white/[0.04]">
               {allRules.map((rule: any) => (
-                <div key={rule.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
+                <div key={rule.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-muted/40 dark:hover:bg-white/[0.02]">
                   <div className="min-w-0">
                     <div className="text-sm font-medium truncate">{rule.name}</div>
                     <div className="text-xs text-muted-foreground mt-0.5">
@@ -131,11 +131,11 @@ export default async function AdminBonusesPage() {
               />
             </div>
           ) : (
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-border dark:divide-white/[0.04]">
               {recentRequests.map((req: any) => {
                 const status = req.status as BonusRequestStatus;
                 return (
-                  <div key={req.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
+                  <div key={req.id} className="flex items-start justify-between gap-3 px-6 py-3.5 transition-colors hover:bg-muted/40 dark:hover:bg-white/[0.02]">
                     <div className="min-w-0">
                       <div className="text-sm font-medium truncate">
                         {req.employee.name}

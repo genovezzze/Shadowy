@@ -91,7 +91,7 @@ export default function HomePage() {
 
               <p data-reveal="blur" data-delay="200" className="mt-5 text-[1.05rem] leading-relaxed text-white/55">
                 Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu
-                pienākumus un darbu ārpus oficiālās lomas —{" "}
+                pienākumus un darbu ārpus oficiālās lomas -{" "}
                 <span className="text-white/80">bez darbinieku novērošanas.</span>
               </p>
               <p data-reveal="blur" data-delay="280" className="mt-3 text-sm leading-relaxed text-white/40">
@@ -408,7 +408,7 @@ export default function HomePage() {
               </h2>
               <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/50">
                 Vadītājs redz visus komandas ierakstus vienā skatā. Var apstiprināt,
-                noraidīt vai atgriezt ar komentāru — viss bez e-pastiem un sanāksmēm.
+                noraidīt vai atgriezt ar komentāru - viss bez e-pastiem un sanāksmēm.
               </p>
               <ul data-reveal="left" data-delay="300" className="mt-6 space-y-3">
                 {[
@@ -455,7 +455,7 @@ export default function HomePage() {
               </h2>
               <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/50">
                 Shadowy apkopo apstiprinātos datus un parāda vadītājam, kur ir
-                pārslodze, lomu neatbilstības un agrīnais izdegšanas risks —
+                pārslodze, lomu neatbilstības un agrīnais izdegšanas risks -
                 automātiski, bez papildu darba.
               </p>
               <ul data-reveal="right" data-delay="300" className="mt-6 space-y-3">
@@ -600,7 +600,7 @@ export default function HomePage() {
               <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/45">
                 Shadowy neizseko privātas sarunas, ekrāna aktivitāti vai katru
                 klikšķi. Platforma balstās uz darbinieku iesniegtiem un apstiprinātiem
-                ierakstiem, lai palīdzētu saprast slodzi — nevis kontrolēt cilvēkus.
+                ierakstiem, lai palīdzētu saprast slodzi - nevis kontrolēt cilvēkus.
               </p>
               <div data-card-glow className="mt-6 flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/8 px-4 py-3">
                 <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-400" />
@@ -701,7 +701,7 @@ export default function HomePage() {
               <p data-reveal="right" className="text-[11px] font-semibold uppercase tracking-widest text-white/30">Nav paredzēts</p>
               <h2 data-reveal="up" data-delay="100" className="mt-2 font-display font-black text-2xl tracking-tight text-white sm:text-3xl">Kam Shadowy nav?</h2>
               <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/45">
-                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi — nevis kontrolēt darbiniekus.
+                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi - nevis kontrolēt darbiniekus.
               </p>
               <ul data-reveal="left" data-delay="280" className="mt-5 space-y-2">
                 {[
@@ -728,7 +728,7 @@ export default function HomePage() {
             <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Process</p>
             <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">Kas notiek pēc pieteikuma?</h2>
             <p data-reveal="blur" data-delay="200" className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/45">
-              Mēs nevēlamies pārsteigt — šeit ir precīzi soļi no pieteikuma līdz pilota sākumam.
+              Mēs nevēlamies pārsteigt - šeit ir precīzi soļi no pieteikuma līdz pilota sākumam.
             </p>
           </div>
 
@@ -812,7 +812,7 @@ export default function HomePage() {
               Sāciet bez riska, bez kredītkartes.
             </p>
             <p className="mt-3 text-sm leading-relaxed text-white/45">
-              Aizpildiet formu — sazināsimies ar jums tuvāko dienu laikā un
+              Aizpildiet formu - sazināsimies ar jums tuvāko dienu laikā un
               palīdzēsim uzsākt pilotu jūsu komandā.
             </p>
           </div>
@@ -1347,7 +1347,7 @@ function PilotReportMockup() {
       {/* Recommendation */}
       <div className="border-t border-white/[0.1] bg-amber-500/[0.04] px-5 py-4">
         <p className="mb-1 font-mono text-[9px] uppercase tracking-wider text-amber-400/60">Ieteikums vadītājam</p>
-        <p className="text-xs leading-relaxed text-white/45">Pārskatīt Mārtiņa B. uzdevumu sadali — 40% darba laika tiek pavadīts ārpus amata apraksta.</p>
+        <p className="text-xs leading-relaxed text-white/45">Pārskatīt Mārtiņa B. uzdevumu sadali - 40% darba laika tiek pavadīts ārpus amata apraksta.</p>
       </div>
     </div>
   );

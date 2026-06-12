@@ -11,14 +11,17 @@ export function ThemeToggle() {
 
   useEffect(() => setMounted(true), []);
 
-  if (!mounted) return <Button variant="ghost" size="icon" disabled aria-label="Mainīt tēmu" />;
+  if (!mounted) return <Button variant="ghost" size="icon" disabled aria-label="Pārslēgt tēmu" />;
+
+  const label = theme === "dark" ? "Gaišā tēma" : "Tumšā tēma";
 
   return (
     <Button
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      aria-label="Mainīt tēmu"
+      aria-label={label}
+      title={label}
     >
       {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>

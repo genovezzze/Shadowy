@@ -166,7 +166,7 @@ export default async function ManagerDashboard({
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -238,13 +238,13 @@ export default async function ManagerDashboard({
                 </span>
               )}
             </div>
-            <div className="divide-y divide-white/[0.04]">
+            <div className="divide-y divide-border dark:divide-white/[0.04]">
               {teamData.map(({ name, entries, hours }, i) => {
                 const isOverloaded = hours > teamAvgHours * 1.8 && teamAvgHours > 0;
                 return (
-                  <div key={i} className="flex items-center justify-between gap-4 px-6 py-3.5 transition-colors hover:bg-white/[0.02]">
+                  <div key={i} className="flex items-center justify-between gap-4 px-6 py-3.5 transition-colors hover:bg-muted/40 dark:hover:bg-white/[0.02]">
                     <div className="flex items-center gap-3 min-w-0">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/[0.08] text-xs font-semibold">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-muted ring-1 ring-border dark:bg-white/[0.06] dark:ring-white/[0.08] text-xs font-semibold">
                         {i + 1}
                       </div>
                       <div className="min-w-0">
@@ -268,7 +268,7 @@ export default async function ManagerDashboard({
                 );
               })}
             </div>
-            <div className="flex items-center justify-between px-6 py-3 border-t border-border dark:border-white/[0.07] bg-white/[0.02] text-xs text-muted-foreground">
+            <div className="flex items-center justify-between px-6 py-3 border-t border-border bg-muted/40 dark:border-white/[0.07] dark:bg-white/[0.02] text-xs text-muted-foreground">
               <span>Vidēji uz darbinieku</span>
               <span className="font-medium tabular-nums">{Math.round(teamAvgHours * 10) / 10}h</span>
             </div>
@@ -289,7 +289,7 @@ export default async function ManagerDashboard({
               return (
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-36 truncate text-xs text-muted-foreground shrink-0">{cat}</div>
-                  <div className="flex-1 h-1.5 bg-white/[0.06] rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-muted dark:bg-white/[0.06] rounded-full overflow-hidden">
                     <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
                   </div>
                   <div className="text-xs text-muted-foreground w-16 text-right tabular-nums">

@@ -28,10 +28,9 @@ export function PeriodTabs({ current, className }: { current: string; className?
   return (
     <div
       className={cn(
-        "flex items-center gap-0.5 rounded-xl border border-white/[0.09] bg-white/[0.04] p-1 backdrop-blur-md",
+        "flex items-center gap-0.5 rounded-xl border border-border bg-muted/60 p-1 backdrop-blur-md dark:border-white/[0.09] dark:bg-white/[0.04] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className
       )}
-      style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}
     >
       {PERIODS.map(({ label, value }) => (
         <button
@@ -40,8 +39,8 @@ export function PeriodTabs({ current, className }: { current: string; className?
           className={cn(
             "flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 sm:flex-initial sm:px-4 sm:text-xs",
             active === value
-              ? "bg-white/[0.12] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
-              : "text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+              ? "bg-card text-foreground shadow-sm dark:bg-white/[0.12] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+              : "text-muted-foreground hover:bg-card/60 hover:text-foreground dark:hover:bg-white/[0.06]"
           )}
         >
           {label}

@@ -26,7 +26,7 @@ export function MobileShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="app-shell flex h-screen bg-background">
       {/* Background glow blobs — dark mode only */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 hidden overflow-hidden dark:block">
         <div className="absolute left-[5%] top-[8%] h-[480px] w-[560px] rounded-full opacity-70"
@@ -73,7 +73,7 @@ export function MobileShell({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <img src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0" />
+          <img src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0 invert dark:invert-0" />
           <span className="text-sm font-semibold">Shadowy</span>
         </div>
 

@@ -121,7 +121,7 @@ export default async function AdminDashboard({
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
@@ -190,7 +190,7 @@ export default async function AdminDashboard({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-white/[0.06] bg-white/[0.02]">
+                  <tr className="border-b border-border bg-muted/40 dark:border-white/[0.06] dark:bg-white/[0.02]">
                     <th className="px-6 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Vadītājs</th>
                     <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Komanda</th>
                     <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground/60">Gaida</th>
@@ -200,11 +200,11 @@ export default async function AdminDashboard({
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/[0.04]">
+                <tbody className="divide-y divide-border dark:divide-white/[0.04]">
                   {managerStats
                     .sort((a, b) => (a.avgReviewDays ?? 999) - (b.avgReviewDays ?? 999))
                     .map((m, i) => (
-                      <tr key={i} className="group hover:bg-white/[0.03] transition-colors">
+                      <tr key={i} className="group hover:bg-muted/40 dark:hover:bg-white/[0.03] transition-colors">
                         <td className="px-6 py-3.5 font-medium">{m.name}</td>
                         <td className="px-4 py-3.5 text-center tabular-nums text-muted-foreground">{m.teamSize}</td>
                         <td className="px-4 py-3.5 text-center">
@@ -256,9 +256,9 @@ export default async function AdminDashboard({
             />
           </div>
         ) : (
-          <div className="divide-y divide-white/[0.04]">
+          <div className="divide-y divide-border dark:divide-white/[0.04]">
             {recent.map((e) => (
-              <div key={e.id} className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-white/[0.02]">
+              <div key={e.id} className="flex items-center justify-between gap-4 px-6 py-4 transition-colors hover:bg-muted/40 dark:hover:bg-white/[0.02]">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">{e.title}</div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
