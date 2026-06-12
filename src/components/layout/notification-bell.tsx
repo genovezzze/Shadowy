@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,23 +31,61 @@ function timeAgo(date: Date): string {
   return `${days} d`;
 }
 
-export function NotificationBell({ initialUnreadCount }: { initialUnreadCount: number }) {
+export function NotificationBell({
+  initialUnreadCount,
+  openUpward,
+  alignLeft,
+}: {
+  initialUnreadCount: number;
+  openUpward?: boolean;
+  alignLeft?: boolean;
+}) {
   const [open, setOpen] = useState(false);
   const [items, setItems] = useState<NotificationItem[] | null>(null);
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [pending, startTransition] = useTransition();
+  const [panelStyle, setPanelStyle] = useState<React.CSSProperties>({});
+  const [mounted, setMounted] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (
+        ref.current &&
+        !ref.current.contains(e.target as Node) &&
+        !(e.target as Element)?.closest?.("[data-notification-panel]")
+      ) {
+        setOpen(false);
+      }
     }
     document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  function updatePanelPosition() {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const panelWidth = Math.min(320, window.innerWidth - 32);
+    let left = alignLeft ? rect.left : rect.right - panelWidth;
+    left = Math.max(8, Math.min(left, window.innerWidth - panelWidth - 8));
+
+    const style: React.CSSProperties = { left, width: panelWidth };
+    if (openUpward) {
+      style.bottom = window.innerHeight - rect.top + 8;
+    } else {
+      style.top = rect.bottom + 8;
+    }
+    setPanelStyle(style);
+  }
+
   function toggleOpen() {
     const next = !open;
+    if (next) updatePanelPosition();
     setOpen(next);
     if (next && items === null) {
       startTransition(async () => {
@@ -55,6 +94,19 @@ export function NotificationBell({ initialUnreadCount }: { initialUnreadCount: n
       });
     }
   }
+
+  useEffect(() => {
+    if (!open) return;
+    function onReposition() {
+      updatePanelPosition();
+    }
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [open]);
 
   function handleMarkAllRead() {
     setUnreadCount(0);
@@ -77,26 +129,12 @@ export function NotificationBell({ initialUnreadCount }: { initialUnreadCount: n
     setOpen(false);
   }
 
-  return (
-    <div ref={ref} className="relative">
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={toggleOpen}
-        aria-label="Paziņojumi"
-        title="Paziņojumi"
-        className="relative"
-      >
-        <Bell className="h-4 w-4" />
-        {unreadCount > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
-        )}
-      </Button>
-
-      {open && (
-        <div className="absolute right-0 top-full z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] rounded-lg border border-border bg-popover shadow-lg">
+  const panel = open && (
+    <div
+      data-notification-panel
+      className="fixed z-[100] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-card dark:rounded-2xl dark:border-white/[0.06] dark:bg-gradient-to-b dark:from-[#1c2436] dark:via-[#161d2c] dark:to-[#121826] dark:bg-[#161e30] dark:backdrop-blur-md dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.65)]"
+      style={panelStyle}
+    >
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
             <span className="text-sm font-semibold">Paziņojumi</span>
             {unreadCount > 0 && (
@@ -153,8 +191,29 @@ export function NotificationBell({ initialUnreadCount }: { initialUnreadCount: n
               })
             )}
           </div>
-        </div>
-      )}
+    </div>
+  );
+
+  return (
+    <div ref={ref} className="relative">
+      <Button
+        ref={buttonRef}
+        variant="ghost"
+        size="icon"
+        onClick={toggleOpen}
+        aria-label="Paziņojumi"
+        title="Paziņojumi"
+        className="relative"
+      >
+        <Bell className="h-4 w-4" />
+        {unreadCount > 0 && (
+          <span className="absolute -right-0.5 -top-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-orange-500 px-1 text-[10px] font-semibold text-white">
+            {unreadCount > 99 ? "99+" : unreadCount}
+          </span>
+        )}
+      </Button>
+
+      {mounted && panel ? createPortal(panel, document.body) : null}
     </div>
   );
 }

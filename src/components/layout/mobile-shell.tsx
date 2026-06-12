@@ -61,6 +61,7 @@ export function MobileShell({
           userName={userName}
           organizationName={organizationName}
           pendingCount={pendingCount}
+          unreadNotificationCount={unreadNotificationCount}
           onClose={() => setSidebarOpen(false)}
         />
       </div>
@@ -78,11 +79,6 @@ export function MobileShell({
           </button>
           <img src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0 invert dark:invert-0" />
           <span className="flex-1 text-sm font-semibold">Shadowy</span>
-          <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
-        </div>
-
-        {/* Desktop top bar */}
-        <div className="hidden items-center justify-end border-b border-border bg-background px-6 py-2.5 md:flex">
           <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
         </div>
 

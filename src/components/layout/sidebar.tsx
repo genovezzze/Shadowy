@@ -20,6 +20,7 @@ import {
   BarChart2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { NotificationBell } from "./notification-bell";
 
 type NavItem = { href: string; label: string; icon: any };
 
@@ -76,10 +77,11 @@ interface SidebarProps {
   userName: string;
   organizationName: string;
   pendingCount?: number;
+  unreadNotificationCount?: number;
   onClose?: () => void;
 }
 
-export function Sidebar({ role, userName, organizationName, pendingCount, onClose }: SidebarProps) {
+export function Sidebar({ role, userName, organizationName, pendingCount, unreadNotificationCount, onClose }: SidebarProps) {
   const pathname = usePathname();
   const items = navFor(role);
 
@@ -111,13 +113,16 @@ export function Sidebar({ role, userName, organizationName, pendingCount, onClos
       />
 
       {/* Logo */}
-      <Link
-        href="/"
-        className="relative z-10 flex items-center gap-2.5 border-b border-sidebar-border px-5 py-5 transition-opacity hover:opacity-75 dark:border-white/[0.07]"
-      >
-        <img src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0 invert dark:invert-0" />
-        <div className="text-lg font-semibold leading-none tracking-tight">Shadowy</div>
-      </Link>
+      <div className="relative z-10 flex items-center justify-between border-b border-sidebar-border px-5 py-5 dark:border-white/[0.07]">
+        <Link
+          href="/"
+          className="flex items-center gap-2.5 transition-opacity hover:opacity-75"
+        >
+          <img src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0 invert dark:invert-0" />
+          <div className="text-lg font-semibold leading-none tracking-tight">Shadowy</div>
+        </Link>
+        <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} alignLeft />
+      </div>
 
       {/* Nav */}
       <nav className="relative z-10 flex-1 space-y-0.5 px-3 py-4">
