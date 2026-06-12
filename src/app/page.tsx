@@ -902,6 +902,11 @@ export default function HomePage() {
               artemijlucin@gmail.com
             </a>
           </p>
+          <p className="mt-2 text-xs text-white/30">
+            <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-white/60">
+              Privātuma politika un noteikumi
+            </Link>
+          </p>
         </div>
       </section>
 
