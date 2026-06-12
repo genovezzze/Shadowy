@@ -66,8 +66,10 @@ export async function createRule(formData: FormData) {
 export async function updateRule(id: string, formData: FormData) {
   const session = await requireUser(["MANAGER"]);
 
-  const rule = await prisma.recognitionRule.findUnique({ where: { id } });
-  if (!rule || rule.managerId !== session.userId) {
+  const rule = await prisma.recognitionRule.findFirst({
+    where: { id, managerId: session.userId },
+  });
+  if (!rule) {
     return { ok: false as const, error: "Nav tiesību rediģēt šo noteikumu." };
   }
 
@@ -108,8 +110,10 @@ export async function updateRule(id: string, formData: FormData) {
 export async function toggleRule(id: string, isActive: boolean) {
   const session = await requireUser(["MANAGER"]);
 
-  const rule = await prisma.recognitionRule.findUnique({ where: { id } });
-  if (!rule || rule.managerId !== session.userId) return;
+  const rule = await prisma.recognitionRule.findFirst({
+    where: { id, managerId: session.userId },
+  });
+  if (!rule) return;
 
   await prisma.recognitionRule.update({ where: { id }, data: { isActive } });
   revalidate();
@@ -118,8 +122,10 @@ export async function toggleRule(id: string, isActive: boolean) {
 export async function deleteRule(id: string) {
   const session = await requireUser(["MANAGER"]);
 
-  const rule = await prisma.recognitionRule.findUnique({ where: { id } });
-  if (!rule || rule.managerId !== session.userId) return;
+  const rule = await prisma.recognitionRule.findFirst({
+    where: { id, managerId: session.userId },
+  });
+  if (!rule) return;
 
   await prisma.recognitionRule.delete({ where: { id } });
   revalidate();

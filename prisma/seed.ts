@@ -16,6 +16,13 @@ const DEFAULT_CATEGORIES = [
 ];
 
 async function main() {
+  if (process.env.SEED_CONFIRM !== "yes-wipe-database") {
+    throw new Error(
+      "Refusing to run: this script WIPES all organizations, users, categories, " +
+        "and entries. Set SEED_CONFIRM=yes-wipe-database to confirm (never on production)."
+    );
+  }
+
   console.log("Seeding Shadowy demo data...");
 
   // Wipe in dependency order (dev convenience)
