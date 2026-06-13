@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateEntry, deleteEntry } from "@/app/employee/history/actions";
 
 interface EmployeeEntryActionsProps {
@@ -82,18 +82,18 @@ export function EmployeeEntryActions({
               <div className="grid grid-cols-2 gap-4">
                 <div className="grid gap-2">
                   <Label htmlFor="edit-category">Kategorija</Label>
-                  <NativeSelect
-                    id="edit-category"
-                    name="category"
-                    required
-                    defaultValue={category}
-                  >
-                    {categories.map((c) => (
-                      <option key={c} value={c}>
-                        {c}
-                      </option>
-                    ))}
-                  </NativeSelect>
+                  <Select name="category" required defaultValue={category}>
+                    <SelectTrigger id="edit-category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map((c) => (
+                        <SelectItem key={c} value={c}>
+                          {c}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="edit-workDate">Darba datums</Label>

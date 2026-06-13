@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { updateRole, deleteRole, addDuty, deleteDuty, assignRole } from "./actions";
 import { Pencil, Trash2, Plus, X, Check, UserPlus } from "lucide-react";
@@ -28,6 +29,7 @@ export function RoleCard({ id, name, description, duties, assignedEmployees, all
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [newDuty, setNewDuty] = useState("");
+  const [assignValue, setAssignValue] = useState("");
   const dutyInputRef = useRef<HTMLInputElement>(null);
 
   const unassigned = allEmployees.filter(e => e.workRoleId !== id);
@@ -169,17 +171,20 @@ export function RoleCard({ id, name, description, duties, assignedEmployees, all
           {unassigned.length > 0 && (
             <div className="flex items-center gap-2">
               <UserPlus className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-              <select
-                className="h-8 w-full rounded-md border border-input bg-background text-sm px-2 text-muted-foreground"
-                defaultValue=""
-                onChange={e => { if (e.target.value) handleAssign(e.target.value); e.target.value = ""; }}
+              <Select
+                value={assignValue}
+                onValueChange={(v) => { handleAssign(v); setAssignValue(""); }}
                 disabled={pending}
               >
-                <option value="" disabled>Piešķirt darbinieku...</option>
-                {unassigned.map(e => (
-                  <option key={e.id} value={e.id}>{e.name}</option>
-                ))}
-              </select>
+                <SelectTrigger className="h-8 py-1 text-sm text-muted-foreground">
+                  <SelectValue placeholder="Piešķirt darbinieku..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {unassigned.map(e => (
+                    <SelectItem key={e.id} value={e.id}>{e.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
         </div>

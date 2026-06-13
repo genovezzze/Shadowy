@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { updateEmployee, deleteEmployee } from "./actions";
 import { Pencil, Trash2, X, Check } from "lucide-react";
@@ -72,7 +73,7 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor={`password-${id}`}>Jauna parole</Label>
-                <Input id={`password-${id}`} name="password" type="password" minLength={8} placeholder="Atstājiet tukšu, ja nemainīt" />
+                <PasswordInput id={`password-${id}`} name="password" minLength={8} placeholder="Atstājiet tukšu, ja nemainīt" />
               </div>
             </div>
             {error && <div className="text-sm text-destructive">{error}</div>}

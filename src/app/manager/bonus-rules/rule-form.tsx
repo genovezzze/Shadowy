@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { NativeSelect } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { createRule, updateRule } from "./actions";
 import { REWARD_LABELS, PERIOD_LABELS, REWARD_TYPES, PERIOD_TYPES } from "@/lib/reward-types";
 import type { RewardType, PeriodType } from "@/lib/reward-types";
@@ -111,35 +111,35 @@ export function RuleForm({
         </div>
         <div className="grid gap-2">
           <Label htmlFor="rule-period">Periods</Label>
-          <NativeSelect
-            id="rule-period"
-            name="periodType"
-            required
-            defaultValue={initial?.periodType ?? "MONTH"}
-          >
-            {PERIOD_TYPES.map((p) => (
-              <option key={p} value={p}>
-                {PERIOD_LABELS[p]}
-              </option>
-            ))}
-          </NativeSelect>
+          <Select name="periodType" required defaultValue={initial?.periodType ?? "MONTH"}>
+            <SelectTrigger id="rule-period">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {PERIOD_TYPES.map((p) => (
+                <SelectItem key={p} value={p}>
+                  {PERIOD_LABELS[p]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
       <div className="grid gap-2">
         <Label htmlFor="rule-reward">Bonusa veids</Label>
-        <NativeSelect
-          id="rule-reward"
-          name="rewardType"
-          required
-          defaultValue={initial?.rewardType ?? "PAID_DAY_OFF"}
-        >
-          {REWARD_TYPES.map((r) => (
-            <option key={r} value={r}>
-              {REWARD_LABELS[r as RewardType]}
-            </option>
-          ))}
-        </NativeSelect>
+        <Select name="rewardType" required defaultValue={initial?.rewardType ?? "PAID_DAY_OFF"}>
+          <SelectTrigger id="rule-reward">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {REWARD_TYPES.map((r) => (
+              <SelectItem key={r} value={r}>
+                {REWARD_LABELS[r as RewardType]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {categories.length > 0 && (

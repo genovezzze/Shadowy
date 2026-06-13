@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { createEmployee } from "./actions";
 
@@ -21,15 +22,18 @@ export function CreateEmployeeForm({ managers }: CreateEmployeeFormProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [managerId, setManagerId] = useState("self");
 
   function onSubmit(formData: FormData) {
     setError(null);
     setSuccess(false);
+    if (formData.get("managerId") === "self") formData.set("managerId", "");
     startTransition(async () => {
       const res = await createEmployee(formData);
       if (!res.ok) setError(res.error);
       else {
         setSuccess(true);
+        setManagerId("self");
         (document.getElementById("admin-create-employee") as HTMLFormElement)?.reset();
         router.refresh();
       }
@@ -72,18 +76,19 @@ export function CreateEmployeeForm({ managers }: CreateEmployeeFormProps) {
       ) : (
         <div className="grid gap-1.5">
           <Label htmlFor="emp-manager">Kurš pārskatīs ierakstus?</Label>
-          <select
-            id="emp-manager"
-            name="managerId"
-            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-          >
-            <option value="">Es pats (administrators)</option>
-            {managers.map((m) => (
-              <option key={m.id} value={m.id}>
-                {m.name} (vadītājs)
-              </option>
-            ))}
-          </select>
+          <Select name="managerId" value={managerId} onValueChange={setManagerId}>
+            <SelectTrigger id="emp-manager">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="self">Es pats (administrators)</SelectItem>
+              {managers.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name} (vadītājs)
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       )}
       {error ? <div className="text-sm text-destructive">{error}</div> : null}

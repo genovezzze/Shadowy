@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { loginAction } from "@/app/(auth)/login/actions";
 
@@ -56,10 +57,9 @@ export function LoginForm() {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="password">Parole</Label>
-        <Input
+        <PasswordInput
           id="password"
           name="password"
-          type="password"
           autoComplete="current-password"
           required
           minLength={6}

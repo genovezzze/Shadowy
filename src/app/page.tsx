@@ -55,12 +55,12 @@ export default function HomePage() {
             <span className="text-base font-semibold tracking-tight text-white">Shadowy</span>
           </a>
           <nav className="hidden items-center gap-0.5 md:flex">
-            <a href="#ka-tas-darbojas" className="rounded-lg px-3 py-1.5 text-[13px] text-white/45 transition-colors hover:text-white/80">Kā tas darbojas</a>
-            <a href="#pilots" className="rounded-lg px-3 py-1.5 text-[13px] text-white/45 transition-colors hover:text-white/80">Pilots</a>
-            <a href="#privatums" className="rounded-lg px-3 py-1.5 text-[13px] text-white/45 transition-colors hover:text-white/80">Privātums</a>
+            <a href="#ka-tas-darbojas" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Kā tas darbojas</a>
+            <a href="#pilots" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Pilots</a>
+            <a href="#privatums" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Privātums</a>
           </nav>
           <div className="flex items-center gap-2">
-            <Button asChild variant="ghost" size="sm" className="text-[13px] text-white/45 hover:text-white/80 hover:bg-white/[0.06]">
+            <Button asChild variant="ghost" size="sm" className="text-[13px] text-white/80 hover:text-white/95 hover:bg-white/[0.06]">
               <Link href="/login">Pieslēgties</Link>
             </Button>
             <Link
@@ -89,12 +89,12 @@ export default function HomePage() {
                 {" "}redzamu.
               </h1>
 
-              <p data-reveal="blur" data-delay="200" className="mt-5 text-[1.05rem] leading-relaxed text-white/55">
+              <p data-reveal="blur" data-delay="200" className="mt-5 text-[1.05rem] leading-relaxed text-white/85">
                 Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu
                 pienākumus un darbu ārpus oficiālās lomas -{" "}
-                <span className="text-white/80">bez darbinieku novērošanas.</span>
+                <span className="text-white/95">bez darbinieku novērošanas.</span>
               </p>
-              <p data-reveal="blur" data-delay="280" className="mt-3 text-sm leading-relaxed text-white/40">
+              <p data-reveal="blur" data-delay="280" className="mt-3 text-sm leading-relaxed text-white/75">
                 Sāciet ar vienu komandu un saņemiet praktisku pārskatu pēc 30 dienām.
               </p>
 
@@ -107,7 +107,7 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <p data-reveal="up" data-delay="400" className="mt-4 flex items-center gap-1.5 text-xs text-white/35">
+              <p data-reveal="up" data-delay="400" className="mt-4 flex items-center gap-1.5 text-xs text-white/70">
                 <CheckCircle2 className="h-3.5 w-3.5 shrink-0 text-emerald-500" />
                 Bez kredītkartes. Bez saistībām. Iestatīšana līdz 10 minūtēm.
               </p>
@@ -137,7 +137,7 @@ export default function HomePage() {
         <div className="animate-marquee flex whitespace-nowrap">
           {[...Array(2)].flatMap((_, pass) =>
             ["Employee-first", "Bez novērošanas", "30 dienu pilots", "GDPR-draudzīgs", "Darbinieku privātums"].map((t) => (
-              <span key={`${pass}-${t}`} className="mx-10 text-[11px] font-semibold uppercase tracking-widest text-white/20">
+              <span key={`${pass}-${t}`} className="mx-10 text-[11px] font-semibold uppercase tracking-widest text-white/55">
                 {t}
               </span>
             ))
@@ -154,7 +154,7 @@ export default function HomePage() {
 
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="mb-10">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/30">Problēma</p>
+            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Problēma</p>
             <h2 data-reveal="left" data-delay="80" className="mt-3 font-display font-black text-5xl leading-[1.05] tracking-tight text-white sm:text-6xl">
               Darbs, kas notiek,<br />
               <span className="text-gradient-emerald">bet netiek pamanīts.</span>
@@ -181,10 +181,10 @@ export default function HomePage() {
                 &ldquo;
               </span>
               <div className="relative flex flex-1 flex-col">
-                <p className="text-2xl font-medium leading-snug text-white/70 sm:text-[1.65rem]">
+                <p className="text-2xl font-medium leading-snug text-white/85 sm:text-[1.65rem]">
                   Kolēģi regulāri palīdz viens otram, bet tas nekur netiek fiksēts.
                 </p>
-                <p className="mt-4 text-sm leading-relaxed text-white/35">
+                <p className="mt-4 text-sm leading-relaxed text-white/70">
                   Katras nedēļas slēptais darbs, kas nekad neparādās nekādos datos.
                 </p>
                 <div className="mt-auto pt-8 flex items-center gap-3">
@@ -192,7 +192,7 @@ export default function HomePage() {
                     Koordinācija
                   </span>
                   <div className="h-px flex-1 bg-white/[0.06]" />
-                  <span className="text-[11px] text-white/20">No. 01</span>
+                  <span className="text-[11px] text-white/55">No. 01</span>
                 </div>
               </div>
             </div>
@@ -210,10 +210,10 @@ export default function HomePage() {
                   data-delay={`${120 + i * 70}`}
                   className={`glass flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:brightness-[1.15] ${cls}`}
                 >
-                  <p className="text-[14px] font-medium leading-relaxed text-white/55">{text}</p>
+                  <p className="text-[14px] font-medium leading-relaxed text-white/85">{text}</p>
                   <div className="mt-4 flex items-center justify-between">
                     <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tagCls}`}>{tag}</span>
-                    <span className="font-mono text-[10px] text-white/15">0{i + 2}</span>
+                    <span className="font-mono text-[10px] text-white/50">0{i + 2}</span>
                   </div>
                 </div>
               ))}
@@ -221,7 +221,7 @@ export default function HomePage() {
           </div>
 
           <div data-reveal="up" data-delay="400" className="mt-8">
-            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/65 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
+            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/80 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
               <a href="#pilots">Pārbaudīt komandā <ArrowRight className="ml-1.5 h-4 w-4" /></a>
             </Button>
           </div>
@@ -254,8 +254,8 @@ export default function HomePage() {
                 className="card-wave glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5 hover:border-emerald-500/20 hover:bg-emerald-500/[0.03]"
                 style={{ '--card-delay': `${i * 2000}ms`, animationDelay: `${i * 2000}ms` } as React.CSSProperties}
               >
-                <p className="text-sm font-medium leading-snug text-white/70">{text}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/30">{sub}</p>
+                <p className="text-sm font-medium leading-snug text-white/85">{text}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-white/65">{sub}</p>
               </div>
             ))}
           </div>
@@ -309,7 +309,7 @@ export default function HomePage() {
               <div key={num} data-reveal="up" data-delay={`${250 + i * 100}`}>
                 <p className={`mb-3 text-[11px] font-bold tracking-[0.18em] uppercase ${color}`}>SOLIS {num}</p>
                 <h3 className="text-[17px] font-semibold leading-snug text-white">{title}</h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-white/40">{desc}</p>
+                <p className="mt-2.5 text-sm leading-relaxed text-white/75">{desc}</p>
               </div>
             ))}
           </div>
@@ -331,13 +331,13 @@ export default function HomePage() {
               >
                 <span className="font-mono text-sm font-bold text-emerald-400">01</span>
                 <div className="h-3.5 w-px bg-emerald-500/30" />
-                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">Darbinieks</span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/80">Darbinieks</span>
               </div>
               <h2 data-reveal="up" data-delay="100" className="font-display font-black text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl">
                 Darbs, kas parasti<br />
                 <span className="text-gradient-emerald">netiek rēķināts.</span>
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/50">
+              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/85">
                 Katrs darbinieks var iesniegt papildu darbu tieši no savas ierīces.
                 Ieraksts ir vienkāršs, ātrs un automātiski nonāk pie vadītāja
                 apstiprināšanai.
@@ -348,7 +348,7 @@ export default function HomePage() {
                   "Brīvs apraksts, laiks un datums",
                   "Darbinieks redz savu ierakstu statusu reāllaikā",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/55">
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/85">
                     <div className="mt-2 h-1 w-1 shrink-0 rounded-full bg-emerald-500" />
                     {item}
                   </li>
@@ -400,13 +400,13 @@ export default function HomePage() {
               >
                 <span className="font-mono text-sm font-bold text-blue-400">02</span>
                 <div className="h-3.5 w-px bg-blue-500/30" />
-                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">Vadītājs</span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/80">Vadītājs</span>
               </div>
               <h2 data-reveal="flip" data-delay="100" className="font-display font-black text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl">
                 Skaidra redzamība.<br />
                 <span className="text-gradient-emerald">Ātra lēmumu<br />pieņemšana.</span>
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/50">
+              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/85">
                 Vadītājs redz visus komandas ierakstus vienā skatā. Var apstiprināt,
                 noraidīt vai atgriezt ar komentāru - viss bez e-pastiem un sanāksmēm.
               </p>
@@ -416,7 +416,7 @@ export default function HomePage() {
                   "Apstiprināt, noraidīt vai atgriezt ar komentāru",
                   "Apstiprinātie ieraksti veido komandas slodzes profilu",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/55">
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/85">
                     <div className="mt-2 h-1 w-1 shrink-0 rounded-full bg-blue-400" />
                     {item}
                   </li>
@@ -447,13 +447,13 @@ export default function HomePage() {
               >
                 <span className="font-mono text-sm font-bold text-purple-400">03</span>
                 <div className="h-3.5 w-px bg-purple-500/30" />
-                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/45">Ieskati</span>
+                <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-white/80">Ieskati</span>
               </div>
               <h2 data-reveal="scale" data-delay="100" className="font-display font-black text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl">
                 Tendences, ko nevar<br />
                 <span className="text-gradient-emerald">redzēt kalendārā.</span>
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/50">
+              <p data-reveal="blur" data-delay="200" className="mt-5 text-base leading-relaxed text-white/85">
                 Shadowy apkopo apstiprinātos datus un parāda vadītājam, kur ir
                 pārslodze, lomu neatbilstības un agrīnais izdegšanas risks -
                 automātiski, bez papildu darba.
@@ -464,7 +464,7 @@ export default function HomePage() {
                   "Lomu neatbilstību atklāšana",
                   "Iknedēļas vadītāja pārskats e-pastā",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/55">
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/85">
                     <div className="mt-2 h-1 w-1 shrink-0 rounded-full bg-purple-400" />
                     {item}
                   </li>
@@ -499,7 +499,7 @@ export default function HomePage() {
               <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
                 Ko uzņēmums saņem<br />pēc 30 dienām?
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/45">
+              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/80">
                 Pilota beigās uzņēmums saņem praktisku pārskatu, kas palīdz saprast, kur komandā rodas slēptā slodze un kā darba sadali var padarīt taisnīgāku.
               </p>
               <ul data-reveal="right" data-delay="300" className="mt-6 space-y-2.5">
@@ -511,7 +511,7 @@ export default function HomePage() {
                   "Pārslodzes signāli",
                   "Ieteikumi vadītājam",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-white/55">
+                  <li key={item} className="flex items-center gap-2.5 text-sm text-white/85">
                     <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
                     {item}
                   </li>
@@ -537,14 +537,14 @@ export default function HomePage() {
       <section className="relative border-t border-white/[0.1]">
         <div className="mx-auto max-w-5xl px-6 py-20">
           <div className="mb-12 text-center">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/30">Salīdzinājums</p>
+            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Salīdzinājums</p>
             <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
               Bez Shadowy un ar Shadowy
             </h2>
           </div>
           <div className="grid gap-4 lg:grid-cols-2">
             <div data-reveal="left" data-delay="100" className="glass rounded-2xl border border-white/[0.07] bg-white/[0.015] p-7">
-              <p className="mb-5 text-xs font-bold uppercase tracking-wider text-white/20">Bez Shadowy</p>
+              <p className="mb-5 text-xs font-bold uppercase tracking-wider text-white/55">Bez Shadowy</p>
               <ul className="space-y-3.5">
                 {[
                   "Papildu darbs paliek tikai sarunās",
@@ -554,8 +554,8 @@ export default function HomePage() {
                   "Role gaps netiek pamanīti",
                   "Onboarding slodze ir neredzama",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/30">
-                    <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/15" />
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/65">
+                    <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/50" />
                     {item}
                   </li>
                 ))}
@@ -572,7 +572,7 @@ export default function HomePage() {
                   "Role gaps kļūst redzami un adresējami",
                   "Onboarding ieguldījums ir izmērāms",
                 ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/60">
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/75">
                     <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
                     {item}
                   </li>
@@ -597,7 +597,7 @@ export default function HomePage() {
               <h2 data-reveal="flip" data-delay="100" className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
                 Kāpēc tas nav<br />novērošanas rīks?
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/45">
+              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/80">
                 Shadowy neizseko privātas sarunas, ekrāna aktivitāti vai katru
                 klikšķi. Platforma balstās uz darbinieku iesniegtiem un apstiprinātiem
                 ierakstiem, lai palīdzētu saprast slodzi - nevis kontrolēt cilvēkus.
@@ -619,20 +619,20 @@ export default function HomePage() {
                   {PRIVACY_SEES.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm">
                       <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                      <span className="leading-snug text-white/55">{item}</span>
+                      <span className="leading-snug text-white/85">{item}</span>
                     </li>
                   ))}
                 </ul>
               </TiltCard>
               <TiltCard className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5">
-                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-white/20">
+                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-white/55">
                   Ko vadītājs neredz
                 </p>
                 <ul className="space-y-3">
                   {PRIVACY_NOT_SEES.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm">
-                      <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/20" />
-                      <span className="leading-snug text-white/30">{item}</span>
+                      <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/55" />
+                      <span className="leading-snug text-white/65">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -648,7 +648,7 @@ export default function HomePage() {
           <div className="mb-12">
             <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Biznesa vērtība</p>
             <h2 data-reveal="flip" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">Kāpēc uzņēmumam tas ir vērtīgi?</h2>
-            <p data-reveal="blur" data-delay="200" className="mt-3 max-w-2xl text-sm leading-relaxed text-white/45">
+            <p data-reveal="blur" data-delay="200" className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">
               Shadowy palīdz vadītājiem redzēt to, kas parasti pazūd starp kalendāriem, uzdevumu sarakstiem un amata aprakstiem.
             </p>
           </div>
@@ -663,8 +663,8 @@ export default function HomePage() {
             ] as const).map(({ title, desc }) => (
               <div key={title} className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5 transition-colors duration-200 hover:border-white/[0.12] hover:bg-white/[0.03]">
                 <div className="mb-2 h-1 w-6 rounded-full bg-emerald-500/40" />
-                <p className="text-sm font-semibold text-white/80">{title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/40">{desc}</p>
+                <p className="text-sm font-semibold text-white/95">{title}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-white/75">{desc}</p>
               </div>
             ))}
           </div>
@@ -678,7 +678,7 @@ export default function HomePage() {
             <div>
               <p data-reveal="left" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Mērķauditorija</p>
               <h2 data-reveal="up" data-delay="100" className="mt-2 font-display font-black text-2xl tracking-tight text-white sm:text-3xl">Kam Shadowy ir piemērots?</h2>
-              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/45">
+              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/80">
                 Īpaši piemērots komandām, kur daudz darba notiek neformāli: palīdzība kolēģiem, koordinācija, klientu jautājumi, onboardings un papildu pienākumi.
               </p>
               <ul data-reveal="right" data-delay="280" className="mt-5 space-y-2">
@@ -690,7 +690,7 @@ export default function HomePage() {
                   "Customer support komandas",
                   "Mazas un vidējas komandas (5–50 cilvēki)",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-white/55">
+                  <li key={item} className="flex items-center gap-2 text-sm text-white/85">
                     <Check className="h-3 w-3 shrink-0 text-emerald-400/70" />
                     {item}
                   </li>
@@ -698,9 +698,9 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <p data-reveal="right" className="text-[11px] font-semibold uppercase tracking-widest text-white/30">Nav paredzēts</p>
+              <p data-reveal="right" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Nav paredzēts</p>
               <h2 data-reveal="up" data-delay="100" className="mt-2 font-display font-black text-2xl tracking-tight text-white sm:text-3xl">Kam Shadowy nav?</h2>
-              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/45">
+              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/80">
                 Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi - nevis kontrolēt darbiniekus.
               </p>
               <ul data-reveal="left" data-delay="280" className="mt-5 space-y-2">
@@ -710,8 +710,8 @@ export default function HomePage() {
                   "Privāto sarunu analīzei",
                   "Mikromenedžmentam",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-white/35">
-                    <X className="h-3 w-3 shrink-0 text-white/20" />
+                  <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+                    <X className="h-3 w-3 shrink-0 text-white/55" />
                     {item}
                   </li>
                 ))}
@@ -727,7 +727,7 @@ export default function HomePage() {
           <div className="mb-16 text-center">
             <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Process</p>
             <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">Kas notiek pēc pieteikuma?</h2>
-            <p data-reveal="blur" data-delay="200" className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/45">
+            <p data-reveal="blur" data-delay="200" className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/80">
               Mēs nevēlamies pārsteigt - šeit ir precīzi soļi no pieteikuma līdz pilota sākumam.
             </p>
           </div>
@@ -773,7 +773,7 @@ export default function HomePage() {
               <div key={num} data-reveal="up" data-delay={`${250 + i * 80}`}>
                 <p className={`mb-2 text-[11px] font-bold tracking-[0.18em] uppercase ${color}`}>SOLIS {num}</p>
                 <h3 className="text-[15px] font-semibold text-white">{title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/40">{desc}</p>
+                <p className="mt-2 text-sm leading-relaxed text-white/75">{desc}</p>
               </div>
             ))}
           </div>
@@ -785,9 +785,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl px-6 py-8">
           <div className="glass flex items-start gap-3 rounded-xl border border-white/[0.07] bg-white/[0.015] p-4">
             <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5">
-              <span className="text-[9px] text-white/40">i</span>
+              <span className="text-[9px] text-white/75">i</span>
             </div>
-            <p className="text-xs leading-relaxed text-white/35">
+            <p className="text-xs leading-relaxed text-white/70">
               Shadowy ir Ventspils Augstskolas studentu veidots agrīnās stadijas projekts. Šobrīd meklējam pirmās komandas 30 dienu pilotam, lai pārbaudītu risinājumu reālā darba vidē. Jūsu atgriezeniskā saite palīdzēs veidot labāku produktu.
             </p>
           </div>
@@ -808,10 +808,10 @@ export default function HomePage() {
             <h2 className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
               Pieteikt 30 dienu pilotu.
             </h2>
-            <p className="mt-2 font-display font-light text-xl text-white/40 sm:text-2xl">
+            <p className="mt-2 font-display font-light text-xl text-white/75 sm:text-2xl">
               Sāciet bez riska, bez kredītkartes.
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-white/45">
+            <p className="mt-3 text-sm leading-relaxed text-white/80">
               Aizpildiet formu - sazināsimies ar jums tuvāko dienu laikā un
               palīdzēsim uzsākt pilotu jūsu komandā.
             </p>
@@ -881,7 +881,7 @@ export default function HomePage() {
           <h2 className="relative z-10 -mt-14 font-display font-black text-3xl tracking-wide text-white sm:text-4xl">
             Gatavi pārbaudīt Shadowy<br />savā komandā?
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/50">
+          <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/85">
             Sāciet ar 30 dienu bezmaksas pilotu vienai komandai. Bez riska,
             bez kredītkartes un bez sarežģītas ieviešanas.
           </p>
@@ -892,18 +892,18 @@ export default function HomePage() {
             >
               Izmēģināt bezmaksas
             </Link>
-            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/65 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
+            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/80 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
               <a href="#pilots">Sazināties</a>
             </Button>
           </div>
-          <p className="mt-6 text-xs text-white/30">
+          <p className="mt-6 text-xs text-white/65">
             Jautājumi?{" "}
-            <a href="mailto:artemijlucin@gmail.com" className="underline underline-offset-2 transition-colors hover:text-white/60">
+            <a href="mailto:artemijlucin@gmail.com" className="underline underline-offset-2 transition-colors hover:text-white/75">
               artemijlucin@gmail.com
             </a>
           </p>
-          <p className="mt-2 text-xs text-white/30">
-            <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-white/60">
+          <p className="mt-2 text-xs text-white/65">
+            <Link href="/privacy" className="underline underline-offset-2 transition-colors hover:text-white/75">
               Privātuma politika un noteikumi
             </Link>
           </p>
@@ -940,14 +940,14 @@ function DashboardMockup() {
             <div className="flex items-center gap-1.5">
               {[0, 1, 2].map((i) => <div key={i} className="h-2.5 w-2.5 rounded-full bg-white/8" />)}
             </div>
-            <span className="flex-1 text-center font-mono text-[10px] text-white/25">shadowy · vadītāja pārskats</span>
+            <span className="flex-1 text-center font-mono text-[10px] text-white/60">shadowy · vadītāja pārskats</span>
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-500/20 text-[8px] font-bold text-emerald-400">MB</div>
           </div>
 
           <div className="flex">
             <div className="flex flex-col items-center gap-1.5 border-r border-white/5 bg-[#0a1220] px-2.5 py-3">
               {[LayoutDashboard, Users, BarChart3, Settings].map((Icon, i) => (
-                <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-md ${i === 0 ? "bg-emerald-500/15 text-emerald-400" : "text-white/20"}`}>
+                <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-md ${i === 0 ? "bg-emerald-500/15 text-emerald-400" : "text-white/55"}`}>
                   <Icon className="h-3.5 w-3.5" />
                 </div>
               ))}
@@ -956,11 +956,11 @@ function DashboardMockup() {
             <div className="min-w-0 flex-1 space-y-2.5 p-3">
               <div className="flex items-center gap-1.5">
                 {["Šī nedēļa", "Visi"].map((f) => (
-                  <div key={f} className="flex items-center gap-1 rounded border border-white/8 bg-white/4 px-2 py-1 text-[10px] text-white/35">
+                  <div key={f} className="flex items-center gap-1 rounded border border-white/8 bg-white/4 px-2 py-1 text-[10px] text-white/70">
                     {f} <span className="opacity-40">▾</span>
                   </div>
                 ))}
-                <span className="ml-auto text-[10px] text-white/20">4 ieraksti</span>
+                <span className="ml-auto text-[10px] text-white/55">4 ieraksti</span>
               </div>
 
               <div className="space-y-1.5">
@@ -970,25 +970,25 @@ function DashboardMockup() {
                   <span className="rounded border border-amber-500/25 px-1.5 py-0.5 text-[9px] font-medium text-amber-400">Vidējs</span>
                 </div>
                 <div className="flex items-center gap-2 rounded-md border border-white/[0.1] bg-white/3 px-2.5 py-1.5">
-                  <TrendingUp className="h-3 w-3 shrink-0 text-white/25" />
-                  <span className="flex-1 text-[10px] text-white/35">Lomas neatbilstība · Mārtiņš B.</span>
-                  <span className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/25">Pārskatīt</span>
+                  <TrendingUp className="h-3 w-3 shrink-0 text-white/60" />
+                  <span className="flex-1 text-[10px] text-white/70">Lomas neatbilstība · Mārtiņš B.</span>
+                  <span className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/60">Pārskatīt</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2">
                 <div className="h-px flex-1 bg-white/6" />
-                <span className="text-[9px] font-medium uppercase tracking-wider text-white/20">Gaida · 3</span>
+                <span className="text-[9px] font-medium uppercase tracking-wider text-white/55">Gaida · 3</span>
                 <div className="h-px flex-1 bg-white/6" />
               </div>
 
               <div className="space-y-px">
                 {entries.map((e) => (
                   <div key={e.name} className={`flex items-center gap-2 rounded-md px-2 py-1.5 ${e.pending ? "hover:bg-white/4" : "opacity-30"}`}>
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/50">{e.initials}</div>
-                    <span className="w-[64px] shrink-0 truncate text-[10px] font-medium text-white/70">{e.name}</span>
-                    <span className="flex-1 truncate text-[10px] text-white/35">{e.type}</span>
-                    <span className="shrink-0 text-[10px] text-white/25">{e.time}</span>
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/85">{e.initials}</div>
+                    <span className="w-[64px] shrink-0 truncate text-[10px] font-medium text-white/85">{e.name}</span>
+                    <span className="flex-1 truncate text-[10px] text-white/70">{e.type}</span>
+                    <span className="shrink-0 text-[10px] text-white/60">{e.time}</span>
                     {e.pending ? (
                       <span className="shrink-0 rounded border border-amber-500/25 bg-amber-500/8 px-1.5 py-0.5 text-[9px] font-medium text-amber-400">Gaida</span>
                     ) : (
@@ -1021,15 +1021,15 @@ function EmployeeFormMockup() {
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => <div key={i} className="h-2.5 w-2.5 rounded-full bg-white/8" />)}
             </div>
-            <span className="flex-1 text-center font-mono text-[10px] text-white/25">shadowy · jauns ieraksts</span>
-            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/40">IK</div>
+            <span className="flex-1 text-center font-mono text-[10px] text-white/60">shadowy · jauns ieraksts</span>
+            <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/75">IK</div>
           </div>
 
           <div className="space-y-4 p-5">
-            <div className="text-sm font-semibold text-white/80">Jauns ieraksts</div>
+            <div className="text-sm font-semibold text-white/95">Jauns ieraksts</div>
 
             <div>
-              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/30">Ieraksta veids</p>
+              <p className="mb-2 text-[10px] font-medium uppercase tracking-wider text-white/65">Ieraksta veids</p>
               <div className="flex flex-wrap gap-1.5">
                 {[
                   { label: "Palīdzība kolēģim", active: true },
@@ -1042,7 +1042,7 @@ function EmployeeFormMockup() {
                     className={`rounded-full border px-2.5 py-1 text-[10px] font-medium ${
                       active
                         ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-400"
-                        : "border-white/8 bg-white/4 text-white/30"
+                        : "border-white/8 bg-white/4 text-white/65"
                     }`}
                   >
                     {label}
@@ -1052,27 +1052,27 @@ function EmployeeFormMockup() {
             </div>
 
             <div>
-              <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/30">Apraksts</p>
+              <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/65">Apraksts</p>
               <div className="min-h-[68px] rounded-lg border border-white/8 bg-white/4 p-3">
-                <p className="text-[11px] leading-relaxed text-white/50">
+                <p className="text-[11px] leading-relaxed text-white/85">
                   Palīdzēju jaunajam darbiniekam saprast CRM sistēmu un onboardinga
                   procesu. Atbildēju uz jautājumiem par klienta komunikāciju
-                  <span className="animate-pulse text-white/30">|</span>
+                  <span className="animate-pulse text-white/65">|</span>
                 </p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/30">Laiks</p>
+                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/65">Laiks</p>
                 <div className="rounded-lg border border-white/8 bg-white/4 px-3 py-2">
-                  <span className="text-[11px] font-medium text-white/65">2 h 30 min</span>
+                  <span className="text-[11px] font-medium text-white/80">2 h 30 min</span>
                 </div>
               </div>
               <div>
-                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/30">Datums</p>
+                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wider text-white/65">Datums</p>
                 <div className="rounded-lg border border-white/8 bg-white/4 px-3 py-2">
-                  <span className="text-[11px] text-white/65">08.06.2025</span>
+                  <span className="text-[11px] text-white/80">08.06.2025</span>
                 </div>
               </div>
             </div>
@@ -1116,14 +1116,14 @@ function ManagerReviewMockup() {
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => <div key={i} className="h-2.5 w-2.5 rounded-full bg-white/8" />)}
             </div>
-            <span className="flex-1 text-center font-mono text-[10px] text-white/25">shadowy · ierakstu pārskatīšana</span>
+            <span className="flex-1 text-center font-mono text-[10px] text-white/60">shadowy · ierakstu pārskatīšana</span>
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-500/20 text-[8px] font-bold text-blue-300">MB</div>
           </div>
 
           <div className="flex" style={{ minHeight: "272px" }}>
             <div className="w-[42%] flex-shrink-0 border-r border-white/[0.1]">
               <div className="border-b border-white/[0.1] px-3 py-2">
-                <span className="text-[9px] font-semibold uppercase tracking-wider text-white/25">Gaidāmie · 3</span>
+                <span className="text-[9px] font-semibold uppercase tracking-wider text-white/60">Gaidāmie · 3</span>
               </div>
               {entries.map((e) => (
                 <div
@@ -1131,12 +1131,12 @@ function ManagerReviewMockup() {
                   className={`relative flex items-start gap-2 border-b border-white/4 px-3 py-2.5 ${e.selected ? "bg-white/5" : ""} ${e.approved ? "opacity-35" : ""}`}
                 >
                   {e.selected && <div className="absolute inset-y-0 left-0 w-0.5 bg-emerald-500" />}
-                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[8px] font-semibold text-white/50">{e.initials}</div>
+                  <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-white/10 text-[8px] font-semibold text-white/85">{e.initials}</div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[10px] font-medium text-white/75">{e.name}</p>
-                    <p className="truncate text-[9px] text-white/35">{e.type}</p>
+                    <p className="truncate text-[10px] font-medium text-white/90">{e.name}</p>
+                    <p className="truncate text-[9px] text-white/70">{e.type}</p>
                     <div className="mt-1 flex items-center gap-1.5">
-                      <span className="text-[9px] text-white/25">{e.time}</span>
+                      <span className="text-[9px] text-white/60">{e.time}</span>
                       {e.approved ? (
                         <span className="rounded border border-emerald-500/25 bg-emerald-500/10 px-1 py-px text-[8px] font-medium text-emerald-400">Apst.</span>
                       ) : (
@@ -1151,10 +1151,10 @@ function ManagerReviewMockup() {
             <div className="flex-1 space-y-3 p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[10px] font-semibold text-white/60">AK</div>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[10px] font-semibold text-white/75">AK</div>
                   <div>
-                    <p className="text-xs font-semibold text-white/80">Anna K.</p>
-                    <p className="text-[9px] text-white/35">08.06.2025</p>
+                    <p className="text-xs font-semibold text-white/95">Anna K.</p>
+                    <p className="text-[9px] text-white/70">08.06.2025</p>
                   </div>
                 </div>
                 <span className="rounded-full border border-amber-500/25 bg-amber-500/10 px-2 py-0.5 text-[9px] font-medium text-amber-400">Gaida</span>
@@ -1162,10 +1162,10 @@ function ManagerReviewMockup() {
 
               <div className="flex items-center gap-2">
                 <span className="rounded-full border border-emerald-500/20 bg-emerald-500/8 px-2 py-0.5 text-[9px] font-medium text-emerald-400">Palīdzība kolēģim</span>
-                <span className="text-[10px] text-white/30">· 2h 30min</span>
+                <span className="text-[10px] text-white/65">· 2h 30min</span>
               </div>
 
-              <div className="rounded-lg border border-white/[0.1] bg-white/[0.025] p-3 text-[10px] italic leading-relaxed text-white/45">
+              <div className="rounded-lg border border-white/[0.1] bg-white/[0.025] p-3 text-[10px] italic leading-relaxed text-white/80">
                 &ldquo;Palīdzēju jaunajam darbiniekam saprast CRM sistēmu un onboardinga procesu...&rdquo;
               </div>
 
@@ -1204,14 +1204,14 @@ function InsightsMockup() {
             <div className="flex gap-1.5">
               {[0, 1, 2].map((i) => <div key={i} className="h-2.5 w-2.5 rounded-full bg-white/8" />)}
             </div>
-            <span className="flex-1 text-center font-mono text-[10px] text-white/25">shadowy · pārskats</span>
+            <span className="flex-1 text-center font-mono text-[10px] text-white/60">shadowy · pārskats</span>
             <div className="flex h-5 w-5 items-center justify-center rounded-full bg-purple-500/20 text-[8px] font-bold text-purple-300">MB</div>
           </div>
 
           <div className="flex">
             <div className="flex flex-col items-center gap-1.5 border-r border-white/5 bg-[#0a1220] px-2.5 py-3">
               {[LayoutDashboard, Users, BarChart3, Settings].map((Icon, i) => (
-                <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-md ${i === 2 ? "bg-purple-500/15 text-purple-400" : "text-white/20"}`}>
+                <div key={i} className={`flex h-7 w-7 items-center justify-center rounded-md ${i === 2 ? "bg-purple-500/15 text-purple-400" : "text-white/55"}`}>
                   <Icon className="h-3.5 w-3.5" />
                 </div>
               ))}
@@ -1226,7 +1226,7 @@ function InsightsMockup() {
                 ].map(({ label, value, cls }) => (
                   <div key={label} className={`rounded-lg border bg-white/3 p-2 text-center ${cls}`}>
                     <p className="text-base font-bold">{value}</p>
-                    <p className="text-[9px] text-white/30">{label}</p>
+                    <p className="text-[9px] text-white/65">{label}</p>
                   </div>
                 ))}
               </div>
@@ -1238,14 +1238,14 @@ function InsightsMockup() {
                   <span className="rounded border border-amber-500/25 px-1.5 py-0.5 text-[9px] font-medium text-amber-400">Vidējs</span>
                 </div>
                 <div className="flex items-center gap-2 rounded-md border border-white/[0.1] bg-white/3 px-2.5 py-1.5">
-                  <TrendingUp className="h-3 w-3 shrink-0 text-white/25" />
-                  <span className="flex-1 text-[10px] text-white/35">Lomas neatbilstība · Mārtiņš B.</span>
-                  <span className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/25">Pārskatīt</span>
+                  <TrendingUp className="h-3 w-3 shrink-0 text-white/60" />
+                  <span className="flex-1 text-[10px] text-white/70">Lomas neatbilstība · Mārtiņš B.</span>
+                  <span className="rounded border border-white/10 px-1.5 py-0.5 text-[9px] text-white/60">Pārskatīt</span>
                 </div>
               </div>
 
               <div>
-                <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wider text-white/20">Nedēļas slodze</p>
+                <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wider text-white/55">Nedēļas slodze</p>
                 <div className="flex items-end gap-1" style={{ height: "40px" }}>
                   {[
                     { day: "P", pct: 55, hi: false },
@@ -1259,7 +1259,7 @@ function InsightsMockup() {
                         className={`w-full rounded-sm ${hi ? "bg-amber-500/35" : "bg-emerald-500/25"}`}
                         style={{ height: `${pct}%` }}
                       />
-                      <span className="text-[8px] text-white/20">{day}</span>
+                      <span className="text-[8px] text-white/55">{day}</span>
                     </div>
                   ))}
                 </div>
@@ -1267,7 +1267,7 @@ function InsightsMockup() {
 
               <div className="flex items-center gap-2">
                 <div className="h-px flex-1 bg-white/6" />
-                <span className="text-[9px] font-medium uppercase tracking-wider text-white/20">Gaida · 3</span>
+                <span className="text-[9px] font-medium uppercase tracking-wider text-white/55">Gaida · 3</span>
                 <div className="h-px flex-1 bg-white/6" />
               </div>
 
@@ -1278,10 +1278,10 @@ function InsightsMockup() {
                   { initials: "MB", name: "Mārtiņš B.", type: "Jauno ievadīšana", time: "4h", pending: false },
                 ].map((e) => (
                   <div key={e.name} className={`flex items-center gap-2 rounded-md px-2 py-1.5 ${!e.pending ? "opacity-30" : ""}`}>
-                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/50">{e.initials}</div>
-                    <span className="w-[60px] shrink-0 truncate text-[10px] font-medium text-white/70">{e.name}</span>
-                    <span className="flex-1 truncate text-[10px] text-white/35">{e.type}</span>
-                    <span className="shrink-0 text-[10px] text-white/25">{e.time}</span>
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/8 text-[8px] font-semibold text-white/85">{e.initials}</div>
+                    <span className="w-[60px] shrink-0 truncate text-[10px] font-medium text-white/85">{e.name}</span>
+                    <span className="flex-1 truncate text-[10px] text-white/70">{e.type}</span>
+                    <span className="shrink-0 text-[10px] text-white/60">{e.time}</span>
                     {e.pending ? (
                       <span className="shrink-0 rounded border border-amber-500/25 bg-amber-500/8 px-1.5 py-0.5 text-[9px] font-medium text-amber-400">Gaida</span>
                     ) : (
@@ -1311,8 +1311,8 @@ function PilotReportMockup() {
       {/* Header */}
       <div className="flex items-center justify-between border-b border-white/[0.1] bg-[#07101e] px-5 py-4">
         <div>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-white/25">Shadowy · 30 dienu pilot atskaite</p>
-          <p className="mt-0.5 text-xs text-white/40">Uzņēmums XYZ · 01.05–31.05.2025</p>
+          <p className="font-mono text-[9px] uppercase tracking-widest text-white/60">Shadowy · 30 dienu pilot atskaite</p>
+          <p className="mt-0.5 text-xs text-white/75">Uzņēmums XYZ · 01.05–31.05.2025</p>
         </div>
         <span className="rounded border border-emerald-500/25 bg-emerald-500/8 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-400">Gatavs</span>
       </div>
@@ -1326,20 +1326,20 @@ function PilotReportMockup() {
         ] as const).map(({ label, value, color }) => (
           <div key={label} className="px-5 py-4 text-center">
             <p className={`text-xl font-bold ${color}`}>{value}</p>
-            <p className="mt-0.5 text-[10px] text-white/35">{label}</p>
+            <p className="mt-0.5 text-[10px] text-white/70">{label}</p>
           </div>
         ))}
       </div>
 
       {/* Breakdown */}
       <div className="px-5 py-4">
-        <p className="mb-3 font-mono text-[9px] uppercase tracking-wider text-white/25">Biežākie papildu darba veidi</p>
+        <p className="mb-3 font-mono text-[9px] uppercase tracking-wider text-white/60">Biežākie papildu darba veidi</p>
         <div className="space-y-2.5">
           {breakdown.map(({ type, hours, pct }) => (
             <div key={type}>
               <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="text-white/55">{type}</span>
-                <span className="font-mono text-white/35">{hours}h</span>
+                <span className="text-white/85">{type}</span>
+                <span className="font-mono text-white/70">{hours}h</span>
               </div>
               <div className="h-1 w-full rounded-full bg-white/[0.05]">
                 <div className="h-1 rounded-full bg-emerald-500/50" style={{ width: `${pct}%` }} />
@@ -1352,7 +1352,7 @@ function PilotReportMockup() {
       {/* Recommendation */}
       <div className="border-t border-white/[0.1] bg-amber-500/[0.04] px-5 py-4">
         <p className="mb-1 font-mono text-[9px] uppercase tracking-wider text-amber-400/60">Ieteikums vadītājam</p>
-        <p className="text-xs leading-relaxed text-white/45">Pārskatīt Mārtiņa B. uzdevumu sadali - 40% darba laika tiek pavadīts ārpus amata apraksta.</p>
+        <p className="text-xs leading-relaxed text-white/80">Pārskatīt Mārtiņa B. uzdevumu sadali - 40% darba laika tiek pavadīts ārpus amata apraksta.</p>
       </div>
     </div>
   );

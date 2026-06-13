@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { resetPassword } from "./actions";
 
@@ -46,10 +47,9 @@ export function ResetForm({ token }: { token: string }) {
     <form action={onSubmit} className="space-y-4">
       <div className="grid gap-2">
         <Label htmlFor="newPassword">Jaunā parole</Label>
-        <Input
+        <PasswordInput
           id="newPassword"
           name="newPassword"
-          type="password"
           autoComplete="new-password"
           minLength={8}
           required
@@ -58,10 +58,9 @@ export function ResetForm({ token }: { token: string }) {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="confirmPassword">Atkārtojiet jauno paroli</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
-          type="password"
           autoComplete="new-password"
           minLength={8}
           required

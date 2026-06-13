@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { registerAction } from "@/app/(auth)/register/actions";
 
@@ -14,6 +15,14 @@ export function RegisterForm() {
 
   async function onSubmit(formData: FormData) {
     setError(null);
+
+    const password = formData.get("password");
+    const confirmPassword = formData.get("confirmPassword");
+    if (password !== confirmPassword) {
+      setError("Paroles nesakrīt.");
+      return;
+    }
+
     startTransition(async () => {
       const res = await registerAction(formData);
       if (!res.ok) {
@@ -42,7 +51,11 @@ export function RegisterForm() {
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="password" className="text-xs">Parole</Label>
-          <Input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" placeholder="Vismaz 8 simboli" className="h-9 text-sm" />
+          <PasswordInput id="password" name="password" required minLength={8} autoComplete="new-password" placeholder="Vismaz 8 simboli" className="h-9 text-sm" />
+        </div>
+        <div className="grid gap-1.5">
+          <Label htmlFor="confirmPassword" className="text-xs">Apstipriniet paroli</Label>
+          <PasswordInput id="confirmPassword" name="confirmPassword" required minLength={8} autoComplete="new-password" placeholder="Ievadiet paroli vēlreiz" className="h-9 text-sm" />
         </div>
 
         {error && (

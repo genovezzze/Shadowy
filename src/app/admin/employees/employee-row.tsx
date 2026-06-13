@@ -4,6 +4,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { updateEmployee, deleteEmployee } from "./actions";
 import { Pencil, Trash2, X, Check } from "lucide-react";
@@ -34,6 +36,7 @@ export function EmployeeRow({
 
   function handleEdit(formData: FormData) {
     setError(null);
+    if (formData.get("managerId") === "self") formData.set("managerId", "");
     startTransition(async () => {
       const res = await updateEmployee(id, formData);
       if (!res.ok) setError(res.error);
@@ -70,21 +73,21 @@ export function EmployeeRow({
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor={`password-${id}`}>Jauna parole</Label>
-                <Input id={`password-${id}`} name="password" type="password" minLength={8} placeholder="Atstājiet tukšu, ja nemainīt" />
+                <PasswordInput id={`password-${id}`} name="password" minLength={8} placeholder="Atstājiet tukšu, ja nemainīt" />
               </div>
               <div className="grid gap-1.5">
                 <Label htmlFor={`manager-${id}`}>Vadītājs</Label>
-                <select
-                  id={`manager-${id}`}
-                  name="managerId"
-                  defaultValue={managerId ?? ""}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <option value="">Es pats (administrators)</option>
-                  {managers.map((m) => (
-                    <option key={m.id} value={m.id}>{m.name}</option>
-                  ))}
-                </select>
+                <Select name="managerId" defaultValue={managerId ?? "self"}>
+                  <SelectTrigger id={`manager-${id}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="self">Es pats (administrators)</SelectItem>
+                    {managers.map((m) => (
+                      <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             </div>
             {error && <div className="text-sm text-destructive">{error}</div>}
@@ -110,7 +113,7 @@ export function EmployeeRow({
       </td>
       <td className="px-6 py-3 text-muted-foreground">{title ?? "—"}</td>
       <td className="px-6 py-3 text-muted-foreground">
-        {managerName ?? <span className="text-xs italic">Administrators</span>}
+        {managerName ?? <span className="text-xs italic">Nav vadītāja (jūs)</span>}
       </td>
       <td className="px-6 py-3 text-right tabular-nums text-muted-foreground">
         {entryCount}

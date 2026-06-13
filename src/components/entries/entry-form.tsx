@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { NativeSelect } from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { createEntry } from "@/app/employee/new-entry/actions";
 
@@ -17,6 +17,7 @@ export function EntryForm({ categories }: EntryFormProps) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [category, setCategory] = useState("");
 
   async function onSubmit(formData: FormData) {
     setError(null);
@@ -27,6 +28,7 @@ export function EntryForm({ categories }: EntryFormProps) {
         setError(result.error);
       } else {
         setSuccess(true);
+        setCategory("");
         (document.getElementById("entry-form") as HTMLFormElement)?.reset();
       }
     });
@@ -56,16 +58,18 @@ export function EntryForm({ categories }: EntryFormProps) {
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <div className="grid gap-2">
               <Label htmlFor="category">Kategorija</Label>
-              <NativeSelect id="category" name="category" required>
-                <option value="" disabled>
-                  Izvēlieties kategoriju
-                </option>
-                {categories.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </NativeSelect>
+              <Select name="category" required value={category} onValueChange={setCategory}>
+                <SelectTrigger id="category">
+                  <SelectValue placeholder="Izvēlieties kategoriju" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c} value={c}>
+                      {c}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="workDate">Darba datums</Label>

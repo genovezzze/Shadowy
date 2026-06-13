@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { changeOwnPassword } from "@/app/account/actions";
 
@@ -29,20 +30,18 @@ export function ChangePasswordForm() {
     <form ref={formRef} action={onSubmit} className="space-y-3 max-w-sm">
       <div className="grid gap-1.5">
         <Label htmlFor="currentPassword">Pašreizējā parole</Label>
-        <Input
+        <PasswordInput
           id="currentPassword"
           name="currentPassword"
-          type="password"
           autoComplete="current-password"
           required
         />
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="newPassword">Jaunā parole</Label>
-        <Input
+        <PasswordInput
           id="newPassword"
           name="newPassword"
-          type="password"
           autoComplete="new-password"
           minLength={8}
           required
@@ -51,10 +50,9 @@ export function ChangePasswordForm() {
       </div>
       <div className="grid gap-1.5">
         <Label htmlFor="confirmPassword">Atkārtojiet jauno paroli</Label>
-        <Input
+        <PasswordInput
           id="confirmPassword"
           name="confirmPassword"
-          type="password"
           autoComplete="new-password"
           minLength={8}
           required
