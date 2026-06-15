@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { submitPilotApplication } from "./pilot-actions";
 import { CheckCircle2 } from "lucide-react";
 
@@ -57,17 +58,16 @@ export function PilotForm() {
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor="pilot-size">Komandas lielums</Label>
-          <select
-            id="pilot-size"
-            name="teamSize"
-            required
-            className="flex h-9 w-full rounded-md border border-input bg-[#060d1c] text-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring [&>option]:bg-[#0d1b2e] [&>option]:text-white"
-          >
-            <option value="">Izvēlieties...</option>
-            {TEAM_SIZES.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+          <Select name="teamSize" required>
+            <SelectTrigger id="pilot-size">
+              <SelectValue placeholder="Izvēlieties..." />
+            </SelectTrigger>
+            <SelectContent>
+              {TEAM_SIZES.map((s) => (
+                <SelectItem key={s} value={s}>{s}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
       <div className="grid gap-1.5">

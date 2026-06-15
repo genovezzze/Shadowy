@@ -40,8 +40,8 @@ const SelectContent = React.forwardRef<
       position={position}
       sideOffset={6}
       className={cn(
-        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
-        "dark:border-white/[0.07] dark:bg-[#161e30]/95 dark:backdrop-blur-md dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.65)]",
+        "glass relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+        "dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-foreground dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_-16px_rgba(0,0,0,0.8)]",
         position === "popper" &&
           "w-full min-w-[var(--radix-select-trigger-width)] translate-y-1",
         className

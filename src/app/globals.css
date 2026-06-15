@@ -104,6 +104,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   html, body {
     @apply text-foreground antialiased;
     background-color: #060d1c;

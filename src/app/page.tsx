@@ -23,6 +23,7 @@ import { MouseEffects } from "./mouse-effects";
 import { HeroTilt } from "./hero-tilt";
 import { TiltCard } from "./tilt-card";
 import { ScrollRevealInit } from "./scroll-reveal";
+import { FaqSection } from "@/components/landing/faq-section";
 
 export default function HomePage() {
   return (
@@ -57,6 +58,7 @@ export default function HomePage() {
           <nav className="hidden items-center gap-0.5 md:flex">
             <a href="#ka-tas-darbojas" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Kā tas darbojas</a>
             <a href="#pilots" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Pilots</a>
+            <a href="#faq" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">FAQ</a>
             <a href="#privatums" className="rounded-lg px-3 py-1.5 text-[13px] text-white/80 transition-colors hover:text-white/95">Privātums</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -263,7 +265,7 @@ export default function HomePage() {
       </section>
 
       {/* ── Kā tas darbojas ──────────────────────────────────────────── */}
-      <section id="ka-tas-darbojas" className="relative border-t border-white/[0.1]">
+      <section id="ka-tas-darbojas" className="relative border-t border-white/[0.1] scroll-mt-24">
         <div className="mx-auto max-w-5xl px-6 py-24">
           <div className="mb-16 text-center">
             <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Vienkārši. Pārredzami.</p>
@@ -795,7 +797,7 @@ export default function HomePage() {
       </div>
 
       {/* ── Pilot form ───────────────────────────────────────────────── */}
-      <section id="pilots" className="relative overflow-hidden border-t border-white/[0.1]">
+      <section id="pilots" className="relative overflow-hidden border-t border-white/[0.1] scroll-mt-24">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute right-[-10%] top-[-20%] h-[500px] w-[600px] rounded-full bg-[hsl(220_80%_30%_/_0.12)] blur-[100px]" />
           <div className="absolute bottom-[-20%] left-[-5%] h-[400px] w-[500px] rounded-full bg-[hsl(160_60%_20%_/_0.10)] blur-[100px]" />
@@ -817,6 +819,21 @@ export default function HomePage() {
             </p>
           </div>
           <PilotForm />
+        </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────── */}
+      <section id="faq" className="relative border-t border-white/[0.1] scroll-mt-24">
+        <div className="mx-auto max-w-3xl px-6 py-24">
+          <div className="mb-10 text-center">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
+              Jautājumi
+            </p>
+            <h2 className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
+              Biežāk uzdotie jautājumi
+            </h2>
+          </div>
+          <FaqSection />
         </div>
       </section>
 
@@ -910,6 +927,74 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Footer ───────────────────────────────────────────────────── */}
+      <footer className="relative border-t border-white/[0.06] bg-black/40">
+        <div className="mx-auto max-w-6xl px-6 py-12">
+          <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
+            <div className="max-w-sm">
+              <a href="#" className="flex items-center gap-2.5">
+                <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
+                <span className="text-base font-semibold tracking-tight text-white">Shadowy</span>
+              </a>
+              <p className="mt-3 text-sm leading-relaxed text-white/60">
+                Padariet neredzamo darbu redzamu - strukturēta darba iesniegšana, vadītāja
+                izskatīšana un godīgāka slodzes pārvaldība.
+              </p>
+              <a
+                href="mailto:artemijlucin@gmail.com"
+                aria-label="E-pasts"
+                className="mt-5 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/60 transition-colors hover:border-white/20 hover:text-white/90"
+              >
+                <Mail className="h-4 w-4" />
+              </a>
+            </div>
+            <div className="flex gap-12 sm:gap-16">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-white/50">
+                  Produkts
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-white/70">
+                  <li>
+                    <a href="#ka-tas-darbojas" className="transition-colors hover:text-white/95">
+                      Kā tas darbojas
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#pilots" className="transition-colors hover:text-white/95">
+                      Pilots
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/login" className="transition-colors hover:text-white/95">
+                      Pieslēgties
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-white/50">
+                  Juridiskā informācija
+                </p>
+                <ul className="mt-3 space-y-2 text-sm text-white/70">
+                  <li>
+                    <Link href="/privacy" className="transition-colors hover:text-white/95">
+                      Privātuma politika
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/privacy#lietosanas-noteikumi" className="transition-colors hover:text-white/95">
+                      Lietošanas noteikumi
+                    </Link>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div className="mt-14 border-t border-white/[0.06] pt-6 text-xs text-white/50">
+            © 2026 Shadowy. Visas tiesības aizsargātas.
+          </div>
+        </div>
+      </footer>
 
       <MouseEffects />
       <ScrollRevealInit />

@@ -84,6 +84,57 @@ export default function PrivacyPage() {
           </section>
         </div>
 
+        <h2 id="lietosanas-noteikumi" className="mt-14 font-display font-black text-2xl tracking-tight sm:text-3xl">
+          Lietošanas noteikumi
+        </h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          Spēkā pilota perioda laikā. Lietojot Shadowy, jūsu organizācija piekrīt šiem noteikumiem.
+        </p>
+
+        <div className="mt-10 space-y-8 text-sm leading-relaxed">
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">7. Pakalpojuma apraksts</h2>
+            <p className="mt-3 text-muted-foreground">
+              Shadowy ir rīks darba ierakstu apkopošanai, apstiprināšanai un bonusu pārvaldībai. Pilota
+              perioda laikā pakalpojums tiek nodrošināts bez maksas un var tikt mainīts vai pārtraukts
+              jebkurā brīdī, par to iepriekš informējot.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">8. Lietotāju pienākumi</h2>
+            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
+              <li>Organizācijas administrators ir atbildīgs par lietotāju kontu pārvaldību savā organizācijā.</li>
+              <li>Konta piekļuves dati nav jānodod trešajām personām.</li>
+              <li>Platforma jāizmanto tikai likumīgiem, ar darba uzskaiti saistītiem mērķiem.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">9. Pieejamība un atbildība</h2>
+            <p className="mt-3 text-muted-foreground">
+              Pilota laikā pakalpojums tiek nodrošināts &quot;kā ir&quot;, bez garantijām par nepārtrauktu pieejamību.
+              Shadowy nav atbildīgs par neiegūto peļņu vai netiešiem zaudējumiem, kas radušies pakalpojuma
+              lietošanas vai tā pārtraukumu rezultātā.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">10. Pilota pārtraukšana un dati</h2>
+            <p className="mt-3 text-muted-foreground">
+              Jūs vai Shadowy var pārtraukt pilota dalību jebkurā brīdī. Pēc pārtraukšanas jūsu organizācijas
+              dati tiks glabāti līdz 30 dienām, lai jūs varētu pieprasīt eksportu, pēc tam tie tiek dzēsti.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">11. Piemērojamie tiesību akti</h2>
+            <p className="mt-3 text-muted-foreground">
+              Šiem noteikumiem piemēro Latvijas Republikas tiesību aktus.
+            </p>
+          </section>
+        </div>
+
         <div className="mt-12">
           <Button asChild variant="outline">
             <Link href="/">Doties uz sākumu</Link>
