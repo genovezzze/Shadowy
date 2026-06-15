@@ -86,28 +86,14 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
   const items = navFor(role);
 
   return (
-    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"
+    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"
     >
-      {/* Emerald glow blob — top center (dark mode only) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-24 left-1/2 hidden h-64 w-64 -translate-x-1/2 rounded-full dark:block"
-        style={{ background: "radial-gradient(circle, hsl(160 65% 35% / 0.22), transparent 68%)" }}
-      />
-
-      {/* Subtle bottom glow (dark mode only) */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-16 left-1/2 hidden h-48 w-48 -translate-x-1/2 rounded-full dark:block"
-        style={{ background: "radial-gradient(circle, hsl(220 80% 40% / 0.10), transparent 70%)" }}
-      />
-
       {/* Dot-grid texture (dark mode only) */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 hidden dark:block"
         style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.028) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(rgba(255,255,255,0.025) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
         }}
       />
@@ -145,12 +131,12 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
             >
               {/* Active left accent bar */}
               {active && (
-                <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-foreground dark:bg-emerald-400/90" />
+                <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-foreground dark:bg-white/80" />
               )}
               <Icon
                 className={cn(
                   "h-[18px] w-[18px] shrink-0 transition-colors",
-                  active ? "text-foreground dark:text-emerald-400" : "group-hover:text-foreground"
+                  active ? "text-foreground" : "group-hover:text-foreground"
                 )}
               />
               <span className="flex-1">{item.label}</span>

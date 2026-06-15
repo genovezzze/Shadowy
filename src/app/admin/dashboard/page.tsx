@@ -121,12 +121,11 @@ export default async function AdminDashboard({
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-white/40">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Organizācijas{" "}
-            <span className="text-gradient-emerald">pārskats</span>
+            Organizācijas pārskats
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground">
             Galvenie rādītāji par jūsu organizāciju.
@@ -143,18 +142,18 @@ export default async function AdminDashboard({
 
       {/* ── KPI grid ── */}
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard label="Vadītāji" value={managers} icon={<UserCog className="h-5 w-5" />} />
-        <KpiCard label="Darbinieki" value={employees} tone="info" icon={<Users className="h-5 w-5" />} />
+        <KpiCard formal label="Vadītāji" value={managers} icon={<UserCog className="h-5 w-5" />} />
+        <KpiCard formal label="Darbinieki" value={employees} icon={<Users className="h-5 w-5" />} />
         <KpiCard
+          formal
           label={period === "all" ? "Visi ieraksti" : "Ieraksti periodā"}
           value={totalEntries}
-          tone="accent"
           icon={<FileText className="h-5 w-5" />}
         />
         <KpiCard
+          formal
           label="Gaida izskatīšanu"
           value={pending}
-          tone="warning"
           icon={<Clock className="h-5 w-5" />}
         />
       </div>
@@ -178,7 +177,7 @@ export default async function AdminDashboard({
             <div className={glassInner} />
             <div className="px-6 py-4 flex items-center justify-between border-b border-border dark:border-white/[0.07]">
               <div className="flex items-center gap-2 text-sm font-semibold">
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 Vadītāju sniegums
               </div>
               {period !== "all" && (

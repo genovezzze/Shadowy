@@ -126,11 +126,11 @@ export default async function EmployeeDashboard() {
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-white/40">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Sveiks, <span className="text-gradient-emerald">{session.name.split(" ")[0]}</span>!
+            Mans darba pārskats
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
             Šeit jūs varat iesniegt neredzamo darbu un sekot līdzi savu ierakstu statusam.
@@ -146,26 +146,27 @@ export default async function EmployeeDashboard() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <KpiCard
+          formal
           label="Gaida izskatīšanu"
           value={pending}
-          tone="warning"
           icon={<Clock className="h-5 w-5" />}
         />
         <KpiCard
+          formal
           label="Apstiprināti"
           value={approved}
           hint={entriesHint}
-          tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
         />
         <KpiCard
+          formal
           label="Apstiprinātās stundas"
           value={`${approvedHours}h`}
           hint={hoursHint}
-          tone="info"
           icon={<Timer className="h-5 w-5" />}
         />
         <KpiCard
+          formal
           label="Atpakaļ / Noraidīti"
           value={`${returned} / ${rejected}`}
           icon={<RotateCcw className="h-5 w-5" />}

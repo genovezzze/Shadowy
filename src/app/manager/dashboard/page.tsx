@@ -166,11 +166,11 @@ export default async function ManagerDashboard({
       {/* ── Header ── */}
       <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-emerald-400/60">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-white/40">
             Pārskats
           </div>
           <h1 className="text-3xl font-bold tracking-tight">
-            Sveiks, <span className="text-gradient-emerald">{session.name.split(" ")[0]}</span>!
+            Komandas pārskats
           </h1>
           <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
             Šeit redzat savas komandas neredzamā darba pārskatu. Lūdzu, izskatiet ierakstus, kas gaida apstiprinājumu.
@@ -185,26 +185,26 @@ export default async function ManagerDashboard({
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-8">
-        <KpiCard label="Komandā darbinieku" value={team} icon={<Users className="h-5 w-5" />} />
+        <KpiCard formal label="Komandā darbinieku" value={team} icon={<Users className="h-5 w-5" />} />
         <KpiCard
+          formal
           label="Gaida apstiprinājumu"
           value={pending}
-          tone="warning"
           icon={<Clock className="h-5 w-5" />}
         />
         <KpiCard
+          formal
           label="Apstiprināti"
           value={approved}
-          tone="success"
           icon={<CheckCircle2 className="h-5 w-5" />}
         />
-        <KpiCard label="Ieraksti kopā" value={totalEntries} tone="accent" icon={<FileText className="h-5 w-5" />} />
+        <KpiCard formal label="Ieraksti kopā" value={totalEntries} icon={<FileText className="h-5 w-5" />} />
         <KpiCard
+          formal
           label="Vid. izskatīšanas laiks"
           value={avgReviewDays !== null ? `${avgReviewDays} d.` : "—"}
           hint={reviewHint}
           icon={<Timer className="h-5 w-5" />}
-          tone={avgReviewDays !== null && avgReviewDays <= 1 ? "success" : avgReviewDays !== null && avgReviewDays > 3 ? "warning" : "info"}
         />
       </div>
 
@@ -229,7 +229,7 @@ export default async function ManagerDashboard({
             <div className={glassInner} />
             <div className="px-6 py-4 flex items-center justify-between border-b border-border dark:border-white/[0.07]">
               <div className="flex items-center gap-2 text-sm font-semibold">
-                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 Komandas sniegums
               </div>
               {period !== "all" && (
@@ -290,7 +290,7 @@ export default async function ManagerDashboard({
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-36 truncate text-xs text-muted-foreground shrink-0">{cat}</div>
                   <div className="flex-1 h-1.5 bg-muted dark:bg-white/[0.06] rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 rounded-full transition-all" style={{ width: `${pct}%` }} />
+                    <div className="h-full bg-foreground/60 dark:bg-white/50 rounded-full transition-all" style={{ width: `${pct}%` }} />
                   </div>
                   <div className="text-xs text-muted-foreground w-16 text-right tabular-nums">
                     {count} · {pct}%

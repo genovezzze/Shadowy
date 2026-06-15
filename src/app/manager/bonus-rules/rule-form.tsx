@@ -203,7 +203,7 @@ export function RuleForm({
           type="checkbox"
           value="true"
           defaultChecked={initial?.oneTimePerPeriod ?? true}
-          className="h-4 w-4 rounded border border-border bg-background accent-primary"
+          className="shrink-0"
         />
         <Label htmlFor="rule-otp" className="cursor-pointer font-normal text-sm">
           Izmantojams tikai vienu reizi periodā

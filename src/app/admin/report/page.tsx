@@ -119,10 +119,10 @@ export default async function AdminReportPage({
   return (
     <div className="max-w-4xl mx-auto">
       {/* Screen header */}
-      <div className="flex items-center justify-between mb-6 print:hidden">
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold">Pilota atskaite</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
+          <h1 className="text-3xl font-bold tracking-tight">Pilota atskaite</h1>
+          <p className="text-sm text-muted-foreground mt-2">
             {org?.name} · {fmtDate(periodStart)} – {fmtDate(now)}
           </p>
         </div>
@@ -194,15 +194,27 @@ export default async function AdminReportPage({
       {/* Weekly activity */}
       <section className="mb-8">
         <h2 className="text-base font-semibold mb-3">Iknedēļas aktivitāte</h2>
-        <div className="rounded-xl border border-border bg-card p-5 print:border-gray-200">
-          <div className="flex items-end gap-2" style={{ height: "80px" }}>
+        <div className="glass rounded-xl border border-border bg-card p-5 print:border-gray-200 dark:rounded-2xl dark:border-white/[0.07] dark:bg-gradient-to-b dark:from-white/[0.06] dark:via-white/[0.035] dark:to-white/[0.015] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.6)] print:[backdrop-filter:none] print:shadow-none">
+          <div className="relative flex items-end gap-2" style={{ height: "88px" }}>
+            {/* Grid lines */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 flex h-[64px] flex-col justify-between print:hidden">
+              {[0, 1, 2].map((i) => (
+                <div key={i} className="h-px w-full bg-white/[0.06]" />
+              ))}
+            </div>
             {weeklyData.map((w, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full flex items-end" style={{ height: "56px" }}>
+              <div key={i} className="flex-1 flex flex-col items-center gap-1.5">
+                <div className="w-full flex items-end" style={{ height: "64px" }}>
                   <div
-                    className="w-full rounded-t bg-emerald-500/70 print:bg-emerald-600"
+                    className="relative w-full min-w-[8px] rounded-md bg-emerald-500/70 dark:bg-gradient-to-t dark:from-emerald-500 dark:to-emerald-400 dark:shadow-[0_0_12px_rgba(52,211,153,0.35)] print:bg-emerald-600"
                     style={{ height: `${Math.max((w.count / maxWeekCount) * 100, w.count > 0 ? 8 : 0)}%` }}
-                  />
+                  >
+                    {w.count > 0 && (
+                      <span className="absolute -top-4 left-1/2 -translate-x-1/2 text-[10px] font-medium text-muted-foreground print:text-gray-500">
+                        {w.count}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-[9px] text-muted-foreground print:text-gray-400">{w.label}</div>
               </div>

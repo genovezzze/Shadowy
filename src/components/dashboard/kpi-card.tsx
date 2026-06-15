@@ -9,6 +9,7 @@ interface KpiCardProps {
   icon?: ReactNode;
   tone?: "default" | "warning" | "success" | "destructive" | "info" | "accent";
   className?: string;
+  formal?: boolean;
 }
 
 const TONE_STYLES: Record<
@@ -60,8 +61,30 @@ export function KpiCard({
   icon,
   tone = "default",
   className,
+  formal = false,
 }: KpiCardProps) {
   const t = TONE_STYLES[tone] ?? TONE_STYLES.default;
+
+  if (formal) {
+    return (
+      <div
+        className={cn(
+          "glass rounded-xl border border-border bg-card p-5 text-card-foreground",
+          "dark:border-white/[0.08] dark:bg-gradient-to-b dark:from-white/[0.05] dark:via-white/[0.03] dark:to-white/[0.01] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-16px_rgba(0,0,0,0.6)]",
+          className
+        )}
+      >
+        {icon ? (
+          <div className="mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground [&>svg]:h-4 [&>svg]:w-4 dark:border-white/[0.1] dark:bg-white/[0.06] dark:text-white/70">
+            {icon}
+          </div>
+        ) : null}
+        <div className="text-sm text-muted-foreground">{label}</div>
+        <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{value}</div>
+        {hint ? <div className="mt-1.5 text-xs text-muted-foreground">{hint}</div> : null}
+      </div>
+    );
+  }
 
   return (
     <Card className={cn("group relative overflow-hidden transition-colors duration-300 dark:hover:border-white/[0.10]", className)}>

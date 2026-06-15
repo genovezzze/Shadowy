@@ -50,7 +50,7 @@ export function ActivityChart({
   const textColor = isDark ? "#9ca3af" : "#8a94a6";
   const gridColor = isDark ? "rgba(255,255,255,0.06)" : "#e5e8ec";
   const barColor = isDark ? "#34d399" : "#1f2933";
-  const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
+  const tooltipBg = isDark ? "rgba(10, 10, 10, 0.92)" : "#ffffff";
   const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
 
   return (

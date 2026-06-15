@@ -210,11 +210,12 @@ export default async function ManagerReportPage({
   return (
     <div className="max-w-4xl mx-auto">
       {/* Screen-only header */}
-      <div className="flex items-center justify-between mb-6 print:hidden">
+      <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold">Pilota atskaite</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            {org?.name} · {session.name} · {fmtDate(periodStart)} – {fmtDate(now)}
+          <h1 className="text-3xl font-bold tracking-tight">Pilota atskaite</h1>
+          <p className="text-sm text-muted-foreground mt-2">{org?.name} · {session.name}</p>
+          <p className="text-sm text-muted-foreground">
+            {fmtDate(periodStart)} – {fmtDate(now)}
           </p>
         </div>
         <div className="flex items-center gap-3">

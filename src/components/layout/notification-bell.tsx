@@ -132,7 +132,7 @@ export function NotificationBell({
   const panel = open && (
     <div
       data-notification-panel
-      className="fixed z-[100] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-card dark:rounded-2xl dark:border-white/[0.06] dark:bg-gradient-to-b dark:from-[#1c2436] dark:via-[#161d2c] dark:to-[#121826] dark:bg-[#161e30] dark:backdrop-blur-md dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.65)]"
+      className="glass fixed z-[100] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-card dark:rounded-2xl dark:border-white/[0.07] dark:bg-gradient-to-b dark:from-white/[0.06] dark:via-white/[0.035] dark:to-white/[0.015] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.6)]"
       style={panelStyle}
     >
           <div className="flex items-center justify-between border-b border-border px-3 py-2">
