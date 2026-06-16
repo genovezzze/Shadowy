@@ -54,7 +54,7 @@ export function OrgRow(props: OrgRowProps) {
 
   const trialDate = trialEndsAt
     ? trialEndsAt.toLocaleDateString("lv-LV", { day: "2-digit", month: "2-digit", year: "numeric" })
-    : "—";
+    : "-";
   const createdDate = createdAt.toLocaleDateString("lv-LV", { day: "2-digit", month: "2-digit", year: "numeric" });
 
   // ── EDIT MODE ──────────────────────────────────────────────

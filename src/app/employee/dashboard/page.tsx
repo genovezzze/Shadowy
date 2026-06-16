@@ -211,7 +211,7 @@ export default async function EmployeeDashboard() {
       {recent.length === 0 ? (
         <EmptyState
           title="Vēl nav iesniegtu ierakstu"
-          description="Iesāciet ar pirmo neredzamā darba ierakstu — tas aizņems mazāk nekā minūti."
+          description="Iesāciet ar pirmo neredzamā darba ierakstu - tas aizņems mazāk nekā minūti."
           action={
             <Button asChild>
               <Link href="/employee/new-entry">Iesniegt pirmo ierakstu</Link>

@@ -28,7 +28,7 @@ import { FaqSection } from "@/components/landing/faq-section";
 export default function HomePage() {
   return (
     <div className="dark relative min-h-screen bg-[#060d1c] text-foreground">
-      {/* Fixed dot-grid — painted once, zero scroll cost */}
+      {/* Fixed dot-grid - painted once, zero scroll cost */}
       <div
         aria-hidden
         className="pointer-events-none fixed inset-0 z-0"
@@ -805,7 +805,7 @@ export default function HomePage() {
         <div className="relative mx-auto max-w-6xl px-6 py-24">
           <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:items-start">
 
-            {/* Left — pitch */}
+            {/* Left - pitch */}
             <div className="lg:pt-2">
               <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-4 py-1.5">
                 <span className="relative flex h-2 w-2">
@@ -823,15 +823,15 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 text-base leading-relaxed text-white/75">
-                Aizpildiet formu — sazināsimies 1–2 darba dienu laikā un palīdzēsim
+                Aizpildiet formu - sazināsimies 1–2 darba dienu laikā un palīdzēsim
                 uzsākt pilotu jūsu komandā.
               </p>
 
               <ul className="mt-8 space-y-3.5">
                 {([
-                  "Iestatīšana 10 minūtēs — sāc tajā pašā dienā",
+                  "Iestatīšana 10 minūtēs - sāc tajā pašā dienā",
                   "Bez kredītkartes un bez saistībām",
-                  "Iepazīšanās zvans 20 min — bez spiediena",
+                  "Iepazīšanās zvans 20 min - bez spiediena",
                   "30 dienu pārskats par komandas slodzi",
                   "Pilns atbalsts latviski visā pilota laikā",
                 ] as const).map((item) => (
@@ -852,7 +852,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right — form card */}
+            {/* Right - form card */}
             <div
               className="glass rounded-2xl border border-emerald-500/20 bg-white/[0.025] p-8 sm:p-10"
               style={{

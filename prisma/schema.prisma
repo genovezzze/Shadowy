@@ -1,4 +1,4 @@
-// Shadowy — multi-tenant invisible-work platform
+// Shadowy - multi-tenant invisible-work platform
 
 generator client {
   provider = "prisma-client-js"

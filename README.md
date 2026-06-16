@@ -127,22 +127,22 @@ EMPLOYEE  →  iesniedz neredzamā darba ierakstus, redz savu vēsturi
 
 ## Kas pagaidām ir MVP / placeholder
 
-- Paroles nomaiņa, paroles atjaunošana — nav ieviesta. Pagaidām administrators / vadītājs piešķir sākotnējo paroli.
-- E-pasta paziņojumi — nav. Lietotāji statusu redz iekšā Shadowy.
-- Audit log / aktivitāšu žurnāls atsevišķā lapā — nav (redzams tikai "Nesenā aktivitāte" admin pārskatā).
-- Eksports (CSV / PDF) — nav.
-- Daudzkrāsainie filtri un sarežģīta meklēšana — nav (sākotnējās tabulas un kartes ir sakārtotas pēc datuma).
-- Komandas pārvaldīšana citu vadītāju starpā (pārvietot darbinieku no viena vadītāja pie otra) — nav.
+- Paroles nomaiņa, paroles atjaunošana - nav ieviesta. Pagaidām administrators / vadītājs piešķir sākotnējo paroli.
+- E-pasta paziņojumi - nav. Lietotāji statusu redz iekšā Shadowy.
+- Audit log / aktivitāšu žurnāls atsevišķā lapā - nav (redzams tikai "Nesenā aktivitāte" admin pārskatā).
+- Eksports (CSV / PDF) - nav.
+- Daudzkrāsainie filtri un sarežģīta meklēšana - nav (sākotnējās tabulas un kartes ir sakārtotas pēc datuma).
+- Komandas pārvaldīšana citu vadītāju starpā (pārvietot darbinieku no viena vadītāja pie otra) - nav.
 
 ## Nākamie soļi (rekomendētā secība)
 
 1. **Paroles nomaiņa lietotāja profilā** + administratora "atiestatīt darbinieka paroli" darbība.
-2. **E-pasta paziņojumi** (Resend / Postmark) — darbinieks saņem ziņu, kad ieraksts ir izskatīts; vadītājs — kad ir jauns iesniegums.
+2. **E-pasta paziņojumi** (Resend / Postmark) - darbinieks saņem ziņu, kad ieraksts ir izskatīts; vadītājs - kad ir jauns iesniegums.
 3. **Filtri un meklēšana** ierakstu sarakstos (statuss, kategorija, periods).
 4. **CSV eksports** vadītājam un administratoram.
 5. **Audit log** kā atsevišķa lapa.
 6. **Darbinieku pārcelšana** starp vadītājiem (ADMIN darbība).
-7. **Komandas analītika** — apkopojumi pa kategorijām, pa nedēļām/mēnešiem.
+7. **Komandas analītika** - apkopojumi pa kategorijām, pa nedēļām/mēnešiem.
 8. **Tikai pēc tam** sākt apsvērt integrācijas (Slack/Jira/Calendar) un AI ieteikumus, kā plānots vēlākajos posmos.
 
 ## Izvietošana uz Vercel
@@ -154,4 +154,4 @@ EMPLOYEE  →  iesniedz neredzamā darba ierakstus, redz savu vēsturi
 
 ## Valodas politika
 
-Visa lietotāja saskarne ir **tikai latviešu valodā**. Lūdzu, sekojiet šim principam, pievienojot jaunas funkcijas — kods un mainīgo nosaukumi paliek angļu valodā, bet viss, ko redz gala lietotājs (etiķetes, pogas, virsraksti, tukšie stāvokļi, kļūdu paziņojumi, palīgteksti), jābūt latviešu valodā.
+Visa lietotāja saskarne ir **tikai latviešu valodā**. Lūdzu, sekojiet šim principam, pievienojot jaunas funkcijas - kods un mainīgo nosaukumi paliek angļu valodā, bet viss, ko redz gala lietotājs (etiķetes, pogas, virsraksti, tukšie stāvokļi, kļūdu paziņojumi, palīgteksti), jābūt latviešu valodā.

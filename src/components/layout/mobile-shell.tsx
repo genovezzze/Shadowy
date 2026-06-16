@@ -39,7 +39,7 @@ export function MobileShell({
         />
       )}
 
-      {/* Sidebar — fixed drawer on mobile, static column on desktop */}
+      {/* Sidebar - fixed drawer on mobile, static column on desktop */}
       <div
         className={[
           "fixed inset-y-0 left-0 z-50 transition-transform duration-300 ease-in-out",

@@ -111,7 +111,7 @@ export function EmployeeRow({
         <div className="font-medium leading-snug">{name}</div>
         <div className="text-xs text-muted-foreground">{email}</div>
       </td>
-      <td className="px-6 py-3 text-muted-foreground">{title ?? "—"}</td>
+      <td className="px-6 py-3 text-muted-foreground">{title ?? "-"}</td>
       <td className="px-6 py-3 text-muted-foreground">
         {managerName ?? <span className="text-xs italic">Nav vadītāja (jūs)</span>}
       </td>

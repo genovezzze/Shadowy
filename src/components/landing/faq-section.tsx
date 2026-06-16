@@ -6,19 +6,19 @@ import { ChevronDown } from "lucide-react";
 const FAQ_ITEMS = [
   {
     q: "Kas ir Shadowy?",
-    a: "Shadowy ir rīks, kas palīdz padarīt neredzamo darbu redzamu — darbinieki strukturēti pieraksta papildu darbu, vadītāji to izskata un apstiprina, bet administratori redz visas organizācijas pārskatu.",
+    a: "Shadowy ir rīks, kas palīdz padarīt neredzamo darbu redzamu - darbinieki strukturēti pieraksta papildu darbu, vadītāji to izskata un apstiprina, bet administratori redz visas organizācijas pārskatu.",
   },
   {
     q: "Cik maksā 30 dienu pilots?",
-    a: "Pilots ir bez maksas un bez kredītkartes. Pieteikuma formā norādiet komandas lielumu, mēs sazināsimies un palīdzēsim uzsākt — bez nekādām saistībām.",
+    a: "Pilots ir bez maksas un bez kredītkartes. Pieteikuma formā norādiet komandas lielumu, mēs sazināsimies un palīdzēsim uzsākt - bez nekādām saistībām.",
   },
   {
     q: "Cik ilgs laiks nepieciešams, lai sāktu?",
-    a: "Lielākā daļa komandu var sākt jau dažu minūšu laikā — administrators pievieno darbiniekus un vadītājus, un sistēma ir gatava lietošanai.",
+    a: "Lielākā daļa komandu var sākt jau dažu minūšu laikā - administrators pievieno darbiniekus un vadītājus, un sistēma ir gatava lietošanai.",
   },
   {
     q: "Kā tiek aizsargāti dati?",
-    a: "Vadītāji redz tikai savas komandas ierakstus, administratori — visus savas organizācijas datus. Citu organizāciju dati nav redzami. Detalizēta informācija ir privātuma politikā.",
+    a: "Vadītāji redz tikai savas komandas ierakstus, administratori - visus savas organizācijas datus. Citu organizāciju dati nav redzami. Detalizēta informācija ir privātuma politikā.",
   },
   {
     q: "Kas notiek pēc pilota beigām?",

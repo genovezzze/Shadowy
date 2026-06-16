@@ -60,7 +60,7 @@ export async function createManager(formData: FormData) {
   try {
     await sendInviteEmail(email, parsed.data.name, "MANAGER", inviteUrl);
   } catch {
-    // Email failed — user still created
+    // Email failed - user still created
   }
 
   revalidatePath("/admin/managers");

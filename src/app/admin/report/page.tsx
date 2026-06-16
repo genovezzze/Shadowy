@@ -136,7 +136,7 @@ export default async function AdminReportPage({
       <div className="hidden print:block mb-8">
         <div className="flex items-start justify-between border-b pb-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-black">Shadowy — Pilota atskaite</h1>
+            <h1 className="text-2xl font-bold text-black">Shadowy - Pilota atskaite</h1>
             <p className="text-sm text-gray-500 mt-1">{org?.name}</p>
             <p className="text-sm text-gray-500">
               Periods: {fmtDate(periodStart)} – {fmtDate(now)} ({getPeriodLabel(period)})
@@ -153,7 +153,7 @@ export default async function AdminReportPage({
           { label: "Darbinieki", value: employees.length, icon: <Users className="h-4 w-4" />, sub: "kopā" },
           { label: "Ieraksti", value: allEntries.length, icon: <FileText className="h-4 w-4" />, sub: "periodā" },
           { label: "Stundas", value: `${totalHours}h`, icon: <Clock className="h-4 w-4" />, sub: "apstiprinātās" },
-          { label: "Vid. izskatīšana", value: avgReviewDays !== null ? `${avgReviewDays}d.` : "—", icon: <TrendingUp className="h-4 w-4" />, sub: "dienas" },
+          { label: "Vid. izskatīšana", value: avgReviewDays !== null ? `${avgReviewDays}d.` : "-", icon: <TrendingUp className="h-4 w-4" />, sub: "dienas" },
         ].map((k, i) => (
           <div key={i} className="rounded-xl border border-border bg-card p-4 print:border-gray-200">
             <div className="flex items-center gap-1.5 text-muted-foreground mb-1 print:text-gray-500">
@@ -255,7 +255,7 @@ export default async function AdminReportPage({
                       <span className={m.avgDays <= 1 ? "text-success font-medium tabular-nums" : m.avgDays <= 3 ? "tabular-nums" : "text-warning font-medium tabular-nums"}>
                         {m.avgDays} d.
                       </span>
-                    ) : <span className="text-muted-foreground">—</span>}
+                    ) : <span className="text-muted-foreground">-</span>}
                   </td>
                 </tr>
               ))}

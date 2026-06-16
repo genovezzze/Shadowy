@@ -28,7 +28,7 @@ export default async function TrialExpiredPage() {
         <div className="flex flex-col gap-3">
           <Button asChild size="lg">
             <a href={`mailto:${CONTACT_EMAIL}`}>
-              Sazināties — {CONTACT_EMAIL}
+              Sazināties - {CONTACT_EMAIL}
             </a>
           </Button>
 

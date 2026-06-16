@@ -72,11 +72,11 @@ export default async function NewEntryPage() {
             <div className="mt-5 pt-4 border-t border-border space-y-1.5">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-block h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                Ietilpst lomā — atbilst pienākumiem
+                Ietilpst lomā - atbilst pienākumiem
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-block h-2 w-2 rounded-full bg-indigo-500 shrink-0" />
-                Papildu ieguldījums — virs lomas
+                Papildu ieguldījums - virs lomas
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="inline-block h-2 w-2 rounded-full bg-muted-foreground/40 shrink-0" />

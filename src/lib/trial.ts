@@ -4,7 +4,7 @@ export function trialEndsAtDate(): Date {
   return new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
 }
 
-// Dates more than 365 days away are treated as "unlimited" — no banner shown.
+// Dates more than 365 days away are treated as "unlimited" - no banner shown.
 const MAX_TRIAL_DISPLAY_DAYS = 365;
 
 export function getTrialDaysLeft(trialEndsAt: Date | null | undefined): number | null {

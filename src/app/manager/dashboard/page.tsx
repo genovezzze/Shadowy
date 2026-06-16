@@ -202,7 +202,7 @@ export default async function ManagerDashboard({
         <KpiCard
           formal
           label="Vid. izskatīšanas laiks"
-          value={avgReviewDays !== null ? `${avgReviewDays} d.` : "—"}
+          value={avgReviewDays !== null ? `${avgReviewDays} d.` : "-"}
           hint={reviewHint}
           icon={<Timer className="h-5 w-5" />}
         />
@@ -307,7 +307,7 @@ export default async function ManagerDashboard({
       {recentPending.length === 0 ? (
         <EmptyState
           title="Nav ierakstu, kas gaida izskatīšanu"
-          description="Lieliski — jūsu komanda šobrīd ir vienlīdzīgi pārskatāma."
+          description="Lieliski - jūsu komanda šobrīd ir vienlīdzīgi pārskatāma."
         />
       ) : (
         <div className="grid gap-4">

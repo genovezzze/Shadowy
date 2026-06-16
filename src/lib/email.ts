@@ -13,7 +13,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
 
   if (!apiKey) {
     console.log(
-      `\n[email:dev] Nav RESEND_API_KEY — vēstule netiek sūtīta.\n  to: ${to}\n  subject: ${subject}\n  html:\n${html}\n`
+      `\n[email:dev] Nav RESEND_API_KEY - vēstule netiek sūtīta.\n  to: ${to}\n  subject: ${subject}\n  html:\n${html}\n`
     );
     return;
   }
@@ -60,7 +60,7 @@ export async function sendWelcomeEmail(
 ): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   const roleLabel = role === "MANAGER" ? "vadītājs" : "darbinieks";
-  const subject = "Shadowy — jūsu pieslēgšanās dati";
+  const subject = "Shadowy - jūsu pieslēgšanās dati";
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Sveiks, ${escapeHtml(name)}!</h2>
@@ -89,7 +89,7 @@ export async function sendPilotInquiry(data: {
   teamSize: string;
   comment: string;
 }): Promise<void> {
-  const subject = `Shadowy pilots — ${data.company}`;
+  const subject = `Shadowy pilots - ${data.company}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <h2 style="margin-bottom:16px">Jauns pilota pieteikums</h2>
@@ -98,7 +98,7 @@ export async function sendPilotInquiry(data: {
         <tr><td style="color:#888;font-size:13px;padding:6px 0">Uzņēmums</td><td style="font-weight:600">${escapeHtml(data.company)}</td></tr>
         <tr><td style="color:#888;font-size:13px;padding:6px 0">E-pasts</td><td><a href="mailto:${encodeURIComponent(data.email)}">${escapeHtml(data.email)}</a></td></tr>
         <tr><td style="color:#888;font-size:13px;padding:6px 0">Komandas lielums</td><td>${escapeHtml(data.teamSize)}</td></tr>
-        <tr><td style="color:#888;font-size:13px;padding:6px 0;vertical-align:top">Komentārs</td><td style="white-space:pre-wrap">${data.comment ? escapeHtml(data.comment) : "—"}</td></tr>
+        <tr><td style="color:#888;font-size:13px;padding:6px 0;vertical-align:top">Komentārs</td><td style="white-space:pre-wrap">${data.comment ? escapeHtml(data.comment) : "-"}</td></tr>
       </table>
     </div>
   `;
@@ -117,7 +117,7 @@ export async function sendEntrySubmittedEmail(opts: {
   entryTitle: string;
 }): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const subject = `Shadowy — jauns ieraksts no ${opts.employeeName}`;
+  const subject = `Shadowy - jauns ieraksts no ${opts.employeeName}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Jauns ieraksts gaida izskatīšanu</h2>
@@ -150,7 +150,7 @@ export async function sendEntryReviewedEmail(opts: {
   const statusColor =
     opts.status === "APPROVED" ? "#0f9d58" :
     opts.status === "REJECTED" ? "#d32f2f" : "#f59e0b";
-  const subject = `Shadowy — jūsu ieraksts ir ${statusLabel}`;
+  const subject = `Shadowy - jūsu ieraksts ir ${statusLabel}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Ieraksts izskatīts</h2>
@@ -177,7 +177,7 @@ export async function sendBonusRequestEmail(opts: {
   ruleName: string;
 }): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const subject = `Shadowy — bonusa pieprasījums no ${opts.employeeName}`;
+  const subject = `Shadowy - bonusa pieprasījums no ${opts.employeeName}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Jauns bonusa pieprasījums</h2>
@@ -206,7 +206,7 @@ export async function sendWeeklyManagerReport(opts: {
   teamSize: number;
 }): Promise<void> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const subject = `Shadowy — iknedēļas pārskats`;
+  const subject = `Shadowy - iknedēļas pārskats`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <div style="margin-bottom:24px">
@@ -268,7 +268,7 @@ export async function sendInviteEmail(
   inviteUrl: string
 ): Promise<void> {
   const roleLabel = role === "MANAGER" ? "vadītājs" : "darbinieks";
-  const subject = "Shadowy — jūsu uzaicinājums";
+  const subject = "Shadowy - jūsu uzaicinājums";
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
       <h2 style="margin-bottom:4px">Sveiks, ${escapeHtml(name)}!</h2>
@@ -286,7 +286,7 @@ export async function sendInviteEmail(
 }
 
 export async function sendPasswordResetEmail(to: string, resetLink: string): Promise<void> {
-  const subject = "Shadowy — paroles atjaunošana";
+  const subject = "Shadowy - paroles atjaunošana";
   const html = `
     <div style="font-family: system-ui, sans-serif; line-height: 1.6;">
       <h2>Paroles atjaunošana</h2>

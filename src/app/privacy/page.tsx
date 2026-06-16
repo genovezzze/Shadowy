@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
-  title: "Privātuma politika — Shadowy",
+  title: "Privātuma politika - Shadowy",
 };
 
 const CONTACT_EMAIL = "artemijlucin@gmail.com";
@@ -42,7 +42,7 @@ export default function PrivacyPage() {
             <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
               <li><strong className="text-foreground">Darbinieks</strong> redz tikai savus ierakstus un to statusu.</li>
               <li><strong className="text-foreground">Vadītājs</strong> redz savas komandas (sev piešķirto darbinieku) ierakstus, apstiprinājumus un bonusu pieprasījumus.</li>
-              <li><strong className="text-foreground">Administrators</strong> redz visus savas organizācijas datus — darbiniekus, vadītājus, ierakstus un pārskatus.</li>
+              <li><strong className="text-foreground">Administrators</strong> redz visus savas organizācijas datus - darbiniekus, vadītājus, ierakstus un pārskatus.</li>
               <li><strong className="text-foreground">Shadowy komanda</strong> pilota laikā var piekļūt organizāciju sarakstam un pamatstatistikai (lai nodrošinātu pilota darbību), bet ikdienā nepiekļūst ierakstu saturam.</li>
             </ul>
           </section>
@@ -52,7 +52,7 @@ export default function PrivacyPage() {
             <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
               <li>Citu organizāciju datus.</li>
               <li>Citu vadītāju komandu ierakstus un pārskatus.</li>
-              <li>Ekrāna aktivitāti, privātas sarunas vai citus ar Shadowy nesaistītus datus — platforma šādus datus nemaz nevāc.</li>
+              <li>Ekrāna aktivitāti, privātas sarunas vai citus ar Shadowy nesaistītus datus - platforma šādus datus nemaz nevāc.</li>
             </ul>
           </section>
 
@@ -60,7 +60,7 @@ export default function PrivacyPage() {
             <h2 className="text-lg font-semibold tracking-tight">4. Datu glabāšana, eksports un dzēšana</h2>
             <p className="mt-3 text-muted-foreground">
               Dati tiek glabāti, kamēr organizācijas konts ir aktīvs. Lai pieprasītu sava konta vai organizācijas
-              datu eksportu (CSV) vai dzēšanu, rakstiet uz kontaktadresi zemāk — pilota laikā šos pieprasījumus
+              datu eksportu (CSV) vai dzēšanu, rakstiet uz kontaktadresi zemāk - pilota laikā šos pieprasījumus
               apstrādājam manuāli, parasti 1–2 darba dienu laikā.
             </p>
           </section>

@@ -47,13 +47,13 @@ export async function submitPilotApplication(formData: FormData) {
       },
     });
   } catch {
-    // DB save failed — still try to send email so the lead isn't lost
+    // DB save failed - still try to send email so the lead isn't lost
   }
 
   try {
     await sendPilotInquiry(parsed.data);
   } catch {
-    // Email failed but DB save succeeded — not a user-facing error
+    // Email failed but DB save succeeded - not a user-facing error
   }
 
   return { ok: true as const };

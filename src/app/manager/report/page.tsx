@@ -228,7 +228,7 @@ export default async function ManagerReportPage({
       <div className="hidden print:block mb-8">
         <div className="flex items-start justify-between border-b pb-4 mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-black">Shadowy — Pilota atskaite</h1>
+            <h1 className="text-2xl font-bold text-black">Shadowy - Pilota atskaite</h1>
             <p className="text-sm text-gray-500 mt-1">
               {org?.name} · Vadītājs: {session.name}
             </p>
@@ -247,7 +247,7 @@ export default async function ManagerReportPage({
           { label: "Ieraksti", value: allEntries.length, icon: <FileText className="h-4 w-4" />, sub: "iesniegti" },
           { label: "Stundas", value: `${totalHours}h`, icon: <Clock className="h-4 w-4" />, sub: "apstiprinātās" },
           { label: "Apstiprinājuma %", value: `${approvalRate}%`, icon: <CheckCircle2 className="h-4 w-4" />, sub: "no iesniegtajiem" },
-          { label: "Vid. izskatīšana", value: avgReviewDays !== null ? `${avgReviewDays}d.` : "—", icon: <TrendingUp className="h-4 w-4" />, sub: "dienas" },
+          { label: "Vid. izskatīšana", value: avgReviewDays !== null ? `${avgReviewDays}d.` : "-", icon: <TrendingUp className="h-4 w-4" />, sub: "dienas" },
         ].map((k, i) => (
           <div key={i} className="rounded-xl border border-border bg-card p-4 print:border-gray-200">
             <div className="flex items-center gap-1.5 text-muted-foreground mb-1 print:text-gray-500">
@@ -345,7 +345,7 @@ export default async function ManagerReportPage({
                           </div>
                           <span className="text-xs tabular-nums">{emp.extraPct}%</span>
                         </div>
-                      ) : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                      ) : <span className="text-muted-foreground print:text-gray-400">-</span>}
                     </td>
                     <td className="px-5 py-3 text-right">
                       {isInactive && (

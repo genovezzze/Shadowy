@@ -43,10 +43,10 @@ export function GettingStarted({
       </CardHeader>
 
       <CardContent className="grid gap-3">
-        {/* Step 1 — always done */}
+        {/* Step 1 - always done */}
         <StepRow done label="Organizācija izveidota" description="Jūsu organizācija ir veiksmīgi reģistrēta." />
 
-        {/* Step 2 — team setup with two-path choice */}
+        {/* Step 2 - team setup with two-path choice */}
         {teamAdded ? (
           <StepRow
             done
@@ -66,7 +66,7 @@ export function GettingStarted({
             </div>
 
             <div className="grid gap-2 sm:grid-cols-2 ml-8">
-              {/* Path A — admin is the manager */}
+              {/* Path A - admin is the manager */}
               <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Es pats esmu vadītājs
@@ -81,7 +81,7 @@ export function GettingStarted({
                 </Button>
               </div>
 
-              {/* Path B — separate manager */}
+              {/* Path B - separate manager */}
               <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-2">
                 <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   Man ir atsevišķs vadītājs

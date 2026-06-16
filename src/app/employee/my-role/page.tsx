@@ -86,10 +86,10 @@ export default async function MyRolePage() {
                     Kad iesniedzat darbu, kas <strong>neietilpst</strong> jūsu oficiālo pienākumu sarakstā, sistēma to atzīmē kā papildu ieguldījumu.
                   </p>
                   <p className="text-muted-foreground">
-                    Tas palīdz jūsu vadītājam redzēt, kur jūs darāt vairāk, nekā prasīts — un var kalpot par pamatu sarunai par lomu vai noslodzes pārskatīšanu.
+                    Tas palīdz jūsu vadītājam redzēt, kur jūs darāt vairāk, nekā prasīts - un var kalpot par pamatu sarunai par lomu vai noslodzes pārskatīšanu.
                   </p>
                   <p className="text-muted-foreground">
-                    Mērķis nav kontrole — bet <strong>atzinība un taisnīgums</strong>.
+                    Mērķis nav kontrole - bet <strong>atzinība un taisnīgums</strong>.
                   </p>
                 </div>
               </div>
@@ -98,7 +98,7 @@ export default async function MyRolePage() {
 
           <div className="rounded-lg border border-border bg-muted/30 p-4">
             <p className="text-xs text-muted-foreground">
-              💡 Ja regulāri veicat uzdevumus ārpus savas lomas, iesakiet vadītājam pārskatīt pienākumu sarakstu — vai arī vienkārši iesniedziet tos kā ierakstu, lai tie kļūtu redzami.
+              💡 Ja regulāri veicat uzdevumus ārpus savas lomas, iesakiet vadītājam pārskatīt pienākumu sarakstu - vai arī vienkārši iesniedziet tos kā ierakstu, lai tie kļūtu redzami.
             </p>
           </div>
         </div>

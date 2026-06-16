@@ -65,7 +65,7 @@ export async function createEmployee(formData: FormData) {
   try {
     await sendInviteEmail(email, parsed.data.name, "EMPLOYEE", inviteUrl);
   } catch {
-    // Email failed — user still created, admin can resend manually
+    // Email failed - user still created, admin can resend manually
   }
 
   revalidatePath("/admin/employees");

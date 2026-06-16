@@ -249,7 +249,7 @@
   animation: marquee 22s linear infinite;
 }
 
-/* Scroll reveal — base */
+/* Scroll reveal - base */
 .js-ready [data-reveal] {
   opacity: 0;
   transition:
@@ -267,7 +267,7 @@
 .js-ready [data-reveal="blur"]  { filter: blur(14px); transform: translateY(14px); }
 .js-ready [data-reveal="flip"]  { transform: perspective(700px) rotateX(28deg) translateY(22px); transform-origin: top center; }
 
-/* Visible state — same for all */
+/* Visible state - same for all */
 .js-ready [data-reveal].is-visible {
   opacity: 1;
   transform: none;
@@ -325,7 +325,7 @@
   animation-delay: var(--step-delay, 0ms);
 }
 
-/* Full-card iridescent pulse — whole card shifts emerald → cyan → emerald */
+/* Full-card iridescent pulse - whole card shifts emerald → cyan → emerald */
 @keyframes card-iridescent {
   0%, 4%, 30%, 100% {
     background-color: rgba(255, 255, 255, 0.012);

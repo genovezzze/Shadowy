@@ -68,7 +68,7 @@ export async function GET(req: NextRequest) {
     return loginError(req, "google_email");
   }
 
-  // Match by email — accounts are provisioned by an admin/manager.
+  // Match by email - accounts are provisioned by an admin/manager.
   const user = await prisma.user.findUnique({
     where: { email: info.email.toLowerCase().trim() },
   });

@@ -212,7 +212,7 @@ export default async function AdminDashboard({
                               {m.pending}
                             </span>
                           ) : (
-                            <span className="text-muted-foreground/50">—</span>
+                            <span className="text-muted-foreground/50">-</span>
                           )}
                         </td>
                         <td className="px-4 py-3.5 text-center tabular-nums text-muted-foreground">{m.reviewed}</td>
@@ -228,7 +228,7 @@ export default async function AdminDashboard({
                               {m.avgReviewDays} d.
                             </span>
                           ) : (
-                            <span className="text-muted-foreground/50">—</span>
+                            <span className="text-muted-foreground/50">-</span>
                           )}
                         </td>
                       </tr>
