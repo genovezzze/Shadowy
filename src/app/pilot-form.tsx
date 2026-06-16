@@ -85,9 +85,13 @@ export function PilotForm() {
       <button
         type="submit"
         disabled={pending}
-        className="glass inline-flex items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-400/[0.07] px-6 py-3 font-display font-black text-base tracking-tight text-white transition-all duration-150 hover:bg-emerald-400/[0.12] hover:border-emerald-400/35 hover:-translate-y-[1px] active:translate-y-[0.5px] disabled:opacity-50 disabled:pointer-events-none w-full sm:w-auto"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-xl py-4 font-display font-black text-base tracking-tight text-white transition-all duration-150 hover:-translate-y-[1px] hover:brightness-110 active:translate-y-[0.5px] disabled:pointer-events-none disabled:opacity-50"
+        style={{
+          background: "hsl(160 84% 34%)",
+          boxShadow: "0 0 0 1px hsl(160 84% 30% / 0.6), 0 4px 24px hsl(160 84% 35% / 0.45)",
+        }}
       >
-        {pending ? "Sūta..." : "Pieteikt 30 dienu pilotu"}
+        {pending ? "Sūta..." : "Pieteikt 30 dienu pilotu →"}
       </button>
     </form>
   );

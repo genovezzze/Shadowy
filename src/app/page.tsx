@@ -799,26 +799,72 @@ export default function HomePage() {
       {/* ── Pilot form ───────────────────────────────────────────────── */}
       <section id="pilots" className="relative overflow-hidden border-t border-white/[0.1] scroll-mt-24">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute right-[-10%] top-[-20%] h-[500px] w-[600px] rounded-full bg-[hsl(220_80%_30%_/_0.12)] blur-[100px]" />
-          <div className="absolute bottom-[-20%] left-[-5%] h-[400px] w-[500px] rounded-full bg-[hsl(160_60%_20%_/_0.10)] blur-[100px]" />
+          <div className="absolute right-[-10%] top-[-20%] h-[700px] w-[800px] rounded-full bg-[hsl(220_80%_30%_/_0.14)] blur-[100px]" />
+          <div className="absolute bottom-[-20%] left-[-5%] h-[600px] w-[700px] rounded-full bg-[hsl(160_70%_20%_/_0.16)] blur-[100px]" />
         </div>
-        <div className="relative mx-auto max-w-3xl px-6 py-24">
-          <div className="mb-10">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
-              Pieteikties
-            </p>
-            <h2 className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
-              Pieteikt 30 dienu pilotu.
-            </h2>
-            <p className="mt-2 font-display font-light text-xl text-white/75 sm:text-2xl">
-              Sāciet bez riska, bez kredītkartes.
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-white/80">
-              Aizpildiet formu - sazināsimies ar jums tuvāko dienu laikā un
-              palīdzēsim uzsākt pilotu jūsu komandā.
-            </p>
+        <div className="relative mx-auto max-w-6xl px-6 py-24">
+          <div className="grid gap-14 lg:grid-cols-[1fr_1.15fr] lg:items-start">
+
+            {/* Left — pitch */}
+            <div className="lg:pt-2">
+              <div className="mb-6 inline-flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-500/[0.08] px-4 py-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.13em] text-emerald-300">
+                  Atvērts bezmaksas pilots
+                </span>
+              </div>
+
+              <h2 className="font-display font-black text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl">
+                Sāciet 30 dienu pilotu<br />
+                <span className="text-gradient-emerald">bez riska.</span>
+              </h2>
+
+              <p className="mt-5 text-base leading-relaxed text-white/75">
+                Aizpildiet formu — sazināsimies 1–2 darba dienu laikā un palīdzēsim
+                uzsākt pilotu jūsu komandā.
+              </p>
+
+              <ul className="mt-8 space-y-3.5">
+                {([
+                  "Iestatīšana 10 minūtēs — sāc tajā pašā dienā",
+                  "Bez kredītkartes un bez saistībām",
+                  "Iepazīšanās zvans 20 min — bez spiediena",
+                  "30 dienu pārskats par komandas slodzi",
+                  "Pilns atbalsts latviski visā pilota laikā",
+                ] as const).map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-sm text-white/80">
+                    <div className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10">
+                      <Check className="h-3 w-3 text-emerald-400" />
+                    </div>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-10 border-t border-white/[0.07] pt-7">
+                <p className="text-xs leading-relaxed text-white/45">
+                  Datus var dzēst jebkurā brīdī. GDPR atbilstīgs.
+                  Serveri ES robežās.
+                </p>
+              </div>
+            </div>
+
+            {/* Right — form card */}
+            <div
+              className="glass rounded-2xl border border-emerald-500/20 bg-white/[0.025] p-8 sm:p-10"
+              style={{
+                boxShadow:
+                  "inset 0 1px 0 rgba(255,255,255,0.07), 0 0 0 1px hsl(160 84% 35% / 0.10), 0 0 80px hsl(160 84% 35% / 0.10), 0 32px 80px rgba(0,0,0,0.40)",
+              }}
+            >
+              <h3 className="mb-1 text-lg font-semibold text-white">Pieteikt pilotu</h3>
+              <p className="mb-6 text-sm text-white/55">Atbildēsim 1–2 darba dienu laikā.</p>
+              <PilotForm />
+            </div>
           </div>
-          <PilotForm />
         </div>
       </section>
 
