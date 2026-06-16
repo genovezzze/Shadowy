@@ -155,77 +155,135 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-24">
-          <div className="mb-10">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Problēma</p>
+          {/* Header */}
+          <div className="mb-12">
+            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/55">Problēma</p>
             <h2 data-reveal="left" data-delay="80" className="mt-3 font-display font-black text-5xl leading-[1.05] tracking-tight text-white sm:text-6xl">
-              Darbs, kas notiek,<br />
-              <span className="text-gradient-emerald">bet netiek pamanīts.</span>
+              Šis ir darbs, ko<br />
+              <span className="text-gradient-emerald">vadītājs bieži neredz.</span>
             </h2>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-[3fr_2fr]">
-            {/* Large featured card */}
+          {/* Main grid */}
+          <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
+
+            {/* Left - Anna's card */}
             <div
               data-reveal="up"
               data-delay="100"
-              className="glass relative flex min-h-[340px] flex-col overflow-hidden rounded-2xl border border-emerald-500/[0.14] bg-gradient-to-br from-emerald-950/30 via-transparent to-transparent p-8"
+              className="glass flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7"
             >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: "radial-gradient(circle, hsl(160 70% 45% / 0.10) 1px, transparent 1px)",
-                  backgroundSize: "22px 22px",
-                  maskImage: "radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 100%)",
-                }}
-              />
-              <span aria-hidden className="pointer-events-none absolute -right-3 -top-8 select-none font-serif text-[200px] leading-none text-emerald-400/[0.055]">
-                &ldquo;
-              </span>
-              <div className="relative flex flex-1 flex-col">
-                <p className="text-2xl font-medium leading-snug text-white/85 sm:text-[1.65rem]">
-                  Kolēģi regulāri palīdz viens otram, bet tas nekur netiek fiksēts.
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-white/70">
-                  Katras nedēļas slēptais darbs, kas nekad neparādās nekādos datos.
-                </p>
-                <div className="mt-auto pt-8 flex items-center gap-3">
-                  <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/80">
-                    Koordinācija
-                  </span>
-                  <div className="h-px flex-1 bg-white/[0.06]" />
-                  <span className="text-[11px] text-white/55">No. 01</span>
+              {/* Employee profile */}
+              <div className="flex items-center gap-4 pb-6 border-b border-white/[0.07]">
+                <div
+                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
+                  style={{ background: "linear-gradient(135deg, hsl(160 60% 28%), hsl(220 60% 35%))" }}
+                >
+                  AK
                 </div>
+                <div>
+                  <p className="text-sm font-semibold text-white/95">Anna Kalniņa</p>
+                  <p className="text-xs text-white/50">Projektu koordinatore</p>
+                </div>
+                <div className="ml-auto flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-2.5 py-1">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                  <span className="text-[10px] font-medium text-emerald-400">Aktīva</span>
+                </div>
+              </div>
+
+              {/* Narrative */}
+              <div className="mt-6 flex-1 space-y-4 text-sm leading-relaxed text-white/70">
+                <p>
+                  Annas darba diena <span className="text-white/90 font-medium">izskatās mierīga</span> - uzdevumi tiek pabeigti laikā, komanda strādā, rezultāts ir redzams.
+                </p>
+                <p>
+                  Bet dienas laikā Anna vēl palīdz kolēģiem, paskaidro procesus jaunam darbiniekam, pārņem steidzamus jautājumus un sakārto komunikāciju starp cilvēkiem.
+                </p>
+                <p className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3 text-white/80">
+                  Šis darbs <span className="text-white font-semibold">notiek</span>. Bet tas neparādās ne kalendārā, ne amata aprakstā, ne atskaitēs.
+                </p>
+              </div>
+
+              {/* Hidden work summary */}
+              <div className="mt-6 grid grid-cols-3 gap-2 border-t border-white/[0.07] pt-5">
+                {([
+                  { value: "4×", label: "šodien" },
+                  { value: "~2h", label: "nereģistrēts" },
+                  { value: "0", label: "fiksēts" },
+                ] as const).map(({ value, label }) => (
+                  <div key={label} className="text-center">
+                    <p className="text-lg font-black text-white/90">{value}</p>
+                    <p className="text-[10px] text-white/45">{label}</p>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {/* Three compact cards */}
-            <div className="grid gap-3">
-              {([
-                { text: "Jaunie darbinieki tiek ievadīti neformāli, bez redzamas slodzes.", tag: "Onboarding", cls: "border-sky-500/[0.14] bg-sky-500/[0.03]", tagCls: "border-sky-500/25 bg-sky-500/10 text-sky-400/70" },
-                { text: "Daļa cilvēku uzņemas vairāk, nekā paredz viņu loma.", tag: "Pārslodze", cls: "border-amber-500/[0.14] bg-amber-500/[0.03]", tagCls: "border-amber-500/25 bg-amber-500/10 text-amber-400/70" },
-                { text: "Vadītājs redz rezultātu, bet neredz slēpto darbu aiz tā.", tag: "Redzamība", cls: "border-violet-500/[0.14] bg-violet-500/[0.03]", tagCls: "border-violet-500/25 bg-violet-500/10 text-violet-400/70" },
-              ] as const).map(({ text, tag, cls, tagCls }, i) => (
-                <div
-                  key={tag}
-                  data-reveal="right"
-                  data-delay={`${120 + i * 70}`}
-                  className={`glass flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:brightness-[1.15] ${cls}`}
-                >
-                  <p className="text-[14px] font-medium leading-relaxed text-white/85">{text}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tagCls}`}>{tag}</span>
-                    <span className="font-mono text-[10px] text-white/50">0{i + 2}</span>
+            {/* Right - Timeline */}
+            <div data-reveal="right" data-delay="120" className="glass rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7">
+              <p className="mb-5 text-[11px] font-semibold uppercase tracking-widest text-white/45">Annas darba diena</p>
+              <div className="relative space-y-0">
+                {/* Vertical line */}
+                <div className="absolute left-[3.25rem] top-3 bottom-3 w-px bg-white/[0.07]" />
+
+                {([
+                  {
+                    time: "09:15",
+                    text: "Palīdz kolēģim atrisināt klienta jautājumu.",
+                    badge: "Nav fiksēts kā uzdevums",
+                    badgeCls: "text-amber-400/80 border-amber-500/20 bg-amber-500/[0.06]",
+                  },
+                  {
+                    time: "11:40",
+                    text: "Ievada jauno darbinieku procesā un atbild uz jautājumiem.",
+                    badge: "Nav redzams viņas slodzē",
+                    badgeCls: "text-sky-400/80 border-sky-500/20 bg-sky-500/[0.06]",
+                  },
+                  {
+                    time: "14:20",
+                    text: 'Pārņem steidzamu problēmu, jo "viņa zina, kā to ātri atrisināt".',
+                    badge: "Nav viņas amata aprakstā",
+                    badgeCls: "text-violet-400/80 border-violet-500/20 bg-violet-500/[0.06]",
+                  },
+                  {
+                    time: "16:30",
+                    text: "Sakārto komunikāciju starp divām komandām.",
+                    badge: "Rezultāts redzams. Slodze - nē.",
+                    badgeCls: "text-red-400/80 border-red-500/20 bg-red-500/[0.06]",
+                  },
+                ] as const).map(({ time, text, badge, badgeCls }) => (
+                  <div key={time} className="relative flex gap-4 pb-6 last:pb-0">
+                    {/* Time */}
+                    <div className="relative z-10 w-10 shrink-0 pt-0.5">
+                      <span className="font-mono text-[11px] font-semibold text-white/40">{time}</span>
+                    </div>
+                    {/* Dot */}
+                    <div className="relative z-10 mt-1.5 flex h-3 w-3 shrink-0 items-center justify-center">
+                      <div className="h-2 w-2 rounded-full border border-white/20 bg-white/10" />
+                    </div>
+                    {/* Content */}
+                    <div className="min-w-0 flex-1 pt-0">
+                      <p className="text-sm leading-snug text-white/80">{text}</p>
+                      <span className={`mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${badgeCls}`}>
+                        {badge}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
-          <div data-reveal="up" data-delay="400" className="mt-8">
-            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/80 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
-              <a href="#pilots">Pārbaudīt komandā <ArrowRight className="ml-1.5 h-4 w-4" /></a>
-            </Button>
+          {/* Bottom conclusion */}
+          <div data-reveal="up" data-delay="200" className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] px-6 py-5">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Bez Shadowy</p>
+              <p className="text-sm text-white/65">Tas izskatās pēc normālas darba dienas. Vadītājs neko neredz.</p>
+            </div>
+            <div className="glass rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] px-6 py-5">
+              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-400/60">Ar Shadowy</p>
+              <p className="text-sm text-white/75">Kļūst redzams, kur patiesībā rodas slēptā slodze - un kuru to dara biežāk par citiem.</p>
+            </div>
           </div>
         </div>
       </section>
