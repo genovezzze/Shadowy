@@ -1,14 +1,15 @@
 "use server";
 
 import { z } from "zod";
+import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser, hashPassword } from "@/lib/auth";
+import { sendInviteEmail } from "@/lib/email";
 
 const schema = z.object({
   name: z.string().min(2, "Vārds ir pārāk īss.").max(80),
   email: z.string().email("Lūdzu, ievadiet derīgu e-pastu."),
-  password: z.string().min(8, "Parolei jābūt vismaz 8 simbolus garai."),
   title: z.string().max(80).optional().nullable(),
   managerId: z.string().optional().nullable(),
 });
@@ -19,7 +20,6 @@ export async function createEmployee(formData: FormData) {
   const parsed = schema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
-    password: formData.get("password"),
     title: formData.get("title") || null,
     managerId: formData.get("managerId") || null,
   });
@@ -43,19 +43,30 @@ export async function createEmployee(formData: FormData) {
     }
   }
 
-  const passwordHash = await hashPassword(parsed.data.password);
+  const inviteToken = randomBytes(32).toString("hex");
+  const inviteTokenExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
   await prisma.user.create({
     data: {
       organizationId: session.organizationId,
       name: parsed.data.name,
       email,
-      passwordHash,
+      passwordHash: null,
       role: "EMPLOYEE",
       title: parsed.data.title || null,
       managerId: parsed.data.managerId || null,
+      inviteToken,
+      inviteTokenExpiresAt,
     },
   });
+
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.shadowy.lv";
+  const inviteUrl = `${appUrl}/accept-invite?token=${inviteToken}`;
+  try {
+    await sendInviteEmail(email, parsed.data.name, "EMPLOYEE", inviteUrl);
+  } catch {
+    // Email failed — user still created, admin can resend manually
+  }
 
   revalidatePath("/admin/employees");
   revalidatePath("/admin/dashboard");

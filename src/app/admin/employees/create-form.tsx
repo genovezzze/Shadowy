@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { createEmployee } from "./actions";
 
@@ -54,20 +55,6 @@ export function CreateEmployeeForm({ managers }: CreateEmployeeFormProps) {
         <Label htmlFor="emp-email">E-pasts</Label>
         <Input id="emp-email" name="email" type="email" required />
       </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="emp-password">Sākotnējā parole</Label>
-        <Input
-          id="emp-password"
-          name="password"
-          type="text"
-          required
-          minLength={8}
-          placeholder="Vismaz 8 simboli"
-        />
-        <p className="text-xs text-muted-foreground">
-          Parole tiks paziņota darbiniekam. Viņš to varēs nomainīt vēlāk.
-        </p>
-      </div>
       {managers.length === 0 ? (
         <div className="rounded-md bg-muted/50 border border-border px-3 py-2 text-xs text-muted-foreground">
           Šī darbinieka ierakstus pārskatīsiet jūs kā administrators.
@@ -92,7 +79,12 @@ export function CreateEmployeeForm({ managers }: CreateEmployeeFormProps) {
         </div>
       )}
       {error ? <div className="text-sm text-destructive">{error}</div> : null}
-      {success ? <div className="text-sm text-success">Darbinieks ir pievienots.</div> : null}
+      {success ? (
+        <div className="flex items-center gap-2 text-sm text-success">
+          <Mail className="h-4 w-4" />
+          Uzaicinājums nosūtīts uz darbinieka e-pastu.
+        </div>
+      ) : null}
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Saglabā..." : "Izveidot darbinieku"}
       </Button>

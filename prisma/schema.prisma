@@ -70,9 +70,12 @@ model User {
 
   name         String
   email        String  @unique
-  passwordHash String
+  passwordHash String?
   role         Role
   title        String?
+
+  inviteToken          String?   @unique
+  inviteTokenExpiresAt DateTime?
 
   managerId String?
   manager   User?   @relation("ManagerEmployees", fields: [managerId], references: [id], onDelete: SetNull)

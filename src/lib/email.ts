@@ -261,6 +261,30 @@ export async function sendWeeklyManagerReport(opts: {
   await sendEmail(opts.to, subject, html);
 }
 
+export async function sendInviteEmail(
+  to: string,
+  name: string,
+  role: "MANAGER" | "EMPLOYEE",
+  inviteUrl: string
+): Promise<void> {
+  const roleLabel = role === "MANAGER" ? "vadītājs" : "darbinieks";
+  const subject = "Shadowy — jūsu uzaicinājums";
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
+      <h2 style="margin-bottom:4px">Sveiks, ${escapeHtml(name)}!</h2>
+      <p style="color:#555;margin-top:0">Jūs esat uzaicināts pievienoties Shadowy kā <strong>${roleLabel}</strong>.</p>
+      <p>Lai iestatītu savu paroli un sāktu lietot platformu, noklikšķiniet uz pogas zemāk:</p>
+      <p>
+        <a href="${inviteUrl}" style="display:inline-block;padding:12px 24px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
+          Iestatīt paroli →
+        </a>
+      </p>
+      <p style="color:#888;font-size:13px">Saite ir derīga 7 dienas. Ja jūs nesaņēmāt šo uzaicinājumu, ignorējiet šo vēstuli.</p>
+    </div>
+  `;
+  await sendEmail(to, subject, html);
+}
+
 export async function sendPasswordResetEmail(to: string, resetLink: string): Promise<void> {
   const subject = "Shadowy — paroles atjaunošana";
   const html = `

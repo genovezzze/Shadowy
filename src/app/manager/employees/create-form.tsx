@@ -41,23 +41,9 @@ export function CreateEmployeeForm() {
         <Label htmlFor="email">E-pasts</Label>
         <Input id="email" name="email" type="email" required />
       </div>
-      <div className="grid gap-1.5">
-        <Label htmlFor="password">Sākotnējā parole</Label>
-        <Input
-          id="password"
-          name="password"
-          type="text"
-          required
-          minLength={8}
-          placeholder="Vismaz 8 simboli"
-        />
-        <p className="text-xs text-muted-foreground">
-          Parole tiks paziņota darbiniekam. Viņš to varēs nomainīt vēlāk.
-        </p>
-      </div>
       {error ? <div className="text-sm text-destructive">{error}</div> : null}
       {success ? (
-        <div className="text-sm text-success">Darbinieks ir pievienots.</div>
+        <div className="text-sm text-success">Uzaicinājums nosūtīts uz darbinieka e-pastu.</div>
       ) : null}
       <Button type="submit" disabled={pending} className="w-full">
         {pending ? "Saglabā..." : "Izveidot darbinieku"}

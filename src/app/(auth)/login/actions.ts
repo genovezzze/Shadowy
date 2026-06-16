@@ -43,6 +43,10 @@ export async function loginAction(formData: FormData) {
     return { ok: false as const, error: "Nederīgs e-pasts vai parole." };
   }
 
+  if (!user.passwordHash) {
+    return { ok: false as const, error: "Lūdzu, pieņemiet uzaicinājumu no e-pasta, lai iestatītu paroli." };
+  }
+
   const valid = await verifyPassword(password, user.passwordHash);
   if (!valid) {
     await recordFailedLogin(ip, email);

@@ -39,6 +39,10 @@ export async function changeOwnPassword(formData: FormData) {
     return { ok: false as const, error: "Lietotājs nav atrasts." };
   }
 
+  if (!user.passwordHash) {
+    return { ok: false as const, error: "Jūsu kontam nav paroles. Izmantojiet 'Aizmirsi paroli?' lai iestatītu." };
+  }
+
   const valid = await verifyPassword(parsed.data.currentPassword, user.passwordHash);
   if (!valid) {
     return { ok: false as const, error: "Pašreizējā parole nav pareiza." };

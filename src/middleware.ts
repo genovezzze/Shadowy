@@ -7,6 +7,7 @@ const PUBLIC_PATHS = [
   "/register",
   "/forgot-password",
   "/reset-password",
+  "/accept-invite",
   "/privacy",
 ];
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME ?? "shadowy_session";
