@@ -52,7 +52,7 @@ export function HoursChart({ title, data }: HoursChartProps) {
     );
   }
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = resolvedTheme !== "light";
   const textColor = isDark ? "#9ca3af" : "#8a94a6";
   const gridColor = isDark ? "rgba(255,255,255,0.06)" : "#e5e8ec";
   const barColor = isDark ? "#34d399" : "#1f2933";

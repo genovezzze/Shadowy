@@ -47,7 +47,7 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
     );
   }
 
-  const isDark = resolvedTheme === "dark";
+  const isDark = resolvedTheme !== "light";
   const textColor = isDark ? "#9ca3af" : "#8a94a6";
   const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
   const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";

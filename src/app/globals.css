@@ -100,6 +100,51 @@
     --kpi-accent-glow: hsl(270 84% 45% / 0.13);
   }
 
+  .slate {
+    color-scheme: dark;
+
+    --background: 222 28% 7%;
+    --foreground: 210 40% 93%;
+
+    --card: 222 28% 11%;
+    --card-foreground: 210 40% 93%;
+
+    --muted: 217 25% 15%;
+    --muted-foreground: 215 12% 55%;
+
+    --primary: 160 70% 22%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 217 25% 15%;
+    --secondary-foreground: 210 40% 93%;
+
+    --accent: 217 30% 18%;
+    --accent-foreground: 210 40% 93%;
+
+    --destructive: 0 63% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 160 84% 39%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 38 92% 55%;
+    --warning-foreground: 0 0% 0%;
+
+    --border: 213 20% 16%;
+    --input: 213 20% 18%;
+    --ring: 160 84% 39%;
+
+    --sidebar: 222 35% 9%;
+    --sidebar-foreground: 210 40% 93%;
+    --sidebar-accent: 217 30% 16%;
+    --sidebar-border: 213 20% 14%;
+
+    --kpi-default-glow: hsl(160 84% 45% / 0.15);
+    --kpi-warning-glow: hsl(38 92% 50% / 0.15);
+    --kpi-info-glow: hsl(200 84% 45% / 0.15);
+    --kpi-accent-glow: hsl(270 84% 45% / 0.13);
+  }
+
   * {
     @apply border-border;
   }
@@ -109,8 +154,7 @@
   }
 
   html, body {
-    @apply text-foreground antialiased;
-    background-color: #000000;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
@@ -168,7 +212,8 @@
   background-clip: text;
 }
 
-.dark .app-shell .text-gradient-emerald {
+.dark .app-shell .text-gradient-emerald,
+.slate .app-shell .text-gradient-emerald {
   background: linear-gradient(135deg, #fff 10%, hsl(160deg 80% 80%) 50%, hsl(160deg 84% 52%) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -338,7 +383,8 @@ input[type="checkbox"] {
   transition: background-color 0.14s ease, border-color 0.14s ease;
 }
 
-.dark input[type="checkbox"] {
+.dark input[type="checkbox"],
+.slate input[type="checkbox"] {
   border-color: rgba(255, 255, 255, 0.14);
   background-color: rgba(255, 255, 255, 0.04);
 }
@@ -368,7 +414,10 @@ input[type="checkbox"]:focus-visible {
 /* Recolor native number/date spin controls to match dark theme */
 .dark input[type="number"]::-webkit-inner-spin-button,
 .dark input[type="number"]::-webkit-outer-spin-button,
-.dark input[type="date"]::-webkit-calendar-picker-indicator {
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.slate input[type="number"]::-webkit-inner-spin-button,
+.slate input[type="number"]::-webkit-outer-spin-button,
+.slate input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1) brightness(0.5);
   opacity: 0.6;
   cursor: pointer;
@@ -399,7 +448,8 @@ input[type="checkbox"]:focus-visible {
     background: hsl(210 24% 10%);
   }
 
-  .dark .btn-shimmer {
+  .dark .btn-shimmer,
+  .slate .btn-shimmer {
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
@@ -412,7 +462,8 @@ input[type="checkbox"]:focus-visible {
     transition: background 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease, border-color 0.14s ease;
   }
 
-  .dark .btn-shimmer:hover {
+  .dark .btn-shimmer:hover,
+  .slate .btn-shimmer:hover {
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.16) 100%);
     border-color: rgba(255, 255, 255, 0.45);
     box-shadow:
@@ -422,7 +473,8 @@ input[type="checkbox"]:focus-visible {
     transform: translateY(-1px);
   }
 
-  .dark .btn-shimmer:active {
+  .dark .btn-shimmer:active,
+  .slate .btn-shimmer:active {
     background: linear-gradient(160deg, rgba(255, 255, 255, 0.26) 0%, rgba(255, 255, 255, 0.12) 100%);
     transform: translateY(0.5px);
   }

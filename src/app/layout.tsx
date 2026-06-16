@@ -48,7 +48,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="font-sans">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="slate"
+          enableSystem={false}
+          themes={["light", "dark", "slate"]}
+          value={{ light: "light", dark: "dark", slate: "slate" }}
+        >
           {children}
         </ThemeProvider>
         <Analytics />
