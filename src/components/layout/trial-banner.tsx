@@ -1,5 +1,5 @@
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "artemijlucin@gmail.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "contact@shadowy.lv";
 
 interface TrialBannerProps {
   daysLeft: number;

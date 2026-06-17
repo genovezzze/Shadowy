@@ -155,135 +155,77 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-24">
-          {/* Header */}
-          <div className="mb-12">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/55">Problēma</p>
+          <div className="mb-10">
+            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Problēma</p>
             <h2 data-reveal="left" data-delay="80" className="mt-3 font-display font-black text-5xl leading-[1.05] tracking-tight text-white sm:text-6xl">
-              Šis ir darbs, ko<br />
-              <span className="text-gradient-emerald">vadītājs bieži neredz.</span>
+              Darbs, kas notiek,<br />
+              <span className="text-gradient-emerald">bet netiek pamanīts.</span>
             </h2>
           </div>
 
-          {/* Main grid */}
-          <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
-
-            {/* Left - Anna's card */}
+          <div className="grid gap-3 lg:grid-cols-[3fr_2fr]">
+            {/* Large featured card */}
             <div
               data-reveal="up"
               data-delay="100"
-              className="glass flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7"
+              className="glass relative flex min-h-[340px] flex-col overflow-hidden rounded-2xl border border-emerald-500/[0.14] bg-gradient-to-br from-emerald-950/30 via-transparent to-transparent p-8"
             >
-              {/* Employee profile */}
-              <div className="flex items-center gap-4 pb-6 border-b border-white/[0.07]">
-                <div
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-base font-bold text-white"
-                  style={{ background: "linear-gradient(135deg, hsl(160 60% 28%), hsl(220 60% 35%))" }}
-                >
-                  AK
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white/95">Anna Kalniņa</p>
-                  <p className="text-xs text-white/50">Projektu koordinatore</p>
-                </div>
-                <div className="ml-auto flex items-center gap-1.5 rounded-full border border-emerald-500/20 bg-emerald-500/[0.07] px-2.5 py-1">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-                  <span className="text-[10px] font-medium text-emerald-400">Aktīva</span>
-                </div>
-              </div>
-
-              {/* Narrative */}
-              <div className="mt-6 flex-1 space-y-4 text-sm leading-relaxed text-white/70">
-                <p>
-                  Annas darba diena <span className="text-white/90 font-medium">izskatās mierīga</span> - uzdevumi tiek pabeigti laikā, komanda strādā, rezultāts ir redzams.
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  backgroundImage: "radial-gradient(circle, hsl(160 70% 45% / 0.10) 1px, transparent 1px)",
+                  backgroundSize: "22px 22px",
+                  maskImage: "radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 100%)",
+                }}
+              />
+              <span aria-hidden className="pointer-events-none absolute -right-3 -top-8 select-none font-serif text-[200px] leading-none text-emerald-400/[0.055]">
+                &ldquo;
+              </span>
+              <div className="relative flex flex-1 flex-col">
+                <p className="text-2xl font-medium leading-snug text-white/85 sm:text-[1.65rem]">
+                  Kolēģi regulāri palīdz viens otram, bet tas nekur netiek fiksēts.
                 </p>
-                <p>
-                  Bet dienas laikā Anna vēl palīdz kolēģiem, paskaidro procesus jaunam darbiniekam, pārņem steidzamus jautājumus un sakārto komunikāciju starp cilvēkiem.
+                <p className="mt-4 text-sm leading-relaxed text-white/70">
+                  Katras nedēļas slēptais darbs, kas nekad neparādās nekādos datos.
                 </p>
-                <p className="rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3 text-white/80">
-                  Šis darbs <span className="text-white font-semibold">notiek</span>. Bet tas neparādās ne kalendārā, ne amata aprakstā, ne atskaitēs.
-                </p>
-              </div>
-
-              {/* Hidden work summary */}
-              <div className="mt-6 grid grid-cols-3 gap-2 border-t border-white/[0.07] pt-5">
-                {([
-                  { value: "4×", label: "šodien" },
-                  { value: "~2h", label: "nereģistrēts" },
-                  { value: "0", label: "fiksēts" },
-                ] as const).map(({ value, label }) => (
-                  <div key={label} className="text-center">
-                    <p className="text-lg font-black text-white/90">{value}</p>
-                    <p className="text-[10px] text-white/45">{label}</p>
-                  </div>
-                ))}
+                <div className="mt-auto pt-8 flex items-center gap-3">
+                  <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/80">
+                    Koordinācija
+                  </span>
+                  <div className="h-px flex-1 bg-white/[0.06]" />
+                  <span className="text-[11px] text-white/55">No. 01</span>
+                </div>
               </div>
             </div>
 
-            {/* Right - Timeline */}
-            <div data-reveal="right" data-delay="120" className="glass rounded-2xl border border-white/[0.08] bg-white/[0.02] p-7">
-              <p className="mb-5 text-[11px] font-semibold uppercase tracking-widest text-white/45">Annas darba diena</p>
-              <div className="relative space-y-0">
-                {/* Vertical line */}
-                <div className="absolute left-[3.25rem] top-3 bottom-3 w-px bg-white/[0.07]" />
-
-                {([
-                  {
-                    time: "09:15",
-                    text: "Palīdz kolēģim atrisināt klienta jautājumu.",
-                    badge: "Nav fiksēts kā uzdevums",
-                    badgeCls: "text-amber-400/80 border-amber-500/20 bg-amber-500/[0.06]",
-                  },
-                  {
-                    time: "11:40",
-                    text: "Ievada jauno darbinieku procesā un atbild uz jautājumiem.",
-                    badge: "Nav redzams viņas slodzē",
-                    badgeCls: "text-sky-400/80 border-sky-500/20 bg-sky-500/[0.06]",
-                  },
-                  {
-                    time: "14:20",
-                    text: 'Pārņem steidzamu problēmu, jo "viņa zina, kā to ātri atrisināt".',
-                    badge: "Nav viņas amata aprakstā",
-                    badgeCls: "text-violet-400/80 border-violet-500/20 bg-violet-500/[0.06]",
-                  },
-                  {
-                    time: "16:30",
-                    text: "Sakārto komunikāciju starp divām komandām.",
-                    badge: "Rezultāts redzams. Slodze - nē.",
-                    badgeCls: "text-red-400/80 border-red-500/20 bg-red-500/[0.06]",
-                  },
-                ] as const).map(({ time, text, badge, badgeCls }) => (
-                  <div key={time} className="relative flex gap-4 pb-6 last:pb-0">
-                    {/* Time */}
-                    <div className="relative z-10 w-10 shrink-0 pt-0.5">
-                      <span className="font-mono text-[11px] font-semibold text-white/40">{time}</span>
-                    </div>
-                    {/* Dot */}
-                    <div className="relative z-10 mt-1.5 flex h-3 w-3 shrink-0 items-center justify-center">
-                      <div className="h-2 w-2 rounded-full border border-white/20 bg-white/10" />
-                    </div>
-                    {/* Content */}
-                    <div className="min-w-0 flex-1 pt-0">
-                      <p className="text-sm leading-snug text-white/80">{text}</p>
-                      <span className={`mt-2 inline-block rounded-full border px-2.5 py-0.5 text-[10px] font-medium ${badgeCls}`}>
-                        {badge}
-                      </span>
-                    </div>
+            {/* Three compact cards */}
+            <div className="grid gap-3">
+              {([
+                { text: "Jaunie darbinieki tiek ievadīti neformāli, bez redzamas slodzes.", tag: "Onboarding", cls: "border-sky-500/[0.14] bg-sky-500/[0.03]", tagCls: "border-sky-500/25 bg-sky-500/10 text-sky-400/70" },
+                { text: "Daļa cilvēku uzņemas vairāk, nekā paredz viņu loma.", tag: "Pārslodze", cls: "border-amber-500/[0.14] bg-amber-500/[0.03]", tagCls: "border-amber-500/25 bg-amber-500/10 text-amber-400/70" },
+                { text: "Vadītājs redz rezultātu, bet neredz slēpto darbu aiz tā.", tag: "Redzamība", cls: "border-violet-500/[0.14] bg-violet-500/[0.03]", tagCls: "border-violet-500/25 bg-violet-500/10 text-violet-400/70" },
+              ] as const).map(({ text, tag, cls, tagCls }, i) => (
+                <div
+                  key={tag}
+                  data-reveal="right"
+                  data-delay={`${120 + i * 70}`}
+                  className={`glass flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:brightness-[1.15] ${cls}`}
+                >
+                  <p className="text-[14px] font-medium leading-relaxed text-white/85">{text}</p>
+                  <div className="mt-4 flex items-center justify-between">
+                    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tagCls}`}>{tag}</span>
+                    <span className="font-mono text-[10px] text-white/50">0{i + 2}</span>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Bottom conclusion */}
-          <div data-reveal="up" data-delay="200" className="mt-4 grid gap-3 sm:grid-cols-2">
-            <div className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">Bez Shadowy</p>
-              <p className="text-sm text-white/65">Tas izskatās pēc normālas darba dienas. Vadītājs neko neredz.</p>
-            </div>
-            <div className="glass rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03] px-6 py-5">
-              <p className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-emerald-400/60">Ar Shadowy</p>
-              <p className="text-sm text-white/75">Kļūst redzams, kur patiesībā rodas slēptā slodze - un kuru to dara biežāk par citiem.</p>
-            </div>
+          <div data-reveal="up" data-delay="400" className="mt-8">
+            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/80 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
+              <a href="#pilots">Pārbaudīt komandā <ArrowRight className="ml-1.5 h-4 w-4" /></a>
+            </Button>
           </div>
         </div>
       </section>
@@ -1019,8 +961,8 @@ export default function HomePage() {
           </div>
           <p className="mt-6 text-xs text-white/65">
             Jautājumi?{" "}
-            <a href="mailto:artemijlucin@gmail.com" className="underline underline-offset-2 transition-colors hover:text-white/75">
-              artemijlucin@gmail.com
+            <a href="https://mail.google.com/mail/?view=cm&to=contact@shadowy.lv" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 transition-colors hover:text-white/75">
+              contact@shadowy.lv
             </a>
           </p>
           <p className="mt-2 text-xs text-white/65">
@@ -1044,13 +986,40 @@ export default function HomePage() {
                 Padariet neredzamo darbu redzamu - strukturēta darba iesniegšana, vadītāja
                 izskatīšana un godīgāka slodzes pārvaldība.
               </p>
-              <a
-                href="mailto:artemijlucin@gmail.com"
-                aria-label="E-pasts"
-                className="mt-5 inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/60 transition-colors hover:border-white/20 hover:text-white/90"
-              >
-                <Mail className="h-4 w-4" />
-              </a>
+              <div className="mt-5 flex items-center gap-3">
+                <a
+                  href="https://mail.google.com/mail/?view=cm&to=contact@shadowy.lv" target="_blank" rel="noopener noreferrer"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/60 transition-colors hover:border-white/20 hover:text-white/90"
+                >
+                  <Mail className="h-4 w-4" />
+                </a>
+                <a
+                  href="https://mail.google.com/mail/?view=cm&to=contact@shadowy.lv" target="_blank" rel="noopener noreferrer"
+                  className="text-sm text-white/60 transition-colors hover:text-white/90"
+                >
+                  contact@shadowy.lv
+                </a>
+              </div>
+              <div className="mt-3 flex items-center gap-3">
+                <a
+                  href="https://www.linkedin.com/in/artemijs-lučins/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03] text-white/60 transition-colors hover:border-white/20 hover:text-white/90"
+                >
+                  <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/artemijs-lučins/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-white/60 transition-colors hover:text-white/90"
+                >
+                  Artemijs Lučins
+                </a>
+              </div>
             </div>
             <div className="flex gap-12 sm:gap-16">
               <div>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getSession } from "@/lib/session";
 
 const CONTACT_EMAIL =
-  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "artemijlucin@gmail.com";
+  process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "contact@shadowy.lv";
 
 export default async function TrialExpiredPage() {
   const session = await getSession();

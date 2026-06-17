@@ -5,7 +5,7 @@ export const metadata = {
   title: "Privātuma politika - Shadowy",
 };
 
-const CONTACT_EMAIL = "artemijlucin@gmail.com";
+const CONTACT_EMAIL = "contact@shadowy.lv";
 
 export default function PrivacyPage() {
   return (
