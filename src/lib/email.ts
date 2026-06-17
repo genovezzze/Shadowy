@@ -102,9 +102,9 @@ export async function sendPilotInquiry(data: {
       </table>
     </div>
   `;
-  const adminEmail = process.env.SUPERADMIN_EMAIL;
+  const adminEmail = process.env.NOTIFICATION_EMAIL ?? process.env.SUPERADMIN_EMAIL;
   if (!adminEmail) {
-    console.log("[email] SUPERADMIN_EMAIL not set, skipping pilot inquiry notification");
+    console.log("[email] NOTIFICATION_EMAIL not set, skipping pilot inquiry notification");
     return;
   }
   await sendEmail(adminEmail, subject, html);
