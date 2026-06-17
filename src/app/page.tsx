@@ -16,6 +16,11 @@ import {
   Mail,
   Phone,
   MessageSquare,
+  Building2,
+  BookOpen,
+  Headphones,
+  FolderKanban,
+  UserCheck,
 } from "lucide-react";
 import { PilotForm } from "./pilot-form";
 
@@ -24,6 +29,8 @@ import { HeroTilt } from "./hero-tilt";
 import { TiltCard } from "./tilt-card";
 import { ScrollRevealInit } from "./scroll-reveal";
 import { FaqSection } from "@/components/landing/faq-section";
+import { PrivacyCards } from "./privacy-cards";
+import { ProblemCards } from "./problem-cards";
 
 export default function HomePage() {
   return (
@@ -148,184 +155,52 @@ export default function HomePage() {
       </div>
 
       {/* ── Problem section ──────────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-white/[0.1]">
+      <section className="relative overflow-hidden border-t border-white/[0.07]">
+        {/* Background */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute right-[-5%] top-[-10%] h-[500px] w-[600px] rounded-full bg-[hsl(160_45%_15%_/_0.08)] blur-[120px]" />
-          <div className="absolute left-[-5%] bottom-0 h-[350px] w-[500px] rounded-full bg-[hsl(220_60%_20%_/_0.06)] blur-[100px]" />
+          {/* Dot grid overlay */}
+          <div className="absolute inset-0 opacity-40"
+            style={{
+              backgroundImage: "radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px)",
+              backgroundSize: "32px 32px",
+            }}
+          />
+          {/* Color orbs */}
+          <div className="absolute left-1/2 top-0 h-[600px] w-[800px] -translate-x-1/2 rounded-full bg-[hsl(160_60%_15%_/_0.12)] blur-[140px]" />
+          <div className="absolute -right-20 top-1/3 h-[400px] w-[400px] rounded-full bg-[hsl(270_60%_20%_/_0.1)] blur-[100px]" />
+          <div className="absolute -left-20 bottom-0 h-[350px] w-[450px] rounded-full bg-[hsl(200_70%_20%_/_0.09)] blur-[100px]" />
+          {/* Subtle top border glow */}
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-24">
-          <div className="mb-10">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Problēma</p>
-            <h2 data-reveal="left" data-delay="80" className="mt-3 font-display font-black text-5xl leading-[1.05] tracking-tight text-white sm:text-6xl">
+        <div className="relative mx-auto max-w-6xl px-6 py-28">
+          {/* Headline – centered, large */}
+          <div className="mb-16 text-center">
+            <div data-reveal="up" className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="text-[11px] font-bold uppercase tracking-widest text-emerald-400">Problēma</span>
+            </div>
+            <h2 data-reveal="up" data-delay="80" className="font-display font-black text-4xl leading-[1.05] tracking-tight text-white sm:text-5xl lg:text-6xl">
               Darbs, kas notiek,<br />
               <span className="text-gradient-emerald">bet netiek pamanīts.</span>
             </h2>
           </div>
 
-          <div className="grid gap-3 lg:grid-cols-[3fr_2fr]">
-            {/* Large featured card */}
-            <div
-              data-reveal="up"
-              data-delay="100"
-              className="glass relative flex min-h-[340px] flex-col overflow-hidden rounded-2xl border border-emerald-500/[0.14] bg-gradient-to-br from-emerald-950/30 via-transparent to-transparent p-8"
-            >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: "radial-gradient(circle, hsl(160 70% 45% / 0.10) 1px, transparent 1px)",
-                  backgroundSize: "22px 22px",
-                  maskImage: "radial-gradient(ellipse 80% 80% at 60% 40%, black 30%, transparent 100%)",
-                }}
-              />
-              <span aria-hidden className="pointer-events-none absolute -right-3 -top-8 select-none font-serif text-[200px] leading-none text-emerald-400/[0.055]">
-                &ldquo;
-              </span>
-              <div className="relative flex flex-1 flex-col">
-                <p className="text-2xl font-medium leading-snug text-white/85 sm:text-[1.65rem]">
-                  Kolēģi regulāri palīdz viens otram, bet tas nekur netiek fiksēts.
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-white/70">
-                  Katras nedēļas slēptais darbs, kas nekad neparādās nekādos datos.
-                </p>
-                <div className="mt-auto pt-8 flex items-center gap-3">
-                  <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-emerald-400/80">
-                    Koordinācija
-                  </span>
-                  <div className="h-px flex-1 bg-white/[0.06]" />
-                  <span className="text-[11px] text-white/55">No. 01</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Three compact cards */}
-            <div className="grid gap-3">
-              {([
-                { text: "Jaunie darbinieki tiek ievadīti neformāli, bez redzamas slodzes.", tag: "Onboarding", cls: "border-sky-500/[0.14] bg-sky-500/[0.03]", tagCls: "border-sky-500/25 bg-sky-500/10 text-sky-400/70" },
-                { text: "Daļa cilvēku uzņemas vairāk, nekā paredz viņu loma.", tag: "Pārslodze", cls: "border-amber-500/[0.14] bg-amber-500/[0.03]", tagCls: "border-amber-500/25 bg-amber-500/10 text-amber-400/70" },
-                { text: "Vadītājs redz rezultātu, bet neredz slēpto darbu aiz tā.", tag: "Redzamība", cls: "border-violet-500/[0.14] bg-violet-500/[0.03]", tagCls: "border-violet-500/25 bg-violet-500/10 text-violet-400/70" },
-              ] as const).map(({ text, tag, cls, tagCls }, i) => (
-                <div
-                  key={tag}
-                  data-reveal="right"
-                  data-delay={`${120 + i * 70}`}
-                  className={`glass flex flex-col justify-between rounded-xl border p-5 transition-all duration-200 hover:brightness-[1.15] ${cls}`}
-                >
-                  <p className="text-[14px] font-medium leading-relaxed text-white/85">{text}</p>
-                  <div className="mt-4 flex items-center justify-between">
-                    <span className={`rounded-full border px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest ${tagCls}`}>{tag}</span>
-                    <span className="font-mono text-[10px] text-white/50">0{i + 2}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div data-reveal="up" data-delay="400" className="mt-8">
-            <Button asChild size="lg" variant="outline" className="border border-white/[0.11] bg-white/[0.04] text-white/80 hover:bg-white/[0.08] hover:border-white/[0.2] hover:text-white/90">
-              <a href="#pilots">Pārbaudīt komandā <ArrowRight className="ml-1.5 h-4 w-4" /></a>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Signs you need Shadowy ───────────────────────────────────── */}
-      <section className="relative border-t border-white/[0.1]">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="mb-12 text-center">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Atpazīstiet sevi?</p>
-            <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
-              Shadowy var būt noderīgs, ja...
-            </h2>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {([
-              { text: "Komandā bieži saka \"es ātri palīdzēšu\"", sub: "bet neviens nezina, cik tas maksā laika" },
-              { text: "Papildu darbs netiek iekļauts KPI vai atzinībā", sub: "neformālais ieguldījums paliek neredzams" },
-              { text: "Grūti saprast, kurš ir pārslogots", sub: "pirms tas kļūst par problēmu" },
-              { text: "Darbinieki dara darbu ārpus amata apraksta", sub: "bet tas nekur nav fiksēts" },
-              { text: "Bonusus un atzinību grūti pamatot ar datiem", sub: "lēmumi balstās uz sajūtu, ne faktiem" },
-              { text: "Onboarding process nav redzams kā slodze", sub: "bet kāds to dara katru reizi no jauna" },
-            ] as const).map(({ text, sub }, i) => (
-              <div
-                key={text}
-                data-reveal="up"
-                data-delay={`${(i % 3) * 80}`}
-                data-card-glow
-                className="card-wave glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5 hover:border-emerald-500/20 hover:bg-emerald-500/[0.03]"
-                style={{ '--card-delay': `${i * 2000}ms`, animationDelay: `${i * 2000}ms` } as React.CSSProperties}
-              >
-                <p className="text-sm font-medium leading-snug text-white/85">{text}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/65">{sub}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Kā tas darbojas ──────────────────────────────────────────── */}
-      <section id="ka-tas-darbojas" className="relative border-t border-white/[0.1] scroll-mt-24">
-        <div className="mx-auto max-w-5xl px-6 py-24">
-          <div className="mb-16 text-center">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Vienkārši. Pārredzami.</p>
-            <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">Kā tas darbojas?</h2>
-          </div>
-
-          {/* Circles + connector line */}
-          <div data-reveal="up" data-delay="150" className="relative mb-14">
-            <div
-              className="absolute z-0 h-px"
-              style={{
-                top: "36px",
-                left: "calc(100% / 6)",
-                right: "calc(100% / 6)",
-                background: "linear-gradient(90deg, rgba(52,211,153,0.45) 0%, rgba(56,189,248,0.45) 50%, rgba(167,139,250,0.45) 100%)",
-              }}
-            />
-            <div className="grid grid-cols-3">
-              {([
-                { icon: <Zap className="h-7 w-7" />, bg: "bg-emerald-950/60", border: "border-emerald-500/30", color: "text-emerald-400", ring: "rgba(52,211,153,0.55)", glow: "rgba(52,211,153,0.28)", outer: "rgba(52,211,153,0.10)", delay: "0ms" },
-                { icon: <CheckCircle2 className="h-7 w-7" />, bg: "bg-sky-950/60", border: "border-sky-500/30", color: "text-sky-400", ring: "rgba(56,189,248,0.55)", glow: "rgba(56,189,248,0.28)", outer: "rgba(56,189,248,0.10)", delay: "3000ms" },
-                { icon: <BarChart3 className="h-7 w-7" />, bg: "bg-violet-950/60", border: "border-violet-500/30", color: "text-violet-400", ring: "rgba(167,139,250,0.55)", glow: "rgba(167,139,250,0.28)", outer: "rgba(167,139,250,0.10)", delay: "6000ms" },
-              ] as const).map(({ icon, bg, border, color, ring, glow, outer, delay }, i) => (
-                <div key={i} className="flex justify-center">
-                  <div
-                    className={`step-circle relative z-10 flex h-[72px] w-[72px] items-center justify-center rounded-full border ${border} ${bg} ${color}`}
-                    style={{ '--circle-ring': ring, '--circle-glow': glow, '--circle-outer': outer, '--step-delay': delay } as React.CSSProperties}
-                  >
-                    {icon}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Step content */}
-          <div className="grid gap-10 text-center sm:grid-cols-3">
-            {([
-              { num: "1", color: "text-emerald-400", title: "Darbinieks pieraksta papildu darbu", desc: "Darbinieks īsi atzīmē palīdzību kolēģiem, koordināciju, onboarding vai darbu ārpus oficiālās lomas." },
-              { num: "2", color: "text-sky-400", title: "Vadītājs apstiprina ierakstus", desc: "Vadītājs redz iesniegtos ierakstus, var tos apstiprināt, noraidīt vai atgriezt ar komentāru." },
-              { num: "3", color: "text-violet-400", title: "Shadowy sagatavo pārskatu", desc: "Platforma apkopo tendences, role gaps, pārslodzes signālus un praktiskus ieteikumus vadītājam." },
-            ] as const).map(({ num, color, title, desc }, i) => (
-              <div key={num} data-reveal="up" data-delay={`${250 + i * 100}`}>
-                <p className={`mb-3 text-[11px] font-bold tracking-[0.18em] uppercase ${color}`}>SOLIS {num}</p>
-                <h3 className="text-[17px] font-semibold leading-snug text-white">{title}</h3>
-                <p className="mt-2.5 text-sm leading-relaxed text-white/75">{desc}</p>
-              </div>
-            ))}
-          </div>
+          <ProblemCards />
         </div>
       </section>
 
       {/* ── Section 01: Employee creates entry ───────────────────────── */}
-      <section id="darbiniekiem" className="relative overflow-hidden">
+      <section id="darbiniekiem" className="relative overflow-hidden border-t border-white/[0.06] scroll-mt-24">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute -left-[10%] top-[10%] h-[500px] w-[600px] rounded-full bg-[hsl(160_70%_20%_/_0.10)] blur-[130px]" />
         </div>
-        <div className="relative mx-auto max-w-6xl px-6 py-24">
+        <div className="relative mx-auto max-w-6xl px-6 py-16">
           <div className="grid gap-16 lg:grid-cols-2 lg:items-center">
             <div>
+              <p id="ka-tas-darbojas" data-reveal="up" className="mb-4 scroll-mt-24 text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
+                Kā tas darbojas?
+              </p>
               <div
                 data-reveal="left"
                 className="mb-5 inline-flex items-center gap-3 rounded-full border border-emerald-500/30 bg-emerald-500/8 px-4 py-2"
@@ -488,187 +363,33 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Pilot report preview ─────────────────────────────────────── */}
-      <section className="relative overflow-hidden border-t border-white/[0.1]">
-        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute left-[10%] top-[-10%] h-[400px] w-[600px] rounded-full bg-[hsl(160_70%_20%_/_0.09)] blur-[120px]" />
-          <div className="absolute right-[5%] bottom-[-10%] h-[300px] w-[400px] rounded-full bg-[hsl(220_80%_30%_/_0.07)] blur-[100px]" />
-        </div>
-        <div className="relative mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-14 lg:grid-cols-2 lg:items-start">
-            <div>
-              <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">30 dienu pilots</p>
-              <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
-                Ko uzņēmums saņem<br />pēc 30 dienām?
-              </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/80">
-                Pilota beigās uzņēmums saņem praktisku pārskatu, kas palīdz saprast, kur komandā rodas slēptā slodze un kā darba sadali var padarīt taisnīgāku.
-              </p>
-              <ul data-reveal="right" data-delay="300" className="mt-6 space-y-2.5">
-                {[
-                  "Komandas slodzes pārskats",
-                  "Biežākie papildu darba veidi",
-                  "Darbs ārpus oficiālās lomas",
-                  "Role gaps",
-                  "Pārslodzes signāli",
-                  "Ieteikumi vadītājam",
-                ].map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 text-sm text-white/85">
-                    <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <div data-reveal="up" data-delay="400" className="mt-8">
-                <a
-                  href="#pilots"
-                  className="glass inline-flex items-center gap-2.5 rounded-full border border-white/[0.14] bg-white/[0.06] px-8 py-[17px] font-display font-black text-[15px] tracking-tight text-white transition-all duration-150 hover:bg-white/[0.1] hover:border-white/[0.22] hover:-translate-y-[1px] active:translate-y-[0.5px]"
-                >
-                  Pieteikt pilotu
-                </a>
-              </div>
-            </div>
-            <div data-reveal="right" data-delay="150">
-              <PilotReportMockup />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Bez Shadowy / Ar Shadowy ─────────────────────────────────── */}
-      <section className="relative border-t border-white/[0.1]">
-        <div className="mx-auto max-w-5xl px-6 py-20">
-          <div className="mb-12 text-center">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Salīdzinājums</p>
-            <h2 data-reveal="scale" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
-              Bez Shadowy un ar Shadowy
-            </h2>
-          </div>
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div data-reveal="left" data-delay="100" className="glass rounded-2xl border border-white/[0.07] bg-white/[0.015] p-7">
-              <p className="mb-5 text-xs font-bold uppercase tracking-wider text-white/55">Bez Shadowy</p>
-              <ul className="space-y-3.5">
-                {[
-                  "Papildu darbs paliek tikai sarunās",
-                  "Vadītājs redz tikai gala rezultātu",
-                  "Pārslodze kļūst redzama pārāk vēlu",
-                  "Atzinība balstās uz sajūtu",
-                  "Role gaps netiek pamanīti",
-                  "Onboarding slodze ir neredzama",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/65">
-                    <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/50" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div data-reveal="right" data-delay="100" className="glass rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.03] p-7">
-              <p className="mb-5 text-xs font-bold uppercase tracking-wider text-emerald-400/60">Ar Shadowy</p>
-              <ul className="space-y-3.5">
-                {[
-                  "Papildu darbs tiek fiksēts un apstiprināts",
-                  "Vadītājs redz reālo slodzi katram darbiniekam",
-                  "Pārslodzes signāli parādās agrīni",
-                  "Lēmumi par atzinību balstās uz datiem",
-                  "Role gaps kļūst redzami un adresējami",
-                  "Onboarding ieguldījums ir izmērāms",
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-sm text-white/75">
-                    <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── Privacy / trust ──────────────────────────────────────────── */}
       <section id="privatums" className="relative overflow-hidden border-t border-white/[0.1]">
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[hsl(160_60%_18%_/_0.07)] blur-[120px]" />
+          <div className="absolute left-1/2 top-0 h-[500px] w-[900px] -translate-x-1/2 rounded-full bg-[hsl(160_60%_18%_/_0.07)] blur-[130px]" />
         </div>
         <div className="relative mx-auto max-w-6xl px-6 py-24">
-          <div className="grid gap-14 lg:grid-cols-2 lg:items-start">
+          <div className="grid gap-14 lg:grid-cols-2 lg:items-center">
             <div>
-              <p data-reveal="left" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
-                Privātums un uzticēšanās
-              </p>
+              <p data-reveal="left" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Privātums un uzticēšanās</p>
               <h2 data-reveal="flip" data-delay="100" className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
                 Kāpēc tas nav<br />novērošanas rīks?
               </h2>
-              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/80">
-                Shadowy neizseko privātas sarunas, ekrāna aktivitāti vai katru
-                klikšķi. Platforma balstās uz darbinieku iesniegtiem un apstiprinātiem
-                ierakstiem, lai palīdzētu saprast slodzi - nevis kontrolēt cilvēkus.
+              <p data-reveal="blur" data-delay="200" className="mt-4 text-sm leading-relaxed text-white/75">
+                Shadowy neizseko privātas sarunas, ekrāna aktivitāti vai katru klikšķi. Platforma balstās uz darbinieku iesniegtiem un apstiprinātiem ierakstiem, lai palīdzētu saprast slodzi - nevis kontrolēt cilvēkus.
               </p>
-              <div data-card-glow className="mt-6 flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/8 px-4 py-3">
+              <div data-reveal="up" data-delay="280" className="mt-6 flex items-center gap-2.5 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.07] px-4 py-3">
                 <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-400" />
-                <p className="text-sm text-emerald-300/80">
-                  Darbinieks kontrolē savus ierakstus pirms tie nonāk pie vadītāja.
-                </p>
+                <p className="text-sm text-emerald-300/80">Darbinieks kontrolē savus ierakstus pirms tie nonāk pie vadītāja.</p>
               </div>
+              <p data-reveal="up" data-delay="340" className="mt-4 text-[12px] text-white/35">
+                GDPR atbilstīgs · Serveri ES robežās · Datus var dzēst jebkurā brīdī
+              </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3">
-              <TiltCard className="glass rounded-xl border border-emerald-500/15 bg-emerald-500/[0.04] p-5">
-                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-emerald-400/70">
-                  Ko vadītājs redz
-                </p>
-                <ul className="space-y-3">
-                  {PRIVACY_SEES.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm">
-                      <Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-emerald-400" />
-                      <span className="leading-snug text-white/85">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </TiltCard>
-              <TiltCard className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5">
-                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-white/55">
-                  Ko vadītājs neredz
-                </p>
-                <ul className="space-y-3">
-                  {PRIVACY_NOT_SEES.map((item) => (
-                    <li key={item} className="flex items-start gap-2 text-sm">
-                      <X className="mt-0.5 h-3.5 w-3.5 shrink-0 text-white/55" />
-                      <span className="leading-snug text-white/65">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </TiltCard>
+            <div data-reveal="right" data-delay="100">
+              <PrivacyCards />
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Kāpēc uzņēmumam vērtīgi ─────────────────────────────────── */}
-      <section className="relative border-t border-white/[0.1]">
-        <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="mb-12">
-            <p data-reveal="up" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Biznesa vērtība</p>
-            <h2 data-reveal="flip" data-delay="100" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">Kāpēc uzņēmumam tas ir vērtīgi?</h2>
-            <p data-reveal="blur" data-delay="200" className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80">
-              Shadowy palīdz vadītājiem redzēt to, kas parasti pazūd starp kalendāriem, uzdevumu sarakstiem un amata aprakstiem.
-            </p>
-          </div>
-          <div data-reveal="up" data-delay="200" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {([
-              { title: "Agrāk pamanīt pārslodzi", desc: "Signāli parādās pirms darbinieks atnāk ar problēmu." },
-              { title: "Taisnīgāk sadalīt darbu", desc: "Skaidrs priekšstats par to, kurš faktiski dara ko un cik daudz." },
-              { title: "Saprast darbu ārpus amata apraksta", desc: "Redzamība uz koordināciju, palīdzību un neformālajiem pienākumiem." },
-              { title: "Labāki lēmumi par atzinību", desc: "Bonusi un uzslavas balstoties uz reālu ieguldījumu, ne tikai formāliem KPI." },
-              { title: "Samazināt haosu komandā", desc: "Izprast, kuri procesi rada slēpto slodzi un kur ir jāmaina organizācija." },
-              { title: "Pamanīt role gaps", desc: "Atklāt, kur komandas locekļi sistemātiski strādā ārpus savas lomas." },
-            ] as const).map(({ title, desc }) => (
-              <div key={title} className="glass rounded-xl border border-white/[0.07] bg-white/[0.015] p-5 transition-colors duration-200 hover:border-white/[0.12] hover:bg-white/[0.03]">
-                <div className="mb-2 h-1 w-6 rounded-full bg-emerald-500/40" />
-                <p className="text-sm font-semibold text-white/95">{title}</p>
-                <p className="mt-1.5 text-xs leading-relaxed text-white/75">{desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -676,14 +397,16 @@ export default function HomePage() {
       {/* ── Kam piemērots + Kam nav ───────────────────────────────────── */}
       <section className="relative border-t border-white/[0.1]">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-12 lg:grid-cols-2">
+          <div className="grid gap-16 lg:grid-cols-2">
             <div>
               <p data-reveal="left" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Mērķauditorija</p>
-              <h2 data-reveal="up" data-delay="100" className="mt-2 font-display font-black text-2xl tracking-tight text-white sm:text-3xl">Kam Shadowy ir piemērots?</h2>
-              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/80">
-                Īpaši piemērots komandām, kur daudz darba notiek neformāli: palīdzība kolēģiem, koordinācija, klientu jautājumi, onboardings un papildu pienākumi.
+              <h2 data-reveal="up" data-delay="80" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
+                Kam Shadowy ir piemērots?
+              </h2>
+              <p data-reveal="blur" data-delay="160" className="mt-3 text-sm leading-relaxed text-white/65">
+                Īpaši piemērots komandām, kur daudz darba notiek neformāli — palīdzība kolēģiem, koordinācija un papildu pienākumi.
               </p>
-              <ul data-reveal="right" data-delay="280" className="mt-5 space-y-2">
+              <ul data-reveal="up" data-delay="220" className="mt-6 space-y-2.5">
                 {[
                   "Biroja un administratīvās komandas",
                   "Grāmatvedības komandas",
@@ -692,28 +415,31 @@ export default function HomePage() {
                   "Customer support komandas",
                   "Mazas un vidējas komandas (5–50 cilvēki)",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-white/85">
-                    <Check className="h-3 w-3 shrink-0 text-emerald-400/70" />
+                  <li key={item} className="flex items-center gap-3 text-sm text-white/80">
+                    <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400/70" />
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
-            <div>
-              <p data-reveal="right" className="text-[11px] font-semibold uppercase tracking-widest text-white/65">Nav paredzēts</p>
-              <h2 data-reveal="up" data-delay="100" className="mt-2 font-display font-black text-2xl tracking-tight text-white sm:text-3xl">Kam Shadowy nav?</h2>
-              <p data-reveal="blur" data-delay="200" className="mt-3 text-sm leading-relaxed text-white/80">
-                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi - nevis kontrolēt darbiniekus.
+
+            <div data-reveal="right" data-delay="100">
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-white/40">Nav paredzēts</p>
+              <h2 className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
+                Kam Shadowy nav?
+              </h2>
+              <p className="mt-3 text-sm leading-relaxed text-white/65">
+                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi — nevis kontrolēt darbiniekus.
               </p>
-              <ul data-reveal="left" data-delay="280" className="mt-5 space-y-2">
+              <ul className="mt-6 space-y-2.5">
                 {[
                   "Darbinieku izsekošanai",
                   "Ekrāna aktivitātes kontrolei",
                   "Privāto sarunu analīzei",
                   "Mikromenedžmentam",
                 ].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm text-white/70">
-                    <X className="h-3 w-3 shrink-0 text-white/55" />
+                  <li key={item} className="flex items-center gap-3 text-sm text-white/55">
+                    <X className="h-3.5 w-3.5 shrink-0 text-white/35" />
                     {item}
                   </li>
                 ))}
