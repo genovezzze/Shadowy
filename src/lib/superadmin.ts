@@ -1,4 +1,5 @@
 export function isSuperAdmin(email: string | null | undefined): boolean {
-  const superAdminEmail = process.env.SUPERADMIN_EMAIL;
-  return Boolean(superAdminEmail) && email === superAdminEmail;
+  if (!email) return false;
+  const raw = process.env.SUPERADMIN_EMAIL ?? "";
+  return raw.split(",").map((e) => e.trim().toLowerCase()).includes(email.toLowerCase());
 }
