@@ -26,11 +26,13 @@ const FAQ_ITEMS = [
   },
 ];
 
+const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+
 export function FaqSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(1);
 
   return (
-    <div className="mx-auto max-w-2xl divide-y divide-white/[0.07]">
+    <div data-reveal="up" data-delay="180" className="divide-y divide-white/[0.09] border-t border-white/[0.09]">
       {FAQ_ITEMS.map((item, i) => {
         const open = openIndex === i;
         return (
@@ -39,19 +41,29 @@ export function FaqSection() {
               type="button"
               onClick={() => setOpenIndex(open ? null : i)}
               aria-expanded={open}
-              className="flex w-full items-center justify-between gap-4 py-5 text-left"
+              className="flex w-full items-center justify-between gap-6 py-6 text-left"
             >
-              <span className="font-display font-black text-base tracking-tight text-white sm:text-lg">
+              <span
+                className="font-display font-bold text-base tracking-tight transition-colors sm:text-lg"
+                style={{ color: open ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.88)" }}
+              >
                 {item.q}
               </span>
               <ChevronDown
-                className={`h-4 w-4 shrink-0 text-white/50 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+                className="h-4 w-4 shrink-0 text-white/45"
+                style={{ transform: open ? "rotate(180deg)" : "rotate(0deg)", transition: `transform 0.4s ${EASE}` }}
               />
             </button>
             <div
-              className={`overflow-hidden transition-all duration-200 ease-out ${open ? "max-h-40 pb-5" : "max-h-0"}`}
+              className="grid"
+              style={{
+                gridTemplateRows: open ? "1fr" : "0fr",
+                transition: `grid-template-rows 0.35s ${EASE}`,
+              }}
             >
-              <p className="text-sm leading-relaxed text-white/65">{item.a}</p>
+              <div className="overflow-hidden">
+                <p className="max-w-2xl pb-6 text-sm leading-relaxed text-white/60 sm:text-[15px]">{item.a}</p>
+              </div>
             </div>
           </div>
         );

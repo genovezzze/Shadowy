@@ -1,41 +1,49 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { ArrowRight } from "lucide-react";
+import { Fragment, useState, useEffect, useRef, MouseEvent } from "react";
+import { ArrowRight, Users, UserPlus, EyeOff } from "lucide-react";
 
 const CARDS = [
   {
     n: "01",
+    icon: Users,
     text: "Kolēģi regulāri palīdz viens otram, bet tas nekur netiek fiksēts.",
     sub: "Katras nedēļas slēptais darbs, kas nekad neparādās nekādos datos.",
     tag: "Koordinācija",
     glow: "160 70% 40%",
     tagCls: "border-emerald-500/30 bg-emerald-500/[0.08] text-emerald-400/80",
+    iconCls: "border-emerald-500/30 bg-emerald-500/[0.08] text-emerald-400",
   },
   {
     n: "02",
+    icon: UserPlus,
     text: "Jaunie darbinieki tiek ievadīti neformāli, bez redzamas slodzes.",
     sub: "Kāds to dara katru reizi no jauna, bet tas nekur nav redzams.",
     tag: "Onboarding",
     glow: "200 80% 55%",
     tagCls: "border-sky-500/30 bg-sky-500/[0.08] text-sky-400/80",
+    iconCls: "border-sky-500/30 bg-sky-500/[0.08] text-sky-400",
   },
   {
     n: "03",
+    icon: EyeOff,
     text: "Vadītājs redz rezultātu, bet neredz slēpto darbu aiz tā.",
     sub: "Daļa cilvēku uzņemas vairāk, nekā paredz viņu loma.",
     tag: "Redzamība",
     glow: "270 80% 65%",
     tagCls: "border-violet-500/30 bg-violet-500/[0.08] text-violet-400/80",
+    iconCls: "border-violet-500/30 bg-violet-500/[0.08] text-violet-400",
   },
 ] as const;
 
 const DURATION = 3200;
+const EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 
 export function ProblemCards() {
   const [active, setActive] = useState(0);
   const [paused, setPaused] = useState(false);
   const [progress, setProgress] = useState(0);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
     if (paused) { setProgress(0); return; }
@@ -52,31 +60,71 @@ export function ProblemCards() {
     return () => cancelAnimationFrame(raf);
   }, [active, paused]);
 
+  const onSpotlightMove = (i: number) => (e: MouseEvent<HTMLDivElement>) => {
+    const el = cardRefs.current[i];
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    el.style.setProperty("--spot-x", `${e.clientX - rect.left}px`);
+    el.style.setProperty("--spot-y", `${e.clientY - rect.top}px`);
+  };
+
   return (
     <div className="flex flex-col items-stretch gap-4 sm:flex-row sm:items-stretch">
       {CARDS.map((card, i) => {
         const isActive = active === i;
+        const Icon = card.icon;
         return (
-          <>
+          <Fragment key={card.n}>
             <div
-              key={card.n}
-              className="glass flex flex-1 flex-col rounded-2xl border"
+              ref={(el) => { cardRefs.current[i] = el; }}
+              className="group relative flex flex-1 flex-col overflow-hidden rounded-2xl border"
               style={{
                 padding: "2rem",
-                minHeight: "340px",
+                minHeight: "360px",
                 borderColor: isActive ? `hsl(${card.glow} / 0.4)` : "rgba(255,255,255,0.07)",
+                backgroundColor: "rgba(255,255,255,0.015)",
+                backdropFilter: "blur(18px)",
                 boxShadow: isActive
-                  ? `0 0 50px hsl(${card.glow} / 0.2), 0 12px 40px rgba(0,0,0,0.5)`
-                  : "0 2px 12px rgba(0,0,0,0.2)",
+                  ? `inset 0 1px 0 rgba(255,255,255,0.06), 0 0 50px hsl(${card.glow} / 0.2), 0 12px 40px rgba(0,0,0,0.5)`
+                  : "inset 0 1px 0 rgba(255,255,255,0.06), 0 2px 12px rgba(0,0,0,0.2)",
                 transform: isActive ? "translateY(-10px) scale(1.02)" : "translateY(0) scale(1)",
-                transition: "border-color 0.8s ease, box-shadow 0.8s ease, transform 0.8s ease",
+                transition: `border-color 0.7s ${EASE}, box-shadow 0.7s ${EASE}, transform 0.7s ${EASE}`,
                 cursor: "pointer",
               }}
               onMouseEnter={() => { setPaused(true); setActive(i); }}
               onMouseLeave={() => setPaused(false)}
+              onMouseMove={onSpotlightMove(i)}
             >
+              {/* Cursor-following spotlight, 21st.dev-style */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                style={{
+                  background: `radial-gradient(360px circle at var(--spot-x, 50%) var(--spot-y, 50%), hsl(${card.glow} / 0.14), transparent 70%)`,
+                }}
+              />
+
+              {/* Header row: icon badge + index */}
+              <div className="relative flex items-center justify-between">
+                <div
+                  className={`flex h-10 w-10 items-center justify-center rounded-xl border transition-transform duration-500 ${card.iconCls}`}
+                  style={{ transform: isActive ? "scale(1.08)" : "scale(1)", transition: `transform 0.7s ${EASE}` }}
+                >
+                  <Icon className="h-[18px] w-[18px]" />
+                </div>
+                <span
+                  className="font-mono text-[13px] font-bold"
+                  style={{
+                    color: isActive ? `hsl(${card.glow})` : "rgba(255,255,255,0.25)",
+                    transition: `color 0.7s ${EASE}`,
+                  }}
+                >
+                  {card.n}
+                </span>
+              </div>
+
               {/* Top accent + progress bar */}
-              <div className="mb-6 h-[2px] w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
+              <div className="relative mt-5 mb-6 h-[2px] w-full overflow-hidden rounded-full" style={{ background: "rgba(255,255,255,0.06)" }}>
                 <div
                   style={{
                     height: "100%",
@@ -88,25 +136,14 @@ export function ProblemCards() {
                 />
               </div>
 
-              {/* Number */}
-              <span
-                className="font-mono text-[13px] font-bold"
-                style={{
-                  color: isActive ? `hsl(${card.glow})` : "rgba(255,255,255,0.25)",
-                  transition: "color 0.8s ease",
-                }}
-              >
-                {card.n}
-              </span>
-
               {/* Main text */}
               <p
-                className="mt-5 font-display font-bold leading-tight tracking-tight"
+                className="relative font-display font-bold leading-tight tracking-tight"
                 style={{
                   fontSize: "clamp(1.15rem, 2vw, 1.45rem)",
                   color: isActive ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.45)",
                   transform: isActive ? "translateY(0)" : "translateY(6px)",
-                  transition: "color 0.8s ease, transform 0.8s ease",
+                  transition: `color 0.7s ${EASE}, transform 0.7s ${EASE}`,
                 }}
               >
                 {card.text}
@@ -114,11 +151,11 @@ export function ProblemCards() {
 
               {/* Sub text */}
               <p
-                className="mt-4 text-[15px] leading-relaxed"
+                className="relative mt-4 text-[15px] leading-relaxed"
                 style={{
                   color: isActive ? "rgba(255,255,255,0.6)" : "rgba(255,255,255,0.22)",
                   transform: isActive ? "translateY(0)" : "translateY(6px)",
-                  transition: "color 0.8s ease, transform 0.8s ease, opacity 0.8s ease",
+                  transition: `color 0.7s ${EASE}, transform 0.7s ${EASE}, opacity 0.7s ${EASE}`,
                   transitionDelay: isActive ? "0.05s" : "0s",
                 }}
               >
@@ -126,12 +163,12 @@ export function ProblemCards() {
               </p>
 
               {/* Tag */}
-              <div className="mt-auto pt-8">
+              <div className="relative mt-auto pt-8">
                 <span
                   className={`rounded-full border px-3 py-1.5 text-[11px] font-semibold uppercase tracking-widest ${card.tagCls}`}
                   style={{
                     opacity: isActive ? 1 : 0.4,
-                    transition: "opacity 0.8s ease",
+                    transition: `opacity 0.7s ${EASE}`,
                   }}
                 >
                   {card.tag}
@@ -140,17 +177,17 @@ export function ProblemCards() {
             </div>
 
             {i < CARDS.length - 1 && (
-              <div key={`arrow-${i}`} className="flex shrink-0 items-center justify-center">
+              <div className="flex shrink-0 items-center justify-center">
                 <ArrowRight
                   className="h-6 w-6 rotate-90 sm:rotate-0"
                   style={{
                     color: active === i ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.12)",
-                    transition: "color 0.8s ease",
+                    transition: `color 0.7s ${EASE}`,
                   }}
                 />
               </div>
             )}
-          </>
+          </Fragment>
         );
       })}
     </div>

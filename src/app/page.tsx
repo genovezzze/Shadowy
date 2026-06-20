@@ -397,16 +397,20 @@ export default function HomePage() {
       {/* ── Kam piemērots + Kam nav ───────────────────────────────────── */}
       <section className="relative border-t border-white/[0.1]">
         <div className="mx-auto max-w-6xl px-6 py-20">
-          <div className="grid gap-16 lg:grid-cols-2">
-            <div>
-              <p data-reveal="left" className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Mērķauditorija</p>
-              <h2 data-reveal="up" data-delay="80" className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              data-reveal="left"
+              data-card-glow
+              className="glass rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.02] p-8 sm:p-10"
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">Mērķauditorija</p>
+              <h2 className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
                 Kam Shadowy ir piemērots?
               </h2>
-              <p data-reveal="blur" data-delay="160" className="mt-3 text-sm leading-relaxed text-white/65">
+              <p className="mt-3 text-sm leading-relaxed text-white/65">
                 Īpaši piemērots komandām, kur daudz darba notiek neformāli — palīdzība kolēģiem, koordinācija un papildu pienākumi.
               </p>
-              <ul data-reveal="up" data-delay="220" className="mt-6 space-y-2.5">
+              <ul className="mt-6 space-y-3">
                 {[
                   "Biroja un administratīvās komandas",
                   "Grāmatvedības komandas",
@@ -416,14 +420,20 @@ export default function HomePage() {
                   "Mazas un vidējas komandas (5–50 cilvēki)",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-white/80">
-                    <Check className="h-3.5 w-3.5 shrink-0 text-emerald-400/70" />
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10">
+                      <Check className="h-3 w-3 text-emerald-400" />
+                    </div>
                     {item}
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div data-reveal="right" data-delay="100">
+            <div
+              data-reveal="right"
+              data-delay="100"
+              className="rounded-2xl border border-white/[0.06] bg-white/[0.008] p-8 sm:p-10"
+            >
               <p className="text-[11px] font-semibold uppercase tracking-widest text-white/40">Nav paredzēts</p>
               <h2 className="mt-2 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
                 Kam Shadowy nav?
@@ -431,7 +441,7 @@ export default function HomePage() {
               <p className="mt-3 text-sm leading-relaxed text-white/65">
                 Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi — nevis kontrolēt darbiniekus.
               </p>
-              <ul className="mt-6 space-y-2.5">
+              <ul className="mt-6 space-y-3">
                 {[
                   "Darbinieku izsekošanai",
                   "Ekrāna aktivitātes kontrolei",
@@ -439,7 +449,9 @@ export default function HomePage() {
                   "Mikromenedžmentam",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-white/55">
-                    <X className="h-3.5 w-3.5 shrink-0 text-white/35" />
+                    <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
+                      <X className="h-3 w-3 text-white/35" />
+                    </div>
                     {item}
                   </li>
                 ))}
@@ -580,6 +592,7 @@ export default function HomePage() {
 
             {/* Right - form card */}
             <div
+              data-card-glow
               className="glass rounded-2xl border border-emerald-500/20 bg-white/[0.025] p-8 sm:p-10"
               style={{
                 boxShadow:
@@ -597,13 +610,13 @@ export default function HomePage() {
       {/* ── FAQ ──────────────────────────────────────────────────────── */}
       <section id="faq" className="relative border-t border-white/[0.1] scroll-mt-24">
         <div className="mx-auto max-w-3xl px-6 py-24">
-          <div className="mb-10 text-center">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-emerald-400">
-              Jautājumi
-            </p>
-            <h2 className="mt-2.5 font-display font-black text-3xl tracking-tight text-white sm:text-4xl">
-              Biežāk uzdotie jautājumi
+          <div data-reveal="up" className="mb-14 text-center">
+            <h2 className="font-display font-black text-4xl tracking-tight text-white sm:text-5xl">
+              Biežāk uzdotie <span className="text-gradient-emerald">jautājumi</span>
             </h2>
+            <p data-reveal="blur" data-delay="120" className="mx-auto mt-4 max-w-none whitespace-nowrap text-base text-white/55">
+              Viss, kas jums jāzina par pilotu, datiem un Shadowy darbību.
+            </p>
           </div>
           <FaqSection />
         </div>
@@ -812,7 +825,7 @@ function DashboardMockup() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" data-card-glow>
       <div
         className="rounded-2xl p-px"
         style={{
@@ -893,7 +906,7 @@ function DashboardMockup() {
 
 function EmployeeFormMockup() {
   return (
-    <div className="relative">
+    <div className="relative" data-card-glow>
       <div
         className="rounded-2xl p-px"
         style={{
@@ -988,7 +1001,7 @@ function ManagerReviewMockup() {
   ];
 
   return (
-    <div className="relative">
+    <div className="relative" data-card-glow>
       <div
         className="rounded-2xl p-px"
         style={{
@@ -1076,7 +1089,7 @@ function ManagerReviewMockup() {
 
 function InsightsMockup() {
   return (
-    <div className="relative">
+    <div className="relative" data-card-glow>
       <div
         className="rounded-2xl p-px"
         style={{
@@ -1182,67 +1195,3 @@ function InsightsMockup() {
   );
 }
 
-/* ── Pilot report mockup ─────────────────────────────────────────────── */
-
-function PilotReportMockup() {
-  const breakdown = [
-    { type: "Palīdzība kolēģiem", hours: 8, pct: 44 },
-    { type: "Koordinācija", hours: 6, pct: 33 },
-    { type: "Onboarding", hours: 4, pct: 22 },
-  ];
-  return (
-    <div className="glass overflow-hidden rounded-2xl border border-white/[0.09] bg-white/[0.02]">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.1] bg-[#07101e] px-5 py-4">
-        <div>
-          <p className="font-mono text-[9px] uppercase tracking-widest text-white/60">Shadowy · 30 dienu pilot atskaite</p>
-          <p className="mt-0.5 text-xs text-white/75">Uzņēmums XYZ · 01.05–31.05.2025</p>
-        </div>
-        <span className="rounded border border-emerald-500/25 bg-emerald-500/8 px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-emerald-400">Gatavs</span>
-      </div>
-
-      {/* KPI row */}
-      <div className="grid grid-cols-3 divide-x divide-white/6 border-b border-white/[0.1]">
-        {([
-          { label: "Papildu darbs", value: "18h", color: "text-emerald-400" },
-          { label: "Role gaps", value: "3", color: "text-amber-400" },
-          { label: "Pārslodzes signāli", value: "2", color: "text-red-400" },
-        ] as const).map(({ label, value, color }) => (
-          <div key={label} className="px-5 py-4 text-center">
-            <p className={`text-xl font-bold ${color}`}>{value}</p>
-            <p className="mt-0.5 text-[10px] text-white/70">{label}</p>
-          </div>
-        ))}
-      </div>
-
-      {/* Breakdown */}
-      <div className="px-5 py-4">
-        <p className="mb-3 font-mono text-[9px] uppercase tracking-wider text-white/60">Biežākie papildu darba veidi</p>
-        <div className="space-y-2.5">
-          {breakdown.map(({ type, hours, pct }) => (
-            <div key={type}>
-              <div className="mb-1 flex items-center justify-between text-xs">
-                <span className="text-white/85">{type}</span>
-                <span className="font-mono text-white/70">{hours}h</span>
-              </div>
-              <div className="h-1 w-full rounded-full bg-white/[0.05]">
-                <div className="h-1 rounded-full bg-emerald-500/50" style={{ width: `${pct}%` }} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Recommendation */}
-      <div className="border-t border-white/[0.1] bg-amber-500/[0.04] px-5 py-4">
-        <p className="mb-1 font-mono text-[9px] uppercase tracking-wider text-amber-400/60">Ieteikums vadītājam</p>
-        <p className="text-xs leading-relaxed text-white/80">Pārskatīt Mārtiņa B. uzdevumu sadali - 40% darba laika tiek pavadīts ārpus amata apraksta.</p>
-      </div>
-    </div>
-  );
-}
-
-/* ── Static data ─────────────────────────────────────────────────────── */
-
-const PRIVACY_SEES = ["Apstiprātus ierakstus", "Kopējo darba slodzi", "Lomu neatbilstības", "Komandas tendences"];
-const PRIVACY_NOT_SEES = ["Privātas sarunas", "Ekrāna aktivitāti", "Neapstiprinātus datus", "Personīgu saturu"];
