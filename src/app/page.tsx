@@ -639,7 +639,7 @@ export default function HomePage() {
             />
             <div
               aria-hidden
-              className="absolute inset-0"
+              className="animate-cta-logo-float absolute inset-0"
               style={{
                 maskImage: "linear-gradient(to bottom, black 0%, black 35%, transparent 75%)",
                 WebkitMaskImage: "linear-gradient(to bottom, black 0%, black 35%, transparent 75%)",

@@ -249,6 +249,16 @@
   animation: marquee 22s linear infinite;
 }
 
+/* Notification list item entrance */
+@keyframes notif-in {
+  from { opacity: 0; transform: translateX(6px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-notif-in {
+  animation: notif-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Scroll reveal - base */
 .js-ready [data-reveal] {
   opacity: 0;
@@ -542,4 +552,17 @@ input[type="checkbox"]:focus-visible {
 
 .animate-cta-logo-rotate {
   animation: cta-logo-rotate 120s linear infinite;
+}
+
+@keyframes cta-logo-float {
+  0%, 100% {
+    transform: translateY(0) scale(1) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) scale(1.045) rotate(2.5deg);
+  }
+}
+
+.animate-cta-logo-float {
+  animation: cta-logo-float 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }

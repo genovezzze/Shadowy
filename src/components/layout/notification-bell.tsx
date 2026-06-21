@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { Bell } from "lucide-react";
+import { Bell, CheckCircle2, Sparkles, Undo2, XCircle, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   listNotifications,
@@ -29,6 +29,25 @@ function timeAgo(date: Date): string {
   if (hours < 24) return `${hours} h`;
   const days = Math.floor(hours / 24);
   return `${days} d`;
+}
+
+function getNotificationVisual(title: string): {
+  icon: LucideIcon;
+  iconCls: string;
+} {
+  if (title.includes("noraidīts")) {
+    return { icon: XCircle, iconCls: "bg-destructive/10 text-destructive" };
+  }
+  if (title.includes("apstiprināts")) {
+    return { icon: CheckCircle2, iconCls: "bg-success/10 text-success" };
+  }
+  if (title.includes("atpakaļ")) {
+    return { icon: Undo2, iconCls: "bg-warning/10 text-warning" };
+  }
+  if (title.startsWith("Jauns")) {
+    return { icon: Sparkles, iconCls: "bg-primary/10 text-primary" };
+  }
+  return { icon: Bell, iconCls: "bg-muted text-muted-foreground" };
 }
 
 export function NotificationBell({
@@ -135,43 +154,57 @@ export function NotificationBell({
       className="glass fixed z-[100] max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border border-border bg-card shadow-card dark:rounded-2xl dark:border-white/[0.07] dark:bg-gradient-to-b dark:from-white/[0.06] dark:via-white/[0.035] dark:to-white/[0.015] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.09),0_16px_40px_-16px_rgba(0,0,0,0.6)]"
       style={panelStyle}
     >
-          <div className="flex items-center justify-between border-b border-border px-3 py-2">
+          <div className="flex items-center gap-2 border-b border-border px-3.5 py-3">
             <span className="text-sm font-semibold">Paziņojumi</span>
+            {unreadCount > 0 && (
+              <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[11px] font-semibold text-primary">
+                {unreadCount}
+              </span>
+            )}
             {unreadCount > 0 && (
               <button
                 onClick={handleMarkAllRead}
                 disabled={pending}
-                className="text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
+                className="ml-auto text-xs text-muted-foreground hover:text-foreground underline-offset-2 hover:underline"
               >
                 Atzīmēt visus kā lasītus
               </button>
             )}
           </div>
 
-          <div className="max-h-96 overflow-y-auto">
+          <div className="max-h-96 divide-y divide-border/60 overflow-y-auto">
             {items === null ? (
               <div className="px-3 py-6 text-center text-sm text-muted-foreground">Ielādē...</div>
             ) : items.length === 0 ? (
-              <div className="px-3 py-6 text-center text-sm text-muted-foreground">
-                Nav paziņojumu.
+              <div className="flex flex-col items-center gap-2 px-3 py-8 text-center">
+                <Bell className="h-5 w-5 text-muted-foreground/50" />
+                <span className="text-sm text-muted-foreground">Nav paziņojumu.</span>
               </div>
             ) : (
-              items.map((item) => {
+              items.map((item, i) => {
+                const { icon: Icon, iconCls } = getNotificationVisual(item.title);
                 const content = (
                   <div
-                    className={`flex flex-col gap-0.5 px-3 py-2.5 text-sm transition-colors hover:bg-accent ${
-                      item.read ? "" : "bg-accent/40"
-                    }`}
+                    className="animate-notif-in flex items-start gap-3 px-3.5 py-3 text-sm transition-colors hover:bg-accent"
+                    style={{ animationDelay: `${Math.min(i, 6) * 35}ms` }}
                   >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="font-medium">{item.title}</span>
-                      <span className="shrink-0 text-xs text-muted-foreground">
-                        {timeAgo(item.createdAt)}
-                      </span>
+                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${iconCls}`}>
+                      <Icon className="h-4 w-4" />
                     </div>
-                    {item.body && (
-                      <span className="text-xs text-muted-foreground">{item.body}</span>
-                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="flex items-center gap-1.5 font-medium">
+                          {!item.read && <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />}
+                          {item.title}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {timeAgo(item.createdAt)}
+                        </span>
+                      </div>
+                      {item.body && (
+                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{item.body}</span>
+                      )}
+                    </div>
                   </div>
                 );
 
