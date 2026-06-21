@@ -45,6 +45,9 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "/",
   },
+  verification: {
+    google: "_N_n1qi-G4kQ72xDD6_7WDP8zvXqNu8LII_bJt8BSa4",
+  },
   robots: {
     index: true,
     follow: true,
