@@ -32,9 +32,24 @@ import { FaqSection } from "@/components/landing/faq-section";
 import { PrivacyCards } from "./privacy-cards";
 import { ProblemCards } from "./problem-cards";
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Shadowy",
+  url: "https://shadowy.lv",
+  logo: "https://shadowy.lv/logo.png",
+  description:
+    "Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas — bez darbinieku novērošanas.",
+  email: "contact@shadowy.lv",
+};
+
 export default function HomePage() {
   return (
     <div className="dark relative min-h-screen bg-[#060d1c] text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+      />
       {/* Fixed dot-grid - painted once, zero scroll cost */}
       <div
         aria-hidden

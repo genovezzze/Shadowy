@@ -30,10 +30,40 @@ const neueHaas = localFont({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://shadowy.lv";
+const title = "Shadowy - Padariet neredzamo darbu redzamu";
+const description =
+  "Shadowy palīdz padarīt neredzamo darbu redzamu: strukturēta darba iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība.";
+
 export const metadata: Metadata = {
-  title: "Shadowy - Padariet neredzamo darbu redzamu",
-  description:
-    "Shadowy palīdz padarīt neredzamo darbu redzamu: strukturēta darba iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: title,
+    template: "%s | Shadowy",
+  },
+  description,
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    locale: "lv_LV",
+    url: "/",
+    siteName: "Shadowy",
+    title,
+    description,
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Shadowy" }],
+  },
+  twitter: {
+    card: "summary",
+    title,
+    description,
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({
