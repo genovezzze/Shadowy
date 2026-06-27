@@ -38,7 +38,13 @@ const description =
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
-    icon: "/images/story/Black.svg",
+    icon: [
+      { url: "/images/story/Black.svg" },
+      {
+        url: "/shadowy.svg",
+        media: "(prefers-color-scheme: dark)",
+      },
+    ],
     shortcut: "/images/story/Black.svg",
   },
   title: {
