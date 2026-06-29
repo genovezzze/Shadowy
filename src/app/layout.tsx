@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { getSiteUrl } from "@/lib/site-url";
 
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
@@ -30,7 +31,16 @@ const neueHaas = localFont({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://shadowy.lv";
+const neueHaasLight = localFont({
+  src: "../../public/fonts/NeueHaasDisplayLight.ttf",
+  weight: "300",
+  style: "normal",
+  variable: "--font-accent",
+  display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
+const siteUrl = getSiteUrl();
 const title = "Shadowy - Padariet neredzamo darbu redzamu";
 const description =
   "Shadowy palīdz padarīt neredzamo darbu redzamu: strukturēta darba iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība.";
@@ -72,13 +82,20 @@ export const metadata: Metadata = {
     siteName: "Shadowy",
     title,
     description,
-    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Shadowy" }],
+    images: [
+      {
+        url: "/images/shadowy-dashboard-wide.png",
+        width: 1916,
+        height: 821,
+        alt: "Shadowy darba pārskats",
+      },
+    ],
   },
   twitter: {
     card: "summary",
     title,
     description,
-    images: ["/logo.png"],
+    images: ["/images/shadowy-dashboard-wide.png"],
   },
 };
 
@@ -90,7 +107,7 @@ export default function RootLayout({
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${neueHaas.variable}`}
+      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable}`}
       suppressHydrationWarning
     >
       <body className="font-sans">

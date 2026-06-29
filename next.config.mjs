@@ -10,6 +10,9 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Keep development artifacts separate so `next build` cannot invalidate
+  // CSS and JS chunks served by a running `next dev` process.
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
   async headers() {
     return [
       {

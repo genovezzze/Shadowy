@@ -34,7 +34,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "C:\\tmp\\shadowy-next/types/**/*.ts",
-    "../../../.next-shadowy/types/**/*.ts"
+    "../../../.next-shadowy/types/**/*.ts",
+    ".next-dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

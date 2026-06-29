@@ -566,3 +566,70 @@ input[type="checkbox"]:focus-visible {
 .animate-cta-logo-float {
   animation: cta-logo-float 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
+
+@keyframes solution-grid-drift {
+  0%   { background-position: 0 0; }
+  50%  { background-position: 42px 21px; }
+  100% { background-position: 84px 42px; }
+}
+
+@keyframes solution-glow-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.7; }
+  35%      { transform: translate3d(120px, -45px, 0) scale(1.16); opacity: 1; }
+  70%      { transform: translate3d(55px, 80px, 0) scale(0.92); opacity: 0.78; }
+}
+
+@keyframes solution-glow-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); opacity: 0.75; }
+  40%      { transform: translate3d(-125px, -70px, 0) scale(1.12); opacity: 1; }
+  72%      { transform: translate3d(-45px, 45px, 0) scale(0.94); opacity: 0.72; }
+}
+
+@keyframes solution-glow-c {
+  0%, 100% { transform: translate3d(-25px, 10px, 0) scale(0.9); opacity: 0.45; }
+  50%      { transform: translate3d(85px, 95px, 0) scale(1.25); opacity: 0.9; }
+}
+
+.animate-solution-grid {
+  animation: solution-grid-drift 28s linear infinite;
+  will-change: background-position;
+}
+
+.animate-solution-glow-a {
+  animation: solution-glow-a 19s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-solution-glow-b {
+  animation: solution-glow-b 23s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-solution-glow-c {
+  animation: solution-glow-c 17s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+@keyframes pilot-grid-drift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 68px 34px, 68px 34px;
+  }
+}
+
+.animate-pilot-grid {
+  animation: pilot-grid-drift 16s linear infinite;
+  will-change: background-position;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-pilot-grid,
+  .animate-solution-grid,
+  .animate-solution-glow-a,
+  .animate-solution-glow-b,
+  .animate-solution-glow-c {
+    animation: none;
+  }
+}

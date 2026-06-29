@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser, hashPassword } from "@/lib/auth";
 import { sendInviteEmail } from "@/lib/email";
+import { getSiteUrl } from "@/lib/site-url";
 
 const schema = z.object({
   name: z.string().min(2, "Vārds ir pārāk īss.").max(80),
@@ -55,7 +56,7 @@ export async function createManager(formData: FormData) {
     },
   });
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.shadowy.lv";
+  const appUrl = getSiteUrl();
   const inviteUrl = `${appUrl}/accept-invite?token=${inviteToken}`;
   try {
     await sendInviteEmail(email, parsed.data.name, "MANAGER", inviteUrl);

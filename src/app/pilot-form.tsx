@@ -1,19 +1,27 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Button } from "@/components/ui/button";
+import { ArrowUpRight, CheckCircle2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { submitPilotApplication } from "./pilot-actions";
-import { CheckCircle2 } from "lucide-react";
 
 const TEAM_SIZES = [
   "2–5 cilvēki",
   "6–15 cilvēki",
   "16–50 cilvēki",
   "51+ cilvēki",
-];
+] as const;
+
+const fieldClassName =
+  "h-10 rounded-lg border-white/[0.12] bg-[#0c1014] px-3.5 font-accent text-[13px] tracking-[0.025em] text-white shadow-none placeholder:text-white/32 focus-visible:border-emerald-300/35 focus-visible:ring-1 focus-visible:ring-emerald-300/25";
 
 export function PilotForm() {
   const [pending, startTransition] = useTransition();
@@ -23,76 +31,140 @@ export function PilotForm() {
   function onSubmit(formData: FormData) {
     setError(null);
     startTransition(async () => {
-      const res = await submitPilotApplication(formData);
-      if (!res.ok) setError(res.error);
+      const result = await submitPilotApplication(formData);
+      if (!result.ok) setError(result.error);
       else setDone(true);
     });
   }
 
   if (done) {
     return (
-      <div className="flex flex-col items-center gap-3 py-8 text-center">
-        <CheckCircle2 className="h-8 w-8 text-[hsl(160_84%_39%)]" />
-        <p className="font-semibold">Pieteikums nosūtīts!</p>
-        <p className="text-sm text-muted-foreground">
-          Sazināsimies ar jums tuvāko dienu laikā.
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-2xl border border-emerald-300/15 bg-emerald-300/[0.04] px-6 text-center">
+        <span className="grid size-12 place-items-center rounded-full border border-emerald-300/20 bg-emerald-300/[0.08] text-emerald-300">
+          <CheckCircle2 className="size-6" />
+        </span>
+        <p className="font-accent text-xl font-bold text-white">
+          Pieteikums nosūtīts!
+        </p>
+        <p className="font-accent text-sm font-light text-white/50">
+          Sazināsimies ar jums tuvāko dienu laikā
         </p>
       </div>
     );
   }
 
   return (
-    <form action={onSubmit} className="space-y-4">
-      <div className="grid gap-4 sm:grid-cols-2">
+    <form action={onSubmit} className="space-y-3.5">
+      <div className="grid gap-3 sm:grid-cols-2">
         <div className="grid gap-1.5">
-          <Label htmlFor="pilot-name">Vārds un uzvārds</Label>
-          <Input id="pilot-name" name="name" placeholder="Jānis Bērziņš" required maxLength={100} />
+          <Label
+            htmlFor="pilot-name"
+            className="font-accent text-[13px] font-bold tracking-[0.025em] text-white/80"
+          >
+            Vārds un uzvārds <span className="text-red-400">*</span>
+          </Label>
+          <Input
+            id="pilot-name"
+            name="name"
+            placeholder="Jānis Bērziņš"
+            required
+            maxLength={100}
+            className={fieldClassName}
+          />
         </div>
+
         <div className="grid gap-1.5">
-          <Label htmlFor="pilot-company">Uzņēmums</Label>
-          <Input id="pilot-company" name="company" placeholder="SIA Piemērs" required maxLength={100} />
+          <Label
+            htmlFor="pilot-company"
+            className="font-accent text-[13px] font-bold tracking-[0.025em] text-white/80"
+          >
+            Uzņēmums <span className="text-red-400">*</span>
+          </Label>
+          <Input
+            id="pilot-company"
+            name="company"
+            placeholder="SIA Piemērs"
+            required
+            maxLength={100}
+            className={fieldClassName}
+          />
         </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="pilot-email">E-pasts</Label>
-          <Input id="pilot-email" name="email" type="email" placeholder="janis@uznemums.lv" required />
+
+        <div className="grid gap-1.5 sm:col-span-2">
+          <Label
+            htmlFor="pilot-email"
+            className="font-accent text-[13px] font-bold tracking-[0.025em] text-white/80"
+          >
+            E-pasts <span className="text-red-400">*</span>
+          </Label>
+          <Input
+            id="pilot-email"
+            name="email"
+            type="email"
+            placeholder="janis@uznemums.lv"
+            required
+            className={fieldClassName}
+          />
         </div>
-        <div className="grid gap-1.5">
-          <Label htmlFor="pilot-size">Komandas lielums</Label>
+
+        <div className="grid gap-1.5 sm:col-span-2">
+          <Label
+            htmlFor="pilot-size"
+            className="font-accent text-[13px] font-bold tracking-[0.025em] text-white/80"
+          >
+            Komandas lielums <span className="text-red-400">*</span>
+          </Label>
           <Select name="teamSize" required>
-            <SelectTrigger id="pilot-size">
+            <SelectTrigger id="pilot-size" className={fieldClassName}>
               <SelectValue placeholder="Izvēlieties..." />
             </SelectTrigger>
             <SelectContent>
-              {TEAM_SIZES.map((s) => (
-                <SelectItem key={s} value={s}>{s}</SelectItem>
+              {TEAM_SIZES.map((size) => (
+                <SelectItem key={size} value={size}>
+                  {size}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
       </div>
+
       <div className="grid gap-1.5">
-        <Label htmlFor="pilot-comment">Īss komentārs <span className="text-muted-foreground">(nav obligāts)</span></Label>
+        <Label
+          htmlFor="pilot-comment"
+          className="font-accent text-[13px] font-bold tracking-[0.025em] text-white/80"
+        >
+          Īss komentārs{" "}
+          <span className="font-light text-white/30">(nav obligāts)</span>
+        </Label>
         <textarea
           id="pilot-comment"
           name="comment"
-          rows={3}
+          rows={2}
           maxLength={1000}
           placeholder="Ko jūs vēlaties uzlabot komandā? Kādi ir galvenie izaicinājumi?"
-          className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+          className="w-full resize-none rounded-lg border border-white/[0.12] bg-[#0c1014] px-3.5 py-2.5 font-accent text-[13px] font-light tracking-[0.025em] text-white outline-none transition placeholder:text-white/32 focus:border-emerald-300/35 focus:ring-1 focus:ring-emerald-300/25"
         />
       </div>
-      {error && <p className="text-sm text-destructive">{error}</p>}
-      <button
-        type="submit"
-        disabled={pending}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-xl py-4 font-display font-black text-base tracking-tight text-white transition-all duration-150 hover:-translate-y-[1px] hover:brightness-110 active:translate-y-[0.5px] disabled:pointer-events-none disabled:opacity-50"
-        style={{
-          background: "hsl(160 84% 34%)",
-          boxShadow: "0 0 0 1px hsl(160 84% 30% / 0.6), 0 4px 24px hsl(160 84% 35% / 0.45)",
-        }}
-      >
-        {pending ? "Sūta..." : "Pieteikt 30 dienu pilotu →"}
-      </button>
+
+      {error && (
+        <p className="rounded-lg border border-red-400/15 bg-red-400/[0.05] px-4 py-3 text-sm text-red-300">
+          {error}
+        </p>
+      )}
+
+      <div className="flex justify-end border-t border-white/[0.09] pt-3.5">
+        <button
+          type="submit"
+          disabled={pending}
+          className="group inline-flex items-center justify-center gap-2 rounded-lg border border-white/75 bg-white px-5 py-2.5 font-accent text-[13px] font-bold tracking-[0.035em] text-[#06110e] shadow-[0_0_22px_rgba(255,255,255,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(255,255,255,0.18)] disabled:pointer-events-none disabled:opacity-50"
+        >
+          {pending ? "Sūta..." : "Pieteikt pilotu"}
+          {!pending && (
+            <ArrowUpRight className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          )}
+        </button>
+      </div>
     </form>
   );
 }

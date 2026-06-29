@@ -1,4 +1,5 @@
 import "server-only";
+import { getSiteUrl } from "@/lib/site-url";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 
@@ -58,7 +59,7 @@ export async function sendWelcomeEmail(
   password: string,
   role: "MANAGER" | "EMPLOYEE"
 ): Promise<void> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getSiteUrl("http://localhost:3000");
   const roleLabel = role === "MANAGER" ? "vadītājs" : "darbinieks";
   const subject = "Shadowy - jūsu pieslēgšanās dati";
   const html = `
@@ -116,7 +117,7 @@ export async function sendEntrySubmittedEmail(opts: {
   employeeName: string;
   entryTitle: string;
 }): Promise<void> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getSiteUrl("http://localhost:3000");
   const subject = `Shadowy - jauns ieraksts no ${opts.employeeName}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
@@ -143,7 +144,7 @@ export async function sendEntryReviewedEmail(opts: {
   status: "APPROVED" | "REJECTED" | "RETURNED";
   comment: string | null;
 }): Promise<void> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getSiteUrl("http://localhost:3000");
   const statusLabel =
     opts.status === "APPROVED" ? "apstiprināts" :
     opts.status === "REJECTED" ? "noraidīts" : "atgriezts labošanai";
@@ -176,7 +177,7 @@ export async function sendBonusRequestEmail(opts: {
   employeeName: string;
   ruleName: string;
 }): Promise<void> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getSiteUrl("http://localhost:3000");
   const subject = `Shadowy - bonusa pieprasījums no ${opts.employeeName}`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:480px">
@@ -205,7 +206,7 @@ export async function sendWeeklyManagerReport(opts: {
   weekHours: number;
   teamSize: number;
 }): Promise<void> {
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const appUrl = getSiteUrl("http://localhost:3000");
   const subject = `Shadowy - iknedēļas pārskats`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">

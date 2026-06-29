@@ -1,0 +1,20 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "magic-api-key",
+      "description": "Magic API Key",
+      "password": true
+    }
+  ],
+  "servers": {
+    "magic": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@21st-dev/magic@latest"],
+      "env": {
+        "API_KEY": "${input:magic-api-key}"
+      }
+    }
+  }
+}
