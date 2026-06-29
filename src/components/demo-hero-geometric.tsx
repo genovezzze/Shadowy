@@ -9,7 +9,7 @@ function DemoHeroGeometric() {
                     Padariet <span className="text-gradient-emerald">neredzamo<br />darbu</span> redzamu.
                 </>
             }
-            description="Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas — bez darbinieku novērošanas."
+            description="Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas - bez darbinieku novērošanas."
         />
     )
 }

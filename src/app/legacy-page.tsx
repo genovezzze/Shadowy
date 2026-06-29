@@ -39,7 +39,7 @@ const organizationJsonLd = {
   url: "https://shadowy.lv",
   logo: "https://shadowy.lv/logo.png",
   description:
-    "Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas — bez darbinieku novērošanas.",
+    "Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas - bez darbinieku novērošanas.",
   email: "contact@shadowy.lv",
 };
 
@@ -189,7 +189,7 @@ export default function HomePage() {
         </div>
 
         <div className="relative mx-auto max-w-6xl px-6 py-28">
-          {/* Headline – centered, large */}
+          {/* Headline - centered, large */}
           <div className="mb-16 text-center">
             <div data-reveal="up" className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -423,7 +423,7 @@ export default function HomePage() {
                 Kam Shadowy ir piemērots?
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-white/65">
-                Īpaši piemērots komandām, kur daudz darba notiek neformāli — palīdzība kolēģiem, koordinācija un papildu pienākumi.
+                Īpaši piemērots komandām, kur daudz darba notiek neformāli - palīdzība kolēģiem, koordinācija un papildu pienākumi.
               </p>
               <ul className="mt-6 space-y-3">
                 {[
@@ -432,7 +432,7 @@ export default function HomePage() {
                   "HR un cilvēkresursu komandas",
                   "Projektu komandas",
                   "Customer support komandas",
-                  "Mazas un vidējas komandas (5–50 cilvēki)",
+                  "Mazas un vidējas komandas (5-50 cilvēki)",
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-sm text-white/80">
                     <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10">
@@ -454,7 +454,7 @@ export default function HomePage() {
                 Kam Shadowy nav?
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-white/65">
-                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi — nevis kontrolēt darbiniekus.
+                Shadowy ir paredzēts komandām, kuras vēlas labāk saprast reālo darba slodzi - nevis kontrolēt darbiniekus.
               </p>
               <ul className="mt-6 space-y-3">
                 {[
@@ -520,7 +520,7 @@ export default function HomePage() {
           {/* Step content */}
           <div className="grid gap-6 text-center sm:grid-cols-2 lg:grid-cols-4">
             {([
-              { num: "1", color: "text-emerald-400", title: "Saņemam pieteikumu", desc: "Apstiprinām saņemšanu 1–2 darba dienu laikā." },
+              { num: "1", color: "text-emerald-400", title: "Saņemam pieteikumu", desc: "Apstiprinām saņemšanu 1-2 darba dienu laikā." },
               { num: "2", color: "text-sky-400", title: "Iepazīšanās zvans", desc: "20 minūšu zvans, lai saprastu jūsu komandas vajadzības." },
               { num: "3", color: "text-violet-400", title: "Saprotam piemērotību", desc: "Godīgi paskaidrojam, vai Shadowy der jūsu situācijai." },
               { num: "4", color: "text-amber-400", title: "Sākam 30 dienu pilotu", desc: "Iestatīšana līdz 10 minūtēm. Sāk darboties tajā pašā dienā." },
@@ -576,7 +576,7 @@ export default function HomePage() {
               </h2>
 
               <p className="mt-5 text-base leading-relaxed text-white/75">
-                Aizpildiet formu - sazināsimies 1–2 darba dienu laikā un palīdzēsim
+                Aizpildiet formu - sazināsimies 1-2 darba dienu laikā un palīdzēsim
                 uzsākt pilotu jūsu komandā.
               </p>
 
@@ -615,7 +615,7 @@ export default function HomePage() {
               }}
             >
               <h3 className="mb-1 text-lg font-semibold text-white">Pieteikt pilotu</h3>
-              <p className="mb-6 text-sm text-white/55">Atbildēsim 1–2 darba dienu laikā.</p>
+              <p className="mb-6 text-sm text-white/55">Atbildēsim 1-2 darba dienu laikā.</p>
               <PilotForm />
             </div>
           </div>

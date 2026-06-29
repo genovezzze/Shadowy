@@ -70,7 +70,7 @@ function PhotoCard({
         }}
       />
 
-      {/* Bubbles — positioned relative to card root */}
+      {/* Bubbles - positioned relative to card root */}
       {children}
 
       {/* Bottom label */}

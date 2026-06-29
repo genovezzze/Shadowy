@@ -163,7 +163,15 @@ export function HeroSection() {
                 </AnimatedGroup>
                 <p className="mx-auto mt-4 flex max-w-sm items-start justify-center gap-2 text-balance text-center text-sm leading-6 tracking-[0.01em] text-white/55 sm:mt-5 sm:max-w-none sm:items-center sm:text-base">
                   <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400 sm:mt-0" />
-                  Bez kredītkartes. Bez saistībām. Iestatīšana līdz 10 minūtēm
+                  <span>
+                    <strong className="font-bold text-white/72 [font-synthesis:weight]">
+                      Bez kredītkartes. Bez saistībām.
+                    </strong>{" "}
+                    Iestatīšana{" "}
+                    <strong className="font-bold text-white/72 [font-synthesis:weight]">
+                      līdz 10 minūtēm
+                    </strong>
+                  </span>
                 </p>
               </div>
             </div>

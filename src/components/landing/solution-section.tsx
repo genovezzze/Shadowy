@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { AnimatedDotSurface } from "@/components/ui/animated-dot-surface";
+import { EmphasizedText } from "@/components/landing/emphasized-text";
 
 const solutionCards = [
   {
@@ -41,12 +42,20 @@ const solutionCards = [
   },
 ] as const;
 
+const importantSolutionPhrases = [
+  "ārpus formālajiem uzdevumiem",
+  "papildu slodze",
+  "regulāri palīdz citiem",
+  "redzams datos",
+  "novērtēt, atzīt",
+] as const;
+
 export function SolutionSection() {
   return (
     <section
       id="risinajums"
       aria-labelledby="solution-heading"
-      className="relative mx-2 mt-12 overflow-hidden rounded-[24px] border border-white/[0.11] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7 lg:mt-24"
+      className="relative -mt-px mx-2 overflow-hidden rounded-t-none rounded-b-[24px] border border-white/[0.11] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7 lg:mt-24"
     >
       <div
         aria-hidden
@@ -87,9 +96,14 @@ export function SolutionSection() {
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-4xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/75 sm:text-xl sm:leading-relaxed sm:text-white/85">
-            Darbinieki var vienkārši piefiksēt savu papildu ieguldījumu, bet
-            vadība redz ne tikai gala rezultātu, bet arī darbu, kas palīdz
-            komandai kustēties uz priekšu
+            Darbinieki var vienkārši piefiksēt savu{" "}
+            <strong className="font-bold text-white/85 [font-synthesis:weight]">
+              papildu ieguldījumu
+            </strong>
+            , bet vadība redz ne tikai gala rezultātu, bet arī{" "}
+            <strong className="font-bold text-white/85 [font-synthesis:weight]">
+              darbu, kas palīdz komandai kustēties uz priekšu
+            </strong>
           </p>
         </header>
 
@@ -140,7 +154,10 @@ export function SolutionSection() {
                     {card.title}
                   </h3>
                   <p className="relative mt-2 font-accent text-sm font-light leading-relaxed tracking-[0.01em] text-white/68">
-                    {card.description}
+                    <EmphasizedText
+                      text={card.description}
+                      phrases={importantSolutionPhrases}
+                    />
                   </p>
 
                   <ul className="relative mt-4 flex flex-wrap gap-x-4 gap-y-1.5">

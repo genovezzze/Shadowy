@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { EmphasizedText } from "@/components/landing/emphasized-text";
 import { cn } from "@/lib/utils";
 
 const FAQ_ITEMS = [
@@ -23,13 +24,24 @@ const FAQ_ITEMS = [
   {
     question: "Kā tiek aizsargāti dati?",
     answer:
-      "Vadītājiem ir pieejami tikai viņu komandas apstiprinātie ieraksti, bet administratoriem — savas organizācijas dati. Citu organizāciju informācija nav pieejama. Detalizēta informācija ir norādīta privātuma politikā",
+      "Vadītājiem ir pieejami tikai viņu komandas apstiprinātie ieraksti, bet administratoriem - savas organizācijas dati. Citu organizāciju informācija nav pieejama. Detalizēta informācija ir norādīta privātuma politikā",
   },
   {
     question: "Kas notiek pēc pilota beigām?",
     answer:
       "Pēc pilota beigām jūs varat izvēlēties turpināt vai pārtraukt lietošanu. Pārtraukšanas gadījumā datus iespējams eksportēt, un pēc noteiktā glabāšanas perioda tie tiek dzēsti",
   },
+] as const;
+
+const importantFaqPhrases = [
+  "strukturēti fiksē papildu darbu",
+  "organizācijas līmeņa pārskatu",
+  "bez maksas un bez kredītkartes",
+  "līdz 10 minūtēm",
+  "tikai viņu komandas apstiprinātie ieraksti",
+  "Citu organizāciju informācija nav pieejama",
+  "turpināt vai pārtraukt lietošanu",
+  "datus iespējams eksportēt",
 ] as const;
 
 export function FaqSection() {
@@ -71,7 +83,10 @@ export function FaqSection() {
               <div className="overflow-hidden">
                 <div className="pb-5">
                   <p className="max-w-2xl pb-1 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/62 sm:text-[15px] sm:leading-relaxed">
-                    {item.answer}
+                    <EmphasizedText
+                      text={item.answer}
+                      phrases={importantFaqPhrases}
+                    />
                   </p>
                 </div>
               </div>

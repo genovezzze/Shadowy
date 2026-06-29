@@ -215,7 +215,7 @@ export default async function ManagerReportPage({
           <h1 className="text-3xl font-bold tracking-tight">Pilota atskaite</h1>
           <p className="text-sm text-muted-foreground mt-2">{org?.name} · {session.name}</p>
           <p className="text-sm text-muted-foreground">
-            {fmtDate(periodStart)} – {fmtDate(now)}
+            {fmtDate(periodStart)} - {fmtDate(now)}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -233,7 +233,7 @@ export default async function ManagerReportPage({
               {org?.name} · Vadītājs: {session.name}
             </p>
             <p className="text-sm text-gray-500">
-              Periods: {fmtDate(periodStart)} – {fmtDate(now)} ({getPeriodLabel(period)})
+              Periods: {fmtDate(periodStart)} - {fmtDate(now)} ({getPeriodLabel(period)})
             </p>
           </div>
           <p className="text-xs text-gray-400">Ģenerēts: {fmtDate(now)}</p>

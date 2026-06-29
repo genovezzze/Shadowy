@@ -4,6 +4,7 @@ import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import { EmphasizedText } from "@/components/landing/emphasized-text";
 import { cn } from "@/lib/utils";
 
 const slides = [
@@ -68,26 +69,32 @@ const slides = [
   },
 ] as const;
 
+const importantStoryPhrases = [
+  "galvenie pienākumi",
+  "darbs, kuru vadība redz",
+  "regulāri palīdz",
+  "neietilpst viņas oficiālajā lomā",
+  "neparādās nevienā atskaitē",
+  "laiku un enerģiju",
+  "fiksēt neredzamo darbu",
+  "kļūst redzami datos",
+  "vairs nepazūd",
+  "palīdz komandai kustēties uz priekšu",
+] as const;
+
 export function AnnaStoryCarousel() {
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const [direction, setDirection] = React.useState(1);
   const activeSlide = slides[activeIndex];
 
-  const showSlide = React.useCallback(
-    (index: number, nextDirection: number) => {
-      setDirection(nextDirection);
-      setActiveIndex((index + slides.length) % slides.length);
-    },
-    [],
-  );
+  const showSlide = React.useCallback((index: number) => {
+    setActiveIndex((index + slides.length) % slides.length);
+  }, []);
 
   const showNext = React.useCallback(() => {
-    setDirection(1);
     setActiveIndex((current) => (current + 1) % slides.length);
   }, []);
 
   const showPrevious = React.useCallback(() => {
-    setDirection(-1);
     setActiveIndex(
       (current) => (current - 1 + slides.length) % slides.length,
     );
@@ -97,7 +104,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative -mt-px mx-2 overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#07090c] py-16 sm:mx-4 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7"
+      className="relative -mt-px mx-2 overflow-hidden rounded-t-[24px] rounded-b-none border border-white/[0.08] bg-[#07090c] py-16 sm:mx-4 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7"
     >
       <div
         aria-hidden
@@ -144,37 +151,37 @@ export function AnnaStoryCarousel() {
 
             <div className="relative grid overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#090d11]/95 sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]">
               <div className="relative h-[210px] overflow-hidden sm:h-[250px] lg:h-auto">
-                <AnimatePresence initial={false} mode="popLayout">
+                <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeSlide.image}
-                    initial={{ opacity: 0, x: direction * 28, scale: 1.025 }}
-                    animate={{ opacity: 1, x: 0, scale: 1 }}
-                    exit={{ opacity: 0, x: direction * -28, scale: 0.99 }}
-                    transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
                     className="absolute inset-0"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.28, ease: "easeInOut" }}
                   >
                     <Image
                       src={activeSlide.image}
-                      alt={`${activeSlide.title} — Anna`}
+                      alt={`${activeSlide.title} - Anna`}
                       fill
                       sizes="(min-width: 1024px) 520px, 100vw"
-                      className="object-cover object-center"
+                      className="object-cover object-[center_18%] sm:object-[center_20%] lg:object-center"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#090d11]/65 via-transparent to-black/5 lg:bg-gradient-to-r lg:from-transparent lg:via-transparent lg:to-[#090d11]/45" />
                   </motion.div>
                 </AnimatePresence>
               </div>
 
-              <div className="relative flex min-h-[410px] flex-col p-4 sm:min-h-[360px] sm:p-5 lg:min-h-0 lg:p-5">
-                <AnimatePresence initial={false} mode="wait">
+              <div className="relative min-h-[410px] sm:min-h-[360px] lg:min-h-0">
+                <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.34, ease: "easeOut" }}
-                    className="flex h-full flex-col"
+                    className="absolute inset-4 flex flex-col sm:inset-5"
                     aria-live="polite"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
                   >
                     <div className="flex items-center gap-4">
                       <span className="font-mono text-xs tracking-[0.18em] text-white/35">
@@ -210,7 +217,12 @@ export function AnnaStoryCarousel() {
 
                     <div className="mt-3 space-y-2.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:text-base sm:leading-relaxed">
                       {activeSlide.paragraphs.map((paragraph) => (
-                        <p key={paragraph}>{paragraph}</p>
+                        <p key={paragraph}>
+                          <EmphasizedText
+                            text={paragraph}
+                            phrases={importantStoryPhrases}
+                          />
+                        </p>
                       ))}
                     </div>
 
@@ -257,9 +269,7 @@ export function AnnaStoryCarousel() {
               <button
                 key={slide.title}
                 type="button"
-                onClick={() =>
-                  showSlide(index, index >= activeIndex ? 1 : -1)
-                }
+                onClick={() => showSlide(index)}
                 aria-label={`Atvērt ${index + 1}. slaidu`}
                 aria-current={index === activeIndex ? "true" : undefined}
                 className={cn(

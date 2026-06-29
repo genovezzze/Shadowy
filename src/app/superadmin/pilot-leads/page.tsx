@@ -15,9 +15,9 @@ function fmtDate(d: Date) {
 }
 
 const TEAM_SIZE_LABELS: Record<string, string> = {
-  "1-5": "1–5 cilvēki",
-  "6-15": "6–15 cilvēki",
-  "16-50": "16–50 cilvēki",
+  "1-5": "1-5 cilvēki",
+  "6-15": "6-15 cilvēki",
+  "16-50": "16-50 cilvēki",
   "51+": "51+ cilvēki",
 };
 

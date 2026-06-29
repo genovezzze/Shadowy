@@ -14,9 +14,9 @@ import {
 import { submitPilotApplication } from "./pilot-actions";
 
 const TEAM_SIZES = [
-  "2–5 cilvēki",
-  "6–15 cilvēki",
-  "16–50 cilvēki",
+  "2-5 cilvēki",
+  "6-15 cilvēki",
+  "16-50 cilvēki",
   "51+ cilvēki",
 ] as const;
 

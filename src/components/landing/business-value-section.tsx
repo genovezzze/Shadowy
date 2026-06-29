@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { EmphasizedText } from "@/components/landing/emphasized-text";
 
 const valueCards = [
   {
@@ -15,6 +16,12 @@ const valueCards = [
     title: "Aprēķini ietaupījumu",
     text: "Izmanto pilota datus, lai saprastu potenciālo finansiālo ieguvumu",
   },
+] as const;
+
+const importantValuePhrases = [
+  "ārpus formālajiem uzdevumiem",
+  "pirms tā kļūst dārga",
+  "potenciālo finansiālo ieguvumu",
 ] as const;
 
 export function BusinessValueSection() {
@@ -56,7 +63,10 @@ export function BusinessValueSection() {
                     {card.title}
                   </h3>
                   <p className="mt-2 font-accent text-sm font-light leading-relaxed tracking-[0.008em] text-white/68 sm:text-base">
-                    {card.text}
+                    <EmphasizedText
+                      text={card.text}
+                      phrases={importantValuePhrases}
+                    />
                   </p>
                 </div>
               </motion.article>
@@ -77,8 +87,13 @@ export function BusinessValueSection() {
             </span>
           </h2>
           <p className="mt-5 max-w-xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:mt-6 sm:text-lg sm:leading-relaxed sm:text-white/78">
-            30 dienu pilotā Shadowy parāda, kur pazūd komandas laiks, kur rodas
-            pārslodze un cik daudz uzņēmums var potenciāli ietaupīt
+            <strong className="font-bold text-white/82 [font-synthesis:weight]">
+              30 dienu pilotā
+            </strong>{" "}
+            Shadowy parāda, kur pazūd komandas laiks, kur rodas pārslodze un{" "}
+            <strong className="font-bold text-white/82 [font-synthesis:weight]">
+              cik daudz uzņēmums var potenciāli ietaupīt
+            </strong>
           </p>
         </div>
       </div>

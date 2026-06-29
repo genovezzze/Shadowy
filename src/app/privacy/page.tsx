@@ -61,7 +61,7 @@ export default function PrivacyPage() {
             <p className="mt-3 text-muted-foreground">
               Dati tiek glabāti, kamēr organizācijas konts ir aktīvs. Lai pieprasītu sava konta vai organizācijas
               datu eksportu (CSV) vai dzēšanu, rakstiet uz kontaktadresi zemāk - pilota laikā šos pieprasījumus
-              apstrādājam manuāli, parasti 1–2 darba dienu laikā.
+              apstrādājam manuāli, parasti 1-2 darba dienu laikā.
             </p>
           </section>
 

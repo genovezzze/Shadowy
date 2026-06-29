@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { EmphasizedText } from "@/components/landing/emphasized-text";
 
 const steps = [
   {
@@ -19,6 +20,14 @@ const steps = [
     title: "Sākam pilotu",
     text: "Iestatīšana aizņem līdz 10 minūtēm. Darbu var sākt tajā pašā dienā",
   },
+] as const;
+
+const importantProcessPhrases = [
+  "1-2 darba dienu laikā",
+  "20 minūšu zvans",
+  "vai Shadowy ir piemērots",
+  "līdz 10 minūtēm",
+  "tajā pašā dienā",
 ] as const;
 
 export function ApplicationProcessSection() {
@@ -93,7 +102,10 @@ export function ApplicationProcessSection() {
                   {step.title}
                 </h3>
                 <p className="mt-3 font-accent text-sm font-light leading-relaxed tracking-[0.015em] text-white/60">
-                  {step.text}
+                  <EmphasizedText
+                    text={step.text}
+                    phrases={importantProcessPhrases}
+                  />
                 </p>
               </motion.article>
             );

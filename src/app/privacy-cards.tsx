@@ -29,7 +29,7 @@ export function PrivacyCards() {
 
   return (
     <div className="grid grid-cols-2 gap-3">
-      {/* Left – what manager sees, animated, spotlight on hover */}
+      {/* Left - what manager sees, animated, spotlight on hover */}
       <div
         ref={seesRef}
         onMouseMove={onSpotlightMove(seesRef)}
@@ -66,7 +66,7 @@ export function PrivacyCards() {
         </ul>
       </div>
 
-      {/* Right – what manager doesn't see, blurred until hovered (visual metaphor for privacy) */}
+      {/* Right - what manager doesn't see, blurred until hovered (visual metaphor for privacy) */}
       <div
         ref={notSeesRef}
         onMouseMove={onSpotlightMove(notSeesRef)}

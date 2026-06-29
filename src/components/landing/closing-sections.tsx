@@ -18,7 +18,7 @@ const processSteps = [
     icon: Mail,
     number: "01",
     title: "Saņemam pieteikumu",
-    text: "Apstiprinām saņemšanu 1–2 darba dienu laikā",
+    text: "Apstiprinām saņemšanu 1-2 darba dienu laikā",
   },
   {
     icon: Phone,
@@ -206,7 +206,7 @@ export function ClosingSections() {
               </span>
             </h2>
             <p className="mt-4 max-w-xl font-accent text-sm font-light leading-relaxed tracking-[0.025em] text-white/65 sm:text-base">
-              Aizpildiet formu - sazināsimies 1–2 darba dienu laikā un
+              Aizpildiet formu - sazināsimies 1-2 darba dienu laikā un
               palīdzēsim uzsākt pilotu jūsu komandā
             </p>
 
@@ -235,15 +235,28 @@ export function ClosingSections() {
               Pieteikt pilotu
             </h3>
             <p className="mb-5 mt-1.5 text-sm tracking-[0.02em] text-white/48">
-              Atbildēsim 1-2 darba dienu laikā
+              Atbildēsim{" "}
+              <strong className="font-bold text-white/62 [font-synthesis:weight]">
+                1-2 darba dienu laikā
+              </strong>
             </p>
             <PilotForm />
           </div>
 
           <p className="mx-auto mt-5 max-w-xl text-center font-accent text-sm font-light leading-relaxed tracking-[0.018em] text-white/48">
             Shadowy ir Ventspils Augstskolas studentu veidots agrīnās stadijas
-            projekts. Šobrīd meklējam pirmās komandas 30 dienu pilotam, lai
-            pārbaudītu risinājumu reālā darba vidē. Jūsu atgriezeniskā saite
+            projekts. Šobrīd meklējam pirmās komandas{" "}
+            <strong className="font-bold text-white/62 [font-synthesis:weight]">
+              30 dienu pilotam
+            </strong>
+            , lai pārbaudītu risinājumu{" "}
+            <strong className="font-bold text-white/62 [font-synthesis:weight]">
+              reālā darba vidē
+            </strong>
+            . Jūsu{" "}
+            <strong className="font-bold text-white/62 [font-synthesis:weight]">
+              atgriezeniskā saite
+            </strong>{" "}
             palīdzēs veidot labāku produktu
           </p>
 

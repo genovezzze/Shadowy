@@ -123,7 +123,7 @@ export default async function AdminReportPage({
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Pilota atskaite</h1>
           <p className="text-sm text-muted-foreground mt-2">
-            {org?.name} · {fmtDate(periodStart)} – {fmtDate(now)}
+            {org?.name} · {fmtDate(periodStart)} - {fmtDate(now)}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -139,7 +139,7 @@ export default async function AdminReportPage({
             <h1 className="text-2xl font-bold text-black">Shadowy - Pilota atskaite</h1>
             <p className="text-sm text-gray-500 mt-1">{org?.name}</p>
             <p className="text-sm text-gray-500">
-              Periods: {fmtDate(periodStart)} – {fmtDate(now)} ({getPeriodLabel(period)})
+              Periods: {fmtDate(periodStart)} - {fmtDate(now)} ({getPeriodLabel(period)})
             </p>
           </div>
           <p className="text-xs text-gray-400">Ģenerēts: {fmtDate(now)}</p>

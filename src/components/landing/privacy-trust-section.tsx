@@ -22,7 +22,7 @@ export function PrivacyTrustSection() {
     <section
       id="privatums"
       aria-labelledby="privacy-trust-heading"
-      className="relative mx-2 overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:py-20 md:py-24 lg:mx-7"
+      className="relative mx-0 overflow-hidden border-y border-white/[0.07] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:border sm:py-20 md:py-24 lg:mx-7"
     >
       <div
         aria-hidden
@@ -43,13 +43,21 @@ export function PrivacyTrustSection() {
             id="privacy-trust-heading"
             className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.8)_68%,rgba(100,116,139,.58)_100%)] bg-clip-text font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-transparent [font-synthesis:weight] sm:text-[clamp(2.4rem,4vw,3.75rem)] lg:whitespace-nowrap"
           >
-            Nav uzraudzība. Tikai redzams ieguldījums
+            Nav uzraudzība.
+            <span className="mt-1 block lg:ml-2 lg:mt-0 lg:inline">
+              Tikai redzams ieguldījums
+            </span>
           </h2>
 
           <p className="mx-auto mt-6 max-w-3xl font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/68 sm:text-lg">
-            Shadowy neseko privātām sarunām, ekrāna aktivitātei vai katram
-            klikšķim. Platforma balstās uz darbinieku iesniegtiem un vadītāja
-            apstiprinātiem ierakstiem
+            Shadowy{" "}
+            <strong className="font-bold text-white/82 [font-synthesis:weight]">
+              neseko privātām sarunām, ekrāna aktivitātei vai katram klikšķim
+            </strong>
+            . Platforma balstās uz{" "}
+            <strong className="font-bold text-white/82 [font-synthesis:weight]">
+              darbinieku iesniegtiem un vadītāja apstiprinātiem ierakstiem
+            </strong>
           </p>
         </header>
 
@@ -79,7 +87,7 @@ export function PrivacyTrustSection() {
             <h3 className="font-accent text-xl font-bold tracking-[0.02em] text-white">
               Ko vadītājs redz
             </h3>
-            <ul className="mt-4 space-y-2 font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/68 sm:text-lg">
+            <ul className="mt-4 space-y-2 font-accent text-base font-medium leading-relaxed tracking-[0.012em] text-white/78 sm:text-lg">
               {visibleItems.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -102,7 +110,7 @@ export function PrivacyTrustSection() {
             <h3 className="font-accent text-xl font-bold tracking-[0.02em] text-white">
               Ko vadītājs neredz
             </h3>
-            <ul className="mt-4 space-y-2 font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/52 sm:text-lg">
+            <ul className="mt-4 space-y-2 font-accent text-base font-medium leading-relaxed tracking-[0.012em] text-white/62 sm:text-lg">
               {hiddenItems.map((item) => (
                 <li key={item}>{item}</li>
               ))}

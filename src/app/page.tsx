@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import { HeroSection } from "@/components/ui/hero-section-1";
 
 export const metadata: Metadata = {
-  title: "Shadowy — Padariet neredzamo darbu redzamu",
+  title: {
+    absolute: "Shadowy",
+  },
   description:
-    "Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas — bez darbinieku novērošanas.",
+    "Shadowy palīdz uzņēmumiem pamanīt slēpto darba slodzi, papildu pienākumus un darbu ārpus oficiālās lomas - bez darbinieku novērošanas.",
   openGraph: {
-    title: "Shadowy — Padariet neredzamo darbu redzamu",
+    title: "Shadowy",
     description:
       "Ieraugiet komandas neredzamo darbu un pieņemiet labākus lēmumus pēc datiem.",
     type: "website",
