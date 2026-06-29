@@ -49,9 +49,9 @@ export function FaqSection() {
               type="button"
               onClick={() => setOpenIndex(isOpen ? null : index)}
               aria-expanded={isOpen}
-              className="flex w-full items-center gap-4 py-5 text-left"
+              className="flex min-h-16 w-full items-center gap-3 py-4 text-left sm:gap-4 sm:py-5"
             >
-              <span className="flex-1 font-accent text-base font-bold tracking-[0.02em] text-white/88 sm:text-lg">
+              <span className="flex-1 font-accent text-[15px] font-bold leading-snug tracking-[0.015em] text-white/88 sm:text-lg">
                 {item.question}
               </span>
               <span className="grid size-8 shrink-0 place-items-center text-white/55">
@@ -70,7 +70,7 @@ export function FaqSection() {
             >
               <div className="overflow-hidden">
                 <div className="pb-5">
-                  <p className="max-w-2xl font-accent text-sm font-light leading-relaxed tracking-[0.015em] text-white/58 sm:text-[15px]">
+                  <p className="max-w-2xl pb-1 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/62 sm:text-[15px] sm:leading-relaxed">
                     {item.answer}
                   </p>
                 </div>

@@ -26,7 +26,7 @@ export function ApplicationProcessSection() {
     <section
       id="pieteikuma-process"
       aria-labelledby="application-process-heading"
-      className="relative mt-16 overflow-hidden bg-[#07090c] py-16"
+      className="relative mt-12 overflow-hidden bg-[#07090c] py-14 sm:mt-16 sm:py-16"
     >
       <div
         aria-hidden
@@ -46,7 +46,7 @@ export function ApplicationProcessSection() {
         <header className="text-center">
           <h2
             id="application-process-heading"
-            className="font-accent text-[clamp(2.1rem,4vw,3.7rem)] font-bold tracking-[0.02em] text-white [font-synthesis:weight]"
+            className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4vw,3.7rem)]"
           >
             Kas notiek pēc pieteikuma?
           </h2>
@@ -56,10 +56,10 @@ export function ApplicationProcessSection() {
         </header>
 
         <motion.div
-          className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4"
+          className="mt-9 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.25 }}
+          viewport={{ once: true, amount: 0.12 }}
           variants={{
             hidden: {},
             visible: {
@@ -73,7 +73,7 @@ export function ApplicationProcessSection() {
             return (
               <motion.article
                 key={step.title}
-                className="rounded-lg border border-white/[0.11] bg-transparent p-7 transition-colors duration-300 hover:border-white/[0.22] hover:bg-white/[0.015]"
+                className="rounded-xl border border-white/[0.11] bg-white/[0.015] p-5 transition-colors duration-300 hover:border-white/[0.22] hover:bg-white/[0.025] sm:p-7"
                 variants={{
                   hidden: { opacity: 0, y: 28, scale: 0.98 },
                   visible: {

@@ -22,7 +22,7 @@ export function PrivacyTrustSection() {
     <section
       id="privatums"
       aria-labelledby="privacy-trust-heading"
-      className="relative mx-2 overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#07090c] py-20 scroll-mt-24 sm:mx-4 md:py-24 lg:mx-7"
+      className="relative mx-2 overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:py-20 md:py-24 lg:mx-7"
     >
       <div
         aria-hidden
@@ -41,7 +41,7 @@ export function PrivacyTrustSection() {
         <header className="mx-auto max-w-6xl text-center">
           <h2
             id="privacy-trust-heading"
-            className="bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.8)_68%,rgba(100,116,139,.58)_100%)] bg-clip-text font-accent text-[clamp(2rem,4vw,3.75rem)] font-bold leading-[1.05] tracking-[0.015em] text-transparent [font-synthesis:weight] lg:whitespace-nowrap"
+            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.8)_68%,rgba(100,116,139,.58)_100%)] bg-clip-text font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-transparent [font-synthesis:weight] sm:text-[clamp(2.4rem,4vw,3.75rem)] lg:whitespace-nowrap"
           >
             Nav uzraudzība. Tikai redzams ieguldījums
           </h2>
@@ -57,14 +57,14 @@ export function PrivacyTrustSection() {
           className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.25 }}
+          viewport={{ once: true, amount: 0.12 }}
           variants={{
             hidden: {},
             visible: { transition: { staggerChildren: 0.16 } },
           }}
         >
           <motion.article
-            className="rounded-2xl border border-white/[0.1] bg-black/10 px-7 py-7 sm:px-9 sm:py-8"
+            className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
             variants={{
               hidden: { opacity: 0, x: -48, rotate: -1.5 },
               visible: {
@@ -87,7 +87,7 @@ export function PrivacyTrustSection() {
           </motion.article>
 
           <motion.article
-            className="rounded-2xl border border-white/[0.1] bg-black/10 px-7 py-7 sm:px-9 sm:py-8"
+            className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
             variants={{
               hidden: { opacity: 0, x: 48, rotate: 1.5 },
               visible: {

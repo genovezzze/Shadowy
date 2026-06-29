@@ -22,14 +22,14 @@ export function BusinessValueSection() {
     <section
       id="biznesa-ieguvums"
       aria-labelledby="business-value-heading"
-      className="relative overflow-hidden bg-[#07090c] py-20 md:py-24"
+      className="relative overflow-hidden bg-[#07090c] py-16 sm:py-20 md:py-24"
     >
-      <div className="relative mx-auto grid max-w-6xl items-center gap-12 px-5 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+      <div className="relative mx-auto grid max-w-6xl items-center gap-9 px-5 sm:gap-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <motion.div
           className="order-2 grid gap-3 lg:order-1"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.12 }}
           variants={{
             hidden: {},
             visible: { transition: { staggerChildren: 0.14 } },
@@ -67,16 +67,16 @@ export function BusinessValueSection() {
         <div className="order-1 lg:order-2">
           <h2
             id="business-value-heading"
-            className="font-accent text-[clamp(1.75rem,4vw,3rem)] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight]"
+            className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,4vw,3rem)]"
           >
-            <span className="block whitespace-nowrap">
+            <span className="block sm:whitespace-nowrap">
               Mazāk neredzama darba
             </span>
-            <span className="mt-1 block whitespace-nowrap bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+            <span className="mt-1 block bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent sm:whitespace-nowrap">
               Vairāk naudas biznesam
             </span>
           </h2>
-          <p className="mt-6 max-w-xl font-accent text-lg font-light leading-relaxed tracking-[0.01em] text-white/78">
+          <p className="mt-5 max-w-xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:mt-6 sm:text-lg sm:leading-relaxed sm:text-white/78">
             30 dienu pilotā Shadowy parāda, kur pazūd komandas laiks, kur rodas
             pārslodze un cik daudz uzņēmums var potenciāli ietaupīt
           </p>

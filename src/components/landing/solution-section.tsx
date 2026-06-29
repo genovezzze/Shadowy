@@ -46,7 +46,7 @@ export function SolutionSection() {
     <section
       id="risinajums"
       aria-labelledby="solution-heading"
-      className="relative mx-2 mt-16 overflow-hidden rounded-[26px] border border-white/[0.11] bg-[#07090c] py-24 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] md:py-32 lg:mx-7 lg:mt-24"
+      className="relative mx-2 mt-12 overflow-hidden rounded-[24px] border border-white/[0.11] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7 lg:mt-24"
     >
       <div
         aria-hidden
@@ -79,14 +79,14 @@ export function SolutionSection() {
         <header className="mx-auto max-w-none text-center">
           <h2
             id="solution-heading"
-            className="whitespace-nowrap font-accent text-[clamp(1rem,4.1vw,3.25rem)] font-bold tracking-[0.02em] text-white [font-synthesis:weight]"
+            className="text-balance font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.25rem)] lg:whitespace-nowrap"
           >
             Shadowy padara{" "}
             <span className="bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
               neredzamo darbu redzamu
             </span>
           </h2>
-          <p className="mx-auto mt-5 max-w-4xl font-accent text-lg font-light leading-relaxed tracking-[0.012em] text-white/85 sm:text-xl">
+          <p className="mx-auto mt-5 max-w-4xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/75 sm:text-xl sm:leading-relaxed sm:text-white/85">
             Darbinieki var vienkārši piefiksēt savu papildu ieguldījumu, bet
             vadība redz ne tikai gala rezultātu, bet arī darbu, kas palīdz
             komandai kustēties uz priekšu
@@ -94,10 +94,10 @@ export function SolutionSection() {
         </header>
 
         <motion.div
-          className="relative mt-12 flex items-stretch gap-3 overflow-x-auto pb-3 md:mt-16 lg:grid lg:grid-cols-[minmax(0,1fr)_36px_minmax(0,1fr)_36px_minmax(0,1fr)] lg:overflow-visible"
+          className="relative mt-10 flex flex-col items-stretch gap-3 md:mt-16 lg:grid lg:grid-cols-[minmax(0,1fr)_36px_minmax(0,1fr)_36px_minmax(0,1fr)]"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: false, amount: 0.2 }}
+          viewport={{ once: true, amount: 0.12 }}
           variants={{
             hidden: {},
             visible: { transition: { staggerChildren: 0.16 } },
@@ -107,7 +107,7 @@ export function SolutionSection() {
             return (
               <div key={card.number} className="contents">
                 <motion.article
-                  className="group relative flex min-h-[230px] min-w-[270px] flex-1 flex-col overflow-hidden rounded-[14px] border border-white/[0.1] bg-[#080c0f] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition-colors duration-300 hover:border-white/[0.16] hover:bg-[#0b1115] lg:min-w-0"
+                  className="group relative flex min-h-[220px] w-full min-w-0 flex-1 flex-col overflow-hidden rounded-[14px] border border-white/[0.1] bg-[#080c0f] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.03)] transition-colors duration-300 hover:border-white/[0.16] hover:bg-[#0b1115]"
                   variants={{
                     hidden: { opacity: 0, y: 44, scale: 0.94 },
                     visible: {
@@ -159,10 +159,10 @@ export function SolutionSection() {
                 {index < solutionCards.length - 1 && (
                   <div
                     aria-hidden
-                    className="flex w-9 shrink-0 items-center justify-center text-white"
+                    className="flex h-9 w-full shrink-0 items-center justify-center text-white lg:h-auto lg:w-9"
                   >
                     <span className="flex size-10 items-center justify-center rounded-full border border-white/[0.16] bg-[#15181d] shadow-[inset_0_1px_0_rgba(255,255,255,0.05),0_6px_18px_rgba(0,0,0,0.28)]">
-                      <ArrowRight className="size-5" strokeWidth={2.4} />
+                      <ArrowRight className="size-5 rotate-90 lg:rotate-0" strokeWidth={2.4} />
                     </span>
                   </div>
                 )}

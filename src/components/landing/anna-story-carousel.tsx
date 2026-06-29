@@ -97,7 +97,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative -mt-px mx-2 overflow-hidden rounded-[26px] border border-white/[0.08] bg-[#07090c] py-24 sm:mx-4 sm:rounded-[32px] md:py-32 lg:mx-7"
+      className="relative -mt-px mx-2 overflow-hidden rounded-[24px] border border-white/[0.08] bg-[#07090c] py-16 sm:mx-4 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7"
     >
       <div
         aria-hidden
@@ -125,25 +125,25 @@ export function AnnaStoryCarousel() {
         <header className="mx-auto max-w-none text-center">
           <h2
             id="anna-story-heading"
-            className="font-accent text-[clamp(1.8rem,4.1vw,3.75rem)] font-bold tracking-[0.02em] text-white [font-synthesis:weight] lg:whitespace-nowrap"
+            className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.75rem)] lg:whitespace-nowrap"
           >
             Darbs, kas notiek, bet netiek pamanīts
           </h2>
-          <p className="mx-auto mt-5 max-w-none font-accent text-[clamp(1.05rem,1.5vw,1.4rem)] font-light leading-relaxed tracking-[0.012em] text-white/80 lg:whitespace-nowrap">
+          <p className="mx-auto mt-5 max-w-4xl text-balance font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:text-[clamp(1.05rem,1.5vw,1.4rem)] sm:text-white/80 lg:max-w-none lg:whitespace-nowrap">
             Daļa komandas ieguldījuma nav redzama datos - īpaši tad, kad cilvēki
             palīdz citiem ārpus savas tiešās lomas
           </p>
         </header>
 
-        <div className="mx-auto mt-4 max-w-3xl md:mt-5">
-          <div className="relative overflow-hidden rounded-[24px] border border-white/[0.1] bg-white/[0.035] p-2 shadow-[0_24px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl">
+        <div className="mx-auto mt-8 max-w-3xl md:mt-10">
+          <div className="relative overflow-hidden rounded-[20px] border border-white/[0.1] bg-white/[0.035] p-1.5 shadow-[0_24px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:rounded-[24px] sm:p-2">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_12%_18%,rgba(52,211,153,0.07),transparent_72%),radial-gradient(70%_60%_at_90%_90%,rgba(59,130,246,0.07),transparent_70%)]"
             />
 
-            <div className="relative grid h-[610px] overflow-hidden rounded-[18px] border border-white/[0.06] bg-[#090d11]/95 sm:h-[580px] lg:h-[370px] lg:grid-cols-[44%_56%]">
-              <div className="relative h-[220px] overflow-hidden lg:h-auto">
+            <div className="relative grid overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#090d11]/95 sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]">
+              <div className="relative h-[210px] overflow-hidden sm:h-[250px] lg:h-auto">
                 <AnimatePresence initial={false} mode="popLayout">
                   <motion.div
                     key={activeSlide.image}
@@ -165,7 +165,7 @@ export function AnnaStoryCarousel() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative flex h-[390px] flex-col overflow-hidden p-4 sm:h-[360px] sm:p-5 lg:h-auto lg:p-5">
+              <div className="relative flex min-h-[410px] flex-col p-4 sm:min-h-[360px] sm:p-5 lg:min-h-0 lg:p-5">
                 <AnimatePresence initial={false} mode="wait">
                   <motion.div
                     key={activeIndex}
@@ -183,7 +183,7 @@ export function AnnaStoryCarousel() {
                       </span>
                     </div>
 
-                    <h3 className="mt-3 font-accent text-[1.35rem] font-bold tracking-[0.02em] text-white [font-synthesis:weight]">
+                    <h3 className="mt-3 text-balance font-accent text-xl font-bold leading-tight tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[1.35rem]">
                       {activeIndex === 0 ? (
                         <>
                           {"Iepaz\u012bsties ar "}
@@ -208,7 +208,7 @@ export function AnnaStoryCarousel() {
                       )}
                     </h3>
 
-                    <div className="mt-3 space-y-2.5 font-accent text-[15px] font-light leading-relaxed tracking-[0.012em] text-white/80 sm:text-base">
+                    <div className="mt-3 space-y-2.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:text-base sm:leading-relaxed">
                       {activeSlide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>{paragraph}</p>
                       ))}
@@ -230,7 +230,7 @@ export function AnnaStoryCarousel() {
                         type="button"
                         onClick={showPrevious}
                         aria-label="Iepriekšējais stāsta slaids"
-                        className="group inline-flex size-8 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                        className="group inline-flex size-11 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:size-10"
                       >
                         <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-0.5" />
                       </button>
@@ -238,7 +238,7 @@ export function AnnaStoryCarousel() {
                         type="button"
                         onClick={showNext}
                         aria-label="Nākamais stāsta slaids"
-                        className="group inline-flex size-8 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50"
+                        className="group inline-flex size-11 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:size-10"
                       >
                         <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" />
                       </button>

@@ -164,7 +164,7 @@ export function ClosingSections() {
       <section
         id="pilots"
         aria-labelledby="pilot-heading-visible"
-        className="relative mx-2 mt-16 overflow-hidden rounded-[28px] border border-white/[0.07] bg-[#07090c] py-8 scroll-mt-24 sm:mx-4 md:py-10 lg:mx-7"
+        className="relative mx-2 mt-12 overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#07090c] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] md:py-10 lg:mx-7"
       >
         <div
           aria-hidden
@@ -187,10 +187,10 @@ export function ClosingSections() {
           aria-hidden
           className="pointer-events-none absolute -left-40 top-1/4 size-[430px] rounded-full bg-emerald-400/[0.07] blur-[130px]"
         />
-        <div className="relative mx-auto max-w-2xl px-5 sm:px-6">
+        <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
           <h2
             id="pilot-heading-visible"
-            className="bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[clamp(1.35rem,4vw,2.65rem)] font-bold leading-[1.03] tracking-[0.035em] text-transparent [font-synthesis:weight] lg:whitespace-nowrap"
+            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[2rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(2rem,4vw,2.65rem)] lg:whitespace-nowrap"
           >
             Sāciet 30 dienu pilotu bez riska
           </h2>
@@ -230,7 +230,7 @@ export function ClosingSections() {
             </p>
           </div>
 
-          <div className="mt-5 rounded-xl border border-white/[0.1] bg-[#07090c] p-4 sm:p-5">
+          <div className="mt-6 rounded-2xl border border-white/[0.1] bg-[#07090c]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] sm:p-5">
             <h3 className="font-accent text-lg font-bold tracking-[0.035em] text-white">
               Pieteikt pilotu
             </h3>
@@ -289,14 +289,14 @@ export function ClosingSections() {
       <section
         id="faq"
         aria-labelledby="faq-heading"
-        className="relative mt-16 bg-[#07090c] py-20 scroll-mt-24 md:py-24"
+        className="relative mt-12 bg-[#07090c] py-16 scroll-mt-24 sm:mt-16 sm:py-20 md:py-24"
       >
         <DottedBackground />
         <div className="relative mx-auto max-w-3xl px-5 sm:px-6">
-          <header className="mb-12 text-center">
+          <header className="mb-9 text-center sm:mb-12">
             <h2
               id="faq-heading"
-              className="font-accent text-[clamp(2rem,3.4vw,2.8rem)] font-bold tracking-[0.025em] text-white [font-synthesis:weight]"
+              className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,3.4vw,2.8rem)]"
             >
               Biežāk uzdotie jautājumi
             </h2>
