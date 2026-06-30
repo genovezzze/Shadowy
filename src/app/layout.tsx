@@ -16,8 +16,13 @@ const inter = Inter({
 const neueHaas = localFont({
   src: [
     {
-      path: "../../public/fonts/NeueHaasDisplayBold.ttf",
+      path: "../../public/fonts/NeueHaasDisplayMediu.ttf",
       weight: "500",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/NeueHaasDisplayBold.ttf",
+      weight: "700",
       style: "normal",
     },
     {

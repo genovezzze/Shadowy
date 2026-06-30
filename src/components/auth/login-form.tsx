@@ -8,6 +8,11 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { loginAction } from "@/app/(auth)/login/actions";
+import {
+  authFieldClassName,
+  authLabelClassName,
+  authPrimaryButtonClassName,
+} from "@/components/auth/styles";
 
 const OAUTH_ERRORS: Record<string, string> = {
   no_account:
@@ -43,54 +48,68 @@ export function LoginForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-4">
+    <form action={onSubmit} className="space-y-3">
       <div className="grid gap-2">
-        <Label htmlFor="email">E-pasts</Label>
+        <Label htmlFor="email" className={authLabelClassName}>
+          E-pasts
+        </Label>
         <Input
           id="email"
           name="email"
           type="email"
           autoComplete="email"
           required
-          placeholder="vards@uznemums.lv"
+          placeholder="E-pasts"
+          className={authFieldClassName}
         />
       </div>
       <div className="grid gap-2">
-        <Label htmlFor="password">Parole</Label>
+        <Label htmlFor="password" className={authLabelClassName}>
+          Parole
+        </Label>
         <PasswordInput
           id="password"
           name="password"
           autoComplete="current-password"
           required
           minLength={6}
-          placeholder="••••••••"
+          placeholder="Parole"
+          className={authFieldClassName}
         />
       </div>
       {error ? (
-        <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+        <div className="rounded-xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 font-accent text-sm leading-5 text-red-300">
           {error}
         </div>
       ) : null}
-      <Button type="submit" variant="glass" className="w-full rounded-[10px] bg-white/[0.12] hover:bg-white/[0.18]" disabled={pending}>
+      <Button
+        type="submit"
+        className={authPrimaryButtonClassName}
+        disabled={pending}
+      >
         {pending ? "Pārbauda..." : "Pieslēgties"}
       </Button>
 
-      <div className="text-right -mt-1">
+      <div className="-mt-1 text-right">
         <Link
           href="/forgot-password"
-          className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+          className="font-accent text-sm text-white/45 transition hover:text-emerald-200"
         >
           Aizmirsi paroli?
         </Link>
       </div>
 
-      <div className="flex items-center gap-3 py-1">
-        <span className="h-px flex-1 bg-border" />
-        <span className="text-xs text-muted-foreground">vai</span>
-        <span className="h-px flex-1 bg-border" />
+      <div className="flex items-center gap-3 py-1.5">
+        <span className="h-px flex-1 bg-white/[0.09]" />
+        <span className="font-accent text-xs text-white/30">vai</span>
+        <span className="h-px flex-1 bg-white/[0.09]" />
       </div>
 
-      <Button asChild variant="outline" className="w-full">
+      <Button
+        asChild
+        variant="outline"
+        className="h-11 w-full rounded-lg border-white/[0.17] bg-black font-accent text-sm font-bold text-white/82 shadow-none hover:border-white/30 hover:bg-white/[0.035] hover:text-white"
+      >
         <a href="/api/auth/google">
           <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
             <path

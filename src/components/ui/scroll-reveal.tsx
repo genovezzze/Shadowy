@@ -8,7 +8,7 @@ type ScrollRevealProps = {
   delay?: number;
   duration?: number;
   className?: string;
-  effect?: "rise" | "left" | "right" | "zoom" | "blur" | "tilt" | "fade";
+  effect?: "rise" | "focus" | "unfold" | "zoom" | "blur" | "tilt" | "fade";
 };
 
 export function ScrollReveal({
@@ -21,8 +21,8 @@ export function ScrollReveal({
   const reduceMotion = useReducedMotion();
   const hiddenStates = {
     rise: { opacity: 0, y: 52 },
-    left: { opacity: 0, x: -64 },
-    right: { opacity: 0, x: 64 },
+    focus: { opacity: 0, y: 20, scale: 0.975, filter: "blur(12px)" },
+    unfold: { opacity: 0, y: 28, scale: 0.985, rotateX: 5 },
     zoom: { opacity: 0, scale: 0.93 },
     blur: { opacity: 0, y: 22, filter: "blur(14px)" },
     tilt: { opacity: 0, y: 40, rotateX: 7, scale: 0.97 },

@@ -7,17 +7,17 @@ export default function LoginPage() {
   return (
     <AuthCard
       title="Pierakstīties"
-      description="Ievadiet savu e-pastu un paroli, lai turpinātu."
+      description="Ievadiet savu e-pastu un paroli, lai turpinātu"
     >
       <Suspense fallback={<div className="text-sm text-white/40">Ielādē...</div>}>
         <LoginForm />
       </Suspense>
 
-      <div className="mt-6 text-sm text-white/45">
+      <div className="mt-6 text-center font-accent text-sm text-white/45">
         Vēl nav konta?{" "}
         <Link
           href="/register"
-          className="font-semibold text-white underline-offset-4 hover:underline"
+          className="font-bold text-white transition hover:text-white/75"
         >
           Izveidot jaunu organizāciju
         </Link>

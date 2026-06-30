@@ -62,7 +62,7 @@ export function PrivacyTrustSection() {
         </header>
 
         <motion.div
-          className="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-2"
+          className="mx-auto mt-12 grid max-w-5xl gap-5 [perspective:1200px] md:grid-cols-2"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, amount: 0.12 }}
@@ -74,11 +74,19 @@ export function PrivacyTrustSection() {
           <motion.article
             className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
             variants={{
-              hidden: { opacity: 0, x: -48, rotate: -1.5 },
+              hidden: {
+                opacity: 0,
+                y: 32,
+                scale: 0.96,
+                rotateX: 6,
+                filter: "blur(10px)",
+              },
               visible: {
                 opacity: 1,
-                x: 0,
-                rotate: 0,
+                y: 0,
+                scale: 1,
+                rotateX: 0,
+                filter: "blur(0px)",
                 transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
               },
             }}
@@ -97,11 +105,19 @@ export function PrivacyTrustSection() {
           <motion.article
             className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
             variants={{
-              hidden: { opacity: 0, x: 48, rotate: 1.5 },
+              hidden: {
+                opacity: 0,
+                y: 32,
+                scale: 0.96,
+                rotateX: 6,
+                filter: "blur(10px)",
+              },
               visible: {
                 opacity: 1,
-                x: 0,
-                rotate: 0,
+                y: 0,
+                scale: 1,
+                rotateX: 0,
+                filter: "blur(0px)",
                 transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
               },
             }}

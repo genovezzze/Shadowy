@@ -211,13 +211,13 @@ export function HeroSection() {
         <ScrollReveal effect="rise">
           <AnnaStoryCarousel />
         </ScrollReveal>
-        <ScrollReveal effect="left">
+        <ScrollReveal effect="focus">
           <SolutionSection />
         </ScrollReveal>
         <ScrollReveal effect="zoom">
           <BusinessValueSection />
         </ScrollReveal>
-        <ScrollReveal effect="right">
+        <ScrollReveal effect="unfold">
           <PrivacyTrustSection />
         </ScrollReveal>
         <ClosingSections />

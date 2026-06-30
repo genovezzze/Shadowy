@@ -8,14 +8,18 @@ export function AuthCard({
   children: React.ReactNode;
 }) {
   return (
-    <div className="glass rounded-2xl border border-white/[0.07] bg-white/[0.015] p-8">
-      <div className="mb-6">
-        <h1 className="font-display font-black text-3xl tracking-tight text-white">{title}</h1>
+    <section>
+      <div className="mb-5 text-center">
+        <h1 className="text-balance font-accent text-[1.6rem] font-bold leading-tight tracking-[0.01em] text-white [font-synthesis:weight] sm:text-[1.8rem]">
+          {title}
+        </h1>
         {description ? (
-          <p className="mt-1.5 text-sm leading-relaxed text-white/45">{description}</p>
+          <p className="mx-auto mt-1.5 max-w-sm font-accent text-[13px] font-light leading-5 tracking-[0.01em] text-white/42">
+            {description}
+          </p>
         ) : null}
       </div>
       {children}
-    </div>
+    </section>
   );
 }

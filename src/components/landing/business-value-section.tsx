@@ -46,17 +46,23 @@ export function BusinessValueSection() {
             return (
               <motion.article
                 key={card.title}
-                className="relative overflow-hidden rounded-[10px] border border-white/[0.11] bg-[#080a0d] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_14px_40px_rgba(0,0,0,0.18)] transition-all duration-300 hover:translate-x-1 hover:border-white/[0.2] hover:bg-[#0a0e12] sm:p-6"
+                className="relative overflow-hidden rounded-[10px] border border-white/[0.11] bg-[#080a0d] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_14px_40px_rgba(0,0,0,0.18)] transition-colors duration-300 hover:border-white/[0.2] hover:bg-[#0a0e12] sm:p-6"
                 variants={{
-                  hidden: { opacity: 0, x: -44, rotateY: -5 },
+                  hidden: {
+                    opacity: 0,
+                    y: 26,
+                    scale: 0.965,
+                    filter: "blur(9px)",
+                  },
                   visible: {
                     opacity: 1,
-                    x: 0,
-                    rotateY: 0,
+                    y: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
                     transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
                   },
                 }}
-                whileHover={{ x: 6, scale: 1.01 }}
+                whileHover={{ y: -4, scale: 1.012 }}
               >
                 <div className="relative">
                   <h3 className="font-accent text-xl font-bold tracking-[0.014em] text-white [font-synthesis:weight]">

@@ -23,6 +23,12 @@ const schema = z.object({
     .string()
     .min(8, "Parolei jābūt vismaz 8 simbolus garai.")
     .max(120),
+  termsAccepted: z
+    .string()
+    .refine(
+      (value) => value === "true",
+      "Lūdzu, izlasiet un pieņemiet lietošanas noteikumus.",
+    ),
 });
 
 const DEFAULT_CATEGORIES = [
@@ -49,6 +55,7 @@ export async function registerAction(formData: FormData) {
     name: formData.get("name"),
     email: formData.get("email"),
     password: formData.get("password"),
+    termsAccepted: formData.get("termsAccepted"),
   });
 
   if (!parsed.success) {
