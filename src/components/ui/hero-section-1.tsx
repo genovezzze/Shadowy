@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { AnnaStoryCarousel } from "@/components/landing/anna-story-carousel";
+import { HiddenCostSection } from "@/components/landing/hidden-cost-section";
 import { SolutionSection } from "@/components/landing/solution-section";
 import { BusinessValueSection } from "@/components/landing/business-value-section";
 import { PrivacyTrustSection } from "@/components/landing/privacy-trust-section";
@@ -105,35 +106,23 @@ export function HeroSection() {
             <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
               <div className="font-accent font-light text-center sm:mx-auto lg:mr-auto lg:mt-0">
                 <AnimatedGroup variants={transitionVariants}>
-                  <div
-                    aria-hidden
-                    className="hidden"
-                  >
-                    <span className="hidden">
-                      30 dienu pilots bez novērošanas
-                    </span>
-                    <img
-                      src="/shadowy.svg"
-                      alt=""
-                      className="size-full object-contain"
-                    />
-                  </div>
-
-                  <h1 className="mx-auto mt-4 max-w-[22rem] text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.82)_68%,rgba(96,165,250,.42)_100%)] bg-clip-text text-[clamp(2.25rem,11vw,3.5rem)] font-bold leading-[0.98] tracking-[0.015em] text-transparent [font-synthesis:weight] sm:mt-8 sm:max-w-3xl sm:text-[clamp(3rem,8vw,4.5rem)] lg:mt-16 lg:max-w-none lg:whitespace-nowrap lg:text-[clamp(3.5rem,5vw,5rem)]">
-                    Padariet neredzamo darbu redzamu
+                  <h1 className="mx-auto mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
+                    Pārvērtiet neredzamo darbu redzamās izmaksās un labākos
+                    lēmumos
                   </h1>
                   <p className="mx-auto mt-6 max-w-4xl text-balance text-base leading-7 tracking-[0.01em] text-white/85 sm:mt-8 sm:text-xl sm:leading-relaxed md:text-2xl">
-                    Shadowy palīdz uzņēmumiem pamanīt{" "}
+                    Fiksējiet slēpto darba slodzi, novērtējiet tās izmaksas un
+                    pieņemiet labākus lēmumus par lomām, darba slodzi un komandas
+                    efektivitāti{" "}
                     <strong className="font-bold [font-synthesis:weight]">
-                      slēpto darba slodzi, papildu pienākumus un darbu ārpus
-                      oficiālās lomas
+                      - bez darbinieku novērošanas.
                     </strong>{" "}
-                    - bez darbinieku novērošanas
                   </p>
                   <p className="mx-auto mt-4 max-w-4xl text-balance text-base leading-7 tracking-[0.01em] text-white/70 sm:text-lg md:text-xl">
-                    Sāciet ar vienu komandu un{" "}
+                    Neredzamais darbs nav bezmaksas.{" "}
                     <strong className="font-bold [font-synthesis:weight]">
-                      saņemiet praktisku pārskatu pēc 30 dienām
+                      Jūsu uzņēmums par to jau maksā - vienkārši vēl neredz
+                      izmaksas.
                     </strong>
                   </p>
                 </AnimatedGroup>
@@ -150,16 +139,22 @@ export function HeroSection() {
                     },
                     ...transitionVariants,
                   }}
-                  className="mt-8 flex flex-col items-center justify-center gap-2 sm:mt-10 md:flex-row"
+                  className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 md:flex-row"
                 >
                   <ButtonColorful
                     type="button"
-                    label="Izmēģināt BEZMAKSAS"
+                    label="Sākt 30 dienu bezmaksas pilotu"
                     onClick={() => {
                       window.location.href = "/register";
                     }}
-                    className="h-[52px] w-full max-w-sm rounded-xl px-6 text-[15px] font-bold sm:w-auto sm:px-7 sm:text-base"
+                    className="h-[52px] w-full max-w-sm rounded-xl px-6 text-[14px] font-bold sm:w-auto sm:px-7 sm:text-[15px]"
                   />
+                  <Link
+                    href="#hidden-cost-calculator"
+                    className="inline-flex h-[52px] w-full max-w-sm items-center justify-center rounded-xl border border-white/[0.14] bg-white/[0.025] px-6 text-[14px] font-bold text-white/82 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white sm:w-auto sm:px-7 sm:text-[15px]"
+                  >
+                    Aprēķināt slēptā darba izmaksas
+                  </Link>
                 </AnimatedGroup>
                 <p className="mx-auto mt-4 flex max-w-sm items-start justify-center gap-2 text-balance text-center text-sm leading-6 tracking-[0.01em] text-white/55 sm:mt-5 sm:max-w-none sm:items-center sm:text-base">
                   <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400 sm:mt-0" />
@@ -169,7 +164,7 @@ export function HeroSection() {
                     </strong>{" "}
                     Iestatīšana{" "}
                     <strong className="font-bold text-white/72 [font-synthesis:weight]">
-                      līdz 10 minūtēm
+                      līdz 10 minūtēm.
                     </strong>
                   </span>
                 </p>
@@ -210,6 +205,9 @@ export function HeroSection() {
 
         <ScrollReveal effect="rise">
           <AnnaStoryCarousel />
+        </ScrollReveal>
+        <ScrollReveal effect="blur">
+          <HiddenCostSection />
         </ScrollReveal>
         <ScrollReveal effect="focus">
           <SolutionSection />
