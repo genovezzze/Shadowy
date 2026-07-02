@@ -682,3 +682,76 @@ input[type="checkbox"]:focus-visible {
     animation: none;
   }
 }
+
+/* Readability inside the authenticated application only. */
+.app-shell {
+  letter-spacing: 0.012em;
+}
+
+.app-shell .text-xs {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.app-shell .text-sm {
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.app-shell .text-\[10px\] {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
+.app-shell .text-\[11px\] {
+  font-size: 0.8125rem;
+  line-height: 1.125rem;
+}
+
+.app-shell .text-\[12px\] {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
+
+.app-shell .text-\[13px\] {
+  font-size: 0.9375rem;
+  line-height: 1.375rem;
+}
+
+/* Primary application buttons: clean white treatment used on the login CTA. */
+.app-shell .btn-shimmer,
+.dark .app-shell .btn-shimmer,
+.slate .app-shell .btn-shimmer {
+  min-height: 0;
+  border: 1px solid rgba(163, 163, 163, 0.72);
+  border-radius: 0.625rem;
+  background: #ffffff;
+  color: #0a0a0a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 3px 10px rgba(0, 0, 0, 0.16);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  transition:
+    background 0.14s ease,
+    border-color 0.14s ease,
+    box-shadow 0.14s ease,
+    transform 0.14s ease;
+}
+
+.app-shell .btn-shimmer:hover,
+.dark .app-shell .btn-shimmer:hover,
+.slate .app-shell .btn-shimmer:hover {
+  border-color: #ffffff;
+  background: #f2f2f2;
+  color: #0a0a0a;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.24);
+  transform: translateY(-1px);
+}
+
+.app-shell .btn-shimmer:active,
+.dark .app-shell .btn-shimmer:active,
+.slate .app-shell .btn-shimmer:active {
+  background: #e8e8e8;
+  transform: translateY(0);
+}

@@ -34,7 +34,7 @@ export function roleHome(role: Role) {
     case "MANAGER":
       return "/manager/dashboard";
     case "EMPLOYEE":
-      return "/employee/dashboard";
+      return "/employee/smart-log";
   }
 }
 

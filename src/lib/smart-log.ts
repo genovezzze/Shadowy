@@ -1,0 +1,96 @@
+import { z } from "zod";
+
+export const SMART_LOG_CATEGORIES = [
+  { value: "helping_colleague", label: "palīdzība kolēģim" },
+  { value: "onboarding", label: "ievadīšana darbā" },
+  { value: "coordination", label: "koordinācija" },
+  { value: "urgent_extra_task", label: "steidzams papildu uzdevums" },
+  { value: "work_outside_role", label: "darbs ārpus lomas" },
+  { value: "fixing_mistakes", label: "kļūdu labošana" },
+  { value: "repeated_questions", label: "atkārtoti jautājumi" },
+  { value: "waiting_for_information", label: "informācijas gaidīšana" },
+  { value: "team_support", label: "komandas atbalsts" },
+  { value: "other", label: "cits" },
+] as const;
+
+export const smartLogCategorySchema = z.enum([
+  "helping_colleague",
+  "onboarding",
+  "coordination",
+  "urgent_extra_task",
+  "work_outside_role",
+  "fixing_mistakes",
+  "repeated_questions",
+  "waiting_for_information",
+  "team_support",
+  "other",
+]);
+
+export type SmartLogCategory = z.infer<typeof smartLogCategorySchema>;
+
+export const SMART_LOG_CATEGORY_LABELS = Object.fromEntries(
+  SMART_LOG_CATEGORIES.map((category) => [category.value, category.label])
+) as Record<SmartLogCategory, string>;
+
+export const smartLogDraftSchema = z.object({
+  title: z.string().trim().min(3).max(120),
+  category: smartLogCategorySchema,
+  description: z.string().trim().min(3).max(2000),
+  estimated_time_minutes: z.number().int().min(1).max(1440).nullable(),
+  is_outside_role: z.boolean().nullable(),
+  role_relation: z.string().trim().max(300),
+  business_impact: z.string().trim().max(500),
+  confidence_score: z.number().min(0).max(1),
+});
+
+export const smartLogResponseSchema = z.object({
+  tickets: z.array(smartLogDraftSchema).max(8),
+});
+
+export type SmartLogDraft = z.infer<typeof smartLogDraftSchema>;
+
+export const SMART_LOG_JSON_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    tickets: {
+      type: "array",
+      maxItems: 8,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          title: { type: "string", minLength: 3, maxLength: 120 },
+          category: {
+            type: "string",
+            enum: SMART_LOG_CATEGORIES.map((category) => category.value),
+          },
+          description: { type: "string", minLength: 3, maxLength: 2000 },
+          estimated_time_minutes: {
+            anyOf: [
+              { type: "integer", minimum: 1, maximum: 1440 },
+              { type: "null" },
+            ],
+          },
+          is_outside_role: {
+            anyOf: [{ type: "boolean" }, { type: "null" }],
+          },
+          role_relation: { type: "string", maxLength: 300 },
+          business_impact: { type: "string", maxLength: 500 },
+          confidence_score: { type: "number", minimum: 0, maximum: 1 },
+        },
+        required: [
+          "title",
+          "category",
+          "description",
+          "estimated_time_minutes",
+          "is_outside_role",
+          "role_relation",
+          "business_impact",
+          "confidence_score",
+        ],
+      },
+    },
+  },
+  required: ["tickets"],
+} as const;

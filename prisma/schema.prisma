@@ -64,7 +64,7 @@ model Organization {
 }
 
 model User {
-  id             String  @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -81,16 +81,16 @@ model User {
   manager   User?   @relation("ManagerEmployees", fields: [managerId], references: [id], onDelete: SetNull)
   employees User[]  @relation("ManagerEmployees")
 
-  workRoleId      String?
-  workRole        WorkRole? @relation("EmployeeWorkRole", fields: [workRoleId], references: [id], onDelete: SetNull)
+  workRoleId       String?
+  workRole         WorkRole?  @relation("EmployeeWorkRole", fields: [workRoleId], references: [id], onDelete: SetNull)
   managedWorkRoles WorkRole[] @relation("ManagerWorkRoles")
 
   submittedEntries InvisibleWorkEntry[] @relation("EntryEmployee")
   reviewedEntries  InvisibleWorkEntry[] @relation("EntryManager")
 
-  managedRecognitionRules RecognitionRule[] @relation("ManagerRecognitionRules")
-  employeeBonusRequests   BonusRequest[]    @relation("EmployeeBonusRequests")
-  managerBonusRequests    BonusRequest[]    @relation("ManagerBonusRequests")
+  managedRecognitionRules RecognitionRule[]    @relation("ManagerRecognitionRules")
+  employeeBonusRequests   BonusRequest[]       @relation("EmployeeBonusRequests")
+  managerBonusRequests    BonusRequest[]       @relation("ManagerBonusRequests")
   passwordResetTokens     PasswordResetToken[]
   notifications           Notification[]
 
@@ -109,8 +109,8 @@ model WorkRole {
   managerId      String
   manager        User         @relation("ManagerWorkRoles", fields: [managerId], references: [id])
 
-  name        String        @db.VarChar(100)
-  description String?       @db.VarChar(500)
+  name        String  @db.VarChar(100)
+  description String? @db.VarChar(500)
 
   duties    WorkRoleDuty[]
   employees User[]         @relation("EmployeeWorkRole")
@@ -133,7 +133,7 @@ model WorkRoleDuty {
 }
 
 model InvisibleWorkEntry {
-  id             String  @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -141,7 +141,7 @@ model InvisibleWorkEntry {
   employee   User   @relation("EntryEmployee", fields: [employeeId], references: [id], onDelete: Cascade)
 
   managerId String?
-  manager   User?  @relation("EntryManager", fields: [managerId], references: [id], onDelete: SetNull)
+  manager   User?   @relation("EntryManager", fields: [managerId], references: [id], onDelete: SetNull)
 
   title           String
   category        String
@@ -151,6 +151,13 @@ model InvisibleWorkEntry {
 
   status         EntryStatus @default(PENDING)
   managerComment String?
+
+  source          String   @default("manual") @db.VarChar(30)
+  originalInput   String?  @db.Text
+  isOutsideRole   Boolean?
+  roleRelation    String?  @db.VarChar(300)
+  businessImpact  String?  @db.VarChar(500)
+  confidenceScore Float?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -199,7 +206,7 @@ model PasswordResetToken {
 }
 
 model Category {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
@@ -247,21 +254,21 @@ model PilotLead {
 }
 
 model BonusRequest {
-  id             String       @id @default(cuid())
+  id             String          @id @default(cuid())
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   employeeId     String
-  employee       User         @relation("EmployeeBonusRequests", fields: [employeeId], references: [id], onDelete: Cascade)
+  employee       User            @relation("EmployeeBonusRequests", fields: [employeeId], references: [id], onDelete: Cascade)
   managerId      String
-  manager        User         @relation("ManagerBonusRequests", fields: [managerId], references: [id], onDelete: Cascade)
+  manager        User            @relation("ManagerBonusRequests", fields: [managerId], references: [id], onDelete: Cascade)
   ruleId         String
   rule           RecognitionRule @relation(fields: [ruleId], references: [id], onDelete: Cascade)
 
   rewardType       RewardType
   status           BonusRequestStatus @default(PENDING)
   hoursAccumulated Float
-  employeeComment  String?    @db.VarChar(1000)
-  managerComment   String?    @db.VarChar(1000)
+  employeeComment  String?            @db.VarChar(1000)
+  managerComment   String?            @db.VarChar(1000)
 
   requestedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -20,7 +20,7 @@ function roleHome(role: string) {
     case "MANAGER":
       return "/manager/dashboard";
     case "EMPLOYEE":
-      return "/employee/dashboard";
+      return "/employee/smart-log";
     default:
       return "/login";
   }

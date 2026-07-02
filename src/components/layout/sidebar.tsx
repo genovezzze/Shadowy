@@ -24,6 +24,25 @@ import { NotificationBell } from "./notification-bell";
 
 type NavItem = { href: string; label: string; icon: any };
 
+function ShadowyNavIcon({ className }: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn("inline-block bg-current", className)}
+      style={{
+        WebkitMaskImage: "url('/shadowy.svg')",
+        maskImage: "url('/shadowy.svg')",
+        WebkitMaskRepeat: "no-repeat",
+        maskRepeat: "no-repeat",
+        WebkitMaskPosition: "center",
+        maskPosition: "center",
+        WebkitMaskSize: "contain",
+        maskSize: "contain",
+      }}
+    />
+  );
+}
+
 const ADMIN_NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Pārskats", icon: LayoutDashboard },
   { href: "/admin/managers", label: "Vadītāji", icon: UserCog },
@@ -47,6 +66,11 @@ const MANAGER_NAV: NavItem[] = [
 
 const EMPLOYEE_NAV: NavItem[] = [
   { href: "/employee/dashboard", label: "Pārskats", icon: LayoutDashboard },
+  {
+    href: "/employee/smart-log",
+    label: "Shadowy AI ieraksts",
+    icon: ShadowyNavIcon,
+  },
   { href: "/employee/new-entry", label: "Jauns ieraksts", icon: PlusCircle },
   { href: "/employee/history", label: "Vēsture", icon: History },
   { href: "/employee/my-role", label: "Mana loma", icon: BadgeCheck },
@@ -86,7 +110,7 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
   const items = navFor(role);
 
   return (
-    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"
+    <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar font-accent backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"
     >
       {/* Dot-grid texture (dark mode only) */}
       <div
@@ -123,7 +147,7 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
               href={item.href}
               onClick={onClose}
               className={cn(
-                "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors duration-150",
+                "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[17px] font-medium transition-colors duration-150",
                 active
                   ? "bg-sidebar-accent text-foreground dark:bg-white/[0.09]"
                   : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground dark:hover:bg-white/[0.05]"
@@ -153,10 +177,10 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
       {/* Footer */}
       <div className="relative z-10 border-t border-sidebar-border p-4 dark:border-white/[0.07] dark:bg-[linear-gradient(to_top,rgba(255,255,255,0.02),transparent)]">
         <div className="mb-3 px-1">
-          <div className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground/70 dark:text-muted-foreground/50">
+          <div className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground/70 dark:text-muted-foreground/50">
             Organizācija
           </div>
-          <div className="mt-0.5 truncate text-sm font-semibold">{organizationName}</div>
+          <div className="mt-1 truncate text-base font-semibold">{organizationName}</div>
         </div>
 
         <div className="flex items-center justify-between gap-2">
@@ -165,8 +189,8 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
             className="-mx-1 min-w-0 rounded-lg px-2 py-1.5 transition-colors hover:bg-sidebar-accent dark:hover:bg-white/[0.06]"
             title="Mans profils"
           >
-            <div className="truncate text-sm font-medium">{userName}</div>
-            <div className="text-xs text-muted-foreground/70">{roleLabels[role]}</div>
+            <div className="truncate text-base font-medium">{userName}</div>
+            <div className="text-sm text-muted-foreground/70">{roleLabels[role]}</div>
           </Link>
 
           <div className="flex items-center gap-1">

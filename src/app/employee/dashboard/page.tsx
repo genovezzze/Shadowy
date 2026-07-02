@@ -11,6 +11,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer } from "lucide-react";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
 import { SectionDivider } from "@/components/dashboard/section-divider";
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -143,6 +145,35 @@ export default async function EmployeeDashboard() {
           </Link>
         </Button>
       </div>
+
+      <Card className="mb-8 overflow-hidden">
+        <CardContent className="relative flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="relative flex items-start gap-3">
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 dark:border-white/[0.1] dark:bg-white/[0.035]">
+              <img
+                src="/shadowy.svg"
+                alt=""
+                width={25}
+                height={25}
+                className="invert dark:invert-0"
+              />
+            </div>
+            <div>
+              <h2 className="font-semibold">Shadowy AI ieraksts</h2>
+              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
+                Apraksti vai ierunā, kas šodien aizņēma papildu laiku, un
+                pārskati Shadowy AI izveidotos melnrakstus.
+              </p>
+            </div>
+          </div>
+          <Button asChild variant="outline" className="relative shrink-0">
+            <Link href="/employee/smart-log">
+              Atvērt Shadowy AI
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
         <KpiCard

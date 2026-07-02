@@ -65,7 +65,7 @@ export default async function EmployeeHistoryPage({
                 <Download className="h-4 w-4" /> Eksportēt CSV
               </a>
             </Button>
-            <Button asChild>
+            <Button asChild className="!min-h-10 !rounded-[10px]">
               <Link href="/employee/new-entry">Jauns ieraksts</Link>
             </Button>
           </>

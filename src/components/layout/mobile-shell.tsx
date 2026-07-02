@@ -29,7 +29,7 @@ export function MobileShell({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="app-shell flex h-screen bg-background">
+    <div className="app-shell flex h-screen bg-background font-accent">
 
       {/* Mobile backdrop */}
       {sidebarOpen && (

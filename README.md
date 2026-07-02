@@ -155,3 +155,26 @@ EMPLOYEE  →  iesniedz neredzamā darba ierakstus, redz savu vēsturi
 ## Valodas politika
 
 Visa lietotāja saskarne ir **tikai latviešu valodā**. Lūdzu, sekojiet šim principam, pievienojot jaunas funkcijas - kods un mainīgo nosaukumi paliek angļu valodā, bet viss, ko redz gala lietotājs (etiķetes, pogas, virsraksti, tukšie stāvokļi, kļūdu paziņojumi, palīgteksti), jābūt latviešu valodā.
+# Viedais darba žurnāls
+
+AI teksta parsēšanai servera vidē nepieciešami:
+
+```env
+OPENAI_API_KEY=...
+OPENAI_MODEL=gpt-5.4-mini
+OPENAI_TRANSCRIBE_MODEL=gpt-4o-mini-transcribe
+```
+
+Pirms funkcijas izvietošanas datubāzē jāizpilda
+[`prisma/smart-log-migration.sql`](prisma/smart-log-migration.sql), pēc tam
+jāģenerē Prisma klients:
+
+```bash
+npx prisma generate
+```
+
+AI izveidotie melnraksti netiek saglabāti automātiski. Datubāzē nonāk tikai
+darbinieka pārskatīti un apstiprināti ieraksti.
+
+Balss ievade pārlūkprogrammā ieraksta ne vairāk kā trīs minūtes. Audio fails
+tiek nosūtīts uz servera transkripcijas maršrutu un netiek saglabāts datubāzē.
