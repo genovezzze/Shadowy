@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { KpiCard } from "@/components/dashboard/kpi-card";
@@ -150,7 +151,7 @@ export default async function EmployeeDashboard() {
         <CardContent className="relative flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex items-start gap-3">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 dark:border-white/[0.1] dark:bg-white/[0.035]">
-              <img
+              <Image
                 src="/shadowy.svg"
                 alt=""
                 width={25}

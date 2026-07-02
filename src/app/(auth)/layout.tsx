@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function AuthLayout({
   children,
@@ -15,7 +16,7 @@ export default function AuthLayout({
             className="mx-auto mb-6 flex w-fit items-center gap-2.5 sm:mb-7"
           >
             <span className="grid size-9 place-items-center">
-              <img
+              <Image
                 src="/shadowy.svg"
                 alt=""
                 width={32}

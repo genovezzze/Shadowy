@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import {
   CheckCircle2,
   Menu,
@@ -190,12 +191,12 @@ export function HeroSection() {
                   className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_bottom,transparent_0%,transparent_68%,rgba(7,9,12,0.45)_84%,#07090c_100%)]"
                 />
                 <div className="relative mx-auto max-w-6xl overflow-hidden rounded-xl border bg-background p-1.5 shadow-lg shadow-zinc-950/15 ring-1 ring-background sm:rounded-2xl sm:p-4 dark:shadow-[inset_0_1px_rgba(255,255,255,0.2)]">
-                  <img
+                  <Image
                     className="relative aspect-video w-full rounded-lg border border-border/25 object-cover sm:rounded-2xl"
                     src="/images/shadowy-dashboard.png"
                     alt="Shadowy darba pārskats klēpjdatora ekrānā"
-                    width="1672"
-                    height="941"
+                    width={1672}
+                    height={941}
                   />
                 </div>
               </div>
@@ -263,7 +264,13 @@ function HeroHeader() {
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
             <div className="flex w-full justify-between lg:w-auto">
               <Link href="/" aria-label="Shadowy home" className="flex items-center gap-2">
-                <img src="/shadowy.svg" alt="" className="size-7 dark:invert-0" />
+                <Image
+                  src="/shadowy.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="size-7 dark:invert-0"
+                />
                 <span className="font-semibold">Shadowy</span>
               </Link>
               <button

@@ -28,6 +28,10 @@ export default withSentryConfig(nextConfig, {
   org: process.env.SENTRY_ORG,
   project: process.env.SENTRY_PROJECT,
   widenClientFileUpload: false,
-  disableLogger: true,
-  automaticVercelMonitors: false,
+  webpack: {
+    treeshake: {
+      removeDebugLogging: true,
+    },
+    automaticVercelMonitors: false,
+  },
 });

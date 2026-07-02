@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { Bell, CheckCircle2, Sparkles, Undo2, XCircle, type LucideIcon } from "lucide-react";
@@ -86,7 +86,7 @@ export function NotificationBell({
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  function updatePanelPosition() {
+  const updatePanelPosition = useCallback(() => {
     const rect = buttonRef.current?.getBoundingClientRect();
     if (!rect) return;
     const panelWidth = Math.min(320, window.innerWidth - 32);
@@ -100,7 +100,7 @@ export function NotificationBell({
       style.top = rect.bottom + 8;
     }
     setPanelStyle(style);
-  }
+  }, [alignLeft, openUpward]);
 
   function toggleOpen() {
     const next = !open;
@@ -125,7 +125,7 @@ export function NotificationBell({
       window.removeEventListener("resize", onReposition);
       window.removeEventListener("scroll", onReposition, true);
     };
-  }, [open]);
+  }, [open, updatePanelPosition]);
 
   function handleMarkAllRead() {
     setUnreadCount(0);

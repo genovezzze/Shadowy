@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import type { Role } from "@prisma/client";
@@ -128,7 +129,7 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
           href="/"
           className="flex items-center gap-2.5 transition-opacity hover:opacity-75"
         >
-          <img src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0 invert dark:invert-0" />
+          <Image src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0 invert dark:invert-0" />
           <div className="text-lg font-semibold leading-none tracking-tight">Shadowy</div>
         </Link>
         <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} alignLeft />

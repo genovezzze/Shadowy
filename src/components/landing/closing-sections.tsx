@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowUpRight,
   Check,
@@ -376,7 +377,13 @@ export function ClosingSections() {
           <div className="grid gap-8 md:grid-cols-[1.35fr_0.65fr_0.8fr]">
             <div className="max-w-md">
               <Link href="/" className="inline-flex items-center gap-2">
-                <img src="/shadowy.svg" alt="" className="size-7" />
+                <Image
+                  src="/shadowy.svg"
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="size-7"
+                />
                 <span className="text-lg font-semibold tracking-normal text-white">
                   Shadowy
                 </span>

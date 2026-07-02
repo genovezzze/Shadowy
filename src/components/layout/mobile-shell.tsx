@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Menu } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { TrialBanner } from "./trial-banner";
@@ -68,7 +69,7 @@ export function MobileShell({
           >
             <Menu className="h-5 w-5" />
           </button>
-          <img src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0 invert dark:invert-0" />
+          <Image src="/shadowy.svg" alt="Shadowy" width={22} height={22} className="shrink-0 invert dark:invert-0" />
           <span className="flex-1 text-sm font-semibold">Shadowy</span>
           <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
         </div>

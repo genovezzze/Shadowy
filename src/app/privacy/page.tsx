@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export const metadata = {
@@ -13,7 +14,7 @@ export default function PrivacyPage() {
       <div className="mx-auto max-w-2xl px-6 py-16">
         <div className="mb-8">
           <Link href="/" className="flex items-center gap-2.5">
-            <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
+            <Image src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
             <span className="text-base font-semibold tracking-tight">Shadowy</span>
           </Link>
         </div>

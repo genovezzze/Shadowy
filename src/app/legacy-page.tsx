@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   ArrowRight,
@@ -74,7 +75,7 @@ export default function HomePage() {
             }}
           />
           <a href="#" className="relative flex items-center gap-2.5">
-            <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
+            <Image src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
             <span className="text-base font-semibold tracking-tight text-white">Shadowy</span>
           </a>
           <nav className="hidden items-center gap-0.5 md:flex">
@@ -733,7 +734,7 @@ export default function HomePage() {
           <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
             <div className="max-w-sm">
               <a href="#" className="flex items-center gap-2.5">
-                <img src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
+                <Image src="/shadowy.svg" alt="Shadowy" width={28} height={28} />
                 <span className="text-base font-semibold tracking-tight text-white">Shadowy</span>
               </a>
               <p className="mt-3 text-sm leading-relaxed text-white/60">
