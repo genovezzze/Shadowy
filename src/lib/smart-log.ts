@@ -36,6 +36,11 @@ export const smartLogDraftSchema = z.object({
   title: z.string().trim().min(3).max(120),
   category: smartLogCategorySchema,
   description: z.string().trim().min(3).max(2000),
+  work_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .nullable(),
+  client_name: z.string().trim().max(120).nullable(),
   estimated_time_minutes: z.number().int().min(1).max(1440).nullable(),
   is_outside_role: z.boolean().nullable(),
   role_relation: z.string().trim().max(300),
@@ -66,6 +71,21 @@ export const SMART_LOG_JSON_SCHEMA = {
             enum: SMART_LOG_CATEGORIES.map((category) => category.value),
           },
           description: { type: "string", minLength: 3, maxLength: 2000 },
+          work_date: {
+            anyOf: [
+              {
+                type: "string",
+                pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+              },
+              { type: "null" },
+            ],
+          },
+          client_name: {
+            anyOf: [
+              { type: "string", maxLength: 120 },
+              { type: "null" },
+            ],
+          },
           estimated_time_minutes: {
             anyOf: [
               { type: "integer", minimum: 1, maximum: 1440 },
@@ -83,6 +103,8 @@ export const SMART_LOG_JSON_SCHEMA = {
           "title",
           "category",
           "description",
+          "work_date",
+          "client_name",
           "estimated_time_minutes",
           "is_outside_role",
           "role_relation",

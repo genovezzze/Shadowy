@@ -10,6 +10,7 @@ interface EntryCardProps {
   title: string;
   category: string;
   description: string;
+  clientName?: string | null;
   workDate: Date | string;
   durationMinutes: number;
   status: EntryStatus;
@@ -23,6 +24,7 @@ export function EntryCard({
   title,
   category,
   description,
+  clientName,
   workDate,
   durationMinutes,
   status,
@@ -38,6 +40,12 @@ export function EntryCard({
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>{category}</span>
+              {clientName ? (
+                <>
+                  <span>·</span>
+                  <span>{clientName}</span>
+                </>
+              ) : null}
               <span>·</span>
               <span>{formatDateLV(workDate)}</span>
               <span>·</span>

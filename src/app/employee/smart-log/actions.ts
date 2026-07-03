@@ -73,9 +73,10 @@ export async function saveConfirmedSmartLogTickets(input: {
           title: ticket.title,
           category: SMART_LOG_CATEGORY_LABELS[ticket.category],
           description: ticket.description,
+          clientName: ticket.client_name || null,
           workDate: new Date(`${ticket.workDate}T12:00:00.000Z`),
           durationMinutes: ticket.estimated_time_minutes,
-          status: "PENDING" as const,
+          status: "APPROVED" as const,
           source: parsed.data.source === "voice" ? "ai_voice" : "ai_text",
           originalInput: parsed.data.originalInput,
           isOutsideRole: ticket.is_outside_role,
@@ -90,8 +91,8 @@ export async function saveConfirmedSmartLogTickets(input: {
           organizationId: session.organizationId,
           userId: managerId,
           title: "Jauni darba ieraksti",
-          body: `${employee.name} iesniedza ${parsed.data.tickets.length} ierakstus no viedā darba žurnāla.`,
-          link: "/manager/entries",
+          body: `${employee.name} pievienoja ${parsed.data.tickets.length} ierakstus — tie automātiski apstiprināti.`,
+          link: "/manager/dashboard",
         },
       });
     });

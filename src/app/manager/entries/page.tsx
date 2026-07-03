@@ -86,9 +86,11 @@ export default async function ManagerEntriesPage({
         <PendingEntriesList
           entries={pending.map((e: any) => ({
             id: e.id,
+            employeeId: e.employee.id,
             title: e.title,
             category: e.category,
             description: e.description,
+            clientName: e.clientName,
             workDate: e.workDate.toISOString(),
             durationMinutes: e.durationMinutes,
             status: e.status,
@@ -114,6 +116,7 @@ export default async function ManagerEntriesPage({
                 title={e.title}
                 category={e.category}
                 description={e.description}
+                clientName={e.clientName}
                 workDate={e.workDate}
                 durationMinutes={e.durationMinutes}
                 status={e.status}

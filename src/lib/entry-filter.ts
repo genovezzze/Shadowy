@@ -30,6 +30,7 @@ export function buildEntryWhere(
     where.OR = [
       { title: { contains: q, mode: "insensitive" } },
       { description: { contains: q, mode: "insensitive" } },
+      { clientName: { contains: q, mode: "insensitive" } },
     ];
   }
 

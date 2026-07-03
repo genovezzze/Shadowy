@@ -19,6 +19,7 @@ import {
   Inbox,
   UserCircle,
   BarChart2,
+  Building2,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -58,6 +59,7 @@ const MANAGER_NAV: NavItem[] = [
   { href: "/manager/dashboard", label: "Pārskats", icon: LayoutDashboard },
   { href: "/manager/employees", label: "Mana komanda", icon: Users },
   { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText },
+  { href: "/manager/clients", label: "Klienti", icon: Building2 },
   { href: "/manager/roles", label: "Lomas", icon: Briefcase },
   { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift },
   { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },

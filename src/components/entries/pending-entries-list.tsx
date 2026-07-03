@@ -4,17 +4,20 @@ import { useState, useTransition } from "react";
 import { EntryCard } from "@/components/entries/entry-card";
 import { ReviewActions } from "@/components/entries/review-actions";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/ui/empty-state";
-import { Check, CheckCircle2, RotateCcw, XCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { bulkReviewEntries } from "@/app/manager/entries/actions";
+import { CheckCircle2, ChevronDown, Pencil } from "lucide-react";
+import { cn, formatDurationLV } from "@/lib/utils";
+import { bulkReviewEntries, editEntry } from "@/app/manager/entries/actions";
 
 export interface PendingEntry {
   id: string;
+  employeeId: string;
   title: string;
   category: string;
   description: string;
+  clientName?: string | null;
   workDate: string;
   durationMinutes: number;
   status: string;
@@ -22,44 +25,320 @@ export interface PendingEntry {
   workType: "in_role" | "extra" | "no_role";
 }
 
-export function PendingEntriesList({ entries }: { entries: PendingEntry[] }) {
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [bulkMode, setBulkMode] = useState<"idle" | "reject" | "return">("idle");
-  const [comment, setComment] = useState("");
-  const [error, setError] = useState<string | null>(null);
+type EmployeeGroup = {
+  employeeId: string;
+  employeeName: string;
+  entries: PendingEntry[];
+  totalMinutes: number;
+  dateRange: string;
+  categories: string[];
+};
+
+function initials(name: string) {
+  return name
+    .split(" ")
+    .map((p) => p[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+function shortDateRange(entries: PendingEntry[]): string {
+  const dates = [...new Set(entries.map((e) => e.workDate.slice(0, 10)))].sort();
+  const fmt = (iso: string) =>
+    new Intl.DateTimeFormat("lv-LV", { day: "numeric", month: "short" }).format(
+      new Date(iso + "T12:00:00Z")
+    );
+  if (dates.length === 1) return fmt(dates[0]);
+  return `${fmt(dates[0])} – ${fmt(dates[dates.length - 1])}`;
+}
+
+function groupByEmployee(entries: PendingEntry[]): EmployeeGroup[] {
+  const map = new Map<string, EmployeeGroup>();
+  for (const e of entries) {
+    if (!map.has(e.employeeId)) {
+      map.set(e.employeeId, {
+        employeeId: e.employeeId,
+        employeeName: e.employeeName,
+        entries: [],
+        totalMinutes: 0,
+        dateRange: "",
+        categories: [],
+      });
+    }
+    const g = map.get(e.employeeId)!;
+    g.entries.push(e);
+    g.totalMinutes += e.durationMinutes;
+    if (!g.categories.includes(e.category)) g.categories.push(e.category);
+  }
+  for (const g of map.values()) {
+    g.dateRange = shortDateRange(g.entries);
+  }
+  return Array.from(map.values());
+}
+
+function pluralEntries(n: number) {
+  if (n === 1) return "1 ieraksts";
+  return `${n} ieraksti`;
+}
+
+type EditFields = { durationMinutes: string; clientName: string; category: string };
+
+function GroupCard({ group }: { group: EmployeeGroup }) {
+  const [expanded, setExpanded] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [approved, setApproved] = useState(false);
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editFields, setEditFields] = useState<EditFields>({
+    durationMinutes: "",
+    clientName: "",
+    category: "",
+  });
+  const [isSaving, startSaving] = useTransition();
+  const [editError, setEditError] = useState<string | null>(null);
 
-  const allSelected = selected.size === entries.length && entries.length > 0;
+  function openEdit(entry: PendingEntry) {
+    setEditingEntryId(entry.id);
+    setEditFields({
+      durationMinutes: String(entry.durationMinutes),
+      clientName: entry.clientName ?? "",
+      category: entry.category,
+    });
+    setEditError(null);
+  }
 
-  function toggle(id: string) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+  function cancelEdit() {
+    setEditingEntryId(null);
+    setEditError(null);
+  }
+
+  function saveEdit() {
+    if (!editingEntryId) return;
+    const dur = parseInt(editFields.durationMinutes, 10);
+    if (!dur || dur < 1 || dur > 1440) {
+      setEditError("Laikam jābūt no 1 līdz 1440 minūtēm.");
+      return;
+    }
+    if (!editFields.category.trim()) {
+      setEditError("Kategorija nevar būt tukša.");
+      return;
+    }
+    startSaving(async () => {
+      const res = await editEntry({
+        entryId: editingEntryId,
+        durationMinutes: dur,
+        clientName: editFields.clientName.trim() || null,
+        category: editFields.category.trim(),
+      });
+      if (res.ok) {
+        setEditingEntryId(null);
+        setEditError(null);
+      } else {
+        setEditError(res.error);
+      }
     });
   }
 
-  function toggleAll() {
-    if (allSelected) clearSelection();
-    else setSelected(new Set(entries.map((e) => e.id)));
-  }
-
-  function clearSelection() {
-    setSelected(new Set());
-    setBulkMode("idle");
-    setComment("");
-    setError(null);
-  }
-
-  function bulkAct(action: "APPROVE" | "REJECT" | "RETURN") {
-    setError(null);
+  function approveAll() {
     startTransition(async () => {
-      const res = await bulkReviewEntries({ entryIds: Array.from(selected), action, comment });
-      if (!res.ok) setError(res.error);
-      else clearSelection();
+      const res = await bulkReviewEntries({
+        entryIds: group.entries.map((e) => e.id),
+        action: "APPROVE",
+      });
+      if (res.ok) setApproved(true);
     });
   }
 
+  if (approved) return null;
+
+  return (
+    <div className="rounded-xl border border-border bg-card overflow-hidden">
+      <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center text-sm font-semibold shrink-0 select-none">
+            {initials(group.employeeName)}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-semibold text-sm leading-snug">{group.employeeName}</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              {pluralEntries(group.entries.length)} · {formatDurationLV(group.totalMinutes)} ·{" "}
+              {group.dateRange}
+            </div>
+            {group.categories.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {group.categories.slice(0, 3).map((cat) => (
+                  <span
+                    key={cat}
+                    className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
+                  >
+                    {cat}
+                  </span>
+                ))}
+                {group.categories.length > 3 && (
+                  <span className="py-0.5 text-xs text-muted-foreground">
+                    +{group.categories.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+              expanded && "bg-muted text-foreground"
+            )}
+          >
+            Pārskatīt
+            <ChevronDown
+              className={cn(
+                "h-3.5 w-3.5 transition-transform duration-200",
+                expanded && "rotate-180"
+              )}
+            />
+          </button>
+          <Button size="sm" variant="success" onClick={approveAll} disabled={isPending}>
+            <CheckCircle2 className="h-3.5 w-3.5" />
+            {isPending ? "Saglabā..." : "Apstiprināt visus"}
+          </Button>
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="border-t border-border">
+          <div className="divide-y divide-border">
+            {group.entries.map((e) => (
+              <div key={e.id} className="p-4">
+                <EntryCard
+                  title={e.title}
+                  category={e.category}
+                  description={e.description}
+                  clientName={e.clientName}
+                  workDate={new Date(e.workDate)}
+                  durationMinutes={e.durationMinutes}
+                  status={e.status as "PENDING"}
+                  workType={e.workType}
+                  footer={
+                    <div className="space-y-3">
+                      <div className="flex flex-wrap gap-2">
+                        <ReviewActions entryId={e.id} />
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            editingEntryId === e.id ? cancelEdit() : openEdit(e)
+                          }
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          {editingEntryId === e.id ? "Atcelt" : "Labot"}
+                        </Button>
+                      </div>
+
+                      {editingEntryId === e.id && (
+                        <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-3">
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <div className="space-y-1.5">
+                              <Label
+                                htmlFor={`dur-${e.id}`}
+                                className="text-xs font-medium"
+                              >
+                                Laiks (min.)
+                              </Label>
+                              <Input
+                                id={`dur-${e.id}`}
+                                type="number"
+                                min={1}
+                                max={1440}
+                                value={editFields.durationMinutes}
+                                onChange={(ev) =>
+                                  setEditFields((f) => ({
+                                    ...f,
+                                    durationMinutes: ev.target.value,
+                                  }))
+                                }
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <Label
+                                htmlFor={`client-${e.id}`}
+                                className="text-xs font-medium"
+                              >
+                                Klients / uzņēmums
+                              </Label>
+                              <Input
+                                id={`client-${e.id}`}
+                                value={editFields.clientName}
+                                onChange={(ev) =>
+                                  setEditFields((f) => ({
+                                    ...f,
+                                    clientName: ev.target.value,
+                                  }))
+                                }
+                                placeholder="Nav norādīts"
+                                className="h-8 text-sm"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-1.5">
+                            <Label
+                              htmlFor={`cat-${e.id}`}
+                              className="text-xs font-medium"
+                            >
+                              Kategorija
+                            </Label>
+                            <Input
+                              id={`cat-${e.id}`}
+                              value={editFields.category}
+                              onChange={(ev) =>
+                                setEditFields((f) => ({
+                                  ...f,
+                                  category: ev.target.value,
+                                }))
+                              }
+                              className="h-8 text-sm"
+                            />
+                          </div>
+                          {editError && (
+                            <p className="text-xs text-destructive">{editError}</p>
+                          )}
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={saveEdit}
+                              disabled={isSaving}
+                            >
+                              {isSaving ? "Saglabā..." : "Saglabāt"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={cancelEdit}
+                              disabled={isSaving}
+                            >
+                              Atcelt
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  }
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function PendingEntriesList({ entries }: { entries: PendingEntry[] }) {
   if (entries.length === 0) {
     return (
       <EmptyState
@@ -69,165 +348,13 @@ export function PendingEntriesList({ entries }: { entries: PendingEntry[] }) {
     );
   }
 
+  const groups = groupByEmployee(entries);
+
   return (
-    <div>
-      {/* Toolbar */}
-      <div className="flex items-center gap-4 mb-3 px-1">
-        <label className="flex items-center gap-2.5 cursor-pointer select-none group">
-          <input type="checkbox" checked={allSelected} onChange={toggleAll} className="sr-only" />
-          <div className={cn(
-            "h-[18px] w-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all duration-150 shrink-0",
-            allSelected
-              ? "bg-emerald-500 border-emerald-500"
-              : "border-muted-foreground/30 bg-background group-hover:border-muted-foreground/60"
-          )}>
-            {allSelected && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
-          </div>
-          <span className="text-xs text-muted-foreground">
-            {allSelected ? "Noņemt atlasi" : "Atlasīt visus"}
-          </span>
-        </label>
-        {selected.size > 0 && (
-          <span className="text-xs text-muted-foreground">
-            {selected.size} no {entries.length} atlasīti
-          </span>
-        )}
-      </div>
-
-      <div className="grid gap-4">
-        {entries.map((e) => (
-          <div
-            key={e.id}
-            className={cn(
-              "relative transition-colors duration-150 rounded-xl",
-              selected.has(e.id) ? "bg-emerald-500/[0.06]" : ""
-            )}
-          >
-            {/* Custom checkbox */}
-            <label className="absolute top-[18px] left-5 z-10 cursor-pointer group">
-              <input
-                type="checkbox"
-                checked={selected.has(e.id)}
-                onChange={() => toggle(e.id)}
-                className="sr-only"
-              />
-              <div className={cn(
-                "h-[18px] w-[18px] rounded-[5px] border-2 flex items-center justify-center transition-all duration-150 shadow-sm",
-                selected.has(e.id)
-                  ? "bg-emerald-500 border-emerald-500"
-                  : "border-muted-foreground/25 bg-background group-hover:border-muted-foreground/50"
-              )}>
-                {selected.has(e.id) && <Check className="h-3 w-3 text-white" strokeWidth={3} />}
-              </div>
-            </label>
-            <div className="pl-11">
-              <EntryCard
-                title={e.title}
-                category={e.category}
-                description={e.description}
-                workDate={new Date(e.workDate)}
-                durationMinutes={e.durationMinutes}
-                status={e.status as "PENDING"}
-                employeeName={e.employeeName}
-                workType={e.workType}
-                footer={<ReviewActions entryId={e.id} />}
-              />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Floating bulk action bar */}
-      {selected.size > 0 && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-full max-w-lg px-4 pointer-events-none">
-          <div className="rounded-2xl border border-border bg-background/95 backdrop-blur-md shadow-2xl p-4 pointer-events-auto">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold">
-                {selected.size} {selected.size === 1 ? "ieraksts" : "ieraksti"} atlasīti
-              </span>
-              <button
-                onClick={clearSelection}
-                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Atcelt
-              </button>
-            </div>
-
-            {bulkMode === "idle" ? (
-              <div className="flex gap-2">
-                <Button
-                  size="sm"
-                  variant="success"
-                  className="flex-1"
-                  onClick={() => bulkAct("APPROVE")}
-                  disabled={isPending}
-                >
-                  <CheckCircle2 className="h-3.5 w-3.5 mr-1.5" />
-                  Apstiprināt
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setBulkMode("return")}
-                  disabled={isPending}
-                >
-                  <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                  Nosūtīt atpakaļ
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  className="flex-1"
-                  onClick={() => setBulkMode("reject")}
-                  disabled={isPending}
-                >
-                  <XCircle className="h-3.5 w-3.5 mr-1.5" />
-                  Noraidīt
-                </Button>
-              </div>
-            ) : (
-              <div className="space-y-2">
-                <Textarea
-                  value={comment}
-                  onChange={(ev) => setComment(ev.target.value)}
-                  placeholder={
-                    bulkMode === "return"
-                      ? "Pastāstiet, ko būtu vērts papildināt vai precizēt."
-                      : "Pamatojiet, kāpēc ieraksti tiek noraidīti."
-                  }
-                  className="text-sm resize-none"
-                  rows={2}
-                />
-                {error && <div className="text-xs text-destructive">{error}</div>}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant={bulkMode === "return" ? "default" : "destructive"}
-                    disabled={isPending || comment.trim().length < 3}
-                    onClick={() => bulkAct(bulkMode === "return" ? "RETURN" : "REJECT")}
-                    className="flex-1"
-                  >
-                    {isPending
-                      ? "Saglabā..."
-                      : bulkMode === "return"
-                      ? "Nosūtīt atpakaļ visiem"
-                      : "Noraidīt visus"}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => { setBulkMode("idle"); setComment(""); setError(null); }}
-                    disabled={isPending}
-                  >
-                    Atcelt
-                  </Button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+    <div className="space-y-3">
+      {groups.map((group) => (
+        <GroupCard key={group.employeeId} group={group} />
+      ))}
     </div>
   );
 }

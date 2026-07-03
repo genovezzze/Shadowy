@@ -101,6 +101,7 @@ export default async function EmployeeHistoryPage({
               title={e.title}
               category={e.category}
               description={e.description}
+              clientName={e.clientName}
               workDate={e.workDate}
               durationMinutes={e.durationMinutes}
               status={e.status}

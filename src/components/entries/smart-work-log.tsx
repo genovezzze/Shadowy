@@ -155,8 +155,25 @@ export function SmartWorkLog() {
       !navigator.mediaDevices?.getUserMedia ||
       !window.MediaRecorder
     ) {
-      setError("Šī pārlūkprogramma neatbalsta balss ierakstīšanu.");
+      if (typeof window !== "undefined" && !window.isSecureContext) {
+        setError("Balss ierakstīšana darbojas tikai ar drošu savienojumu (HTTPS).");
+      } else {
+        setError("Šī pārlūkprogramma neatbalsta balss ierakstīšanu.");
+      }
       return;
+    }
+
+    // Pre-check permission state so we can give actionable guidance
+    try {
+      const permStatus = await navigator.permissions.query({ name: "microphone" as PermissionName });
+      if (permStatus.state === "denied") {
+        setError(
+          "Mikrofons ir bloķēts šai vietnei. Noklikšķini uz slēdzenes ikonas adreses joslā → Vietnes iestatījumi → Mikrofons → Atļaut, tad atjauno lapu."
+        );
+        return;
+      }
+    } catch {
+      // permissions API not supported — fall through to getUserMedia
     }
 
     try {
@@ -209,12 +226,19 @@ export function SmartWorkLog() {
     } catch (recordingError) {
       stopMediaTracks();
       setRecording(false);
-      setError(
-        recordingError instanceof DOMException &&
-          recordingError.name === "NotAllowedError"
-          ? "Lai ierunātu aprakstu, atļauj pārlūkprogrammai izmantot mikrofonu."
-          : "Neizdevās sākt audio ierakstu. Lūdzu, mēģini vēlreiz."
-      );
+      if (recordingError instanceof DOMException) {
+        if (recordingError.name === "NotAllowedError") {
+          setError(
+            "Pārlūkprogramma liedza piekļuvi mikrofonam. Noklikšķini uz slēdzenes ikonas adreses joslā → Vietnes iestatījumi → Mikrofons → Atļaut, tad atjauno lapu."
+          );
+        } else if (recordingError.name === "NotFoundError") {
+          setError("Mikrofons nav atrasts. Pārliec, ka ierīcei ir pievienots mikrofons.");
+        } else {
+          setError("Neizdevās sākt audio ierakstu. Lūdzu, mēģini vēlreiz.");
+        }
+      } else {
+        setError("Neizdevās sākt audio ierakstu. Lūdzu, mēģini vēlreiz.");
+      }
     }
   }
 
@@ -282,8 +306,8 @@ export function SmartWorkLog() {
         parsed.data.tickets.map((ticket, index) => ({
           ...ticket,
           id: `${Date.now()}-${index}`,
-          workDate: today,
-          confirmed: false,
+          workDate: ticket.work_date ?? today,
+          confirmed: ticket.estimated_time_minutes !== null,
           editing: false,
         }))
       );
@@ -301,14 +325,18 @@ export function SmartWorkLog() {
   function confirmTicket(ticket: ReviewTicket) {
     if (ticket.estimated_time_minutes === null) {
       updateTicket(ticket.id, { editing: true });
-      setError("Pirms apstiprināšanas precizē aptuveno laiku.");
+      setError("Pirms iekļaušanas precizē aptuveno laiku.");
       return;
     }
-    setError(null);
-    updateTicket(ticket.id, {
-      confirmed: !ticket.confirmed,
-      editing: false,
-    });
+    const newConfirmed = !ticket.confirmed;
+    if (newConfirmed && ticket.client_name === null) {
+      setError(
+        "Ieteicams norādīt klientu/uzņēmumu — tas ļauj analizēt laiku pa klientiem. Vari iekļaut arī bez klienta."
+      );
+    } else {
+      setError(null);
+    }
+    updateTicket(ticket.id, { confirmed: newConfirmed, editing: false });
   }
 
   function saveConfirmed() {
@@ -324,6 +352,8 @@ export function SmartWorkLog() {
         title: ticket.title,
         category: ticket.category,
         description: ticket.description,
+        work_date: ticket.work_date,
+        client_name: ticket.client_name,
         estimated_time_minutes: ticket.estimated_time_minutes!,
         is_outside_role: ticket.is_outside_role,
         role_relation: ticket.role_relation,
@@ -334,7 +364,7 @@ export function SmartWorkLog() {
       }));
 
     if (confirmedTickets.length === 0) {
-      setError("Apstiprini vismaz vienu ierakstu.");
+      setError("Iekļauj vismaz vienu ierakstu.");
       return;
     }
 
@@ -435,7 +465,7 @@ export function SmartWorkLog() {
               </p>
             </div>
             <Badge variant={confirmedCount > 0 ? "success" : "muted"}>
-              Apstiprināti {confirmedCount} no {tickets.length}
+              Iekļauti {confirmedCount} no {tickets.length}
             </Badge>
           </div>
 
@@ -455,7 +485,7 @@ export function SmartWorkLog() {
                     {ticket.confirmed ? (
                       <Badge variant="success">
                         <Check className="mr-1 h-3 w-3" />
-                        Apstiprināts
+                        Iekļauts
                       </Badge>
                     ) : null}
                     {ticket.estimated_time_minutes === null ? (
@@ -468,6 +498,11 @@ export function SmartWorkLog() {
                       <Badge variant="warning">
                         <AlertTriangle className="mr-1 h-3 w-3" />
                         Nepieciešama pārbaude
+                      </Badge>
+                    ) : null}
+                    {!ticket.client_name ? (
+                      <Badge variant="outline" className="border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400">
+                        Norādīt klientu
                       </Badge>
                     ) : null}
                   </div>
@@ -547,6 +582,23 @@ export function SmartWorkLog() {
                       </div>
 
                       <div className="grid gap-2">
+                        <Label htmlFor={`client-${ticket.id}`}>
+                          Klients / uzņēmums
+                        </Label>
+                        <Input
+                          id={`client-${ticket.id}`}
+                          value={ticket.client_name ?? ""}
+                          maxLength={120}
+                          placeholder="Nav norādīts"
+                          onChange={(event) =>
+                            updateTicket(ticket.id, {
+                              client_name: event.target.value || null,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <div className="grid gap-2">
                         <Label htmlFor={`description-${ticket.id}`}>
                           Apraksts
                         </Label>
@@ -608,6 +660,9 @@ export function SmartWorkLog() {
                             : "Laiks nav norādīts"}
                         </span>
                         <span>{roleLabel(ticket.is_outside_role)}</span>
+                        {ticket.client_name ? (
+                          <span>Klients: {ticket.client_name}</span>
+                        ) : null}
                         <span>
                           Pārliecības līmenis{" "}
                           {Math.round(ticket.confidence_score * 100)}%
@@ -664,11 +719,11 @@ export function SmartWorkLog() {
                       onClick={() => confirmTicket(ticket)}
                     >
                       {ticket.confirmed ? (
-                        "Atcelt apstiprinājumu"
+                        "Neiekļaut"
                       ) : (
                         <>
                           <Check className="h-3.5 w-3.5" />
-                          Apstiprināt
+                          Iekļaut
                         </>
                       )}
                     </Button>
@@ -682,7 +737,7 @@ export function SmartWorkLog() {
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
               <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
               <span>
-                Datubāzē tiks saglabāti tikai tavi apstiprinātie ieraksti.
+                Ar vienu pogu tiks saglabāti visi iekļautie ieraksti.
               </span>
             </div>
             <Button
@@ -697,7 +752,7 @@ export function SmartWorkLog() {
               )}
               {saving
                 ? "Saglabā ierakstus..."
-                : "Saglabāt apstiprinātos ierakstus"}
+                : "Saglabāt visus iekļautos ierakstus"}
             </Button>
           </div>
         </section>

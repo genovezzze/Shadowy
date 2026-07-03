@@ -141,15 +141,15 @@ export function VercelV0Chat({
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-4xl flex-col items-center px-1 font-accent sm:px-4",
+        "mx-auto flex w-full max-w-4xl flex-col items-center px-4 font-accent sm:px-6",
         compact ? "space-y-5" : "space-y-8"
       )}
     >
-      <div className="text-center">
-        <h1 className="text-balance text-3xl font-bold leading-[1.05] tracking-[0.015em] text-foreground [font-synthesis:weight] sm:text-4xl lg:text-[42px]">
+      <div className="w-full text-center">
+        <h1 className="text-balance text-2xl font-bold leading-[1.1] tracking-[0.015em] text-foreground [font-synthesis:weight] sm:text-4xl lg:text-[42px]">
           Pastāsti, kas šodien aizņēma papildu laiku
         </h1>
-        <p className="mx-auto mt-4 whitespace-nowrap text-base font-light leading-7 tracking-[0.01em] text-muted-foreground sm:text-xl">
+        <p className="mx-auto mt-3 max-w-md text-sm font-light leading-6 tracking-[0.01em] text-muted-foreground sm:mt-4 sm:text-xl sm:max-w-none sm:leading-7">
           Apraksti situāciju saviem vārdiem vai ierunā to. Shadowy izveidos
           melnraksta ierakstus pārskatīšanai
         </p>
@@ -268,9 +268,13 @@ export function VercelV0Chat({
                 </button>
               ))}
             </div>
-            <p className="mt-5 text-center text-sm font-light tracking-[0.01em] text-muted-foreground">
-              Ieraksts tiks saglabāts tikai pēc tavas apstiprināšanas
-            </p>
+            <div className="mt-5 space-y-1 text-center text-sm font-light tracking-[0.01em] text-muted-foreground">
+              <p>Ieraksti tiek sagatavoti vienā reizē un saglabāti ar vienu pogu</p>
+              <p>
+                Fiksē tikai darba laiku un darba uzdevumus - privātā dzīve
+                netiek analizēta
+              </p>
+            </div>
           </>
         ) : null}
       </div>

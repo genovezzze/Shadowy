@@ -57,6 +57,7 @@ model Organization {
   users            User[]
   entries          InvisibleWorkEntry[]
   categories       Category[]
+  clients          Client[]
   workRoles        WorkRole[]
   recognitionRules RecognitionRule[]
   bonusRequests    BonusRequest[]
@@ -146,6 +147,7 @@ model InvisibleWorkEntry {
   title           String
   category        String
   description     String
+  clientName      String?      @db.VarChar(120)
   workDate        DateTime
   durationMinutes Int
 
@@ -203,6 +205,21 @@ model PasswordResetToken {
   createdAt DateTime  @default(now())
 
   @@index([userId])
+}
+
+model Client {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name                String  @db.VarChar(120)
+  freeMinutesPerMonth Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, name])
+  @@index([organizationId])
 }
 
 model Category {

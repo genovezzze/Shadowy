@@ -70,6 +70,7 @@ export default async function ManagerEmployeeDetail({
               title={e.title}
               category={e.category}
               description={e.description}
+              clientName={e.clientName}
               workDate={e.workDate}
               durationMinutes={e.durationMinutes}
               status={e.status}

@@ -104,6 +104,16 @@ export function EntryForm({ categories }: EntryFormProps) {
           </div>
 
           <div className="grid gap-2">
+            <Label htmlFor="clientName">Klients / uzņēmums</Label>
+            <Input
+              id="clientName"
+              name="clientName"
+              maxLength={120}
+              placeholder="Neobligāti"
+            />
+          </div>
+
+          <div className="grid gap-2">
             <Label htmlFor="durationMinutes">Ilgums (minūtēs)</Label>
             <Input
               id="durationMinutes"

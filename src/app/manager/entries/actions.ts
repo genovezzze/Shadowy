@@ -90,6 +90,45 @@ export async function reviewEntry(input: {
   return { ok: true as const };
 }
 
+const editSchema = z.object({
+  entryId: z.string().min(1),
+  durationMinutes: z.number().int().min(1).max(1440),
+  clientName: z.string().trim().max(120).nullable(),
+  category: z.string().trim().min(1).max(100),
+});
+
+export async function editEntry(input: {
+  entryId: string;
+  durationMinutes: number;
+  clientName: string | null;
+  category: string;
+}) {
+  const session = await requireUser(["MANAGER"]);
+  const parsed = editSchema.safeParse(input);
+  if (!parsed.success) return { ok: false as const, error: "Nederīgi dati." };
+
+  const { entryId, durationMinutes, clientName, category } = parsed.data;
+
+  const exists = await prisma.invisibleWorkEntry.findFirst({
+    where: {
+      id: entryId,
+      organizationId: session.organizationId,
+      managerId: session.userId,
+      status: "PENDING",
+    },
+  });
+  if (!exists) return { ok: false as const, error: "Ieraksts nav atrasts vai nav rediģējams." };
+
+  await prisma.invisibleWorkEntry.update({
+    where: { id: entryId },
+    data: { durationMinutes, clientName: clientName || null, category },
+  });
+
+  revalidatePath("/manager/entries");
+  revalidatePath("/manager/dashboard");
+  return { ok: true as const };
+}
+
 const bulkSchema = z.object({
   entryIds: z.array(z.string().min(1)).min(1).max(200),
   action: z.enum(["APPROVE", "REJECT", "RETURN"]),

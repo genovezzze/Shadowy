@@ -14,6 +14,7 @@ const schema = z.object({
     .string()
     .min(10, "Lūdzu, aprakstiet vismaz dažus teikumus.")
     .max(2000),
+  clientName: z.string().trim().max(120).optional(),
   workDate: z.coerce.date(),
   durationMinutes: z.coerce
     .number()
@@ -29,6 +30,7 @@ export async function createEntry(formData: FormData) {
     title: formData.get("title"),
     category: formData.get("category"),
     description: formData.get("description"),
+    clientName: formData.get("clientName"),
     workDate: formData.get("workDate"),
     durationMinutes: formData.get("durationMinutes"),
   });
@@ -51,6 +53,7 @@ export async function createEntry(formData: FormData) {
       title: entryTitle,
       category: parsed.data.category,
       description: parsed.data.description.trim(),
+      clientName: parsed.data.clientName || null,
       workDate: parsed.data.workDate,
       durationMinutes: parsed.data.durationMinutes,
       status: "PENDING",

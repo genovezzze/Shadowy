@@ -120,6 +120,7 @@ export default async function ManagerReportPage({
         id: true,
         title: true,
         category: true,
+        clientName: true,
         durationMinutes: true,
         status: true,
         createdAt: true,
@@ -202,6 +203,28 @@ export default async function ManagerReportPage({
 
   // Total approved hours
   const totalHours = Math.round((approved.reduce((s, e) => s + e.durationMinutes, 0) / 60) * 10) / 10;
+
+  // Client hours breakdown
+  const clientMap = new Map<string, number>();
+  for (const e of approved) {
+    if (e.clientName) {
+      clientMap.set(e.clientName, (clientMap.get(e.clientName) ?? 0) + e.durationMinutes);
+    }
+  }
+  const clientData = Array.from(clientMap.entries())
+    .map(([name, minutes]) => ({ name, hours: Math.round((minutes / 60) * 10) / 10 }))
+    .sort((a, b) => b.hours - a.hours);
+
+  // Hidden cost: approved extra hours (work outside role)
+  let extraMinutes = 0;
+  for (const e of approved) {
+    const emp = teamUsers.find((u) => u.id === e.employeeId);
+    const duties = emp?.workRole?.duties.map((d) => d.text) ?? [];
+    if (classifyWorkType(e.category, e.title, duties) === "extra") {
+      extraMinutes += e.durationMinutes;
+    }
+  }
+  const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
 
   const recommendations = generateRecommendations({
     teamAvgHours, overloaded, extraPct, noRolePct, avgReviewDays, zeroEntryCount, topCategory, topCategoryPct,
@@ -399,6 +422,62 @@ export default async function ManagerReportPage({
                 );
               })}
             </div>
+          </div>
+        </section>
+      )}
+
+      {/* Client hours */}
+      {clientData.length > 0 && (
+        <section className="mb-8">
+          <h2 className="text-base font-semibold mb-3">Stundas pa klientiem</h2>
+          <div className="rounded-xl border border-border overflow-hidden print:border-gray-200">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-border bg-muted/30 print:bg-gray-50">
+                  <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground">#</th>
+                  <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground">Klients / uzņēmums</th>
+                  <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">Apst. stundas</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border print:divide-gray-100">
+                {clientData.map((c, i) => (
+                  <tr key={i} className="hover:bg-muted/20 transition-colors print:hover:bg-transparent">
+                    <td className="px-5 py-3 text-muted-foreground">{i + 1}</td>
+                    <td className="px-5 py-3 font-medium">{c.name}</td>
+                    <td className="px-5 py-3 text-right tabular-nums font-semibold">{c.hours}h</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
+      {/* Hidden cost estimate */}
+      {extraHours > 0 && (
+        <section className="mb-8">
+          <h2 className="text-base font-semibold mb-3">Neredzamā darba novērtējums</h2>
+          <div className="rounded-xl border border-border bg-card p-5 print:border-gray-200">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Papildu darba stundas</div>
+                <div className="text-2xl font-bold tabular-nums">{extraHours}h</div>
+                <div className="text-xs text-muted-foreground mt-0.5">ārpus oficiālās lomas</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">Novērtētā vērtība (€15/h)</div>
+                <div className="text-2xl font-bold tabular-nums">€{Math.round(extraHours * 15)}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">neformalizēts ieguldījums</div>
+              </div>
+              <div>
+                <div className="text-xs text-muted-foreground mb-1">No apstiprinātajiem</div>
+                <div className="text-2xl font-bold tabular-nums">{extraPct}%</div>
+                <div className="text-xs text-muted-foreground mt-0.5">ir papildu darbs</div>
+              </div>
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground border-t border-border pt-3 print:text-gray-400">
+              Novērtējums balstīts uz €15/h likmi. Mainiet likmi atbilstoši jūsu komandas faktiskajām izmaksām.
+            </p>
           </div>
         </section>
       )}

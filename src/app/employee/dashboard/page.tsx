@@ -258,6 +258,7 @@ export default async function EmployeeDashboard() {
               title={e.title}
               category={e.category}
               description={e.description}
+              clientName={e.clientName}
               workDate={e.workDate}
               durationMinutes={e.durationMinutes}
               status={e.status}
