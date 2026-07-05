@@ -202,7 +202,7 @@ export function NotificationBell({
                         </span>
                       </div>
                       {item.body && (
-                        <span className="mt-0.5 block truncate text-xs text-muted-foreground">{item.body}</span>
+                        <span className="mt-0.5 block text-xs text-muted-foreground line-clamp-2">{item.body}</span>
                       )}
                     </div>
                   </div>

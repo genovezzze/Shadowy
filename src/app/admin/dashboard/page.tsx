@@ -10,6 +10,8 @@ import { FileText, UserCog, Users, Clock, Timer, TrendingUp } from "lucide-react
 import { GettingStarted } from "@/components/dashboard/getting-started";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { SectionDivider } from "@/components/dashboard/section-divider";
+import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
+import { resolveWorkType } from "@/lib/work-type";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -47,7 +49,7 @@ export default async function AdminDashboard({
 
   const twelveMonthsAgo = new Date(Date.now() - 365 * 86400000);
 
-  const [managers, employees, totalEntries, pending, recent, allEntries, managerList] =
+  const [managers, employees, totalEntries, pending, recent, allEntries, managerList, approvedEntries] =
     await Promise.all([
       prisma.user.count({ where: { organizationId: orgId, role: "MANAGER" } }),
       prisma.user.count({ where: { organizationId: orgId, role: "EMPLOYEE" } }),
@@ -76,7 +78,33 @@ export default async function AdminDashboard({
         },
         orderBy: { name: "asc" },
       }),
+      prisma.invisibleWorkEntry.findMany({
+        where: {
+          organizationId: orgId,
+          status: "APPROVED",
+          ...(periodFilter ? { workDate: periodFilter } : {}),
+        },
+        select: {
+          durationMinutes: true,
+          isOutsideRole: true,
+          category: true,
+          title: true,
+          employee: {
+            select: {
+              workRole: { select: { duties: { select: { text: true } } } },
+            },
+          },
+        },
+      }),
     ]);
+
+  let extraMinutes = 0;
+  for (const e of approvedEntries) {
+    const duties = e.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
+    if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
+      extraMinutes += e.durationMinutes;
+    }
+  }
 
   // Per-manager stats
   const managerStats = await Promise.all(
@@ -157,6 +185,8 @@ export default async function AdminDashboard({
           icon={<Clock className="h-5 w-5" />}
         />
       </div>
+
+      <CostCalculatorWidget extraMinutes={extraMinutes} />
 
       {/* ── Section divider ── */}
       <SectionDivider label="Aktivitāte" />

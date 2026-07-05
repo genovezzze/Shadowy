@@ -20,7 +20,6 @@ import {
   UserCircle,
   BarChart2,
   Building2,
-  ArrowLeft,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -57,10 +56,10 @@ const ADMIN_ONLY_NAV: NavItem[] = [
 ];
 
 const ADMIN_MANAGER_NAV: NavItem[] = [
-  { href: "/manager/roles", label: "Lomas", icon: Briefcase },
-  { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift },
-  { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },
-  { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText },
+  { href: "/admin/lomas", label: "Lomas", icon: Briefcase },
+  { href: "/admin/atzinibas", label: "Atzinības noteikumi", icon: Gift },
+  { href: "/admin/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },
+  { href: "/admin/komandas-ieraksti", label: "Komandas ieraksti", icon: FileText },
 ];
 
 const MANAGER_NAV: NavItem[] = [
@@ -92,7 +91,7 @@ const EMPLOYEE_NAV: NavItem[] = [
 function NavLink({ item, pathname, pendingCount, onClose }: { item: NavItem; pathname: string; pendingCount?: number; onClose?: () => void }) {
   const active = pathname === item.href || pathname.startsWith(item.href + "/");
   const Icon = item.icon;
-  const showBadge = item.href === "/manager/entries" && (pendingCount ?? 0) > 0;
+  const showBadge = (item.href === "/manager/entries" || item.href === "/admin/komandas-ieraksti") && (pendingCount ?? 0) > 0;
 
   return (
     <Link
@@ -145,14 +144,9 @@ interface SidebarProps {
 
 export function Sidebar({ role, userName, organizationName, pendingCount, unreadNotificationCount, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const isAdminOnManagerRoutes = role === "ADMIN" && pathname.startsWith("/manager");
   const isAdmin = role === "ADMIN";
-
-  const mainItems = isAdminOnManagerRoutes
-    ? [{ href: "/admin/dashboard", label: "Atpakaļ uz administrāciju", icon: ArrowLeft }, ...MANAGER_NAV.filter((i) => i.href !== "/manager/profile")]
-    : isAdmin ? ADMIN_ONLY_NAV : navFor(role);
-
-  const managerItems = isAdmin && !isAdminOnManagerRoutes ? ADMIN_MANAGER_NAV : [];
+  const mainItems = isAdmin ? ADMIN_ONLY_NAV : navFor(role);
+  const managerItems = isAdmin ? ADMIN_MANAGER_NAV : [];
 
   return (
     <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar font-accent backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"

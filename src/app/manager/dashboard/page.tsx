@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { SectionDivider } from "@/components/dashboard/section-divider";
+import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import {
@@ -109,7 +110,6 @@ export default async function ManagerDashboard({
 
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
-  const extraValue = Math.round(extraHours * HOURLY_RATE_EUR);
 
   // Client rows with limit comparison
   const clientRows = clients.map((c) => {
@@ -167,7 +167,7 @@ export default async function ManagerDashboard({
         {[
           { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā" },
           { label: "Kopā stundas", value: `${totalHours}h`, icon: Clock, sub: "ierakstītas" },
-          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: `~€${extraValue}` },
+          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts darbs" },
           { label: "Gaida apstiprinājumu", value: pendingCount, icon: AlertTriangle, sub: "manuāli ieraksti" },
         ].map((k, i) => (
           <Card key={i} className="p-4">
@@ -180,6 +180,8 @@ export default async function ManagerDashboard({
           </Card>
         ))}
       </div>
+
+      <CostCalculatorWidget extraMinutes={extraMinutes} />
 
       {/* Client table */}
       <SectionDivider label="Klienti" />
