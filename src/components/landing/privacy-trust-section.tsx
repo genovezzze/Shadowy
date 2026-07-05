@@ -2,12 +2,13 @@
 
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
+import { EtheralShadow } from "@/components/ui/etheral-shadow";
 
 const visibleItems = [
   "Apstiprinātus ierakstus",
   "Kopējo darba slodzi",
-  "Lomu neatbilstības",
-  "Komandas tendences",
+  "Atkārtojošās problēmas",
+  "Kur rodas lieka slodze",
 ] as const;
 
 const hiddenItems = [
@@ -22,8 +23,25 @@ export function PrivacyTrustSection() {
     <section
       id="privatums"
       aria-labelledby="privacy-trust-heading"
-      className="relative mx-0 overflow-hidden border-y border-white/[0.07] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:border sm:py-20 md:py-24 lg:mx-7"
+      className="relative overflow-hidden bg-[#07090c] py-14 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:border sm:border-white/[0.07] sm:py-20 md:py-24 lg:mx-7"
     >
+      {/* Mobile top fade */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-[#07090c] to-transparent sm:hidden" />
+      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute inset-y-0 -left-48 -right-48"
+          animate={{ x: [0, 200, 0] }}
+          transition={{ duration: 90, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <EtheralShadow
+            color="rgba(90, 90, 98, 1)"
+            animation={{ scale: 50, speed: 40 }}
+            noise={{ opacity: 0, scale: 1 }}
+            sizing="fill"
+            style={{ opacity: 0.38 }}
+          />
+        </motion.div>
+      </div>
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-30"
@@ -43,20 +61,20 @@ export function PrivacyTrustSection() {
             id="privacy-trust-heading"
             className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.8)_68%,rgba(100,116,139,.58)_100%)] bg-clip-text font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-transparent [font-synthesis:weight] sm:text-[clamp(2.4rem,4vw,3.75rem)] lg:whitespace-nowrap"
           >
-            Nav uzraudzība.
+            Nav kontroles rīks.
             <span className="mt-1 block lg:ml-2 lg:mt-0 lg:inline">
-              Tikai redzams ieguldījums
+              Tas ir par procesu uzlabošanu
             </span>
           </h2>
 
-          <p className="mx-auto mt-6 max-w-3xl font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/68 sm:text-lg">
-            Shadowy{" "}
+          <p className="mx-auto mt-6 max-w-4xl font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/68 sm:text-lg">
+            Shadowy neskatās, cik ilgi cilvēks sēž pie datora.{" "}
             <strong className="font-bold text-white/82 [font-synthesis:weight]">
-              neseko privātām sarunām, ekrāna aktivitātei vai katram klikšķim
-            </strong>
-            . Platforma balstās uz{" "}
+              Mēs nesekojam katrai darbībai un neveidojam darbinieku reitingu.
+            </strong>{" "}
+            Shadowy palīdz saprast, kur darba procesā rodas{" "}
             <strong className="font-bold text-white/82 [font-synthesis:weight]">
-              darbinieku iesniegtiem un vadītāja apstiprinātiem ierakstiem
+              slēptā slodze, lieki pārtraukumi un neefektivitāte
             </strong>
           </p>
         </header>
@@ -138,7 +156,7 @@ export function PrivacyTrustSection() {
           <div className="flex items-center gap-3 text-emerald-200">
             <ShieldCheck className="size-5 shrink-0" aria-hidden />
             <p className="font-accent text-sm font-medium tracking-[0.012em] sm:text-base">
-              Darbinieks pats kontrolē, ko iesniedz
+              Darbinieks pats kontrolē, ko iesniedz un ko apstiprina
             </p>
           </div>
           <p className="text-center text-xs font-medium tracking-[0.01em] text-white/35 sm:text-right">

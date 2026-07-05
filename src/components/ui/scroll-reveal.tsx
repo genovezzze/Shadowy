@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useReducedMotion } from "framer-motion";
-import type { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 
 type ScrollRevealProps = {
   children: ReactNode;
@@ -9,7 +9,17 @@ type ScrollRevealProps = {
   duration?: number;
   className?: string;
   effect?: "rise" | "focus" | "unfold" | "zoom" | "blur" | "tilt" | "fade";
+  disableOnMobile?: boolean;
 };
+
+const visibleState = {
+  opacity: 1,
+  x: 0,
+  y: 0,
+  scale: 1,
+  rotateX: 0,
+  filter: "blur(0px)",
+} as const;
 
 export function ScrollReveal({
   children,
@@ -17,8 +27,18 @@ export function ScrollReveal({
   duration = 0.72,
   className,
   effect = "rise",
+  disableOnMobile = false,
 }: ScrollRevealProps) {
   const reduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useLayoutEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 640);
+    check();
+    window.addEventListener("resize", check, { passive: true });
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
   const hiddenStates = {
     rise: { opacity: 0, y: 52 },
     focus: { opacity: 0, y: 20, scale: 0.975, filter: "blur(12px)" },
@@ -29,26 +49,19 @@ export function ScrollReveal({
     fade: { opacity: 0 },
   } as const;
 
+  const skipAnimation = reduceMotion || (disableOnMobile && isMobile);
+
   return (
     <motion.div
       className={className}
-      initial={reduceMotion ? false : hiddenStates[effect]}
-      whileInView={
-        reduceMotion
-          ? undefined
-          : {
-              opacity: 1,
-              x: 0,
-              y: 0,
-              scale: 1,
-              rotateX: 0,
-              filter: "blur(0px)",
-            }
-      }
-      viewport={{ once: false, amount: 0.08 }}
+      initial={skipAnimation ? false : hiddenStates[effect]}
+      // When mobile detected after mount, force-snap to visible instantly
+      animate={disableOnMobile && isMobile ? visibleState : undefined}
+      whileInView={skipAnimation ? undefined : visibleState}
+      viewport={skipAnimation ? undefined : { once: false, amount: 0.08 }}
       transition={{
-        duration,
-        delay,
+        duration: disableOnMobile && isMobile ? 0 : duration,
+        delay: disableOnMobile && isMobile ? 0 : delay,
         ease: [0.22, 1, 0.36, 1],
       }}
     >

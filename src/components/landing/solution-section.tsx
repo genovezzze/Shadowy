@@ -8,46 +8,47 @@ import { EmphasizedText } from "@/components/landing/emphasized-text";
 const solutionCards = [
   {
     number: "01",
-    title: "Darbinieks fiksē ieguldījumu",
+    title: "Darbinieks apraksta situāciju",
     description:
-      "Darbinieks pievieno īsu ierakstu par darbu, kas bieži paliek ārpus formālajiem uzdevumiem",
+      "Darbinieks apraksta saviem vārdiem vai ierunā, kas šodien traucēja pabeigt pamatdarbu vai bija ārpus viņa lomas",
     examples: [
-      "Palīdzība kolēģim",
-      "Papildu komunikācija",
-      "Jauno darbinieku ievadīšana",
+      "Palīdzēju kolēģim",
+      "Gaidīju informāciju",
+      "Fokuss tika pārtraukts",
       "Darbs ārpus lomas",
     ],
   },
   {
     number: "02",
-    title: "Vadītājs redz kontekstu",
+    title: "AI izveido melnrakstu",
     description:
-      "Vadītājs var saprast, kur komandā notiek papildu slodze un kuri cilvēki regulāri palīdz citiem",
+      "Shadowy AI pats izveido strukturētus melnraksta ierakstus ar kategoriju, laiku un ietekmi uz darbu",
     examples: [
-      "Kas palīdz visbiežāk",
-      "Kur rodas slēptā slodze",
-      "Kāds darbs netiek pamanīts",
+      "Automātiska kategorija",
+      "Aptuvenais laiks",
+      "Bez garām formām",
     ],
   },
   {
     number: "03",
-    title: "Komanda saņem atzinību",
+    title: "Darbinieks apstiprina",
     description:
-      "Papildu ieguldījums kļūst redzams datos, tāpēc to ir vieglāk novērtēt, atzīt un ņemt vērā",
+      "AI neko nesaglabā automātiski - darbinieks pārskata melnrakstus, labo vai dzēš, tad apstiprina",
     examples: [
-      "Godīgāka atzinība",
-      "Labāka slodzes izpratne",
-      "Vairāk uzticības komandā",
+      "Pilna kontrole",
+      "30 sekundes dienā",
+      "Dati tikai pēc apstiprinājuma",
     ],
   },
 ] as const;
 
 const importantSolutionPhrases = [
-  "ārpus formālajiem uzdevumiem",
-  "papildu slodze",
-  "regulāri palīdz citiem",
-  "redzams datos",
-  "novērtēt, atzīt",
+  "saviem vārdiem",
+  "kas šodien traucēja",
+  "melnraksta ierakstus",
+  "Bez garām formām",
+  "neko nesaglabā automātiski",
+  "pilna kontrole",
 ] as const;
 
 export function SolutionSection() {
@@ -55,7 +56,7 @@ export function SolutionSection() {
     <section
       id="risinajums"
       aria-labelledby="solution-heading"
-      className="relative -mt-px mx-2 overflow-hidden rounded-t-none rounded-b-[24px] border border-white/[0.11] bg-[#07090c] py-16 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7 lg:mt-24"
+      className="relative overflow-hidden bg-[#07090c] py-14 scroll-mt-24 sm:mx-4 sm:mt-20 sm:rounded-[32px] sm:border sm:border-white/[0.11] sm:py-24 md:py-32 lg:mx-7 lg:mt-24"
     >
       <div
         aria-hidden
@@ -72,15 +73,15 @@ export function SolutionSection() {
       />
       <div
         aria-hidden
-        className="animate-solution-glow-a pointer-events-none absolute -left-52 top-1/4 size-[440px] rounded-full bg-emerald-500/[0.11] blur-[130px]"
+        className="animate-solution-glow-a pointer-events-none absolute -left-52 top-1/4 size-[440px] rounded-full bg-emerald-500/[0.11] blur-[130px] hidden sm:block"
       />
       <div
         aria-hidden
-        className="animate-solution-glow-b pointer-events-none absolute -right-48 bottom-0 size-[460px] rounded-full bg-blue-500/[0.11] blur-[140px]"
+        className="animate-solution-glow-b pointer-events-none absolute -right-48 bottom-0 size-[460px] rounded-full bg-blue-500/[0.11] blur-[140px] hidden sm:block"
       />
       <div
         aria-hidden
-        className="animate-solution-glow-c pointer-events-none absolute left-[42%] top-[18%] size-[280px] rounded-full bg-cyan-400/[0.055] blur-[110px]"
+        className="animate-solution-glow-c pointer-events-none absolute left-[42%] top-[18%] size-[280px] rounded-full bg-cyan-400/[0.055] blur-[110px] hidden sm:block"
       />
       <AnimatedDotSurface className="top-8 z-0 h-[500px] opacity-90" />
 
@@ -90,20 +91,18 @@ export function SolutionSection() {
             id="solution-heading"
             className="text-balance font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.25rem)] lg:whitespace-nowrap"
           >
-            Shadowy padara{" "}
+            Bez garām formām.{" "}
             <span className="bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
-              neredzamo darbu redzamu
+              Apraksti, kas traucēja pamatdarbam
             </span>
           </h2>
           <p className="mx-auto mt-5 max-w-4xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/75 sm:text-xl sm:leading-relaxed sm:text-white/85">
-            Darbinieki var vienkārši piefiksēt savu{" "}
-            <strong className="font-bold text-white/85 [font-synthesis:weight]">
-              papildu ieguldījumu
+            Darbinieks apraksta situāciju saviem vārdiem vai ierunā to
+            <br className="hidden sm:block" />
+            {" "}<strong className="font-bold text-white/85 [font-synthesis:weight]">
+              Shadowy AI pārvērš to strukturētos datos
             </strong>
-            , bet vadība redz ne tikai gala rezultātu, bet arī{" "}
-            <strong className="font-bold text-white/85 [font-synthesis:weight]">
-              darbu, kas palīdz komandai kustēties uz priekšu
-            </strong>
+            {" "}- darbinieks tikai pārskata un apstiprina
           </p>
         </header>
 

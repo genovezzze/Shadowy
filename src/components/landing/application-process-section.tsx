@@ -1,6 +1,8 @@
 "use client";
 
+import React from "react";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { EmphasizedText } from "@/components/landing/emphasized-text";
 
 const steps = [
@@ -59,57 +61,78 @@ export function ApplicationProcessSection() {
           >
             Kas notiek pēc pieteikuma?
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl font-accent text-base font-light leading-relaxed tracking-[0.015em] text-white/58 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-balance font-accent text-sm font-light leading-relaxed tracking-[0.015em] text-white/58 sm:text-lg">
             Precīzi soļi no pieteikuma iesniegšanas līdz pilota sākumam
           </p>
         </header>
 
         <motion.div
-          className="mt-9 grid gap-3 sm:mt-12 sm:grid-cols-2 sm:gap-4 lg:grid-cols-4"
+          className="mt-10 flex flex-col gap-3 sm:mt-14 lg:flex-row lg:items-stretch lg:gap-0"
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, amount: 0.12 }}
+          viewport={{ once: true, amount: 0.15 }}
           variants={{
             hidden: {},
-            visible: {
-              transition: {
-                staggerChildren: 0.12,
-              },
-            },
+            visible: { transition: { staggerChildren: 0.14 } },
           }}
         >
-          {steps.map((step) => {
-            return (
+          {steps.map((step, i) => (
+            <React.Fragment key={step.title}>
+              {/* Card */}
               <motion.article
-                key={step.title}
-                className="rounded-xl border border-white/[0.11] bg-white/[0.015] p-5 transition-colors duration-300 hover:border-white/[0.22] hover:bg-white/[0.025] sm:p-7"
+                className="group relative flex-1 overflow-hidden rounded-xl border border-white/[0.11] bg-white/[0.018] p-5 transition-colors duration-300 hover:border-white/[0.2] hover:bg-white/[0.03] sm:p-6"
                 variants={{
-                  hidden: { opacity: 0, y: 28, scale: 0.98 },
+                  hidden: { opacity: 0, y: 28 },
                   visible: {
                     opacity: 1,
                     y: 0,
-                    scale: 1,
-                    transition: {
-                      duration: 0.55,
-                      ease: [0.22, 1, 0.36, 1],
-                    },
+                    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
                   },
                 }}
-                whileHover={{ y: -6 }}
-                transition={{ duration: 0.22, ease: "easeOut" }}
+                whileHover={{ y: -5 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
               >
-                <h3 className="font-accent text-lg font-bold tracking-[0.02em] text-white">
+                {/* Step number badge */}
+                <div className="mb-4 flex items-center gap-2.5">
+                  <span className="flex size-7 items-center justify-center rounded-full border border-white/[0.16] bg-white/[0.06] font-accent text-xs font-bold tabular-nums text-white/60">
+                    {i + 1}
+                  </span>
+                  <div className="h-px flex-1 bg-white/[0.07]" />
+                </div>
+
+                <h3 className="font-accent text-base font-bold tracking-[0.02em] text-white sm:text-lg">
                   {step.title}
                 </h3>
-                <p className="mt-3 font-accent text-sm font-light leading-relaxed tracking-[0.015em] text-white/60">
+                <p className="mt-2.5 font-accent text-sm font-light leading-relaxed tracking-[0.015em] text-white/55">
                   <EmphasizedText
                     text={step.text}
                     phrases={importantProcessPhrases}
                   />
                 </p>
               </motion.article>
-            );
-          })}
+
+              {/* Arrow between steps */}
+              {i < steps.length - 1 && (
+                <motion.div
+                  className="hidden shrink-0 lg:flex lg:items-center lg:justify-center lg:px-1"
+                  variants={{
+                    hidden: { opacity: 0, x: -8 },
+                    visible: {
+                      opacity: 1,
+                      x: 0,
+                      transition: { duration: 0.35, ease: "easeOut" },
+                    },
+                  }}
+                >
+                  <ArrowRight
+                    className="size-4 text-white/20"
+                    strokeWidth={2}
+                    aria-hidden
+                  />
+                </motion.div>
+              )}
+            </React.Fragment>
+          ))}
         </motion.div>
       </div>
     </section>

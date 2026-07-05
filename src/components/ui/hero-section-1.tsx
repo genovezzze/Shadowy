@@ -17,6 +17,9 @@ import { AnnaStoryCarousel } from "@/components/landing/anna-story-carousel";
 import { HiddenCostSection } from "@/components/landing/hidden-cost-section";
 import { SolutionSection } from "@/components/landing/solution-section";
 import { BusinessValueSection } from "@/components/landing/business-value-section";
+import { EmployeeValueSection } from "@/components/landing/employee-value-section";
+import { WhatToLogSection } from "@/components/landing/what-to-log-section";
+import { PilotResultsSection } from "@/components/landing/pilot-results-section";
 import { PrivacyTrustSection } from "@/components/landing/privacy-trust-section";
 import { ClosingSections } from "@/components/landing/closing-sections";
 import { cn } from "@/lib/utils";
@@ -108,22 +111,16 @@ export function HeroSection() {
               <div className="font-accent font-light text-center sm:mx-auto lg:mr-auto lg:mt-0">
                 <AnimatedGroup variants={transitionVariants}>
                   <h1 className="mx-auto mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
-                    Pārvērtiet neredzamo darbu redzamās izmaksās un labākos
-                    lēmumos
+                    Pārvērtiet neredzamo darbu redzamās izmaksās un labākos lēmumos
                   </h1>
-                  <p className="mx-auto mt-6 max-w-4xl text-balance text-base leading-7 tracking-[0.01em] text-white/85 sm:mt-8 sm:text-xl sm:leading-relaxed md:text-2xl">
-                    Fiksējiet slēpto darba slodzi, novērtējiet tās izmaksas un
-                    pieņemiet labākus lēmumus par lomām, darba slodzi un komandas
-                    efektivitāti{" "}
-                    <strong className="font-bold [font-synthesis:weight]">
-                      - bez darbinieku novērošanas.
-                    </strong>{" "}
-                  </p>
-                  <p className="mx-auto mt-4 max-w-4xl text-balance text-base leading-7 tracking-[0.01em] text-white/70 sm:text-lg md:text-xl">
-                    Neredzamais darbs nav bezmaksas.{" "}
-                    <strong className="font-bold [font-synthesis:weight]">
-                      Jūsu uzņēmums par to jau maksā - vienkārši vēl neredz
-                      izmaksas.
+                  <p className="mx-auto mt-6 max-w-3xl text-balance text-base leading-7 tracking-[0.01em] text-white/55 sm:mt-8 sm:text-lg sm:leading-relaxed md:text-xl">
+                    Shadowy parāda, kur komandā{" "}
+                    <strong className="font-semibold text-white/75 [font-synthesis:weight]">
+                      pazūd laiks, nauda un fokuss
+                    </strong>
+                    {" "}- bez darbinieku kontroles. Darbinieki apraksta situācijas saviem vārdiem. Shadowy pārvērš tās{" "}
+                    <strong className="font-semibold text-white/75 [font-synthesis:weight]">
+                      datos par slēpto slodzi, izmaksām un procesu uzlabojumiem.
                     </strong>
                   </p>
                 </AnimatedGroup>
@@ -204,7 +201,7 @@ export function HeroSection() {
           </div>
         </section>
 
-        <ScrollReveal effect="rise">
+        <ScrollReveal effect="rise" disableOnMobile>
           <AnnaStoryCarousel />
         </ScrollReveal>
         <ScrollReveal effect="blur">
@@ -216,8 +213,17 @@ export function HeroSection() {
         <ScrollReveal effect="zoom">
           <BusinessValueSection />
         </ScrollReveal>
-        <ScrollReveal effect="unfold">
+        <ScrollReveal effect="blur">
+          <EmployeeValueSection />
+        </ScrollReveal>
+        <ScrollReveal effect="fade">
+          <WhatToLogSection />
+        </ScrollReveal>
+        <ScrollReveal effect="unfold" disableOnMobile>
           <PrivacyTrustSection />
+        </ScrollReveal>
+        <ScrollReveal effect="rise">
+          <PilotResultsSection />
         </ScrollReveal>
         <ClosingSections />
 

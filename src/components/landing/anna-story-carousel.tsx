@@ -20,17 +20,15 @@ const slides = [
   },
   {
     image: "/images/anna/anna-2.png",
-    title: "Bet tas nav viss",
-    role: "Papildu darbs",
+    title: "Bet fokuss bieži tiek pārtraukts",
+    role: "Neredzamā slodze",
     paragraphs: [
-      "Papildus saviem tiešajiem pienākumiem Anna regulāri palīdz arī citur",
-      "Viņa izskaidro procesus, palīdz ar dokumentiem, ievada jaunos darbiniekus un atbild uz jautājumiem, kas neietilpst viņas oficiālajā lomā",
+      "Papildus saviem tiešajiem pienākumiem Anna katru dienu saskaras ar neplānotiem pārtraukumiem",
+      "Kolēģu jautājumi, steidzami uzdevumi, informācijas gaidīšana un koordinācija ārpus lomas - katrs šķiet mazs, bet kopā tie izjauc dziļo darbu",
     ],
     tags: [
-      "Admin atbalsts",
-      "Palīdzība kolēģiem",
-      "Jauno darbinieku ievadīšana",
-      "Tulkošana",
+      "Fokusa pārtraukumi",
+      "Atkārtoti jautājumi",
     ],
   },
   {
@@ -38,8 +36,8 @@ const slides = [
     title: "Darbs notiek, bet netiek fiksēts",
     role: "Neredzamais ieguldījums",
     paragraphs: [
-      "Kolēģi novērtē Annas palīdzību, bet šis ieguldījums neparādās nevienā atskaitē",
-      "Vadība redz paveiktos grāmatvedības uzdevumus, bet neredz laiku un enerģiju, ko Anna iegulda komandas atbalstā",
+      "Šie pārtraukumi neparādās nekur - ne kalendārā, ne atskaitēs, ne darba uzdevumos",
+      "Uzņēmums neredz, cik laika aiziet ārpus pamatdarba. Vadība neredz, kas traucē Annai strādāt efektīvāk",
     ],
     tags: ["Nav datos", "Nav atskaitē", "Nav redzams vadībai"],
   },
@@ -48,38 +46,38 @@ const slides = [
     title: "Te palīdz Shadowy",
     role: "Risinājums",
     paragraphs: [
-      "Shadowy palīdz darbiniekiem fiksēt neredzamo darbu vienkāršā un saprotamā veidā",
-      "Palīdzība kolēģiem, papildu komunikācija, ievadīšana darbā un citi ieguldījumi kļūst redzami datos",
+      "Anna vienkārši apraksta, kas šodien traucēja vai aizņēma papildu laiku. Shadowy AI izveido melnraksta ierakstus",
+      "Neko automātiski nesaglabā - Anna pārskata un apstiprina. 30 sekundes dienā",
     ],
     tags: [
-      "Redzams ieguldījums",
-      "Godīgāka atzinība",
-      "Labāki dati vadībai",
+      "AI melnraksts",
+      "Darbinieks apstiprina",
+      "30 sek. dienā",
     ],
   },
   {
     image: "/images/anna/anna-5.png",
     title: "Rezultāts",
-    role: "Darbs tiek pamanīts",
+    role: "Redzamas izmaksas",
     paragraphs: [
-      "Anna joprojām palīdz komandai, bet tagad viņas papildu ieguldījums vairs nepazūd",
-      "Vadība redz ne tikai gala rezultātu, bet arī to, kas palīdz komandai kustēties uz priekšu",
+      "Vadība tagad redz, kur komandā pazūd laiks, kuri procesi rada slēpto slodzi un ko var uzlabot",
+      "Anna var parādīt, kas viņai traucē strādāt efektīvāk - un uzņēmums var to novērst",
     ],
-    tags: ["Pamanīts", "Novērtēts", "Pierādāms"],
+    tags: ["Redzamas izmaksas", "Labāki lēmumi", "Mazāk šķēršļu"],
   },
 ] as const;
 
 const importantStoryPhrases = [
   "galvenie pienākumi",
   "darbs, kuru vadība redz",
-  "regulāri palīdz",
-  "neietilpst viņas oficiālajā lomā",
-  "neparādās nevienā atskaitē",
-  "laiku un enerģiju",
-  "fiksēt neredzamo darbu",
-  "kļūst redzami datos",
-  "vairs nepazūd",
-  "palīdz komandai kustēties uz priekšu",
+  "fokuss bieži tiek pārtraukts",
+  "neplānotiem pārtraukumiem",
+  "izjauc dziļo darbu",
+  "neparādās nekur",
+  "kas traucē Annai strādāt efektīvāk",
+  "melnraksta ierakstus",
+  "kur komandā pazūd laiks",
+  "ko var uzlabot",
 ] as const;
 
 export function AnnaStoryCarousel() {
@@ -104,7 +102,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative -mt-px mx-2 overflow-hidden rounded-t-[24px] rounded-b-none border border-white/[0.08] bg-[#07090c] py-16 sm:mx-4 sm:rounded-[32px] sm:py-24 md:py-32 lg:mx-7"
+      className="relative overflow-hidden bg-[#07090c] py-14 sm:-mt-px sm:mx-4 sm:rounded-[32px] sm:border sm:border-white/[0.08] sm:py-24 md:py-32 lg:mx-7"
     >
       <div
         aria-hidden
@@ -121,11 +119,11 @@ export function AnnaStoryCarousel() {
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -left-52 top-1/3 size-[430px] rounded-full bg-emerald-500/[0.09] blur-[120px]"
+        className="pointer-events-none absolute -left-52 top-1/3 size-[430px] rounded-full bg-emerald-500/[0.09] blur-[120px] hidden sm:block"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-52 bottom-0 size-[480px] rounded-full bg-blue-500/[0.09] blur-[130px]"
+        className="pointer-events-none absolute -right-52 bottom-0 size-[480px] rounded-full bg-blue-500/[0.09] blur-[130px] hidden sm:block"
       />
 
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6">
@@ -134,11 +132,12 @@ export function AnnaStoryCarousel() {
             id="anna-story-heading"
             className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.75rem)] lg:whitespace-nowrap"
           >
-            Darbs, kas notiek, bet netiek pamanīts
+            Kur pazūd laiks, nauda un komandas fokuss
           </h2>
-          <p className="mx-auto mt-5 max-w-4xl text-balance font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:text-[clamp(1.05rem,1.5vw,1.4rem)] sm:text-white/80 lg:max-w-none lg:whitespace-nowrap">
-            Daļa komandas ieguldījuma nav redzama datos - īpaši tad, kad cilvēki
-            palīdz citiem ārpus savas tiešās lomas
+          <p className="mx-auto mt-5 max-w-4xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:text-[clamp(1.05rem,1.5vw,1.4rem)] sm:text-white/80 lg:max-w-none lg:whitespace-nowrap">
+            Daļa darba notiek ārpus sistēmām - ārpus kalendāra, uzdevumiem un atskaitēm.
+            <br className="hidden sm:block" />
+            {" "}Katrs gadījums šķiet mazs, bet kopā tie kļūst par reālām izmaksām
           </p>
         </header>
 
@@ -150,7 +149,7 @@ export function AnnaStoryCarousel() {
             />
 
             <div className="relative grid overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#090d11]/95 sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]">
-              <div className="relative h-[210px] overflow-hidden sm:h-[250px] lg:h-auto">
+              <div className="relative h-[240px] overflow-hidden sm:h-[260px] lg:h-auto">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeSlide.image}
@@ -172,7 +171,7 @@ export function AnnaStoryCarousel() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative min-h-[410px] sm:min-h-[360px] lg:min-h-0">
+              <div className="relative min-h-[380px] sm:min-h-[360px] lg:min-h-0">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
@@ -183,10 +182,30 @@ export function AnnaStoryCarousel() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.2, ease: "easeInOut" }}
                   >
-                    <div className="flex items-center gap-4">
-                      <span className="font-mono text-xs tracking-[0.18em] text-white/35">
-                        {String(activeIndex + 1).padStart(2, "0")} /{" "}
-                        {String(slides.length).padStart(2, "0")}
+                    <div className="relative size-8 shrink-0">
+                      <svg className="-rotate-90" width="32" height="32" viewBox="0 0 32 32">
+                        <circle
+                          cx="16" cy="16" r="13"
+                          fill="none"
+                          stroke="rgba(255,255,255,0.07)"
+                          strokeWidth="1.5"
+                        />
+                        <motion.circle
+                          cx="16" cy="16" r="13"
+                          fill="none"
+                          stroke="rgba(110,231,183,0.7)"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
+                          strokeDasharray={2 * Math.PI * 13}
+                          animate={{
+                            strokeDashoffset: 2 * Math.PI * 13 * (1 - (activeIndex + 1) / slides.length),
+                          }}
+                          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                          key="progress-circle"
+                        />
+                      </svg>
+                      <span className="absolute inset-0 flex items-center justify-center font-accent text-[11px] font-medium tabular-nums text-white/50">
+                        {String(activeIndex + 1).padStart(2, "0")}
                       </span>
                     </div>
 
@@ -209,6 +228,11 @@ export function AnnaStoryCarousel() {
                         <>
                           {"Te pal\u012bdz "}
                           <span className="text-emerald-300">Shadowy</span>
+                        </>
+                      ) : activeIndex === 4 ? (
+                        <>
+                          <span className="text-emerald-300">Redzamas</span>
+                          {" izmaksas, lab\u0101ki l\u0113mumi"}
                         </>
                       ) : (
                         activeSlide.title

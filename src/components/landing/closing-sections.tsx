@@ -65,10 +65,10 @@ const processTones = [
 ] as const;
 
 const pilotBenefits = [
-  "Iestatīšana 10 minūtēs - sāciet tajā pašā dienā",
+  "2 nedēļas, 5–8 darbinieki, 30 sekundes dienā",
   "Bez kredītkartes un bez saistībām",
   "Iepazīšanās zvans 20 minūtes - bez spiediena",
-  "30 dienu pārskats par komandas slodzi",
+  "Pilota beigās: stundas, kategorijas, šķēršļi, izmaksas",
   "Pilns atbalsts latviski visā pilota laikā",
 ] as const;
 
@@ -165,7 +165,7 @@ export function ClosingSections() {
       <section
         id="pilots"
         aria-labelledby="pilot-heading-visible"
-        className="relative mx-2 mt-12 overflow-hidden rounded-[24px] border border-white/[0.07] bg-[#07090c] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] md:py-10 lg:mx-7"
+        className="relative mt-8 overflow-hidden bg-[#07090c] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-10 lg:mx-7"
       >
         <div
           aria-hidden
@@ -193,7 +193,7 @@ export function ClosingSections() {
             id="pilot-heading-visible"
             className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[2rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(2rem,4vw,2.65rem)] lg:whitespace-nowrap"
           >
-            Sāciet 30 dienu pilotu bez riska
+            Izmēģiniet pilotu bez riska
           </h2>
           <div className="hidden">
             <h2
@@ -248,9 +248,9 @@ export function ClosingSections() {
             Shadowy ir Ventspils Augstskolas studentu veidots agrīnās stadijas
             projekts. Šobrīd meklējam pirmās komandas{" "}
             <strong className="font-bold text-white/62 [font-synthesis:weight]">
-              30 dienu pilotam
+              2 nedēļu pilotam
             </strong>
-            , lai pārbaudītu risinājumu{" "}
+            {" "}ar 5–20 darbiniekiem, lai pārbaudītu risinājumu{" "}
             <strong className="font-bold text-white/62 [font-synthesis:weight]">
               reālā darba vidē
             </strong>
@@ -314,7 +314,7 @@ export function ClosingSections() {
             >
               Biežāk uzdotie jautājumi
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl font-accent text-base font-light text-white/55 sm:text-lg">
+            <p className="mx-auto mt-4 max-w-2xl text-balance font-accent text-sm font-light text-white/55 sm:text-lg">
               Viss, kas jums jāzina par pilotu, datiem un Shadowy darbību
             </p>
           </header>
@@ -373,8 +373,8 @@ export function ClosingSections() {
 
       <ScrollReveal effect="rise">
       <footer className="relative bg-black">
-        <div className="relative mx-auto max-w-6xl px-6 pb-6 pt-9 sm:pt-10">
-          <div className="grid gap-8 md:grid-cols-[1.35fr_0.65fr_0.8fr]">
+        <div className="relative mx-auto max-w-6xl px-5 pb-6 pt-8 sm:px-6 sm:pt-10">
+          <div className="grid gap-10 sm:gap-8 md:grid-cols-[1.35fr_0.65fr_0.8fr]">
             <div className="max-w-md">
               <Link href="/" className="inline-flex items-center gap-2">
                 <Image
@@ -389,8 +389,7 @@ export function ClosingSections() {
                 </span>
               </Link>
               <p className="mt-3 max-w-sm font-accent text-sm font-light leading-relaxed tracking-[0.018em] text-white/48">
-                Padariet neredzamo darbu redzamu - strukturēta darba
-                iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība
+                Parādiet, kur pazūd laiks, nauda un komandas fokuss - bez darbinieku kontroles
               </p>
 
               <div className="mt-5 flex flex-col gap-3">
@@ -412,31 +411,48 @@ export function ClosingSections() {
                   <span className="grid size-8 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.025] transition group-hover:border-sky-300/20 group-hover:text-sky-300">
                     <Linkedin className="size-3.5" aria-hidden />
                   </span>
-                  Artemijs Lučins
+                  <span className="flex flex-col">
+                    Artemijs Lučins
+                    <span className="text-[11px] text-white/30">Produkta un platformas vadība</span>
+                  </span>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/līga-migoļa-694651406/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex w-fit items-center gap-2.5 text-[13px] text-white/55 transition hover:text-white"
+                >
+                  <span className="grid size-8 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.025] transition group-hover:border-sky-300/20 group-hover:text-sky-300">
+                    <Linkedin className="size-3.5" aria-hidden />
+                  </span>
+                  <span className="flex flex-col">
+                    Līga Migoļa
+                    <span className="text-[11px] text-white/30">Pētniecība un komunikācija</span>
+                  </span>
                 </a>
               </div>
             </div>
 
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
                 Produkts
               </h3>
-              <nav className="mt-3.5 flex flex-col gap-2.5 text-[13px]">
+              <nav className="mt-3.5 flex flex-col gap-3">
                 <a
                   href="#risinajums"
-                  className="w-fit text-white/55 transition hover:text-white"
+                  className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Kā tas darbojas
                 </a>
                 <a
                   href="#pilots"
-                  className="w-fit text-white/55 transition hover:text-white"
+                  className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Pilots
                 </a>
                 <Link
                   href="/login"
-                  className="w-fit text-white/55 transition hover:text-white"
+                  className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Pieslēgties
                 </Link>
@@ -444,19 +460,19 @@ export function ClosingSections() {
             </div>
 
             <div>
-              <h3 className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
                 Juridiskā informācija
               </h3>
-              <nav className="mt-3.5 flex flex-col gap-2.5 text-[13px]">
+              <nav className="mt-3.5 flex flex-col gap-3">
                 <Link
                   href="/privacy"
-                  className="w-fit text-white/55 transition hover:text-white"
+                  className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Privātuma politika
                 </Link>
                 <Link
                   href="/privacy#terms"
-                  className="w-fit text-white/55 transition hover:text-white"
+                  className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Lietošanas noteikumi
                 </Link>

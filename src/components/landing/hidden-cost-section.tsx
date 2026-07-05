@@ -133,11 +133,11 @@ export function HiddenCostSection() {
         <div>
           <h2
             id="hidden-cost-heading"
-            className="max-w-xl bg-gradient-to-r from-white from-[0%] via-zinc-300 via-[45%] to-zinc-700 to-[100%] bg-clip-text text-balance font-accent text-[clamp(2.8rem,6vw,5rem)] font-bold leading-[0.98] tracking-[-0.02em] text-transparent"
+            className="max-w-xl bg-gradient-to-r from-white from-[0%] via-zinc-300 via-[45%] to-zinc-700 to-[100%] bg-clip-text text-balance font-accent text-[clamp(2rem,6vw,5rem)] font-bold leading-[0.98] tracking-[-0.02em] text-transparent"
           >
             Neredzamais darbs nav bezmaksas
           </h2>
-          <p className="mt-8 max-w-[36rem] font-accent text-xl font-light leading-[1.55] text-white/68 sm:text-[1.4rem] lg:text-[clamp(1.4rem,1.65vw,1.75rem)]">
+          <p className="mt-6 max-w-[36rem] font-accent text-base font-light leading-[1.65] text-white/68 sm:mt-8 sm:text-xl lg:text-[clamp(1.4rem,1.65vw,1.75rem)]">
             Katra stunda, kas veltīta palīdzībai kolēģiem, jauno darbinieku
             ievadīšanai, steidzamu uzdevumu koordinēšanai vai darbam ārpus
             oficiālās lomas,{" "}

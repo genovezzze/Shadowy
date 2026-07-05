@@ -5,23 +5,24 @@ import { EmphasizedText } from "@/components/landing/emphasized-text";
 
 const valueCards = [
   {
-    title: "Redzi slēptās stundas",
-    text: "Uzzini, kur komanda tērē laiku ārpus formālajiem uzdevumiem",
+    title: "Redzi, kur pazūd laiks",
+    text: "Uzzini, cik daudz laika aiziet neredzamajā darbā un kādas kategorijas atkārtojas visbiežāk",
   },
   {
-    title: "Samazini lieko slodzi",
-    text: "Pamani pārslodzi un pārdali darbu pirms tā kļūst dārga",
+    title: "Samazini slēptās izmaksas",
+    text: "Pamani, kur rodas lieka slodze un fokusa pārtraukumi, pirms tie kļūst dārgi",
   },
   {
-    title: "Aprēķini ietaupījumu",
-    text: "Izmanto pilota datus, lai saprastu potenciālo finansiālo ieguvumu",
+    title: "Uzlabo procesus",
+    text: "Saņem konkrētus ieteikumus - kur sakārtot darba sadali, lomas un iekšējos procesus",
   },
 ] as const;
 
 const importantValuePhrases = [
-  "ārpus formālajiem uzdevumiem",
-  "pirms tā kļūst dārga",
-  "potenciālo finansiālo ieguvumu",
+  "neredzamajā darbā",
+  "fokusa pārtraukumi",
+  "pirms tie kļūst dārgi",
+  "konkrētus ieteikumus",
 ] as const;
 
 export function BusinessValueSection() {
@@ -29,7 +30,7 @@ export function BusinessValueSection() {
     <section
       id="biznesa-ieguvums"
       aria-labelledby="business-value-heading"
-      className="relative overflow-hidden bg-[#07090c] py-16 sm:py-20 md:py-24"
+      className="relative overflow-hidden bg-[#07090c] py-14 sm:py-20 md:py-24"
     >
       <div className="relative mx-auto grid max-w-6xl items-center gap-9 px-5 sm:gap-12 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <motion.div
@@ -86,20 +87,18 @@ export function BusinessValueSection() {
             className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,4vw,3rem)]"
           >
             <span className="block sm:whitespace-nowrap">
-              Mazāk neredzama darba
+              Redzamas izmaksas
             </span>
             <span className="mt-1 block bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent sm:whitespace-nowrap">
-              Vairāk naudas biznesam
+              Labāki lēmumi
             </span>
           </h2>
           <p className="mt-5 max-w-xl font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:mt-6 sm:text-lg sm:leading-relaxed sm:text-white/78">
+            Ja uzņēmums neredz, kur pazūd darbinieku laiks,{" "}
             <strong className="font-bold text-white/82 [font-synthesis:weight]">
-              30 dienu pilotā
-            </strong>{" "}
-            Shadowy parāda, kur pazūd komandas laiks, kur rodas pārslodze un{" "}
-            <strong className="font-bold text-white/82 [font-synthesis:weight]">
-              cik daudz uzņēmums var potenciāli ietaupīt
+              tas nevar saprast, kur pazūd nauda
             </strong>
+            . Shadowy parāda slēptās izmaksas un palīdz saprast, kur var uzlabot procesus
           </p>
         </div>
       </div>

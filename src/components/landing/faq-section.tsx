@@ -7,6 +7,11 @@ import { cn } from "@/lib/utils";
 
 const FAQ_ITEMS = [
   {
+    question: "Kas ir neredzamais darbs?",
+    answer:
+      "Neredzamais darbs ir viss tas, ko darbinieks dara papildus saviem darba līgumā noteiktajiem pienākumiem - vai kas pārtrauc viņa fokusu un traucē pamatdarbam. Piemēram: palīdzība kolēģiem, jauno darbinieku ievadīšana, atkārtotu jautājumu atbildēšana, informācijas gaidīšana, koordinācija starp cilvēkiem, steidzami uzdevumi ārpus lomas. Katrs šāds gadījums atsevišķi šķiet mazs, bet kopā tie katru mēnesi izmaksā uzņēmumam reālu naudu - un neviens to neredz",
+  },
+  {
     question: "Kas ir Shadowy?",
     answer:
       "Shadowy ir darba slodzes pārskatāmības rīks. Darbinieki strukturēti fiksē papildu darbu, vadītāji izvērtē un apstiprina iesniegtos ierakstus, savukārt administratori saņem organizācijas līmeņa pārskatu",
@@ -31,9 +36,31 @@ const FAQ_ITEMS = [
     answer:
       "Pēc pilota beigām jūs varat izvēlēties turpināt vai pārtraukt lietošanu. Pārtraukšanas gadījumā datus iespējams eksportēt, un pēc noteiktā glabāšanas perioda tie tiek dzēsti",
   },
+  {
+    question: "Vai darbiniekiem jāfiksē visas darbības?",
+    answer:
+      "Nē. Shadowy nav paredzēts visu ikdienas darbību fiksēšanai. Darbinieks fiksē tikai situācijas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto darbu. Parastais ikdienas darbs nav jāfiksē",
+  },
+  {
+    question: "Kāpēc darbiniekam būtu to jāaizpilda?",
+    answer:
+      "Lai redzētu, kas viņam traucē strādāt efektīvāk: atkārtoti jautājumi, gaidīšana, neskaidras atbildības, palīdzība citiem vai steidzami neplānoti uzdevumi. Mērķis ir uzlabot procesus, nevis kontrolēt cilvēku",
+  },
+  {
+    question: "Vai šo var izmantot pret darbinieku?",
+    answer:
+      "Nē. Shadowy ir procesu pārskatāmības rīks. Dati jāizmanto, lai saprastu slēpto slodzi un uzlabotu darbu, nevis sodītu vai salīdzinātu darbiniekus. Darbinieks pats kontrolē, ko iesniedz",
+  },
+  {
+    question: "Vai AI saglabā ierakstus automātiski?",
+    answer:
+      "Nē. AI izveido tikai melnrakstus. Darbinieks pats pārskata, labo un apstiprina ierakstus pirms saglabāšanas. Nekas netiek saglabāts bez darbinieka apstiprinājuma",
+  },
 ] as const;
 
 const importantFaqPhrases = [
+  "neparādās kalendārā",
+  "izmaksā uzņēmumam reālu naudu",
   "strukturēti fiksē papildu darbu",
   "organizācijas līmeņa pārskatu",
   "bez maksas un bez kredītkartes",
@@ -42,6 +69,10 @@ const importantFaqPhrases = [
   "Citu organizāciju informācija nav pieejama",
   "turpināt vai pārtraukt lietošanu",
   "datus iespējams eksportēt",
+  "tikai situācijas, kas bija ārpus pamatdarba",
+  "uzlabot procesus, nevis kontrolēt",
+  "pats kontrolē, ko iesniedz",
+  "Nekas netiek saglabāts bez darbinieka apstiprinājuma",
 ] as const;
 
 export function FaqSection() {
