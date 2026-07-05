@@ -58,12 +58,12 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={210}>
+        <ResponsiveContainer width="100%" height={280}>
           <PieChart>
             <Pie
               data={data.map((d) => ({ ...d, fill: d.color }))}
               cx="50%"
-              cy="45%"
+              cy="38%"
               innerRadius={48}
               outerRadius={68}
               dataKey="value"

@@ -225,7 +225,7 @@ export function VercelV0Chat({
   recordingSeconds = 0,
   compact = false,
 }: VercelV0ChatProps) {
-  const MAX_HEIGHT = 220;
+  const MAX_HEIGHT = 400;
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 76,
     maxHeight: MAX_HEIGHT,
@@ -358,7 +358,10 @@ export function VercelV0Chat({
           className="flex sm:hidden flex-col -mx-4 -mt-4 font-accent bg-background"
           style={{ height: "calc(100dvh - 4rem)" }}
         >
-          <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <div className={cn(
+            "flex flex-col items-center justify-center px-6 text-center",
+            value.length > 0 ? "hidden" : "flex-1"
+          )}>
             <h1 className="text-balance text-3xl font-bold leading-[1.15] tracking-[0.015em] text-foreground [font-synthesis:weight]">
               Pastāsti, kas šodien aizņēma papildu laiku
             </h1>
@@ -367,7 +370,10 @@ export function VercelV0Chat({
             </p>
           </div>
 
-          <div className="px-4 pb-5 pt-2 bg-background border-t border-border/30">
+          <div className={cn(
+            "px-4 pb-5 bg-background border-t border-border/30",
+            value.length > 0 ? "flex-1 pt-4 flex flex-col justify-end" : "pt-2"
+          )}>
             {inputBox}
             <p className="mt-2 text-center text-[11px] text-muted-foreground/50">
               Ieraksts tiks saglabāts tikai pēc tavas apstiprināšanas
