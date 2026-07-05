@@ -103,14 +103,13 @@ export async function POST(request: Request) {
   );
   upstreamForm.append(
     "model",
-    process.env.OPENAI_TRANSCRIBE_MODEL ?? "whisper-1"
+    process.env.OPENAI_TRANSCRIBE_MODEL ?? "gpt-4o-transcribe"
   );
   upstreamForm.append("language", "lv");
   upstreamForm.append("response_format", "json");
-  upstreamForm.append("temperature", "0");
   upstreamForm.append(
     "prompt",
-    "Šodien strādāju pie projekta. Apmēram 30 minūtes veltīju kolēģu jautājumiem. Vadītājs lūdza sagatavot atskaiti. Piedalījos sanāksmē. Apmācīju jaunu darbinieku. Risināju tehniskas problēmas. Rakstīju e-pastus un dokumentāciju. Pārtrauca ar steidzamu uzdevumu. Nevaru pabeigt galveno darbu termiņā. Papildu ieguldījums, neredzamais darbs, darba loma, pienākumi, klients, projekts, uzdevums, stunda, minūte, nedēļa."
+    "Audio is in Latvian. It is an employee describing extra work, focus interruptions, waiting for information, helping colleagues, urgent tasks, repeated questions or work outside their role for Shadowy. Transcribe clearly in Latvian. Do not translate."
   );
 
   try {
