@@ -11,8 +11,10 @@ import {
   ArrowUpIcon,
   Clock3,
   LoaderCircle,
+  Maximize2,
   MessageCircleQuestion,
   Mic,
+  Minimize2,
   Shuffle,
   Square,
   Target,
@@ -225,10 +227,34 @@ export function VercelV0Chat({
   recordingSeconds = 0,
   compact = false,
 }: VercelV0ChatProps) {
-  const MAX_HEIGHT = 400;
+  const [maxHeight, setMaxHeight] = useState(220);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const expandedTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    function update() {
+      if (window.innerWidth < 640) {
+        setMaxHeight(window.innerHeight - 64 - 120);
+      } else {
+        setMaxHeight(220);
+      }
+    }
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  useEffect(() => {
+    if (isExpanded && expandedTextareaRef.current) {
+      const el = expandedTextareaRef.current;
+      el.focus();
+      el.setSelectionRange(el.value.length, el.value.length);
+    }
+  }, [isExpanded]);
+
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 76,
-    maxHeight: MAX_HEIGHT,
+    maxHeight,
   });
 
   const canSubmit = value.trim().length >= 10 && !disabled;
@@ -295,6 +321,18 @@ export function VercelV0Chat({
         {!value && !isRecording && !isTranscribing && (
           <TypewriterPlaceholder />
         )}
+
+        {/* Expand to full-screen (mobile only) */}
+        {value.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setIsExpanded(true)}
+            className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground/50 hover:text-muted-foreground transition-colors sm:hidden"
+            aria-label="Paplašināt"
+          >
+            <Maximize2 className="h-3.5 w-3.5" />
+          </button>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-3 p-3 pt-1">
@@ -354,14 +392,83 @@ export function VercelV0Chat({
   if (!compact) {
     return (
       <>
+        {/* Full-screen expand overlay (mobile only) */}
+        {isExpanded && (
+          <div className="fixed inset-0 z-50 flex flex-col bg-background sm:hidden">
+            <div className="flex items-center justify-between px-4 pt-4 pb-2">
+              <span className="text-xs tabular-nums text-muted-foreground/60">
+                {value.length}/4000
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsExpanded(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Samazināt"
+              >
+                <Minimize2 className="h-4 w-4" />
+              </button>
+            </div>
+
+            <textarea
+              ref={expandedTextareaRef}
+              value={value}
+              onChange={(e) => onValueChange(e.target.value)}
+              maxLength={4000}
+              disabled={disabled}
+              className="flex-1 resize-none bg-transparent px-4 py-2 text-lg leading-7 font-accent font-light tracking-[0.01em] focus:outline-none"
+            />
+
+            <div className="flex items-center justify-between px-4 pb-10 pt-3 border-t border-border/30">
+              <button
+                type="button"
+                onClick={isRecording ? onStopRecording : onStartRecording}
+                disabled={disabled && !isRecording}
+                className={cn(
+                  "group flex h-9 items-center gap-2 rounded-lg px-2.5 text-sm transition-colors",
+                  "hover:bg-neutral-200 disabled:pointer-events-none disabled:opacity-50",
+                  "dark:hover:bg-neutral-800",
+                  isRecording && "bg-red-500/10 text-red-500"
+                )}
+              >
+                {isRecording ? (
+                  <Square className="h-4 w-4 fill-current" />
+                ) : (
+                  <Mic className="h-4 w-4" />
+                )}
+                <span className="text-sm font-light tracking-[0.01em]">
+                  {isRecording ? "Pabeigt" : "Ierunāt"}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => { setIsExpanded(false); onSubmit(); }}
+                disabled={!canSubmit}
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-full transition-colors",
+                  canSubmit
+                    ? "bg-white text-black hover:bg-neutral-200"
+                    : "bg-neutral-800 text-neutral-500",
+                  "disabled:pointer-events-none"
+                )}
+                aria-label="Izveidot melnraksta ierakstus"
+              >
+                {isSubmitting ? (
+                  <LoaderCircle className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ArrowUpIcon className="h-5 w-5" />
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        <>
         <div
           className="flex sm:hidden flex-col -mx-4 -mt-4 font-accent bg-background"
           style={{ height: "calc(100dvh - 4rem)" }}
         >
-          <div className={cn(
-            "flex flex-col items-center justify-center px-6 text-center",
-            value.length > 0 ? "hidden" : "flex-1"
-          )}>
+          <div className="flex-1 min-h-0 overflow-hidden flex flex-col items-center justify-center px-6 text-center">
             <h1 className="text-balance text-3xl font-bold leading-[1.15] tracking-[0.015em] text-foreground [font-synthesis:weight]">
               Pastāsti, kas šodien aizņēma papildu laiku
             </h1>
@@ -370,10 +477,7 @@ export function VercelV0Chat({
             </p>
           </div>
 
-          <div className={cn(
-            "px-4 pb-5 bg-background border-t border-border/30",
-            value.length > 0 ? "flex-1 pt-4 flex flex-col justify-end" : "pt-2"
-          )}>
+          <div className="px-4 pb-5 pt-2 bg-background border-t border-border/30">
             {inputBox}
             <p className="mt-2 text-center text-[11px] text-muted-foreground/50">
               Ieraksts tiks saglabāts tikai pēc tavas apstiprināšanas
@@ -411,6 +515,7 @@ export function VercelV0Chat({
           </div>
         </div>
       </>
+    </>
     );
   }
 
