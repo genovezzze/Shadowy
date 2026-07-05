@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText } from "lucide-react";
@@ -102,7 +102,7 @@ export default async function ManagerReportPage({
 }: {
   searchParams: { period?: string };
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
   const managerId = session.userId;
   const period = searchParams?.period ?? "30d";
@@ -125,6 +125,7 @@ export default async function ManagerReportPage({
         status: true,
         createdAt: true,
         employeeId: true,
+        isOutsideRole: true,
         employee: { select: { id: true, name: true } },
       },
     }),
@@ -143,7 +144,7 @@ export default async function ManagerReportPage({
   for (const e of approved) {
     const emp = teamUsers.find((u) => u.id === e.employeeId);
     const duties = emp?.workRole?.duties.map((d) => d.text) ?? [];
-    const wt = classifyWorkType(e.category, e.title, duties);
+    const wt = resolveWorkType(e.isOutsideRole, e.category, e.title, duties);
     workTypeCount[wt]++;
   }
   const totalApproved = approved.length || 1;
@@ -163,7 +164,7 @@ export default async function ManagerReportPage({
     if (e.status === "APPROVED") {
       emp.approvedMinutes += e.durationMinutes;
       const duties = teamUsers.find((u) => u.id === e.employeeId)?.workRole?.duties.map((d) => d.text) ?? [];
-      const wt = classifyWorkType(e.category, e.title, duties);
+      const wt = resolveWorkType(e.isOutsideRole, e.category, e.title, duties);
       if (wt === "extra") emp.extraCount++;
     }
   }
@@ -220,7 +221,7 @@ export default async function ManagerReportPage({
   for (const e of approved) {
     const emp = teamUsers.find((u) => u.id === e.employeeId);
     const duties = emp?.workRole?.duties.map((d) => d.text) ?? [];
-    if (classifyWorkType(e.category, e.title, duties) === "extra") {
+    if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
       extraMinutes += e.durationMinutes;
     }
   }

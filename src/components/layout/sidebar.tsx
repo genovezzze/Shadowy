@@ -20,6 +20,7 @@ import {
   UserCircle,
   BarChart2,
   Building2,
+  ArrowLeft,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -45,7 +46,7 @@ function ShadowyNavIcon({ className }: { className?: string }) {
   );
 }
 
-const ADMIN_NAV: NavItem[] = [
+const ADMIN_ONLY_NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Pārskats", icon: LayoutDashboard },
   { href: "/admin/managers", label: "Vadītāji", icon: UserCog },
   { href: "/admin/employees", label: "Darbinieki", icon: Users },
@@ -53,6 +54,13 @@ const ADMIN_NAV: NavItem[] = [
   { href: "/admin/bonuses", label: "Bonusu pārskats", icon: Gift },
   { href: "/admin/report", label: "Pilota atskaite", icon: BarChart2 },
   { href: "/admin/profile", label: "Mans profils", icon: UserCircle },
+];
+
+const ADMIN_MANAGER_NAV: NavItem[] = [
+  { href: "/manager/roles", label: "Lomas", icon: Briefcase },
+  { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift },
+  { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },
+  { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText },
 ];
 
 const MANAGER_NAV: NavItem[] = [
@@ -81,8 +89,35 @@ const EMPLOYEE_NAV: NavItem[] = [
   { href: "/employee/profile", label: "Mans profils", icon: UserCircle },
 ];
 
+function NavLink({ item, pathname, pendingCount, onClose }: { item: NavItem; pathname: string; pendingCount?: number; onClose?: () => void }) {
+  const active = pathname === item.href || pathname.startsWith(item.href + "/");
+  const Icon = item.icon;
+  const showBadge = item.href === "/manager/entries" && (pendingCount ?? 0) > 0;
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onClose}
+      className={cn(
+        "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[17px] font-medium transition-colors duration-150",
+        active
+          ? "bg-sidebar-accent text-foreground dark:bg-white/[0.09]"
+          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground dark:hover:bg-white/[0.05]"
+      )}
+    >
+      {active && <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-foreground dark:bg-white/80" />}
+      <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-colors", active ? "text-foreground" : "group-hover:text-foreground")} />
+      <span className="flex-1">{item.label}</span>
+      {showBadge && (
+        <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[11px] font-semibold text-white">
+          {pendingCount! > 99 ? "99+" : pendingCount}
+        </span>
+      )}
+    </Link>
+  );
+}
+
 function navFor(role: Role): NavItem[] {
-  if (role === "ADMIN") return ADMIN_NAV;
   if (role === "MANAGER") return MANAGER_NAV;
   return EMPLOYEE_NAV;
 }
@@ -110,7 +145,14 @@ interface SidebarProps {
 
 export function Sidebar({ role, userName, organizationName, pendingCount, unreadNotificationCount, onClose }: SidebarProps) {
   const pathname = usePathname();
-  const items = navFor(role);
+  const isAdminOnManagerRoutes = role === "ADMIN" && pathname.startsWith("/manager");
+  const isAdmin = role === "ADMIN";
+
+  const mainItems = isAdminOnManagerRoutes
+    ? [{ href: "/admin/dashboard", label: "Atpakaļ uz administrāciju", icon: ArrowLeft }, ...MANAGER_NAV.filter((i) => i.href !== "/manager/profile")]
+    : isAdmin ? ADMIN_ONLY_NAV : navFor(role);
+
+  const managerItems = isAdmin && !isAdminOnManagerRoutes ? ADMIN_MANAGER_NAV : [];
 
   return (
     <aside className="relative flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar font-accent backdrop-blur-md shadow-[1px_0_24px_rgba(15,23,42,0.05)] dark:border-white/[0.07] dark:bg-white/[0.02] dark:shadow-[inset_-1px_0_0_rgba(255,255,255,0.04),1px_0_40px_rgba(0,0,0,0.35)]"
@@ -138,44 +180,23 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
       </div>
 
       {/* Nav */}
-      <nav className="relative z-10 flex-1 space-y-0.5 px-3 py-4">
-        {items.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
-          const Icon = item.icon;
-          const showBadge = item.href === "/manager/entries" && (pendingCount ?? 0) > 0;
+      <div className="relative z-10 flex-1 overflow-hidden">
+        <nav className="h-full space-y-0.5 overflow-y-auto px-3 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {mainItems.map((item) => <NavLink key={item.href} item={item} pathname={pathname} pendingCount={pendingCount} onClose={onClose} />)}
 
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={onClose}
-              className={cn(
-                "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[17px] font-medium transition-colors duration-150",
-                active
-                  ? "bg-sidebar-accent text-foreground dark:bg-white/[0.09]"
-                  : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground dark:hover:bg-white/[0.05]"
-              )}
-            >
-              {/* Active left accent bar */}
-              {active && (
-                <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-foreground dark:bg-white/80" />
-              )}
-              <Icon
-                className={cn(
-                  "h-[18px] w-[18px] shrink-0 transition-colors",
-                  active ? "text-foreground" : "group-hover:text-foreground"
-                )}
-              />
-              <span className="flex-1">{item.label}</span>
-              {showBadge && (
-                <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[11px] font-semibold text-white">
-                  {pendingCount! > 99 ? "99+" : pendingCount}
+          {managerItems.length > 0 && (
+            <>
+              <div className="px-3 pb-1 pt-4">
+                <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                  Vadītāja funkcijas
                 </span>
-              )}
-            </Link>
-          );
-        })}
-      </nav>
+              </div>
+              {managerItems.map((item) => <NavLink key={item.href} item={item} pathname={pathname} pendingCount={pendingCount} onClose={onClose} />)}
+            </>
+          )}
+        </nav>
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-sidebar to-transparent" />
+      </div>
 
       {/* Footer */}
       <div className="relative z-10 border-t border-sidebar-border p-4 dark:border-white/[0.07] dark:bg-[linear-gradient(to_top,rgba(255,255,255,0.02),transparent)]">

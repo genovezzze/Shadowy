@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { SectionDivider } from "@/components/dashboard/section-divider";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import {
   AlertTriangle,
@@ -40,7 +40,7 @@ export default async function ManagerDashboard({
 }: {
   searchParams: { period?: string };
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
   const managerId = session.userId;
   const period = searchParams?.period ?? "30d";
@@ -67,6 +67,7 @@ export default async function ManagerDashboard({
         durationMinutes: true,
         workDate: true,
         source: true,
+        isOutsideRole: true,
         employee: {
           select: {
             id: true,
@@ -101,7 +102,7 @@ export default async function ManagerDashboard({
     categoryCount.set(e.category, (categoryCount.get(e.category) ?? 0) + 1);
 
     const duties = e.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
-    if (classifyWorkType(e.category, e.title, duties) === "extra") {
+    if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
       extraMinutes += e.durationMinutes;
     }
   }

@@ -8,7 +8,7 @@ import { RuleCard } from "./rule-card";
 import { Gift } from "lucide-react";
 
 export default async function BonusRulesPage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const [rules, categories, workRoles] = await Promise.all([
     prisma.recognitionRule.findMany({

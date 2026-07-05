@@ -78,25 +78,25 @@ export function LoginForm() {
           className={authFieldClassName}
         />
       </div>
-      <label className="group flex cursor-pointer select-none items-center gap-2.5 py-0.5">
-        <input
-          type="checkbox"
-          name="rememberMe"
-          checked={remember}
-          onChange={(e) => setRemember(e.target.checked)}
-          className="sr-only"
-        />
-        <span className={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${remember ? "border-white/30 bg-white/[0.12]" : "border-white/[0.18] bg-white/[0.05] group-hover:border-white/25"}`}>
+      <input type="hidden" name="rememberMe" value={remember ? "on" : ""} />
+      <button
+        type="button"
+        role="checkbox"
+        aria-checked={remember}
+        onClick={() => setRemember((v) => !v)}
+        className="flex cursor-pointer select-none items-center gap-2.5 py-0.5"
+      >
+        <span className={`flex size-4 shrink-0 items-center justify-center rounded-sm border transition-colors ${remember ? "border-neutral-500 bg-neutral-700" : "border-white/20 bg-transparent"}`}>
           {remember && (
-            <svg viewBox="0 0 10 8" className="size-2.5 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <svg viewBox="0 0 10 8" className="size-2.5 text-white/80" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="1,4 3.5,6.5 9,1" />
             </svg>
           )}
         </span>
-        <span className="font-accent text-sm text-white/50 transition-colors group-hover:text-white/65">
+        <span className="font-accent text-sm text-white/50">
           Atcerēties mani
         </span>
-      </label>
+      </button>
       {error ? (
         <div className="rounded-xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 font-accent text-sm leading-5 text-red-300">
           {error}

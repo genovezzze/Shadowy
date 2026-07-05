@@ -15,7 +15,7 @@ export async function upsertClient(input: {
   name: string;
   freeMinutesPerMonth: number | null;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const parsed = clientSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Pārbaudi ievadītos datus." };
 
@@ -48,7 +48,7 @@ export async function upsertClient(input: {
 }
 
 export async function deleteClient(id: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const exists = await prisma.client.findFirst({
     where: { id, organizationId: session.organizationId },
   });

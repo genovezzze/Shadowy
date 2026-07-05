@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { AlertTriangle, ArrowLeft, Clock, Settings, TrendingUp } from "lucide-react";
 
@@ -25,7 +25,7 @@ export default async function ClientProfilePage({
 }: {
   params: { id: string };
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const client = await prisma.client.findFirst({
     where: { id: params.id, organizationId: session.organizationId },
@@ -106,7 +106,7 @@ export default async function ClientProfilePage({
   for (const e of entries) {
     const emp = teamUsers.find((u) => u.id === e.employee.id);
     const duties = emp?.workRole?.duties.map((d) => d.text) ?? [];
-    if (classifyWorkType(e.category, e.title, duties) === "extra") {
+    if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
       extraMinutes += e.durationMinutes;
     }
   }

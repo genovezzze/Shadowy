@@ -74,7 +74,7 @@ export function MobileShell({
           <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} />
         </div>
 
-        {trialDaysLeft != null && <TrialBanner daysLeft={trialDaysLeft} />}
+        {trialDaysLeft != null && role !== "EMPLOYEE" && <TrialBanner daysLeft={trialDaysLeft} />}
 
         <main className="flex-1 overflow-y-auto [scrollbar-gutter:stable]">
           <div className="mx-auto max-w-6xl px-4 py-4 sm:px-8 sm:py-8">{children}</div>

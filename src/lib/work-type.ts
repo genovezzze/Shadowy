@@ -1,11 +1,22 @@
 export type WorkType = "in_role" | "extra" | "no_role";
 
+export function resolveWorkType(
+  isOutsideRole: boolean | null | undefined,
+  category: string,
+  title: string,
+  duties: string[]
+): WorkType {
+  if (isOutsideRole === false) return "in_role";
+  if (isOutsideRole === true) return "extra";
+  return classifyWorkType(category, title, duties);
+}
+
 export function classifyWorkType(
   entryCategory: string,
   entryTitle: string,
   duties: string[]
 ): WorkType {
-  if (duties.length === 0) return "no_role";
+  if (duties.length === 0) return "extra";
 
   const normalize = (s: string) => s.toLowerCase().replace(/[^a-zāčēģīķļņšūž\s]/gi, " ");
   const cat = normalize(entryCategory);

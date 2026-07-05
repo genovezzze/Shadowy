@@ -126,9 +126,10 @@ export function VercelV0Chat({
   recordingSeconds = 0,
   compact = false,
 }: VercelV0ChatProps) {
+  const MAX_HEIGHT = 220;
   const { textareaRef, adjustHeight } = useAutoResizeTextarea({
     minHeight: 76,
-    maxHeight: 220,
+    maxHeight: MAX_HEIGHT,
   });
 
   const [typedText, setTypedText] = useState("");
@@ -231,7 +232,7 @@ export function VercelV0Chat({
             "font-accent font-light tracking-[0.01em]",
             "focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
           )}
-          style={{ overflow: "hidden" }}
+          style={{ overflowY: "auto" }}
         />
 
         {/* Typewriter placeholder */}
@@ -321,13 +322,16 @@ export function VercelV0Chat({
           <button
             key={label}
             type="button"
-            onClick={() => applySuggestion(text)}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              applySuggestion(text);
+            }}
             disabled={disabled}
             className={cn(
               "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 transition-colors",
               "border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-foreground",
               "dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800",
-              "disabled:pointer-events-none disabled:opacity-50"
+              "disabled:pointer-events-none disabled:opacity-50 focus:outline-none"
             )}
           >
             <Icon className="h-3.5 w-3.5 shrink-0" />
@@ -358,9 +362,6 @@ export function VercelV0Chat({
           </div>
 
           <div className="px-4 pb-5 pt-2 bg-background border-t border-border/30">
-            <div className="mb-3">
-              <QuickButtons scrollable />
-            </div>
             {inputBox}
             <p className="mt-2 text-center text-[11px] text-muted-foreground/50">
               Ieraksts tiks saglabāts tikai pēc tavas apstiprināšanas

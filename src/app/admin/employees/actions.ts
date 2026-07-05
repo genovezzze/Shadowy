@@ -35,9 +35,11 @@ export async function createEmployee(formData: FormData) {
     return { ok: false as const, error: "Lietotājs ar šādu e-pastu jau eksistē." };
   }
 
+  const managerId = parsed.data.managerId || session.userId;
+
   if (parsed.data.managerId) {
     const manager = await prisma.user.findFirst({
-      where: { id: parsed.data.managerId, organizationId: session.organizationId, role: "MANAGER" },
+      where: { id: parsed.data.managerId, organizationId: session.organizationId, role: { in: ["MANAGER", "ADMIN"] } },
     });
     if (!manager) {
       return { ok: false as const, error: "Vadītājs nav atrasts." };
@@ -55,7 +57,7 @@ export async function createEmployee(formData: FormData) {
       passwordHash: null,
       role: "EMPLOYEE",
       title: parsed.data.title || null,
-      managerId: parsed.data.managerId || null,
+      managerId,
       inviteToken,
       inviteTokenExpiresAt,
     },
@@ -109,7 +111,7 @@ export async function updateEmployee(employeeId: string, formData: FormData) {
 
   if (parsed.data.managerId) {
     const manager = await prisma.user.findFirst({
-      where: { id: parsed.data.managerId, organizationId: session.organizationId, role: "MANAGER" },
+      where: { id: parsed.data.managerId, organizationId: session.organizationId, role: { in: ["MANAGER", "ADMIN"] } },
     });
     if (!manager) return { ok: false as const, error: "Vadītājs nav atrasts." };
   }
@@ -118,7 +120,7 @@ export async function updateEmployee(employeeId: string, formData: FormData) {
     name: parsed.data.name,
     email,
     title: parsed.data.title || null,
-    managerId: parsed.data.managerId || null,
+    managerId: parsed.data.managerId || session.userId,
   };
   if (parsed.data.password) {
     data.passwordHash = await hashPassword(parsed.data.password);

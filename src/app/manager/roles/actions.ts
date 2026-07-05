@@ -6,7 +6,7 @@ import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 
 export async function createRole(formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   if (!name || name.length < 2) return { ok: false as const, error: "Nosaukums ir pārāk īss." };
@@ -25,7 +25,7 @@ export async function createRole(formData: FormData) {
 }
 
 export async function updateRole(roleId: string, formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   if (!name || name.length < 2) return { ok: false as const, error: "Nosaukums ir pārāk īss." };
@@ -41,7 +41,7 @@ export async function updateRole(roleId: string, formData: FormData) {
 }
 
 export async function deleteRole(roleId: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const role = await prisma.workRole.findFirst({
     where: { id: roleId, managerId: session.userId },
   });
@@ -53,7 +53,7 @@ export async function deleteRole(roleId: string) {
 }
 
 export async function addDuty(roleId: string, text: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const t = text.trim();
   if (!t || t.length < 2) return { ok: false as const, error: "Pienākums ir pārāk īss." };
 
@@ -68,7 +68,7 @@ export async function addDuty(roleId: string, text: string) {
 }
 
 export async function deleteDuty(dutyId: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const duty = await prisma.workRoleDuty.findFirst({
     where: { id: dutyId, workRole: { managerId: session.userId } },
   });
@@ -80,7 +80,7 @@ export async function deleteDuty(dutyId: string) {
 }
 
 export async function assignRole(employeeId: string, roleId: string | null) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const employee = await prisma.user.findFirst({
     where: { id: employeeId, managerId: session.userId, role: "EMPLOYEE" },

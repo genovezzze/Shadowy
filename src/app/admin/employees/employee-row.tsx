@@ -24,10 +24,11 @@ interface EmployeeRowProps {
   managerName: string | null;
   entryCount: number;
   managers: Manager[];
+  isRegistered: boolean;
 }
 
 export function EmployeeRow({
-  id, name, email, title, managerId, managerName, entryCount, managers,
+  id, name, email, title, managerId, managerName, entryCount, managers, isRegistered,
 }: EmployeeRowProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
@@ -55,8 +56,8 @@ export function EmployeeRow({
 
   if (mode === "edit") {
     return (
-      <tr>
-        <td colSpan={5} className="px-6 py-4">
+      <tr className="edit-form-row">
+        <td colSpan={6} className="px-6 py-4">
           <form action={handleEdit} className="space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="grid gap-1.5">
@@ -107,18 +108,31 @@ export function EmployeeRow({
 
   return (
     <tr>
-      <td className="px-6 py-3">
+      <td className="px-4 py-3">
         <div className="font-medium leading-snug">{name}</div>
         <div className="text-xs text-muted-foreground">{email}</div>
       </td>
-      <td className="px-6 py-3 text-muted-foreground">{title ?? "-"}</td>
-      <td className="px-6 py-3 text-muted-foreground">
+      <td className="px-4 py-3 text-muted-foreground">{title ?? "-"}</td>
+      <td className="px-4 py-3 text-muted-foreground">
         {managerName ?? <span className="text-xs italic">Nav vadītāja (jūs)</span>}
       </td>
-      <td className="px-6 py-3 text-right tabular-nums text-muted-foreground">
+      <td className="px-4 py-3">
+        {isRegistered ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+            Reģistrēts
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 px-2.5 py-0.5 text-xs font-medium text-amber-500">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            Gaida
+          </span>
+        )}
+      </td>
+      <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
         {entryCount}
       </td>
-      <td className="px-4 py-3">
+      <td className="px-3 py-3">
         {mode === "delete" ? (
           <div className="flex items-center justify-end gap-2">
             <span className="text-xs text-muted-foreground whitespace-nowrap">Dzēst?</span>

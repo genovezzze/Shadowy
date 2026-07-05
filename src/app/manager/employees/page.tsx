@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { UserPlus, Users } from "lucide-react";
 
 export default async function ManagerEmployeesPage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const employees = await prisma.user.findMany({
     where: {
       organizationId: session.organizationId,

@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { ProfileView } from "@/components/account/profile-view";
 
 export default async function ManagerProfilePage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const user = await prisma.user.findUnique({
     where: { id: session.userId },
     select: { title: true },

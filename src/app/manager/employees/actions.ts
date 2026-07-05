@@ -15,7 +15,7 @@ const schema = z.object({
 });
 
 export async function createEmployee(formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const parsed = schema.safeParse({
     name: formData.get("name"),
@@ -70,7 +70,7 @@ const updateSchema = z.object({
 });
 
 export async function updateEmployee(employeeId: string, formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const parsed = updateSchema.safeParse({
     name: formData.get("name"),
@@ -107,7 +107,7 @@ export async function updateEmployee(employeeId: string, formData: FormData) {
 }
 
 export async function deleteEmployee(employeeId: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const employee = await prisma.user.findFirst({
     where: { id: employeeId, organizationId: session.organizationId, managerId: session.userId, role: "EMPLOYEE" },

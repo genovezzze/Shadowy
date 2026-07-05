@@ -1,6 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText, UserCog } from "lucide-react";
@@ -60,7 +60,7 @@ export default async function AdminReportPage({
       where: { organizationId: orgId, createdAt: { gte: periodStart } },
       select: {
         id: true, title: true, category: true, durationMinutes: true,
-        status: true, createdAt: true, employeeId: true, managerId: true,
+        status: true, createdAt: true, employeeId: true, managerId: true, isOutsideRole: true,
       },
     }),
     prisma.invisibleWorkEntry.findMany({
@@ -79,7 +79,7 @@ export default async function AdminReportPage({
   for (const e of approved) {
     const emp = employees.find((u) => u.id === e.employeeId);
     const duties = emp?.workRole?.duties.map((d) => d.text) ?? [];
-    const wt = classifyWorkType(e.category, e.title, duties);
+    const wt = resolveWorkType(e.isOutsideRole, e.category, e.title, duties);
     workTypeCount[wt]++;
   }
   const inRolePct = Math.round((workTypeCount.in_role / totalApproved) * 100);

@@ -8,7 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Briefcase } from "lucide-react";
 
 export default async function ManagerRolesPage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const [roles, employees] = await Promise.all([
     prisma.workRole.findMany({

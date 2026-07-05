@@ -10,7 +10,7 @@ export default async function ManagerLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const [org, pendingCount, unreadNotificationCount] = await Promise.all([
     prisma.organization.findUnique({ where: { id: session.organizationId } }),
     prisma.invisibleWorkEntry.count({
@@ -23,7 +23,7 @@ export default async function ManagerLayout({
 
   return (
     <AppShell
-      role="MANAGER"
+      role={session.role}
       userName={session.name}
       organizationName={org?.name ?? "Organizācija"}
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}

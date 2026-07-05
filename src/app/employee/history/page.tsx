@@ -8,7 +8,7 @@ import { Pagination } from "@/components/entries/pagination";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import { Download } from "lucide-react";
 import {
   buildEntryWhere,
@@ -106,7 +106,7 @@ export default async function EmployeeHistoryPage({
               durationMinutes={e.durationMinutes}
               status={e.status}
               managerComment={e.managerComment}
-              workType={classifyWorkType(e.category, e.title, duties)}
+              workType={resolveWorkType(e.isOutsideRole, e.category, e.title, duties)}
               footer={
                 e.status === "PENDING" || e.status === "RETURNED" ? (
                   <EmployeeEntryActions

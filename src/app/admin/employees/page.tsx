@@ -55,15 +55,16 @@ export default async function AdminEmployeesPage() {
             />
           ) : (
             <Card>
-              <CardContent className="p-0">
-                <table className="w-full text-sm">
+              <CardContent className="overflow-x-auto p-0">
+                <table className="w-full min-w-[560px] text-sm [&:has(.edit-form-row)>thead]:hidden">
                   <thead className="text-xs text-muted-foreground border-b border-border">
                     <tr>
-                      <th className="text-left font-medium px-6 py-3">Vārds</th>
-                      <th className="text-left font-medium px-6 py-3">Amats</th>
-                      <th className="text-left font-medium px-6 py-3">Vadītājs</th>
-                      <th className="text-right font-medium px-6 py-3">Ieraksti</th>
-                      <th className="px-4 py-3" />
+                      <th className="text-left font-medium px-4 py-3">Vārds</th>
+                      <th className="text-left font-medium px-4 py-3">Amats</th>
+                      <th className="text-left font-medium px-4 py-3">Vadītājs</th>
+                      <th className="text-left font-medium px-4 py-3">Statuss</th>
+                      <th className="text-right font-medium px-4 py-3">Ieraksti</th>
+                      <th className="px-3 py-3" />
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -78,6 +79,7 @@ export default async function AdminEmployeesPage() {
                         managerName={e.manager?.name ?? null}
                         entryCount={e._count.submittedEntries}
                         managers={managers}
+                        isRegistered={e.passwordHash !== null}
                       />
                     ))}
                   </tbody>

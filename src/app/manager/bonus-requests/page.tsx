@@ -6,7 +6,7 @@ import { RequestCard } from "./request-card";
 import { Inbox } from "lucide-react";
 
 export default async function BonusRequestsPage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const [pending, reviewed] = await Promise.all([
     prisma.bonusRequest.findMany({

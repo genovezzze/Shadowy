@@ -12,7 +12,7 @@ function revalidate() {
 }
 
 export async function approveRequest(id: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const req = await prisma.bonusRequest.findFirst({
     where: { id, managerId: session.userId, status: { in: ["PENDING", "RETURNED"] } },
@@ -37,7 +37,7 @@ export async function approveRequest(id: string) {
 }
 
 export async function rejectRequest(id: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const req = await prisma.bonusRequest.findFirst({
     where: { id, managerId: session.userId, status: { in: ["PENDING", "RETURNED"] } },
@@ -62,7 +62,7 @@ export async function rejectRequest(id: string) {
 }
 
 export async function returnRequest(id: string, comment: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   if (!comment.trim()) {
     return { ok: false as const, error: "Komentārs ir obligāts, nosūtot atpakaļ." };

@@ -19,7 +19,7 @@ export async function reviewEntry(input: {
   action: "APPROVE" | "REJECT" | "RETURN";
   comment?: string;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const parsed = schema.safeParse(input);
   if (!parsed.success) {
     return { ok: false as const, error: "Nederīgi dati." };
@@ -103,7 +103,7 @@ export async function editEntry(input: {
   clientName: string | null;
   category: string;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const parsed = editSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Nederīgi dati." };
 
@@ -140,7 +140,7 @@ export async function bulkReviewEntries(input: {
   action: "APPROVE" | "REJECT" | "RETURN";
   comment?: string;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
   const parsed = bulkSchema.safeParse(input);
   if (!parsed.success) return { ok: false as const, error: "Nederīgi dati." };
 

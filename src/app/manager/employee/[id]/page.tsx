@@ -12,7 +12,7 @@ export default async function ManagerEmployeeDetail({
 }: {
   params: { id: string };
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const employee = await prisma.user.findFirst({
     where: {

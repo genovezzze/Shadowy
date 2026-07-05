@@ -24,7 +24,7 @@ function revalidate() {
 }
 
 export async function createRule(formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const raw = {
     name: formData.get("name"),
@@ -64,7 +64,7 @@ export async function createRule(formData: FormData) {
 }
 
 export async function updateRule(id: string, formData: FormData) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const rule = await prisma.recognitionRule.findFirst({
     where: { id, managerId: session.userId },
@@ -108,7 +108,7 @@ export async function updateRule(id: string, formData: FormData) {
 }
 
 export async function toggleRule(id: string, isActive: boolean) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const rule = await prisma.recognitionRule.findFirst({
     where: { id, managerId: session.userId },
@@ -120,7 +120,7 @@ export async function toggleRule(id: string, isActive: boolean) {
 }
 
 export async function deleteRule(id: string) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const rule = await prisma.recognitionRule.findFirst({
     where: { id, managerId: session.userId },

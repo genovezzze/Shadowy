@@ -4,7 +4,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { ClientList } from "@/components/clients/client-list";
 
 export default async function ManagerClientsPage() {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   const [clients, entryStats] = await Promise.all([
     prisma.client.findMany({

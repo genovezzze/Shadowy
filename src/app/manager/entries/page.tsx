@@ -7,7 +7,7 @@ import { PendingEntriesList } from "@/components/entries/pending-entries-list";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { FileText, Download } from "lucide-react";
-import { classifyWorkType } from "@/lib/work-type";
+import { resolveWorkType } from "@/lib/work-type";
 import {
   buildEntryWhere,
   buildExportHref,
@@ -19,7 +19,7 @@ export default async function ManagerEntriesPage({
 }: {
   searchParams: EntrySearchParams;
 }) {
-  const session = await requireUser(["MANAGER"]);
+  const session = await requireUser(["MANAGER", "ADMIN"]);
 
   // Status is handled by the pending/reviewed split, so ignore it here.
   const filterParams: EntrySearchParams = { ...searchParams, status: undefined };
@@ -56,7 +56,7 @@ export default async function ManagerEntriesPage({
 
   function getWorkType(entry: typeof pending[number]) {
     const duties = entry.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
-    return classifyWorkType(entry.category, entry.title, duties);
+    return resolveWorkType(entry.isOutsideRole, entry.category, entry.title, duties);
   }
 
   return (
