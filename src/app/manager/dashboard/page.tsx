@@ -3,10 +3,10 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/empty-state";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { SectionDivider } from "@/components/dashboard/section-divider";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
+import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import {
@@ -15,6 +15,7 @@ import {
   Clock,
   FileText,
   Plus,
+  Timer,
   TrendingUp,
   Users,
 } from "lucide-react";
@@ -34,6 +35,161 @@ function periodLabel(period: string) {
   if (period === "30d") return "mēnesis";
   if (period === "90d") return "ceturksnis";
   return "viss laiks";
+}
+
+// ISO week key "YYYY-WNN"
+function weekKey(date: Date): string {
+  const d = new Date(date);
+  const day = d.getDay() || 7;
+  d.setDate(d.getDate() + 4 - day);
+  const yearStart = new Date(d.getFullYear(), 0, 1);
+  const wn = Math.ceil(((d.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${d.getFullYear()}-W${wn.toString().padStart(2, "0")}`;
+}
+
+type ApprovedEntry = {
+  title: string;
+  category: string;
+  clientName: string | null;
+  durationMinutes: number;
+  workDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  isOutsideRole: boolean | null;
+  employee: {
+    id: string;
+    name: string;
+    workRole: { duties: { text: string }[] } | null;
+  };
+};
+
+function isExtraEntry(e: ApprovedEntry): boolean {
+  const duties = e.employee.workRole?.duties.map((d) => d.text) ?? [];
+  return resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra";
+}
+
+function buildWeeklyTrendData(
+  entries: ApprovedEntry[],
+  period: string
+): { label: string; value: number }[] {
+  const now = Date.now();
+  const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
+
+  if (period === "7d") {
+    const slots = new Map<string, number>();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now - i * 86400000);
+      slots.set(d.toISOString().slice(0, 10), 0);
+    }
+    for (const e of entries) {
+      if (!isExtraEntry(e)) continue;
+      const key = e.workDate.toISOString().slice(0, 10);
+      if (slots.has(key)) slots.set(key, (slots.get(key) ?? 0) + e.durationMinutes);
+    }
+    return Array.from(slots.entries()).map(([k, v]) => ({
+      label: k.slice(5).replace("-", "/"),
+      value: Math.round((v / 60) * 10) / 10,
+    }));
+  }
+
+  if (period === "all") {
+    const slots = new Map<string, number>();
+    const nowDate = new Date(now);
+    for (let i = 11; i >= 0; i--) {
+      const d = new Date(nowDate.getFullYear(), nowDate.getMonth() - i, 1);
+      slots.set(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`, 0);
+    }
+    for (const e of entries) {
+      if (!isExtraEntry(e)) continue;
+      const d = e.workDate;
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      if (slots.has(key)) slots.set(key, (slots.get(key) ?? 0) + e.durationMinutes);
+    }
+    return Array.from(slots.entries()).map(([k, v]) => ({
+      label: LV_MONTHS[parseInt(k.slice(5), 10) - 1],
+      value: Math.round((v / 60) * 10) / 10,
+    }));
+  }
+
+  // Weekly for 30d / 90d
+  const weeksToShow = period === "30d" ? 5 : 13;
+  const slots = new Map<number, { label: string; minutes: number }>();
+  for (let i = weeksToShow - 1; i >= 0; i--) {
+    const d = new Date(now - i * 7 * 86400000);
+    d.setHours(0, 0, 0, 0);
+    const dow = d.getDay() || 7;
+    d.setDate(d.getDate() - dow + 1); // Monday
+    const wn = Math.floor(d.getTime() / (7 * 86400000));
+    const label = d.toLocaleDateString("lv-LV", { month: "short", day: "numeric" });
+    if (!slots.has(wn)) slots.set(wn, { label, minutes: 0 });
+  }
+  for (const e of entries) {
+    if (!isExtraEntry(e)) continue;
+    const d = new Date(e.workDate);
+    d.setHours(0, 0, 0, 0);
+    const dow = d.getDay() || 7;
+    d.setDate(d.getDate() - dow + 1);
+    const wn = Math.floor(d.getTime() / (7 * 86400000));
+    const slot = slots.get(wn);
+    if (slot) slots.set(wn, { ...slot, minutes: slot.minutes + e.durationMinutes });
+  }
+  return Array.from(slots.values()).map(({ label, minutes }) => ({
+    label,
+    value: Math.round((minutes / 60) * 10) / 10,
+  }));
+}
+
+function buildEmployeeBreakdown(entries: ApprovedEntry[]) {
+  const map = new Map<string, { name: string; extraMin: number; totalMin: number }>();
+  for (const e of entries) {
+    const { id, name } = e.employee;
+    if (!map.has(id)) map.set(id, { name, extraMin: 0, totalMin: 0 });
+    const slot = map.get(id)!;
+    slot.totalMin += e.durationMinutes;
+    if (isExtraEntry(e)) slot.extraMin += e.durationMinutes;
+  }
+  return Array.from(map.entries())
+    .map(([id, { name, extraMin, totalMin }]) => ({
+      id,
+      name,
+      extraH: Math.round((extraMin / 60) * 10) / 10,
+      totalH: Math.round((totalMin / 60) * 10) / 10,
+    }))
+    .filter((e) => e.extraH > 0)
+    .sort((a, b) => b.extraH - a.extraH)
+    .slice(0, 8);
+}
+
+function findInterruptionPattern(entries: ApprovedEntry[]): string | null {
+  if (entries.length < 5) return null;
+  const weekCats = new Map<string, Map<string, number>>();
+  for (const e of entries) {
+    const wk = weekKey(e.workDate);
+    if (!weekCats.has(wk)) weekCats.set(wk, new Map());
+    const m = weekCats.get(wk)!;
+    m.set(e.category, (m.get(e.category) ?? 0) + 1);
+  }
+  const sortedWeeks = Array.from(weekCats.keys()).sort().slice(-4);
+  if (sortedWeeks.length < 3) return null;
+  const tops = sortedWeeks.map((wk) => {
+    const catMap = weekCats.get(wk)!;
+    return [...catMap.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "";
+  }).filter(Boolean);
+  const freq = new Map<string, number>();
+  for (const cat of tops) freq.set(cat, (freq.get(cat) ?? 0) + 1);
+  for (const [cat, count] of freq) {
+    if (count >= 3) return cat;
+  }
+  return null;
+}
+
+function computeAvgApprovalDays(entries: ApprovedEntry[]): number | null {
+  if (entries.length === 0) return null;
+  const totalMs = entries.reduce(
+    (s, e) => s + (e.updatedAt.getTime() - e.createdAt.getTime()),
+    0
+  );
+  return Math.round((totalMs / entries.length / 86400000) * 10) / 10;
 }
 
 export default async function ManagerDashboard({
@@ -67,7 +223,8 @@ export default async function ManagerDashboard({
         clientName: true,
         durationMinutes: true,
         workDate: true,
-        source: true,
+        createdAt: true,
+        updatedAt: true,
         isOutsideRole: true,
         employee: {
           select: {
@@ -89,7 +246,7 @@ export default async function ManagerDashboard({
     }),
   ]);
 
-  // Aggregate by client name
+  // --- Core aggregation ---
   const clientMinutes = new Map<string, number>();
   const categoryCount = new Map<string, number>();
   let totalMinutes = 0;
@@ -101,17 +258,20 @@ export default async function ManagerDashboard({
       clientMinutes.set(e.clientName, (clientMinutes.get(e.clientName) ?? 0) + e.durationMinutes);
     }
     categoryCount.set(e.category, (categoryCount.get(e.category) ?? 0) + 1);
-
-    const duties = e.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
-    if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
-      extraMinutes += e.durationMinutes;
-    }
+    if (isExtraEntry(e)) extraMinutes += e.durationMinutes;
   }
 
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
 
-  // Client rows with limit comparison
+  // --- Analytics ---
+  const weeklyTrendData = buildWeeklyTrendData(approved, period);
+  const employeeBreakdown = buildEmployeeBreakdown(approved);
+  const patternCategory = findInterruptionPattern(approved);
+  const avgApprovalDays = computeAvgApprovalDays(approved);
+  const maxEmpExtraH = employeeBreakdown[0]?.extraH ?? 1;
+
+  // --- Client rows ---
   const clientRows = clients.map((c) => {
     const used = clientMinutes.get(c.name) ?? 0;
     const overrun =
@@ -126,7 +286,6 @@ export default async function ManagerDashboard({
     };
   }).sort((a, b) => b.usedMinutes - a.usedMinutes);
 
-  // Untracked entries (clientName set but no client record)
   const untrackedNames = [...new Set(
     approved
       .map((e) => e.clientName)
@@ -163,12 +322,18 @@ export default async function ManagerDashboard({
       </div>
 
       {/* KPI strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-8">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 mb-8">
         {[
           { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā" },
           { label: "Kopā stundas", value: `${totalHours}h`, icon: Clock, sub: "ierakstītas" },
-          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts darbs" },
-          { label: "Gaida apstiprinājumu", value: pendingCount, icon: AlertTriangle, sub: "manuāli ieraksti" },
+          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts" },
+          { label: "Gaida", value: pendingCount, icon: AlertTriangle, sub: "apstiprinājumu" },
+          {
+            label: "Izskatīšana",
+            value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "—",
+            icon: Timer,
+            sub: "vid. laiks",
+          },
         ].map((k, i) => (
           <Card key={i} className="p-4">
             <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
@@ -182,6 +347,65 @@ export default async function ManagerDashboard({
       </div>
 
       <CostCalculatorWidget extraMinutes={extraMinutes} />
+
+      {/* Analytics */}
+      {approved.length > 0 && (
+        <>
+          <SectionDivider label="Analītika" />
+
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-6">
+            {/* Employee breakdown */}
+            {employeeBreakdown.length > 0 && (
+              <Card className="p-5">
+                <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Papildu darbs pa darbiniekiem
+                </div>
+                <div className="space-y-2.5">
+                  {employeeBreakdown.map((emp) => {
+                    const pct = Math.round((emp.extraH / maxEmpExtraH) * 100);
+                    return (
+                      <div key={emp.id} className="flex items-center gap-3">
+                        <div className="w-28 shrink-0 truncate text-xs">{emp.name}</div>
+                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-foreground/60 rounded-full"
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                        <div className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                          {emp.extraH}h
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
+
+            {/* Hours trend */}
+            <HoursTrendChart
+              title="Papildu darba tendence"
+              data={weeklyTrendData}
+              badge={periodLabel(period)}
+            />
+          </div>
+
+          {/* Interruption pattern alert */}
+          {patternCategory && (
+            <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+              <div>
+                <div className="text-sm font-semibold">Sistemātisks traucējums</div>
+                <p className="mt-0.5 text-sm text-muted-foreground">
+                  Kategorija{" "}
+                  <span className="font-medium text-foreground">"{patternCategory}"</span>{" "}
+                  ir biežākā pēdējās 4 nedēļās — iespējama strukturāla problēma, ne gadījuma rakstura.
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Client table */}
       <SectionDivider label="Klienti" />
@@ -290,12 +514,16 @@ export default async function ManagerDashboard({
             <div className="space-y-3">
               {topCategories.map(([cat, count], i) => {
                 const pct = approved.length > 0 ? Math.round((count / approved.length) * 100) : 0;
+                const isPattern = cat === patternCategory;
                 return (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="w-40 truncate text-xs text-muted-foreground shrink-0">{cat}</div>
+                    <div className={`w-40 shrink-0 truncate text-xs ${isPattern ? "font-medium text-amber-500" : "text-muted-foreground"}`}>
+                      {cat}
+                      {isPattern && " ⚠"}
+                    </div>
                     <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-foreground/60 rounded-full"
+                        className={`h-full rounded-full ${isPattern ? "bg-amber-500/70" : "bg-foreground/60"}`}
                         style={{ width: `${pct}%` }}
                       />
                     </div>
