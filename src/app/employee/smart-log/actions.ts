@@ -55,8 +55,11 @@ export async function saveConfirmedSmartLogTickets(input: {
   }
   const managerId = employee.managerId;
 
-  const today = new Date().toISOString().slice(0, 10);
-  if (parsed.data.tickets.some((ticket) => ticket.workDate > today)) {
+  // Allow UTC+14 offset: "today" for any timezone is at most UTC+1 day
+  const maxDate = new Date();
+  maxDate.setUTCDate(maxDate.getUTCDate() + 1);
+  const maxDateStr = maxDate.toISOString().slice(0, 10);
+  if (parsed.data.tickets.some((ticket) => ticket.workDate > maxDateStr)) {
     return {
       ok: false as const,
       error: "Darba datums nevar būt nākotnē.",

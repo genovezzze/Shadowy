@@ -525,8 +525,8 @@ export function SmartWorkLog() {
                         />
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-3 [&>*]:min-w-0">
-                        <div className="grid gap-2">
+                      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 [&>*]:min-w-0">
+                        <div className="col-span-2 sm:col-span-1 grid gap-2">
                           <Label htmlFor={`category-${ticket.id}`}>
                             Kategorija
                           </Label>
@@ -716,17 +716,17 @@ export function SmartWorkLog() {
                     </Button>
                     <Button
                       type="button"
-                      variant={ticket.confirmed ? "outline" : "success"}
+                      variant={ticket.confirmed ? "success" : "outline"}
                       size="sm"
                       onClick={() => confirmTicket(ticket)}
                     >
                       {ticket.confirmed ? (
-                        "Neiekļaut"
-                      ) : (
                         <>
                           <Check className="h-3.5 w-3.5" />
-                          Iekļaut
+                          Iekļauts
                         </>
+                      ) : (
+                        "Iekļaut"
                       )}
                     </Button>
                   </div>
