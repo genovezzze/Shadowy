@@ -1,8 +1,44 @@
 "use client";
 
-import { motion } from "framer-motion";
+import React from "react";
+import { motion, useReducedMotion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
 import { EtheralShadow } from "@/components/ui/etheral-shadow";
+
+function EtheralShadowBackground() {
+  const prefersReduced = useReducedMotion();
+  const [show, setShow] = React.useState(false);
+
+  React.useEffect(() => {
+    // Only show on desktop screens
+    if (window.innerWidth < 640) return;
+    // Skip on reduced-motion preference
+    if (prefersReduced) return;
+    // Skip on low-end devices (2 or fewer CPU cores)
+    if (navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 2) return;
+    setShow(true);
+  }, [prefersReduced]);
+
+  if (!show) return null;
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <motion.div
+        className="absolute inset-y-0 -left-48 -right-48"
+        animate={{ x: [0, 200, 0] }}
+        transition={{ duration: 90, repeat: Infinity, ease: "easeInOut" }}
+      >
+        <EtheralShadow
+          color="rgba(90, 90, 98, 1)"
+          animation={{ scale: 50, speed: 40 }}
+          noise={{ opacity: 0, scale: 1 }}
+          sizing="fill"
+          style={{ opacity: 0.38 }}
+        />
+      </motion.div>
+    </div>
+  );
+}
 
 const visibleItems = [
   "Apstiprinātus ierakstus",
@@ -27,21 +63,7 @@ export function PrivacyTrustSection() {
     >
       {/* Mobile top fade */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-[#07090c] to-transparent sm:hidden" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 hidden overflow-hidden sm:block">
-        <motion.div
-          className="absolute inset-y-0 -left-48 -right-48"
-          animate={{ x: [0, 200, 0] }}
-          transition={{ duration: 90, repeat: Infinity, ease: "easeInOut" }}
-        >
-          <EtheralShadow
-            color="rgba(90, 90, 98, 1)"
-            animation={{ scale: 50, speed: 40 }}
-            noise={{ opacity: 0, scale: 1 }}
-            sizing="fill"
-            style={{ opacity: 0.38 }}
-          />
-        </motion.div>
-      </div>
+      <EtheralShadowBackground />
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-30"
