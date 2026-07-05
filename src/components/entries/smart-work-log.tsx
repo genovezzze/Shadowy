@@ -396,7 +396,7 @@ export function SmartWorkLog() {
         className={
           hasResults
             ? "mx-auto w-full max-w-4xl pt-2"
-            : "mx-auto flex min-h-[calc(100vh-4rem)] w-full flex-col items-center justify-center"
+            : "w-full sm:mx-auto sm:flex sm:min-h-[calc(100vh-4rem)] sm:flex-col sm:items-center sm:justify-center"
         }
       >
         <VercelV0Chat
