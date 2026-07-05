@@ -55,13 +55,15 @@ export async function loginAction(formData: FormData) {
 
   await clearLoginAttempts(ip, email);
 
+  const rememberMe = formData.get("rememberMe") === "on";
+
   await createSession({
     userId: user.id,
     organizationId: user.organizationId,
     role: user.role,
     email: user.email,
     name: user.name,
-  });
+  }, rememberMe);
 
   return { ok: true as const, redirectTo: roleHome(user.role) };
 }

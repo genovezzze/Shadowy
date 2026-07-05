@@ -4,17 +4,19 @@ import {
   useCallback,
   useEffect,
   useRef,
+  useState,
   type KeyboardEvent,
 } from "react";
 import {
   ArrowUpIcon,
   Clock3,
-  HandHelping,
   LoaderCircle,
-  Mic,
   MessageCircleQuestion,
+  Mic,
+  Shuffle,
   Square,
-  UserPlus,
+  Target,
+  Zap,
 } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -62,26 +64,38 @@ function useAutoResizeTextarea({
   return { textareaRef, adjustHeight };
 }
 
-const suggestions = [
+const rotatingPrompts = [
+  "Kas šodien pārtrauca tavu fokusu?",
+  "Kas traucēja pabeigt pamatdarbu?",
+  "Vai bija atkārtoti jautājumi?",
+  "Vai gaidīji informāciju?",
+];
+
+const quickActions = [
   {
-    icon: HandHelping,
-    label: "Palīdzēju kolēģim",
-    text: "Šodien palīdzēju kolēģim ",
-  },
-  {
-    icon: UserPlus,
-    label: "Ievadīju darbinieku",
-    text: "Šodien palīdzēju jaunam darbiniekam ",
+    icon: MessageCircleQuestion,
+    label: "Pārtrauca ar jautājumiem",
+    text: "Kolēģi pārtrauca ar jautājumiem ",
   },
   {
     icon: Clock3,
     label: "Gaidīju informāciju",
-    text: "Šodien gaidīju darbam nepieciešamo informāciju ",
+    text: "Gaidīju nepieciešamo informāciju ",
   },
   {
-    icon: MessageCircleQuestion,
-    label: "Atbildēju uz jautājumiem",
-    text: "Šodien atbildēju uz kolēģu jautājumiem ",
+    icon: Zap,
+    label: 'Steidzams "ātri tikai"',
+    text: 'Bija steidzams "ātri tikai" uzdevums ',
+  },
+  {
+    icon: Shuffle,
+    label: "Pārslēdzos uz citu uzdevumu",
+    text: "Nācās pārslēgties uz citu uzdevumu ",
+  },
+  {
+    icon: Target,
+    label: "Nevarēju pabeigt dziļo darbu",
+    text: "Nevarēju pabeigt dziļo darbu ",
   },
 ];
 
@@ -116,6 +130,50 @@ export function VercelV0Chat({
     minHeight: 76,
     maxHeight: 220,
   });
+
+  const [typedText, setTypedText] = useState("");
+  const [cursorOn, setCursorOn] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const charIndexRef = useRef(0);
+  const promptIdxRef = useRef(0);
+
+  // Typewriter effect
+  useEffect(() => {
+    function erase() {
+      charIndexRef.current--;
+      setTypedText(rotatingPrompts[promptIdxRef.current].slice(0, charIndexRef.current));
+
+      if (charIndexRef.current <= 0) {
+        promptIdxRef.current = (promptIdxRef.current + 1) % rotatingPrompts.length;
+        timerRef.current = setTimeout(tick, 500);
+      } else {
+        timerRef.current = setTimeout(erase, 38);
+      }
+    }
+
+    function tick() {
+      const current = rotatingPrompts[promptIdxRef.current];
+      charIndexRef.current++;
+      setTypedText(current.slice(0, charIndexRef.current));
+
+      if (charIndexRef.current >= current.length) {
+        // Hold, then erase character by character
+        timerRef.current = setTimeout(erase, 8000);
+      } else {
+        timerRef.current = setTimeout(tick, 60);
+      }
+    }
+
+    timerRef.current = setTimeout(tick, 400);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
+  // Cursor blink
+  useEffect(() => {
+    const interval = setInterval(() => setCursorOn((v) => !v), 530);
+    return () => clearInterval(interval);
+  }, []);
+
   const canSubmit = value.trim().length >= 10 && !disabled;
 
   useEffect(() => {
@@ -138,7 +196,7 @@ export function VercelV0Chat({
     });
   }
 
-  // ── Input box (shared between mobile and desktop) ──────────────────────────
+  // ── Input box ──────────────────────────────────────────────────────────────
   const inputBox = (
     <div className="relative rounded-2xl border border-neutral-200 bg-neutral-50 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
       {isRecording ? (
@@ -159,7 +217,7 @@ export function VercelV0Chat({
         </div>
       ) : null}
 
-      <div className="overflow-y-auto">
+      <div className="relative overflow-y-auto">
         <Textarea
           ref={textareaRef}
           value={value}
@@ -167,15 +225,32 @@ export function VercelV0Chat({
           onKeyDown={handleKeyDown}
           maxLength={4000}
           disabled={disabled || isRecording}
-          placeholder="Apraksti, kas šodien notika..."
+          placeholder=""
           className={cn(
             "min-h-[76px] w-full resize-none border-none bg-transparent px-4 py-4 text-lg leading-7 shadow-none",
             "font-accent font-light tracking-[0.01em]",
             "focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0",
-            "placeholder:text-neutral-500"
           )}
           style={{ overflow: "hidden" }}
         />
+
+        {/* Typewriter placeholder */}
+        {!value && !isRecording && !isTranscribing && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 px-4 py-4"
+          >
+            <span className="font-accent text-lg font-light leading-7 tracking-[0.01em] text-neutral-500">
+              {typedText}
+              <span
+                className={cn(
+                  "ml-[1px] inline-block h-[1.2em] w-[1.5px] translate-y-[0.1em] bg-neutral-500 transition-opacity duration-75",
+                  cursorOn ? "opacity-100" : "opacity-0"
+                )}
+              />
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between gap-3 p-3 pt-1">
@@ -231,16 +306,48 @@ export function VercelV0Chat({
     </div>
   );
 
-  // ── MOBILE layout (hidden on sm+) ──────────────────────────────────────────
+  // ── Quick action buttons ───────────────────────────────────────────────────
+  function QuickButtons({ scrollable }: { scrollable: boolean }) {
+    return (
+      <div
+        className={cn(
+          "flex gap-2",
+          scrollable
+            ? "overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            : "flex-wrap items-center justify-center"
+        )}
+      >
+        {quickActions.map(({ icon: Icon, label, text }) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => applySuggestion(text)}
+            disabled={disabled}
+            className={cn(
+              "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 transition-colors",
+              "border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-foreground",
+              "dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800",
+              "disabled:pointer-events-none disabled:opacity-50"
+            )}
+          >
+            <Icon className="h-3.5 w-3.5 shrink-0" />
+            <span className="whitespace-nowrap text-xs font-light tracking-[0.01em]">
+              {label}
+            </span>
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+  // ── MOBILE layout ──────────────────────────────────────────────────────────
   if (!compact) {
     return (
       <>
-        {/* MOBILE: full-screen ChatGPT-style — escape parent container padding */}
         <div
           className="flex sm:hidden flex-col -mx-4 -mt-4 font-accent bg-background"
           style={{ height: "calc(100dvh - 4rem)" }}
         >
-          {/* Heading */}
           <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
             <h1 className="text-balance text-3xl font-bold leading-[1.15] tracking-[0.015em] text-foreground [font-synthesis:weight]">
               Pastāsti, kas šodien aizņēma papildu laiku
@@ -250,8 +357,10 @@ export function VercelV0Chat({
             </p>
           </div>
 
-          {/* Input pinned to bottom */}
           <div className="px-4 pb-5 pt-2 bg-background border-t border-border/30">
+            <div className="mb-3">
+              <QuickButtons scrollable />
+            </div>
             {inputBox}
             <p className="mt-2 text-center text-[11px] text-muted-foreground/50">
               Ieraksts tiks saglabāts tikai pēc tavas apstiprināšanas
@@ -259,18 +368,18 @@ export function VercelV0Chat({
           </div>
         </div>
 
-        {/* DESKTOP: current centered layout */}
+        {/* DESKTOP layout */}
         <div
           className={cn(
             "hidden sm:flex mx-auto w-full max-w-4xl flex-col items-center px-6 font-accent",
             "space-y-8"
           )}
         >
-          <div className="w-full text-center">
+          <div className="w-full space-y-4 text-center">
             <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-[0.015em] text-foreground [font-synthesis:weight] lg:text-[42px]">
               Pastāsti, kas šodien aizņēma papildu laiku
             </h1>
-            <p className="mx-auto mt-4 max-w-none text-xl font-light leading-7 tracking-[0.01em] text-muted-foreground">
+            <p className="mx-auto max-w-none text-xl font-light leading-7 tracking-[0.01em] text-muted-foreground">
               Apraksti situāciju saviem vārdiem vai ierunā to. Shadowy izveidos
               melnraksta ierakstus pārskatīšanai
             </p>
@@ -279,19 +388,8 @@ export function VercelV0Chat({
           <div className="w-full">
             {inputBox}
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              {suggestions.map(({ icon: Icon, label, text }) => (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => applySuggestion(text)}
-                  disabled={disabled}
-                  className="flex items-center gap-2 rounded-full border border-neutral-200 bg-neutral-50 px-4 py-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-foreground disabled:pointer-events-none disabled:opacity-50 dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800"
-                >
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm font-light tracking-[0.01em]">{label}</span>
-                </button>
-              ))}
+            <div className="mt-4">
+              <QuickButtons scrollable={false} />
             </div>
             <div className="mt-5 space-y-1 text-center text-sm font-light tracking-[0.01em] text-muted-foreground">
               <p>Ieraksti tiek sagatavoti vienā reizē un saglabāti ar vienu pogu</p>
@@ -303,7 +401,7 @@ export function VercelV0Chat({
     );
   }
 
-  // ── Compact mode (when results are showing) — same on all screens ──────────
+  // ── Compact mode ──────────────────────────────────────────────────────────
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col items-center px-4 font-accent sm:px-6 space-y-5">
       <div className="w-full">{inputBox}</div>

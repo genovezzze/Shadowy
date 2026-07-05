@@ -17,7 +17,9 @@ export type SessionPayload = {
   name: string;
 };
 
-const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 days
+const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 days (Google OAuth / default)
+const REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
+const SESSION_ONLY_DURATION_SECONDS = 60 * 60 * 24; // 24 h (no-remember JWT TTL)
 
 /** Cookie options shared by createSession and route handlers that set the session directly. */
 export function sessionCookieOptions() {
@@ -39,9 +41,23 @@ export async function signSessionToken(payload: SessionPayload) {
     .sign(secret);
 }
 
-export async function createSession(payload: SessionPayload) {
-  const token = await signSessionToken(payload);
-  cookies().set(COOKIE_NAME, token, sessionCookieOptions());
+export async function createSession(payload: SessionPayload, rememberMe = false) {
+  const duration = rememberMe ? REMEMBER_ME_DURATION_SECONDS : SESSION_ONLY_DURATION_SECONDS;
+  const token = await new SignJWT({ ...payload })
+    .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
+    .setExpirationTime(`${duration}s`)
+    .sign(secret);
+
+  const cookieOpts = {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    ...(rememberMe ? { maxAge: REMEMBER_ME_DURATION_SECONDS } : {}),
+  };
+
+  cookies().set(COOKIE_NAME, token, cookieOpts);
 }
 
 export async function destroySession() {

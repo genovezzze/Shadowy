@@ -29,6 +29,7 @@ export function LoginForm() {
   const params = useSearchParams();
   const nextPath = params.get("next") ?? undefined;
   const errorCode = params.get("error");
+  const [remember, setRemember] = useState(false);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(
     errorCode ? OAUTH_ERRORS[errorCode] ?? "Neizdevās pieslēgties." : null
@@ -77,6 +78,25 @@ export function LoginForm() {
           className={authFieldClassName}
         />
       </div>
+      <label className="group flex cursor-pointer select-none items-center gap-2.5 py-0.5">
+        <input
+          type="checkbox"
+          name="rememberMe"
+          checked={remember}
+          onChange={(e) => setRemember(e.target.checked)}
+          className="sr-only"
+        />
+        <span className={`flex size-4 shrink-0 items-center justify-center rounded border transition-colors ${remember ? "border-white/30 bg-white/[0.12]" : "border-white/[0.18] bg-white/[0.05] group-hover:border-white/25"}`}>
+          {remember && (
+            <svg viewBox="0 0 10 8" className="size-2.5 text-white/70" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="1,4 3.5,6.5 9,1" />
+            </svg>
+          )}
+        </span>
+        <span className="font-accent text-sm text-white/50 transition-colors group-hover:text-white/65">
+          Atcerēties mani
+        </span>
+      </label>
       {error ? (
         <div className="rounded-xl border border-red-400/20 bg-red-400/[0.06] px-4 py-3 font-accent text-sm leading-5 text-red-300">
           {error}
