@@ -76,7 +76,7 @@ export function EtheralShadow({ sizing = 'fill', color = 'rgba(128,128,128,1)', 
         )}
         <div style={{
           backgroundColor: color,
-          maskImage: `url('https://framerusercontent.com/images/ceBGguIpUU8luwByxuQz79t7To.png')`,
+          maskImage: `url('/etheral-mask.png')`,
           maskSize: sizing === 'stretch' ? '100% 100%' : 'cover',
           maskRepeat: 'no-repeat',
           maskPosition: 'center',

@@ -27,7 +27,7 @@ export function PrivacyTrustSection() {
     >
       {/* Mobile top fade */}
       <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-[#07090c] to-transparent sm:hidden" />
-      <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div aria-hidden className="pointer-events-none absolute inset-0 hidden overflow-hidden sm:block">
         <motion.div
           className="absolute inset-y-0 -left-48 -right-48"
           animate={{ x: [0, 200, 0] }}
