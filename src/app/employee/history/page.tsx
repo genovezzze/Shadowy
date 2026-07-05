@@ -9,6 +9,7 @@ import { EmployeeEntryActions } from "@/components/entries/employee-entry-action
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { resolveWorkType } from "@/lib/work-type";
+import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 import { Download } from "lucide-react";
 import {
   buildEntryWhere,
@@ -27,12 +28,8 @@ export default async function EmployeeHistoryPage({
   const session = await requireUser(["EMPLOYEE"]);
   const where = { employeeId: session.userId, ...buildEntryWhere(searchParams) };
 
-  const [total, categories, user] = await Promise.all([
+  const [total, user] = await Promise.all([
     prisma.invisibleWorkEntry.count({ where }),
-    prisma.category.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { name: "asc" },
-    }),
     prisma.user.findUnique({
       where: { id: session.userId },
       include: { workRole: { include: { duties: true } } },
@@ -50,7 +47,6 @@ export default async function EmployeeHistoryPage({
   });
 
   const duties = user?.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
-  const categoryNames = categories.map((c: { name: string }) => c.name);
   const filtered = hasActiveFilters(searchParams);
 
   return (
@@ -73,7 +69,7 @@ export default async function EmployeeHistoryPage({
       />
 
       {entries.length > 0 || filtered ? (
-        <EntriesFilter categories={categoryNames} />
+        <EntriesFilter categories={SMART_LOG_CATEGORIES.map((c) => c.label)} />
       ) : null}
 
       {entries.length === 0 ? (
@@ -116,7 +112,6 @@ export default async function EmployeeHistoryPage({
                     description={e.description}
                     workDate={e.workDate.toISOString().slice(0, 10)}
                     durationMinutes={e.durationMinutes}
-                    categories={categoryNames}
                   />
                 ) : null
               }

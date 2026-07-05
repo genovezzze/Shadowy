@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { updateEntry, deleteEntry } from "@/app/employee/history/actions";
+import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 
 interface EmployeeEntryActionsProps {
   entryId: string;
@@ -16,7 +17,6 @@ interface EmployeeEntryActionsProps {
   description: string;
   workDate: string;
   durationMinutes: number;
-  categories: string[];
 }
 
 export function EmployeeEntryActions({
@@ -26,7 +26,6 @@ export function EmployeeEntryActions({
   description,
   workDate,
   durationMinutes,
-  categories,
 }: EmployeeEntryActionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -87,9 +86,9 @@ export function EmployeeEntryActions({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {categories.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
+                      {SMART_LOG_CATEGORIES.map(({ value, label }) => (
+                        <SelectItem key={value} value={label}>
+                          {label}
                         </SelectItem>
                       ))}
                     </SelectContent>

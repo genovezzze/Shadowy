@@ -47,7 +47,7 @@ export default async function EmployeeDashboard() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 86400000);
 
-  const [pending, approved, returned, rejected, recent, allEntries, categories] = await Promise.all([
+  const [pending, approved, returned, rejected, recent, allEntries] = await Promise.all([
     prisma.invisibleWorkEntry.count({
       where: { employeeId: session.userId, status: "PENDING" },
     }),
@@ -69,13 +69,8 @@ export default async function EmployeeDashboard() {
       where: { employeeId: session.userId },
       select: { createdAt: true, status: true, category: true, durationMinutes: true },
     }),
-    prisma.category.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { name: "asc" },
-    }),
   ]);
 
-  const categoryNames = categories.map((c: { name: string }) => c.name);
   const monthlyData = buildMonthlyData(allEntries);
 
   type EntrySlice = { createdAt: Date; status: string; category: string; durationMinutes: number };
@@ -272,7 +267,6 @@ export default async function EmployeeDashboard() {
                     description={e.description}
                     workDate={e.workDate.toISOString().slice(0, 10)}
                     durationMinutes={e.durationMinutes}
-                    categories={categoryNames}
                   />
                 ) : null
               }

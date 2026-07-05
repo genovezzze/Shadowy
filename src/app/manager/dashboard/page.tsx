@@ -398,7 +398,7 @@ export default async function ManagerDashboard({
                 <div className="text-sm font-semibold">Sistemātisks traucējums</div>
                 <p className="mt-0.5 text-sm text-muted-foreground">
                   Kategorija{" "}
-                  <span className="font-medium text-foreground">"{patternCategory}"</span>{" "}
+                  <span className="font-medium text-foreground">&ldquo;{patternCategory}&rdquo;</span>{" "}
                   ir biežākā pēdējās 4 nedēļās — iespējama strukturāla problēma, ne gadījuma rakstura.
                 </p>
               </div>

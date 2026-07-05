@@ -4,20 +4,17 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RuleForm } from "./rule-form";
+import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 import { RuleCard } from "./rule-card";
 import { Gift } from "lucide-react";
 
 export default async function BonusRulesPage() {
   const session = await requireUser(["MANAGER", "ADMIN"]);
 
-  const [rules, categories, workRoles] = await Promise.all([
+  const [rules, workRoles] = await Promise.all([
     prisma.recognitionRule.findMany({
       where: { managerId: session.userId },
       orderBy: { createdAt: "desc" },
-    }),
-    prisma.category.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { name: "asc" },
     }),
     prisma.workRole.findMany({
       where: { managerId: session.userId },
@@ -25,7 +22,6 @@ export default async function BonusRulesPage() {
     }),
   ]);
 
-  const categoryNames = categories.map((c: { name: string }) => c.name);
   const roleOptions = workRoles.map((r: { id: string; name: string }) => ({
     id: r.id,
     name: r.name,
@@ -47,7 +43,7 @@ export default async function BonusRulesPage() {
             <CardContent>
               <RuleForm
                 mode="create"
-                categories={categoryNames}
+                categories={SMART_LOG_CATEGORIES.map((c) => c.label)}
                 workRoles={roleOptions}
               />
             </CardContent>
@@ -67,7 +63,7 @@ export default async function BonusRulesPage() {
                 <RuleCard
                   key={rule.id}
                   rule={rule}
-                  categories={categoryNames}
+                  categories={SMART_LOG_CATEGORIES.map((c) => c.label)}
                   workRoles={roleOptions}
                 />
               ))}

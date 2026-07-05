@@ -84,8 +84,8 @@ const quickActions = [
   },
   {
     icon: Zap,
-    label: 'Steidzams "ātri tikai"',
-    text: 'Bija steidzams "ātri tikai" uzdevums ',
+    label: "Negaidīts steidzams uzdevums",
+    text: "Nācās veikt negaidītu steidzamu uzdevumu ",
   },
   {
     icon: Shuffle,
@@ -98,6 +98,105 @@ const quickActions = [
     text: "Nevarēju pabeigt dziļo darbu ",
   },
 ];
+
+// Isolated so its 60ms timer re-renders don't propagate to the parent.
+function TypewriterPlaceholder() {
+  const [typedText, setTypedText] = useState("");
+  const [cursorOn, setCursorOn] = useState(true);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const charIndexRef = useRef(0);
+  const promptIdxRef = useRef(0);
+
+  useEffect(() => {
+    function erase() {
+      charIndexRef.current--;
+      setTypedText(rotatingPrompts[promptIdxRef.current].slice(0, charIndexRef.current));
+      if (charIndexRef.current <= 0) {
+        promptIdxRef.current = (promptIdxRef.current + 1) % rotatingPrompts.length;
+        timerRef.current = setTimeout(tick, 500);
+      } else {
+        timerRef.current = setTimeout(erase, 38);
+      }
+    }
+    function tick() {
+      const current = rotatingPrompts[promptIdxRef.current];
+      charIndexRef.current++;
+      setTypedText(current.slice(0, charIndexRef.current));
+      if (charIndexRef.current >= current.length) {
+        timerRef.current = setTimeout(erase, 8000);
+      } else {
+        timerRef.current = setTimeout(tick, 60);
+      }
+    }
+    timerRef.current = setTimeout(tick, 400);
+    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => setCursorOn((v) => !v), 530);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 px-4 py-4">
+      <span className="font-accent text-lg font-light leading-7 tracking-[0.01em] text-neutral-500">
+        {typedText}
+        <span
+          className={cn(
+            "ml-[1px] inline-block h-[1.2em] w-[1.5px] translate-y-[0.1em] bg-neutral-500 transition-opacity duration-75",
+            cursorOn ? "opacity-100" : "opacity-0"
+          )}
+        />
+      </span>
+    </div>
+  );
+}
+
+interface QuickButtonsProps {
+  disabled?: boolean;
+  // eslint-disable-next-line no-unused-vars
+  onAction: (text: string) => void;
+  scrollable: boolean;
+}
+
+// Defined at module level so its identity is stable across parent re-renders.
+function QuickButtons({ disabled, onAction, scrollable }: QuickButtonsProps) {
+  return (
+    <div
+      className={cn(
+        "flex gap-2",
+        scrollable
+          ? "overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          : "flex-wrap items-center justify-center"
+      )}
+    >
+      {quickActions.map(({ icon: Icon, label, text }) => (
+        <button
+          key={label}
+          type="button"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            onAction(text);
+          }}
+          disabled={disabled}
+          className={cn(
+            "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5",
+            "transition-[background-color,color,border-color] duration-150",
+            "border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800",
+            "dark:border-white/10 dark:bg-white/[0.05] dark:text-white/50",
+            "dark:hover:bg-white/[0.11] dark:hover:text-white/80 dark:hover:border-white/[0.18]",
+            "disabled:pointer-events-none disabled:opacity-50 focus:outline-none"
+          )}
+        >
+          <Icon className="h-3.5 w-3.5 shrink-0" />
+          <span className="whitespace-nowrap text-xs font-light tracking-[0.01em]">
+            {label}
+          </span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 interface VercelV0ChatProps {
   value: string;
@@ -131,49 +230,6 @@ export function VercelV0Chat({
     minHeight: 76,
     maxHeight: MAX_HEIGHT,
   });
-
-  const [typedText, setTypedText] = useState("");
-  const [cursorOn, setCursorOn] = useState(true);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const charIndexRef = useRef(0);
-  const promptIdxRef = useRef(0);
-
-  // Typewriter effect
-  useEffect(() => {
-    function erase() {
-      charIndexRef.current--;
-      setTypedText(rotatingPrompts[promptIdxRef.current].slice(0, charIndexRef.current));
-
-      if (charIndexRef.current <= 0) {
-        promptIdxRef.current = (promptIdxRef.current + 1) % rotatingPrompts.length;
-        timerRef.current = setTimeout(tick, 500);
-      } else {
-        timerRef.current = setTimeout(erase, 38);
-      }
-    }
-
-    function tick() {
-      const current = rotatingPrompts[promptIdxRef.current];
-      charIndexRef.current++;
-      setTypedText(current.slice(0, charIndexRef.current));
-
-      if (charIndexRef.current >= current.length) {
-        // Hold, then erase character by character
-        timerRef.current = setTimeout(erase, 8000);
-      } else {
-        timerRef.current = setTimeout(tick, 60);
-      }
-    }
-
-    timerRef.current = setTimeout(tick, 400);
-    return () => { if (timerRef.current) clearTimeout(timerRef.current); };
-  }, []);
-
-  // Cursor blink
-  useEffect(() => {
-    const interval = setInterval(() => setCursorOn((v) => !v), 530);
-    return () => clearInterval(interval);
-  }, []);
 
   const canSubmit = value.trim().length >= 10 && !disabled;
 
@@ -237,20 +293,7 @@ export function VercelV0Chat({
 
         {/* Typewriter placeholder */}
         {!value && !isRecording && !isTranscribing && (
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 px-4 py-4"
-          >
-            <span className="font-accent text-lg font-light leading-7 tracking-[0.01em] text-neutral-500">
-              {typedText}
-              <span
-                className={cn(
-                  "ml-[1px] inline-block h-[1.2em] w-[1.5px] translate-y-[0.1em] bg-neutral-500 transition-opacity duration-75",
-                  cursorOn ? "opacity-100" : "opacity-0"
-                )}
-              />
-            </span>
-          </div>
+          <TypewriterPlaceholder />
         )}
       </div>
 
@@ -307,43 +350,6 @@ export function VercelV0Chat({
     </div>
   );
 
-  // ── Quick action buttons ───────────────────────────────────────────────────
-  function QuickButtons({ scrollable }: { scrollable: boolean }) {
-    return (
-      <div
-        className={cn(
-          "flex gap-2",
-          scrollable
-            ? "overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            : "flex-wrap items-center justify-center"
-        )}
-      >
-        {quickActions.map(({ icon: Icon, label, text }) => (
-          <button
-            key={label}
-            type="button"
-            onMouseDown={(e) => {
-              e.preventDefault();
-              applySuggestion(text);
-            }}
-            disabled={disabled}
-            className={cn(
-              "flex shrink-0 items-center gap-1.5 rounded-full border px-3.5 py-1.5 transition-colors",
-              "border-neutral-200 bg-neutral-50 text-neutral-500 hover:bg-neutral-100 hover:text-foreground",
-              "dark:border-neutral-800 dark:bg-neutral-900 dark:hover:bg-neutral-800",
-              "disabled:pointer-events-none disabled:opacity-50 focus:outline-none"
-            )}
-          >
-            <Icon className="h-3.5 w-3.5 shrink-0" />
-            <span className="whitespace-nowrap text-xs font-light tracking-[0.01em]">
-              {label}
-            </span>
-          </button>
-        ))}
-      </div>
-    );
-  }
-
   // ── MOBILE layout ──────────────────────────────────────────────────────────
   if (!compact) {
     return (
@@ -390,7 +396,7 @@ export function VercelV0Chat({
             {inputBox}
 
             <div className="mt-4">
-              <QuickButtons scrollable={false} />
+              <QuickButtons scrollable={false} disabled={disabled} onAction={applySuggestion} />
             </div>
             <div className="mt-5 space-y-1 text-center text-sm font-light tracking-[0.01em] text-muted-foreground">
               <p>Ieraksti tiek sagatavoti vienā reizē un saglabāti ar vienu pogu</p>

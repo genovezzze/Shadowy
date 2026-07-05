@@ -182,6 +182,8 @@ export function SmartWorkLog() {
           echoCancellation: true,
           noiseSuppression: true,
           autoGainControl: true,
+          channelCount: 1,
+          sampleRate: { ideal: 16000 },
         },
       });
       streamRef.current = stream;

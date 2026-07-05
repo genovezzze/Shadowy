@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { FileText, Download } from "lucide-react";
 import { buildExportHref } from "@/lib/entry-filter";
+import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 import { AdminReviewActions } from "@/components/entries/admin-review-actions";
 import {
   buildEntryWhere,
@@ -29,13 +30,8 @@ export default async function AdminEntriesPage({
     ...buildEntryWhere(searchParams),
   };
 
-  const [total, categories, employees] = await Promise.all([
+  const [total, employees] = await Promise.all([
     prisma.invisibleWorkEntry.count({ where }),
-    prisma.category.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { name: "asc" },
-      select: { name: true },
-    }),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, role: "EMPLOYEE" },
       orderBy: { name: "asc" },
@@ -71,7 +67,7 @@ export default async function AdminEntriesPage({
       />
 
       <EntriesFilter
-        categories={categories.map((c) => c.name)}
+        categories={SMART_LOG_CATEGORIES.map((c) => c.label)}
         employees={employees}
       />
 

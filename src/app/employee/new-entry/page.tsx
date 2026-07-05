@@ -8,19 +8,13 @@ import { CheckCircle2, Circle } from "lucide-react";
 export default async function NewEntryPage() {
   const session = await requireUser(["EMPLOYEE"]);
 
-  const [employee, categories] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: session.userId },
-      include: {
-        manager: true,
-        workRole: { include: { duties: { orderBy: { createdAt: "asc" } } } },
-      },
-    }),
-    prisma.category.findMany({
-      where: { organizationId: session.organizationId },
-      orderBy: { name: "asc" },
-    }),
-  ]);
+  const employee = await prisma.user.findUnique({
+    where: { id: session.userId },
+    include: {
+      manager: true,
+      workRole: { include: { duties: { orderBy: { createdAt: "asc" } } } },
+    },
+  });
 
   const duties = employee?.workRole?.duties ?? [];
 
@@ -43,7 +37,7 @@ export default async function NewEntryPage() {
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <EntryForm categories={categories.map((c) => c.name)} />
+          <EntryForm />
 
           {/* Duties sidebar */}
           <div className="rounded-xl border border-border bg-card p-5 h-fit">

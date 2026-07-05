@@ -8,28 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { createEntry } from "@/app/employee/new-entry/actions";
+import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 
-interface EntryFormProps {
-  categories: string[];
-}
-
-export function EntryForm({ categories }: EntryFormProps) {
+export function EntryForm() {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [category, setCategory] = useState("");
-  const [customCategory, setCustomCategory] = useState("");
-
-  const resolvedCategory = category === "Cits" ? customCategory.trim() : category;
 
   async function onSubmit(formData: FormData) {
     setError(null);
     setSuccess(false);
-    if (category === "Cits" && !customCategory.trim()) {
-      setError("Lūdzu, ievadiet kategoriju.");
-      return;
-    }
-    formData.set("category", resolvedCategory);
+    formData.set("category", category);
     startTransition(async () => {
       const result = await createEntry(formData);
       if (!result.ok) {
@@ -37,7 +27,6 @@ export function EntryForm({ categories }: EntryFormProps) {
       } else {
         setSuccess(true);
         setCategory("");
-        setCustomCategory("");
         (document.getElementById("entry-form") as HTMLFormElement)?.reset();
       }
     });
@@ -72,23 +61,13 @@ export function EntryForm({ categories }: EntryFormProps) {
                   <SelectValue placeholder="Izvēlieties kategoriju" />
                 </SelectTrigger>
                 <SelectContent>
-                  {categories.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
+                  {SMART_LOG_CATEGORIES.map(({ value, label }) => (
+                    <SelectItem key={value} value={label}>
+                      {label}
                     </SelectItem>
                   ))}
-                  <SelectItem value="Cits">Cits</SelectItem>
                 </SelectContent>
               </Select>
-              {category === "Cits" && (
-                <Input
-                  placeholder="Norādiet savu kategoriju"
-                  value={customCategory}
-                  onChange={(e) => setCustomCategory(e.target.value)}
-                  maxLength={80}
-                  autoFocus
-                />
-              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="workDate">Darba datums</Label>

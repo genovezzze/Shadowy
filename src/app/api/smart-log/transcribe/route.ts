@@ -103,13 +103,14 @@ export async function POST(request: Request) {
   );
   upstreamForm.append(
     "model",
-    process.env.OPENAI_TRANSCRIBE_MODEL ?? "gpt-4o-mini-transcribe"
+    process.env.OPENAI_TRANSCRIBE_MODEL ?? "whisper-1"
   );
   upstreamForm.append("language", "lv");
   upstreamForm.append("response_format", "json");
+  upstreamForm.append("temperature", "0");
   upstreamForm.append(
     "prompt",
-    "Latviešu valodas darba dienas apraksts. Shadowy, kolēģis, vadītājs, neredzamais darbs, papildu uzdevums, ievadīšana darbā."
+    "Šodien strādāju pie projekta. Apmēram 30 minūtes veltīju kolēģu jautājumiem. Vadītājs lūdza sagatavot atskaiti. Piedalījos sanāksmē. Apmācīju jaunu darbinieku. Risināju tehniskas problēmas. Rakstīju e-pastus un dokumentāciju. Pārtrauca ar steidzamu uzdevumu. Nevaru pabeigt galveno darbu termiņā. Papildu ieguldījums, neredzamais darbs, darba loma, pienākumi, klients, projekts, uzdevums, stunda, minūte, nedēļa."
   );
 
   try {
