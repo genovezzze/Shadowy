@@ -91,7 +91,7 @@ export function CostCalculatorWidget({ extraMinutes }: Props) {
           </button>
 
           {editing && mounted && (
-            <div className="absolute right-0 top-full z-50 mt-1.5 w-60 rounded-lg border border-border bg-popover p-3 shadow-lg">
+            <div className="absolute right-0 top-full z-50 mt-1.5 w-64 rounded-xl border border-border bg-card p-4 shadow-[0_8px_32px_rgba(0,0,0,0.28)] dark:border-white/[0.12] dark:shadow-[0_8px_40px_rgba(0,0,0,0.6)]">
               <p className="mb-2 text-xs font-medium text-muted-foreground">Likmes veids</p>
               <div className="mb-3 flex rounded-md border border-border overflow-hidden text-xs">
                 {(["hourly", "monthly"] as const).map((m) => (
