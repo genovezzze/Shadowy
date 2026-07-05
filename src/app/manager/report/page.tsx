@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText } from "lucide-react";
 
 function getPeriodStart(period: string): Date {
@@ -458,28 +459,7 @@ export default async function ManagerReportPage({
       {extraHours > 0 && (
         <section className="mb-8">
           <h2 className="text-base font-semibold mb-3">Neredzamā darba novērtējums</h2>
-          <div className="rounded-xl border border-border bg-card p-5 print:border-gray-200">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Papildu darba stundas</div>
-                <div className="text-2xl font-bold tabular-nums">{extraHours}h</div>
-                <div className="text-xs text-muted-foreground mt-0.5">ārpus oficiālās lomas</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">Novērtētā vērtība (€15/h)</div>
-                <div className="text-2xl font-bold tabular-nums">€{Math.round(extraHours * 15)}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">neformalizēts ieguldījums</div>
-              </div>
-              <div>
-                <div className="text-xs text-muted-foreground mb-1">No apstiprinātajiem</div>
-                <div className="text-2xl font-bold tabular-nums">{extraPct}%</div>
-                <div className="text-xs text-muted-foreground mt-0.5">ir papildu darbs</div>
-              </div>
-            </div>
-            <p className="mt-4 text-xs text-muted-foreground border-t border-border pt-3 print:text-gray-400">
-              Novērtējums balstīts uz €15/h likmi. Mainiet likmi atbilstoši jūsu komandas faktiskajām izmaksām.
-            </p>
-          </div>
+          <InvisibleWorkCostPanel extraHours={extraHours} extraPct={extraPct} />
         </section>
       )}
 
