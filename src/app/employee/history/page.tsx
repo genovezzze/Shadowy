@@ -47,7 +47,13 @@ export default async function EmployeeHistoryPage({
     orderBy: { createdAt: "desc" },
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
-    include: { timeLogs: { select: { minutes: true } } },
+    select: {
+      id: true, title: true, category: true, description: true,
+      clientName: true, clientId: true,
+      workDate: true, durationMinutes: true, status: true,
+      managerComment: true, isOutsideRole: true,
+      timeLogs: { select: { minutes: true } },
+    },
   });
 
   const duties = user?.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
@@ -104,6 +110,7 @@ export default async function EmployeeHistoryPage({
                 category={e.category}
                 description={e.description}
                 clientName={e.clientName}
+                clientHref={e.clientId ? `/employee/clients/${e.clientId}` : undefined}
                 workDate={e.workDate}
                 durationMinutes={totalMinutes}
                 status={e.status}

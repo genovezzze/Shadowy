@@ -46,7 +46,7 @@ export default async function AdminReportPage({
   const periodStart = getPeriodStart(period);
   const now = new Date();
 
-  const [org, employees, managers, allEntries, reviewedAll] = await Promise.all([
+  const [org, employees, managers, allEntries, reviewedAll, clients] = await Promise.all([
     prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } }),
     prisma.user.findMany({
       where: { organizationId: orgId, role: "EMPLOYEE" },
@@ -60,12 +60,18 @@ export default async function AdminReportPage({
       where: { organizationId: orgId, createdAt: { gte: periodStart } },
       select: {
         id: true, title: true, category: true, durationMinutes: true,
-        status: true, createdAt: true, employeeId: true, managerId: true, isOutsideRole: true,
+        status: true, createdAt: true, employeeId: true, managerId: true,
+        isOutsideRole: true, clientId: true, clientName: true,
       },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: { organizationId: orgId, status: { in: ["APPROVED", "REJECTED", "RETURNED"] } },
       select: { managerId: true, createdAt: true, updatedAt: true },
+    }),
+    prisma.client.findMany({
+      where: { organizationId: orgId, status: "active" },
+      select: { id: true, name: true, freeMinutesPerMonth: true },
+      orderBy: { name: "asc" },
     }),
   ]);
 
@@ -109,6 +115,37 @@ export default async function AdminReportPage({
   // Weekly activity
   const weeklyData = buildWeeklyData(allEntries, periodStart);
   const maxWeekCount = Math.max(...weeklyData.map((w) => w.count), 1);
+
+  // Client analytics
+  const adminClientMinMap = new Map<string, number>();
+  const adminClientNameMinMap = new Map<string, { minutes: number; displayName: string }>();
+  let adminNoClientCount = 0;
+  for (const e of approved) {
+    if (e.clientId) {
+      adminClientMinMap.set(e.clientId, (adminClientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
+    } else if (e.clientName) {
+      const key = e.clientName.toLowerCase();
+      const existing = adminClientNameMinMap.get(key);
+      adminClientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
+    } else {
+      adminNoClientCount++;
+    }
+  }
+  const registeredClientLower = new Set(clients.map((c) => c.name.toLowerCase()));
+  const adminClientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
+  for (const c of clients) {
+    const nameEntry = adminClientNameMinMap.get(c.name.toLowerCase());
+    const minutes = (adminClientMinMap.get(c.id) ?? 0) + (nameEntry?.minutes ?? 0);
+    if (minutes === 0) continue;
+    const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;
+    adminClientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
+  }
+  for (const [nameLower, { minutes, displayName }] of adminClientNameMinMap.entries()) {
+    if (!registeredClientLower.has(nameLower)) {
+      adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: null, overrun: 0, eur: 0, registered: false });
+    }
+  }
+  adminClientData.sort((a, b) => b.minutes - a.minutes);
 
   // Org avg review
   const avgMs = reviewedAll.length > 0
@@ -263,6 +300,60 @@ export default async function AdminReportPage({
           </table>
         </div>
       </section>
+
+      {/* Client analytics */}
+      {(adminClientData.length > 0 || adminNoClientCount > 0) && (
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="text-base font-semibold mb-0.5">Klienti</h2>
+              <p className="text-xs text-muted-foreground">Pārsniegums = Ierakstīts − Bezmaksas limits</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground">Stundas likme</div>
+              <div className="text-sm font-semibold">€20 / h</div>
+            </div>
+          </div>
+          <div className="rounded-xl border border-border overflow-hidden print:border-gray-200">
+            {adminClientData.length > 0 && (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30 print:bg-gray-50">
+                    <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground print:text-gray-500">Klients</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Ierakstīts</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Bezmaksas limits</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Pārsniegums</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">~EUR</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border print:divide-gray-100">
+                  {adminClientData.map((c) => (
+                    <tr key={c.id} className="hover:bg-muted/20 transition-colors print:hover:bg-transparent">
+                      <td className="px-5 py-3 font-medium">{c.name}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{`${Math.round((c.minutes / 60) * 10) / 10}h`}</td>
+                      <td className="px-4 py-3 text-right tabular-nums text-muted-foreground print:text-gray-400">
+                        {c.registered ? (c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞") : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {c.registered && c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                      </td>
+                      <td className="px-5 py-3 text-right tabular-nums">
+                        {c.registered && c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {adminNoClientCount > 0 && (
+              <div className={`flex items-center gap-2 px-5 py-3 text-sm text-amber-600 dark:text-amber-400 print:text-amber-700 ${adminClientData.length > 0 ? "border-t border-border" : ""}`}>
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {adminNoClientCount} ierakst{adminNoClientCount === 1 ? "s" : "i"} bez klienta.
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Top categories */}
       {topCats.length > 0 && (

@@ -5,7 +5,9 @@ import { PageHeader } from "@/components/layout/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { formatDurationLV } from "@/lib/utils";
+import { toggleCanSeeAllClients } from "./actions";
 
 export default async function ManagerEmployeeDetail({
   params,
@@ -18,8 +20,8 @@ export default async function ManagerEmployeeDetail({
     where: {
       id: params.id,
       organizationId: session.organizationId,
-      managerId: session.userId,
       role: "EMPLOYEE",
+      ...(session.role === "MANAGER" ? { managerId: session.userId } : {}),
     },
   });
   if (!employee) notFound();
@@ -27,6 +29,11 @@ export default async function ManagerEmployeeDetail({
   const entries = await prisma.invisibleWorkEntry.findMany({
     where: { employeeId: employee.id, organizationId: session.organizationId, deletedAt: null },
     orderBy: { createdAt: "desc" },
+    select: {
+      id: true, title: true, category: true, description: true,
+      clientName: true, clientId: true,
+      workDate: true, durationMinutes: true, status: true, managerComment: true,
+    },
   });
 
   const totalMinutes = entries.reduce((s, e) => s + e.durationMinutes, 0);
@@ -55,6 +62,26 @@ export default async function ManagerEmployeeDetail({
           />
           <Stat label="Kopā laiks" value={formatDurationLV(totalMinutes)} />
         </CardContent>
+        <div className="border-t border-border px-6 py-4 flex items-center justify-between gap-4">
+          <div>
+            <div className="text-sm font-medium">Redz visus klientus</div>
+            <div className="text-xs text-muted-foreground mt-0.5">
+              Ja ieslēgts — darbinieks var izvēlēties jebkuru klientu iesniedzot ierakstu
+            </div>
+          </div>
+          <form action={async () => {
+            "use server";
+            await toggleCanSeeAllClients(employee.id, employee.canSeeAllClients);
+          }}>
+            <Button
+              type="submit"
+              variant={employee.canSeeAllClients ? "default" : "outline"}
+              size="sm"
+            >
+              {employee.canSeeAllClients ? "Ieslēgts" : "Izslēgts"}
+            </Button>
+          </form>
+        </div>
       </Card>
 
       {entries.length === 0 ? (
@@ -71,6 +98,7 @@ export default async function ManagerEmployeeDetail({
               category={e.category}
               description={e.description}
               clientName={e.clientName}
+              clientHref={e.clientId ? `/manager/clients/${e.clientId}` : undefined}
               workDate={e.workDate}
               durationMinutes={e.durationMinutes}
               status={e.status}

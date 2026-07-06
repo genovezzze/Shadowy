@@ -2,6 +2,7 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PageHeader } from "@/components/layout/page-header";
 import { ClientList } from "@/components/clients/client-list";
+import { LinkEntriesButton } from "@/components/clients/link-entries-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FileSpreadsheet } from "lucide-react";
@@ -15,16 +16,15 @@ export default async function ManagerClientsPage() {
       orderBy: { name: "asc" },
       include: { assignments: { select: { employeeId: true } } },
     }),
-    prisma.invisibleWorkEntry.groupBy({
-      by: ["clientName"],
+    prisma.invisibleWorkEntry.findMany({
       where: {
         organizationId: session.organizationId,
-        managerId: session.userId,
+        ...(session.role === "MANAGER" ? { managerId: session.userId } : {}),
         status: "APPROVED",
-        clientName: { not: null },
         deletedAt: null,
+        OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
       },
-      _sum: { durationMinutes: true },
+      select: { clientId: true, clientName: true, durationMinutes: true },
     }),
     prisma.user.findMany({
       where: {
@@ -37,16 +37,23 @@ export default async function ManagerClientsPage() {
     }),
   ]);
 
-  const minutesByName = new Map(
-    entryStats.map((s) => [s.clientName!, s._sum.durationMinutes ?? 0])
-  );
+  const minutesById = new Map<string, number>();
+  const minutesByNameLower = new Map<string, number>();
+  for (const e of entryStats) {
+    if (e.clientId) {
+      minutesById.set(e.clientId, (minutesById.get(e.clientId) ?? 0) + e.durationMinutes);
+    } else if (e.clientName) {
+      const key = e.clientName.toLowerCase().trim();
+      minutesByNameLower.set(key, (minutesByNameLower.get(key) ?? 0) + e.durationMinutes);
+    }
+  }
 
   const clientsWithStats = clients.map((c) => ({
     id: c.id,
     name: c.name,
     freeMinutesPerMonth: c.freeMinutesPerMonth,
     status: c.status,
-    totalMinutes: minutesByName.get(c.name) ?? 0,
+    totalMinutes: (minutesById.get(c.id) ?? 0) + (minutesByNameLower.get(c.name.toLowerCase().trim()) ?? 0),
     assignedEmployeeIds: c.assignments.map((a) => a.employeeId),
   }));
 
@@ -57,12 +64,15 @@ export default async function ManagerClientsPage() {
         description="Pārvaldiet klientu sarakstu, piešķiriet darbiniekus un norādiet bezmaksas stundas mēnesī."
         actions={
           session.role === "ADMIN" ? (
-            <Button asChild variant="outline" size="sm">
-              <Link href="/admin/clients/import">
-                <FileSpreadsheet className="h-4 w-4" />
-                Importēt no Excel
-              </Link>
-            </Button>
+            <div className="flex items-center gap-2">
+              <LinkEntriesButton />
+              <Button asChild variant="outline" size="sm">
+                <Link href="/admin/clients/import">
+                  <FileSpreadsheet className="h-4 w-4" />
+                  Importēt no Excel
+                </Link>
+              </Button>
+            </div>
           ) : null
         }
       />

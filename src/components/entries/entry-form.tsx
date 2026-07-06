@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ClientCombobox } from "@/components/ui/client-combobox";
 import { createEntry } from "@/app/employee/new-entry/actions";
 import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 
@@ -91,19 +92,13 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="client">Klients</Label>
+            <Label>Klients</Label>
             {clients.length > 0 ? (
-              <Select value={clientId} onValueChange={setClientId}>
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Izvēlieties klientu (neobligāti)" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__none__">Nav klienta</SelectItem>
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <ClientCombobox
+                clients={clients}
+                value={clientId}
+                onChange={setClientId}
+              />
             ) : (
               <Input
                 id="clientName"

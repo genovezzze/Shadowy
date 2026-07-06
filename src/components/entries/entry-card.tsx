@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { WorkTypeBadge } from "./work-type-badge";
@@ -11,6 +12,7 @@ interface EntryCardProps {
   category: string;
   description: string;
   clientName?: string | null;
+  clientHref?: string;
   workDate: Date | string;
   durationMinutes: number;
   status: EntryStatus;
@@ -25,6 +27,7 @@ export function EntryCard({
   category,
   description,
   clientName,
+  clientHref,
   workDate,
   durationMinutes,
   status,
@@ -43,7 +46,13 @@ export function EntryCard({
               {clientName ? (
                 <>
                   <span>·</span>
-                  <span>{clientName}</span>
+                  {clientHref ? (
+                    <Link href={clientHref} className="hover:underline hover:text-foreground transition-colors">
+                      {clientName}
+                    </Link>
+                  ) : (
+                    <span>{clientName}</span>
+                  )}
                 </>
               ) : null}
               <span>·</span>

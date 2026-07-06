@@ -93,6 +93,8 @@ model User {
   manager   User?   @relation("ManagerEmployees", fields: [managerId], references: [id], onDelete: SetNull)
   employees User[]  @relation("ManagerEmployees")
 
+  canSeeAllClients Boolean @default(false)
+
   workRoleId       String?
   workRole         WorkRole?  @relation("EmployeeWorkRole", fields: [workRoleId], references: [id], onDelete: SetNull)
   managedWorkRoles WorkRole[] @relation("ManagerWorkRoles")

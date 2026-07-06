@@ -110,7 +110,7 @@ export default async function ManagerReportPage({
   const periodStart = getPeriodStart(period);
   const now = new Date();
 
-  const [teamUsers, allEntries, reviewedEntries, org] = await Promise.all([
+  const [teamUsers, allEntries, reviewedEntries, org, clients] = await Promise.all([
     prisma.user.findMany({
       where: { organizationId: orgId, managerId, role: "EMPLOYEE" },
       select: { id: true, name: true, workRole: { select: { duties: { select: { text: true } } } } },
@@ -122,6 +122,7 @@ export default async function ManagerReportPage({
         title: true,
         category: true,
         clientName: true,
+        clientId: true,
         durationMinutes: true,
         status: true,
         createdAt: true,
@@ -135,6 +136,11 @@ export default async function ManagerReportPage({
       select: { createdAt: true, updatedAt: true },
     }),
     prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } }),
+    prisma.client.findMany({
+      where: { organizationId: orgId, status: "active" },
+      select: { id: true, name: true, freeMinutesPerMonth: true },
+      orderBy: { name: "asc" },
+    }),
   ]);
 
   const approved = allEntries.filter((e) => e.status === "APPROVED");
@@ -206,16 +212,36 @@ export default async function ManagerReportPage({
   // Total approved hours
   const totalHours = Math.round((approved.reduce((s, e) => s + e.durationMinutes, 0) / 60) * 10) / 10;
 
-  // Client hours breakdown
-  const clientMap = new Map<string, number>();
+  // Client analytics
+  const clientMinMap = new Map<string, number>(); // clientId → minutes
+  const clientNameMinMap = new Map<string, { minutes: number; displayName: string }>(); // clientName.lower → data
+  let noClientCount = 0;
   for (const e of approved) {
-    if (e.clientName) {
-      clientMap.set(e.clientName, (clientMap.get(e.clientName) ?? 0) + e.durationMinutes);
+    if (e.clientId) {
+      clientMinMap.set(e.clientId, (clientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
+    } else if (e.clientName) {
+      const key = e.clientName.toLowerCase();
+      const existing = clientNameMinMap.get(key);
+      clientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
+    } else {
+      noClientCount++;
     }
   }
-  const clientData = Array.from(clientMap.entries())
-    .map(([name, minutes]) => ({ name, hours: Math.round((minutes / 60) * 10) / 10 }))
-    .sort((a, b) => b.hours - a.hours);
+  const registeredClientLower = new Set(clients.map((c) => c.name.toLowerCase()));
+  const clientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
+  for (const c of clients) {
+    const nameMinutes = clientNameMinMap.get(c.name.toLowerCase())?.minutes ?? 0;
+    const minutes = (clientMinMap.get(c.id) ?? 0) + nameMinutes;
+    if (minutes === 0) continue;
+    const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;
+    clientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
+  }
+  for (const [nameLower, { minutes, displayName }] of clientNameMinMap.entries()) {
+    if (!registeredClientLower.has(nameLower)) {
+      clientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: null, overrun: 0, eur: 0, registered: false });
+    }
+  }
+  clientData.sort((a, b) => b.minutes - a.minutes);
 
   // Hidden cost: approved extra hours (work outside role)
   let extraMinutes = 0;
@@ -428,29 +454,56 @@ export default async function ManagerReportPage({
         </section>
       )}
 
-      {/* Client hours */}
-      {clientData.length > 0 && (
+      {/* Client analytics */}
+      {(clientData.length > 0 || noClientCount > 0) && (
         <section className="mb-8">
-          <h2 className="text-base font-semibold mb-3">Stundas pa klientiem</h2>
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <h2 className="text-base font-semibold mb-0.5">Klienti</h2>
+              <p className="text-xs text-muted-foreground">Pārsniegums = Ierakstīts − Bezmaksas limits</p>
+            </div>
+            <div className="text-right">
+              <div className="text-xs text-muted-foreground">Stundas likme</div>
+              <div className="text-sm font-semibold">€20 / h</div>
+            </div>
+          </div>
           <div className="rounded-xl border border-border overflow-hidden print:border-gray-200">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/30 print:bg-gray-50">
-                  <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground">#</th>
-                  <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground">Klients / uzņēmums</th>
-                  <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground">Apst. stundas</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border print:divide-gray-100">
-                {clientData.map((c, i) => (
-                  <tr key={i} className="hover:bg-muted/20 transition-colors print:hover:bg-transparent">
-                    <td className="px-5 py-3 text-muted-foreground">{i + 1}</td>
-                    <td className="px-5 py-3 font-medium">{c.name}</td>
-                    <td className="px-5 py-3 text-right tabular-nums font-semibold">{c.hours}h</td>
+            {clientData.length > 0 && (
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30 print:bg-gray-50">
+                    <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground print:text-gray-500">Klients</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Ierakstīts</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Bezmaksas limits</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">Pārsniegums</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-muted-foreground print:text-gray-500">~EUR</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-border print:divide-gray-100">
+                  {clientData.map((c) => (
+                    <tr key={c.id} className="hover:bg-muted/20 transition-colors print:hover:bg-transparent">
+                      <td className="px-5 py-3 font-medium">{c.name}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{`${Math.round((c.minutes / 60) * 10) / 10}h`}</td>
+                      <td className="px-4 py-3 text-right tabular-nums text-muted-foreground print:text-gray-400">
+                        {c.registered ? (c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞") : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right tabular-nums">
+                        {c.registered && c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                      </td>
+                      <td className="px-5 py-3 text-right tabular-nums">
+                        {c.registered && c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+            {noClientCount > 0 && (
+              <div className={`flex items-center gap-2 px-5 py-3 text-sm text-amber-600 dark:text-amber-400 print:text-amber-700 ${clientData.length > 0 ? "border-t border-border" : ""}`}>
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                {noClientCount} ierakst{noClientCount === 1 ? "s" : "i"} bez klienta.
+              </div>
+            )}
           </div>
         </section>
       )}

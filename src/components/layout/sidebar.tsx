@@ -79,13 +79,13 @@ const MANAGER_NAV: NavItem[] = [
 
 const EMPLOYEE_NAV: NavItem[] = [
   { href: "/employee/dashboard", label: "Pārskats", icon: LayoutDashboard },
+  { href: "/employee/history", label: "Vēsture", icon: History },
   {
     href: "/employee/smart-log",
     label: "Shadowy AI ieraksts",
     icon: ShadowyNavIcon,
   },
   { href: "/employee/new-entry", label: "Jauns ieraksts", icon: PlusCircle },
-  { href: "/employee/history", label: "Vēsture", icon: History },
   { href: "/employee/my-role", label: "Mana loma", icon: BadgeCheck },
   { href: "/employee/bonuses", label: "Atzinība", icon: Gift },
   { href: "/employee/profile", label: "Mans profils", icon: UserCircle },
