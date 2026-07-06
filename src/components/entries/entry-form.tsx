@@ -10,16 +10,23 @@ import { Button } from "@/components/ui/button";
 import { createEntry } from "@/app/employee/new-entry/actions";
 import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 
-export function EntryForm() {
+interface ClientOption {
+  id: string;
+  name: string;
+}
+
+export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [category, setCategory] = useState("");
+  const [clientId, setClientId] = useState("");
 
   async function onSubmit(formData: FormData) {
     setError(null);
     setSuccess(false);
     formData.set("category", category);
+    if (clientId && clientId !== "__none__") formData.set("clientId", clientId);
     startTransition(async () => {
       const result = await createEntry(formData);
       if (!result.ok) {
@@ -27,6 +34,7 @@ export function EntryForm() {
       } else {
         setSuccess(true);
         setCategory("");
+        setClientId("");
         (document.getElementById("entry-form") as HTMLFormElement)?.reset();
       }
     });
@@ -83,13 +91,27 @@ export function EntryForm() {
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="clientName">Klients / uzņēmums</Label>
-            <Input
-              id="clientName"
-              name="clientName"
-              maxLength={120}
-              placeholder="Neobligāti"
-            />
+            <Label htmlFor="client">Klients</Label>
+            {clients.length > 0 ? (
+              <Select value={clientId} onValueChange={setClientId}>
+                <SelectTrigger id="client">
+                  <SelectValue placeholder="Izvēlieties klientu (neobligāti)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__none__">Nav klienta</SelectItem>
+                  {clients.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            ) : (
+              <Input
+                id="clientName"
+                name="clientName"
+                maxLength={120}
+                placeholder="Neobligāti"
+              />
+            )}
           </div>
 
           <div className="grid gap-2">

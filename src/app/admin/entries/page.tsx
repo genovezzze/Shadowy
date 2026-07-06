@@ -100,7 +100,7 @@ export default async function AdminEntriesPage({
               employeeName={e.employee.name}
               managerComment={e.managerComment}
               footer={
-                e.status === "PENDING" ? (
+                e.status !== "REJECTED" ? (
                   <AdminReviewActions entryId={e.id} />
                 ) : (
                   <div className="text-xs text-muted-foreground">

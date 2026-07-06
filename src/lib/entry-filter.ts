@@ -23,7 +23,7 @@ export interface EntrySearchParams {
 export function buildEntryWhere(
   sp: EntrySearchParams
 ): Prisma.InvisibleWorkEntryWhereInput {
-  const where: Prisma.InvisibleWorkEntryWhereInput = {};
+  const where: Prisma.InvisibleWorkEntryWhereInput = { deletedAt: null };
 
   const q = sp.q?.trim();
   if (q) {

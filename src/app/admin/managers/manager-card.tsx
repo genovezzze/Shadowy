@@ -9,6 +9,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { updateManager, deleteManager } from "./actions";
 import { Pencil, Trash2, X, Check } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface ManagerCardProps {
   id: string;
@@ -16,9 +17,10 @@ interface ManagerCardProps {
   email: string;
   title: string | null;
   employeeCount: number;
+  registered: boolean;
 }
 
-export function ManagerCard({ id, name, email, title, employeeCount }: ManagerCardProps) {
+export function ManagerCard({ id, name, email, title, employeeCount, registered }: ManagerCardProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [pending, startTransition] = useTransition();
@@ -84,7 +86,14 @@ export function ManagerCard({ id, name, email, title, employeeCount }: ManagerCa
     <Card>
       <CardContent className="p-5 flex items-center justify-between gap-4">
         <div className="min-w-0">
-          <div className="text-sm font-semibold truncate">{name}</div>
+          <div className="flex items-center gap-2">
+            <div className="text-sm font-semibold truncate">{name}</div>
+            {registered ? (
+              <Badge variant="success" className="shrink-0 text-[11px] px-1.5 py-0">Reģistrējies</Badge>
+            ) : (
+              <Badge variant="warning" className="shrink-0 text-[11px] px-1.5 py-0">Nav reģistrējies</Badge>
+            )}
+          </div>
           <div className="text-xs text-muted-foreground">
             {email}{title ? ` · ${title}` : ""}
           </div>

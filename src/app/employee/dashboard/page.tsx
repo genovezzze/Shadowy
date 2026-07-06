@@ -47,26 +47,19 @@ export default async function EmployeeDashboard() {
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 86400000);
 
+  const baseWhere = { employeeId: session.userId, deletedAt: null };
   const [pending, approved, returned, rejected, recent, allEntries] = await Promise.all([
-    prisma.invisibleWorkEntry.count({
-      where: { employeeId: session.userId, status: "PENDING" },
-    }),
-    prisma.invisibleWorkEntry.count({
-      where: { employeeId: session.userId, status: "APPROVED" },
-    }),
-    prisma.invisibleWorkEntry.count({
-      where: { employeeId: session.userId, status: "RETURNED" },
-    }),
-    prisma.invisibleWorkEntry.count({
-      where: { employeeId: session.userId, status: "REJECTED" },
-    }),
+    prisma.invisibleWorkEntry.count({ where: { ...baseWhere, status: "PENDING" } }),
+    prisma.invisibleWorkEntry.count({ where: { ...baseWhere, status: "APPROVED" } }),
+    prisma.invisibleWorkEntry.count({ where: { ...baseWhere, status: "RETURNED" } }),
+    prisma.invisibleWorkEntry.count({ where: { ...baseWhere, status: "REJECTED" } }),
     prisma.invisibleWorkEntry.findMany({
-      where: { employeeId: session.userId },
+      where: baseWhere,
       orderBy: { updatedAt: "desc" },
       take: 4,
     }),
     prisma.invisibleWorkEntry.findMany({
-      where: { employeeId: session.userId },
+      where: baseWhere,
       select: { createdAt: true, status: true, category: true, durationMinutes: true },
     }),
   ]);

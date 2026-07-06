@@ -215,6 +215,7 @@ export default async function ManagerDashboard({
         organizationId: orgId,
         managerId,
         status: "APPROVED",
+        deletedAt: null,
         ...(periodFilter ? { workDate: periodFilter } : {}),
       },
       select: {
@@ -236,13 +237,13 @@ export default async function ManagerDashboard({
       },
     }),
     prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: orgId, managerId, status: "PENDING" },
+      where: { organizationId: orgId, managerId, status: "PENDING", deletedAt: null },
       orderBy: { createdAt: "desc" },
       take: 5,
       include: { employee: { select: { name: true } } },
     }),
     prisma.invisibleWorkEntry.count({
-      where: { organizationId: orgId, managerId, status: "PENDING" },
+      where: { organizationId: orgId, managerId, status: "PENDING", deletedAt: null },
     }),
   ]);
 

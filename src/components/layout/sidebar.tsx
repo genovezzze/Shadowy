@@ -20,6 +20,7 @@ import {
   UserCircle,
   BarChart2,
   Building2,
+  Settings,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -49,9 +50,11 @@ const ADMIN_ONLY_NAV: NavItem[] = [
   { href: "/admin/dashboard", label: "Pārskats", icon: LayoutDashboard },
   { href: "/admin/managers", label: "Vadītāji", icon: UserCog },
   { href: "/admin/employees", label: "Darbinieki", icon: Users },
+  { href: "/manager/clients", label: "Klienti", icon: Building2 },
   { href: "/admin/entries", label: "Visi ieraksti", icon: FileText },
   { href: "/admin/bonuses", label: "Bonusu pārskats", icon: Gift },
   { href: "/admin/report", label: "Pilota atskaite", icon: BarChart2 },
+  { href: "/admin/settings", label: "Iestatījumi", icon: Settings },
   { href: "/admin/profile", label: "Mans profils", icon: UserCircle },
 ];
 

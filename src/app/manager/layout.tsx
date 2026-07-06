@@ -14,7 +14,7 @@ export default async function ManagerLayout({
   const [org, pendingCount, unreadNotificationCount] = await Promise.all([
     prisma.organization.findUnique({ where: { id: session.organizationId } }),
     prisma.invisibleWorkEntry.count({
-      where: { organizationId: session.organizationId, managerId: session.userId, status: "PENDING" },
+      where: { organizationId: session.organizationId, managerId: session.userId, status: "RETURNED" },
     }),
     getUnreadNotificationCount(session.userId),
   ]);

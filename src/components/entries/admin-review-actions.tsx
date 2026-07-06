@@ -15,7 +15,7 @@ export function AdminReviewActions({ entryId }: AdminReviewActionsProps) {
   const [comment, setComment] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  function act(action: "APPROVE" | "REJECT" | "RETURN") {
+  function act(action: "REJECT" | "RETURN") {
     setError(null);
     startTransition(async () => {
       const res = await reviewEntryAsAdmin({ entryId, action, comment });
@@ -31,9 +31,6 @@ export function AdminReviewActions({ entryId }: AdminReviewActionsProps) {
   if (mode === "idle") {
     return (
       <div className="flex flex-wrap items-center gap-2">
-        <Button size="sm" variant="success" onClick={() => act("APPROVE")} disabled={pending}>
-          Apstiprināt
-        </Button>
         <Button size="sm" variant="outline" onClick={() => setMode("return")} disabled={pending}>
           Nosūtīt atpakaļ ar komentāru
         </Button>

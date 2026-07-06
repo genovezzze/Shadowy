@@ -25,7 +25,7 @@ export default async function ManagerEmployeeDetail({
   if (!employee) notFound();
 
   const entries = await prisma.invisibleWorkEntry.findMany({
-    where: { employeeId: employee.id, organizationId: session.organizationId },
+    where: { employeeId: employee.id, organizationId: session.organizationId, deletedAt: null },
     orderBy: { createdAt: "desc" },
   });
 

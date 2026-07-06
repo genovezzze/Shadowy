@@ -26,14 +26,20 @@ export async function reviewEntry(input: {
   }
   const { entryId, action, comment } = parsed.data;
 
-  const entry = await prisma.invisibleWorkEntry.findFirst({
-    where: {
-      id: entryId,
-      organizationId: session.organizationId,
-      managerId: session.userId,
-    },
-    include: { employee: { select: { id: true, name: true, email: true } } },
-  });
+  const [entry, org] = await Promise.all([
+    prisma.invisibleWorkEntry.findFirst({
+      where: {
+        id: entryId,
+        organizationId: session.organizationId,
+        managerId: session.userId,
+      },
+      include: { employee: { select: { id: true, name: true, email: true } } },
+    }),
+    prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { emailOnEntryApproved: true },
+    }),
+  ]);
   if (!entry) {
     return { ok: false as const, error: "Ieraksts nav atrasts." };
   }
@@ -70,8 +76,9 @@ export async function reviewEntry(input: {
     });
   }
 
+  const sendEmail = action !== "APPROVE" || org?.emailOnEntryApproved !== false;
   try {
-    if (entry.employee?.email) {
+    if (sendEmail && entry.employee?.email) {
       await sendEntryReviewedEmail({
         to: entry.employee.email,
         employeeName: entry.employee.name ?? "",
@@ -114,7 +121,7 @@ export async function editEntry(input: {
       id: entryId,
       organizationId: session.organizationId,
       managerId: session.userId,
-      status: "PENDING",
+      status: { in: ["APPROVED", "PENDING"] },
     },
   });
   if (!exists) return { ok: false as const, error: "Ieraksts nav atrasts vai nav rediģējams." };
@@ -153,15 +160,21 @@ export async function bulkReviewEntries(input: {
   const status =
     action === "APPROVE" ? "APPROVED" : action === "REJECT" ? "REJECTED" : "RETURNED";
 
-  const entries = await prisma.invisibleWorkEntry.findMany({
-    where: {
-      id: { in: entryIds },
-      organizationId: session.organizationId,
-      managerId: session.userId,
-      status: "PENDING",
-    },
-    include: { employee: { select: { id: true, name: true, email: true } } },
-  });
+  const [entries, org] = await Promise.all([
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        id: { in: entryIds },
+        organizationId: session.organizationId,
+        managerId: session.userId,
+        status: "PENDING",
+      },
+      include: { employee: { select: { id: true, name: true, email: true } } },
+    }),
+    prisma.organization.findUnique({
+      where: { id: session.organizationId },
+      select: { emailOnEntryApproved: true },
+    }),
+  ]);
 
   await prisma.invisibleWorkEntry.updateMany({
     where: {
@@ -190,20 +203,23 @@ export async function bulkReviewEntries(input: {
       )
   );
 
+  const sendEmail = action !== "APPROVE" || org?.emailOnEntryApproved !== false;
   try {
-    await Promise.all(
-      entries
-        .filter((e) => e.employee?.email)
-        .map((e) =>
-          sendEntryReviewedEmail({
-            to: e.employee!.email!,
-            employeeName: e.employee!.name ?? "",
-            entryTitle: e.title,
-            status,
-            comment: action === "APPROVE" ? null : comment.trim(),
-          })
-        )
-    );
+    if (sendEmail) {
+      await Promise.all(
+        entries
+          .filter((e) => e.employee?.email)
+          .map((e) =>
+            sendEntryReviewedEmail({
+              to: e.employee!.email!,
+              employeeName: e.employee!.name ?? "",
+              entryTitle: e.title,
+              status,
+              comment: action === "APPROVE" ? null : comment.trim(),
+            })
+          )
+      );
+    }
   } catch {}
 
   revalidatePath("/manager/entries");

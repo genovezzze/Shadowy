@@ -12,7 +12,14 @@ export default async function AdminManagersPage() {
   const managers = await prisma.user.findMany({
     where: { organizationId: session.organizationId, role: "MANAGER" },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { employees: true } } },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      title: true,
+      passwordHash: true,
+      _count: { select: { employees: true } },
+    },
   });
 
   return (
@@ -51,6 +58,7 @@ export default async function AdminManagersPage() {
                 email={m.email}
                 title={m.title}
                 employeeCount={m._count.employees}
+                registered={m.passwordHash !== null}
               />
             ))
           )}

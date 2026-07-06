@@ -7,9 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { EmptyState } from "@/components/ui/empty-state";
-import { CheckCircle2, ChevronDown, Pencil } from "lucide-react";
+import { ChevronDown, Pencil } from "lucide-react";
 import { cn, formatDurationLV } from "@/lib/utils";
-import { bulkReviewEntries, editEntry } from "@/app/manager/entries/actions";
+import { editEntry } from "@/app/manager/entries/actions";
 
 export interface PendingEntry {
   id: string;
@@ -86,8 +86,6 @@ type EditFields = { durationMinutes: string; clientName: string; category: strin
 
 function GroupCard({ group }: { group: EmployeeGroup }) {
   const [expanded, setExpanded] = useState(false);
-  const [isPending, startTransition] = useTransition();
-  const [approved, setApproved] = useState(false);
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
   const [editFields, setEditFields] = useState<EditFields>({
     durationMinutes: "",
@@ -139,18 +137,6 @@ function GroupCard({ group }: { group: EmployeeGroup }) {
     });
   }
 
-  function approveAll() {
-    startTransition(async () => {
-      const res = await bulkReviewEntries({
-        entryIds: group.entries.map((e) => e.id),
-        action: "APPROVE",
-      });
-      if (res.ok) setApproved(true);
-    });
-  }
-
-  if (approved) return null;
-
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       <div className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:gap-4">
@@ -201,10 +187,6 @@ function GroupCard({ group }: { group: EmployeeGroup }) {
               )}
             />
           </button>
-          <Button size="sm" variant="success" onClick={approveAll} disabled={isPending}>
-            <CheckCircle2 className="h-3.5 w-3.5" />
-            {isPending ? "Saglabā..." : "Apstiprināt visus"}
-          </Button>
         </div>
       </div>
 
@@ -342,7 +324,7 @@ export function PendingEntriesList({ entries }: { entries: PendingEntry[] }) {
   if (entries.length === 0) {
     return (
       <EmptyState
-        title="Nav ierakstu, kas gaida izskatīšanu"
+        title="Nav jaunu ierakstu"
         description="Kad darbinieki iesniegs jaunus ierakstus, tie parādīsies šeit."
       />
     );

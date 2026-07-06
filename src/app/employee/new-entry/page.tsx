@@ -8,14 +8,32 @@ import { CheckCircle2, Circle } from "lucide-react";
 export default async function NewEntryPage() {
   const session = await requireUser(["EMPLOYEE"]);
 
-  const employee = await prisma.user.findUnique({
-    where: { id: session.userId },
-    include: {
-      manager: true,
-      workRole: { include: { duties: { orderBy: { createdAt: "asc" } } } },
-    },
-  });
+  const [employee, assignedClients, allClients] = await Promise.all([
+    prisma.user.findUnique({
+      where: { id: session.userId },
+      include: {
+        manager: true,
+        workRole: { include: { duties: { orderBy: { createdAt: "asc" } } } },
+      },
+    }),
+    prisma.client.findMany({
+      where: {
+        organizationId: session.organizationId,
+        status: "active",
+        assignments: { some: { employeeId: session.userId } },
+      },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+    prisma.client.findMany({
+      where: { organizationId: session.organizationId, status: "active" },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
+  // Use assigned clients if any; fall back to all org clients
+  const clients = assignedClients.length > 0 ? assignedClients : allClients;
   const duties = employee?.workRole?.duties ?? [];
 
   return (
@@ -37,7 +55,7 @@ export default async function NewEntryPage() {
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <EntryForm />
+          <EntryForm clients={clients} />
 
           {/* Duties sidebar */}
           <div className="rounded-xl border border-border bg-card p-5 h-fit">

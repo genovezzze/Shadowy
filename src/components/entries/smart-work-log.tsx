@@ -32,11 +32,17 @@ import {
   type ConfirmedSmartLogTicket,
 } from "@/app/employee/smart-log/actions";
 
+interface ClientOption {
+  id: string;
+  name: string;
+}
+
 type ReviewTicket = SmartLogDraft & {
   id: string;
   workDate: string;
   confirmed: boolean;
   editing: boolean;
+  client_id: string | null;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -47,7 +53,7 @@ function roleLabel(value: boolean | null) {
   return "Saistība ar lomu nav skaidra";
 }
 
-export function SmartWorkLog() {
+export function SmartWorkLog({ clients = [] }: { clients?: ClientOption[] }) {
   const [description, setDescription] = useState("");
   const [inputSource, setInputSource] = useState<"text" | "voice">("text");
   const [tickets, setTickets] = useState<ReviewTicket[]>([]);
@@ -304,6 +310,9 @@ export function SmartWorkLog() {
         return;
       }
 
+      const clientNameMap = new Map(
+        clients.map((c) => [c.name.toLowerCase(), c.id])
+      );
       setTickets(
         parsed.data.tickets.map((ticket, index) => ({
           ...ticket,
@@ -311,6 +320,9 @@ export function SmartWorkLog() {
           workDate: ticket.work_date ?? today,
           confirmed: ticket.estimated_time_minutes !== null,
           editing: false,
+          client_id: ticket.client_name
+            ? (clientNameMap.get(ticket.client_name.toLowerCase()) ?? null)
+            : null,
         }))
       );
       setParsedInput(cleanDescription);
@@ -584,20 +596,51 @@ export function SmartWorkLog() {
                       </div>
 
                       <div className="grid gap-2">
-                        <Label htmlFor={`client-${ticket.id}`}>
-                          Klients / uzņēmums
-                        </Label>
-                        <Input
-                          id={`client-${ticket.id}`}
-                          value={ticket.client_name ?? ""}
-                          maxLength={120}
-                          placeholder="Nav norādīts"
-                          onChange={(event) =>
-                            updateTicket(ticket.id, {
-                              client_name: event.target.value || null,
-                            })
-                          }
-                        />
+                        <Label htmlFor={`client-${ticket.id}`}>Klients</Label>
+                        {clients.length > 0 ? (
+                          <>
+                            <select
+                              id={`client-${ticket.id}`}
+                              value={ticket.client_id ?? "__none__"}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                if (val === "__none__") {
+                                  updateTicket(ticket.id, { client_id: null, client_name: null });
+                                } else {
+                                  const found = clients.find((c) => c.id === val);
+                                  updateTicket(ticket.id, {
+                                    client_id: val,
+                                    client_name: found?.name ?? null,
+                                  });
+                                }
+                              }}
+                              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            >
+                              <option value="__none__">Nav klienta</option>
+                              {clients.map((c) => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                              ))}
+                            </select>
+                            {ticket.client_name && !ticket.client_id && (
+                              <p className="text-xs text-amber-500">
+                                Atpazīts klients: &ldquo;{ticket.client_name}&rdquo; — nav sarakstā. Izvēlies vai atstāj bez klienta.
+                              </p>
+                            )}
+                          </>
+                        ) : (
+                          <Input
+                            id={`client-${ticket.id}`}
+                            value={ticket.client_name ?? ""}
+                            maxLength={120}
+                            placeholder="Nav norādīts"
+                            onChange={(e) =>
+                              updateTicket(ticket.id, {
+                                client_name: e.target.value || null,
+                                client_id: null,
+                              })
+                            }
+                          />
+                        )}
                       </div>
 
                       <div className="grid gap-2">

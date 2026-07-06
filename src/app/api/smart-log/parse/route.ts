@@ -36,8 +36,16 @@ Noteikumi:
 - Kategorijai izmanto tikai JSON shēmā atļautās enum vērtības.
 - Atpazīsti datumus no teksta, tostarp "šodien", "vakar" un "aizvakar".
 - Ja aktivitātei datums nav minēts, work_date ir šodienas datums.
-- Ja tekstā ir minēts klients vai uzņēmums, ieraksti to client_name.
+
+Klienti:
+- Ja tekstā ir minēts klients vai uzņēmums (piemēram, "klientam Ventspils Balss", "SIA Piemērs"), ieraksti precīzi to client_name.
+- Ja viens klients ir pieminēts vairākās aktivitātēs, katram attiecīgajam ierakstam norādi to pašu client_name.
 - Neizdomā klientu. Ja klients nav minēts, client_name ir null.
+
+Laiks:
+- Ja tekstā ir minēts konkrēts laiks (piemēram, "30 minūtes", "pusstunda", "aptuveni stundu"), izmanto to kā estimated_time_minutes.
+- Ja vienam uzdevumam laiks sadalīts pa posmiem (piem., "30 min no rīta + 20 min pēcpusdienā"), summē un ieraksti kopsummu.
+- Ja laiku nevar noteikt no teksta, estimated_time_minutes ir null.
 `.trim();
 }
 

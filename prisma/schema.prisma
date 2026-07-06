@@ -54,6 +54,14 @@ model Organization {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
+  // Email notification settings
+  emailOnNewEntry      Boolean  @default(true)
+  emailOnEntryApproved Boolean  @default(false)
+  emailWeeklySummary   Boolean  @default(true)
+
+  // Default hourly rate for cost calculations (EUR)
+  defaultHourlyRate Decimal? @db.Decimal(10, 2)
+
   users            User[]
   entries          InvisibleWorkEntry[]
   categories       Category[]
@@ -75,6 +83,9 @@ model User {
   role         Role
   title        String?
 
+  // Individual hourly rate for cost calculations (EUR), overrides role/org default
+  hourlyRate Decimal? @db.Decimal(10, 2)
+
   inviteToken          String?   @unique
   inviteTokenExpiresAt DateTime?
 
@@ -86,8 +97,10 @@ model User {
   workRole         WorkRole?  @relation("EmployeeWorkRole", fields: [workRoleId], references: [id], onDelete: SetNull)
   managedWorkRoles WorkRole[] @relation("ManagerWorkRoles")
 
-  submittedEntries InvisibleWorkEntry[] @relation("EntryEmployee")
-  reviewedEntries  InvisibleWorkEntry[] @relation("EntryManager")
+  submittedEntries  InvisibleWorkEntry[] @relation("EntryEmployee")
+  reviewedEntries   InvisibleWorkEntry[] @relation("EntryManager")
+  timeLogsCreated   WorkEntryTimeLog[]
+  clientAssignments ClientEmployee[]
 
   managedRecognitionRules RecognitionRule[]    @relation("ManagerRecognitionRules")
   employeeBonusRequests   BonusRequest[]       @relation("EmployeeBonusRequests")
@@ -112,6 +125,9 @@ model WorkRole {
 
   name        String  @db.VarChar(100)
   description String? @db.VarChar(500)
+
+  // Default hourly rate for employees in this role (EUR)
+  defaultHourlyRate Decimal? @db.Decimal(10, 2)
 
   duties    WorkRoleDuty[]
   employees User[]         @relation("EmployeeWorkRole")
@@ -148,6 +164,8 @@ model InvisibleWorkEntry {
   category        String
   description     String
   clientName      String?      @db.VarChar(120)
+  clientId        String?
+  client          Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
   workDate        DateTime
   durationMinutes Int
 
@@ -161,6 +179,12 @@ model InvisibleWorkEntry {
   businessImpact  String?  @db.VarChar(500)
   confidenceScore Float?
 
+  // Soft delete
+  deletedAt DateTime?
+  deletedBy String?
+
+  timeLogs WorkEntryTimeLog[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -168,6 +192,7 @@ model InvisibleWorkEntry {
   @@index([employeeId])
   @@index([managerId])
   @@index([status])
+  @@index([clientId])
 }
 
 // Tracks failed login attempts for brute-force / password-spray rate limiting.
@@ -214,12 +239,45 @@ model Client {
 
   name                String  @db.VarChar(120)
   freeMinutesPerMonth Int?
+  status              String  @default("active") @db.VarChar(20)
+
+  entries     InvisibleWorkEntry[]
+  assignments ClientEmployee[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([organizationId, name])
   @@index([organizationId])
+}
+
+model ClientEmployee {
+  id         String   @id @default(cuid())
+  clientId   String
+  client     Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  employeeId String
+  employee   User     @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([clientId, employeeId])
+  @@index([clientId])
+  @@index([employeeId])
+}
+
+model WorkEntryTimeLog {
+  id      String             @id @default(cuid())
+  entryId String
+  entry   InvisibleWorkEntry @relation(fields: [entryId], references: [id], onDelete: Cascade)
+
+  minutes     Int
+  comment     String? @db.VarChar(500)
+  createdById String
+  createdBy   User    @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([entryId])
+  @@index([createdById])
 }
 
 model Category {

@@ -8,13 +8,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatDurationLV } from "@/lib/utils";
-import { upsertClient, deleteClient } from "@/app/manager/clients/actions";
+import { upsertClient, deleteClient, toggleClientStatus } from "@/app/manager/clients/actions";
+import { AssignEmployeesDialog } from "./assign-employees-dialog";
+
+interface Employee {
+  id: string;
+  name: string;
+  email: string;
+}
 
 interface ClientItem {
   id: string;
   name: string;
   freeMinutesPerMonth: number | null;
   totalMinutes: number;
+  status: string;
+  assignedEmployeeIds: string[];
 }
 
 function fmtLimit(minutes: number | null) {
@@ -25,9 +34,11 @@ function fmtLimit(minutes: number | null) {
 
 function ClientRow({
   client,
+  employees,
   onDeleted,
 }: {
   client: ClientItem;
+  employees: Employee[];
   onDeleted: () => void;
 }) {
   const [editing, setEditing] = useState(false);
@@ -38,6 +49,15 @@ function ClientRow({
   const [error, setError] = useState<string | null>(null);
   const [isSaving, startSaving] = useTransition();
   const [isDeleting, startDeleting] = useTransition();
+  const [isToggling, startToggling] = useTransition();
+
+  const isActive = client.status === "active";
+
+  function toggleStatus() {
+    startToggling(async () => {
+      await toggleClientStatus(client.id);
+    });
+  }
 
   const overrunMinutes =
     client.freeMinutesPerMonth !== null
@@ -98,10 +118,15 @@ function ClientRow({
   }
 
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">
+    <div className={`flex items-center gap-4 rounded-xl border bg-card p-4 transition-opacity ${isActive ? "border-border" : "border-border/50 opacity-60"}`}>
       <Building2 className="h-5 w-5 shrink-0 text-muted-foreground" />
       <div className="flex-1 min-w-0">
-        <div className="font-medium text-sm truncate">{client.name}</div>
+        <div className="flex items-center gap-2">
+          <span className="font-medium text-sm truncate">{client.name}</span>
+          <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${isActive ? "bg-emerald-500/15 text-emerald-500" : "bg-muted text-muted-foreground"}`}>
+            {isActive ? "Aktīvs" : "Neaktīvs"}
+          </span>
+        </div>
         <div className="mt-0.5 flex flex-wrap gap-x-4 gap-y-0.5 text-xs text-muted-foreground">
           <span>Limits: {fmtLimit(client.freeMinutesPerMonth)}</span>
           <span>Kopā ierakstīts: {formatDurationLV(client.totalMinutes)}</span>
@@ -112,7 +137,13 @@ function ClientRow({
           )}
         </div>
       </div>
-      <div className="flex gap-1.5 shrink-0">
+      <div className="flex gap-1.5 shrink-0 flex-wrap justify-end">
+        <AssignEmployeesDialog
+          clientId={client.id}
+          clientName={client.name}
+          employees={employees}
+          assignedIds={client.assignedEmployeeIds}
+        />
         <Button asChild size="sm" variant="ghost">
           <Link href={`/manager/clients/${client.id}`}>
             <ExternalLink className="h-3.5 w-3.5" />
@@ -120,6 +151,15 @@ function ClientRow({
         </Button>
         <Button size="sm" variant="ghost" onClick={() => setEditing(true)}>
           <Pencil className="h-3.5 w-3.5" />
+        </Button>
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={toggleStatus}
+          disabled={isToggling}
+          title={isActive ? "Deaktivizēt klientu" : "Aktivizēt klientu"}
+        >
+          {isActive ? <X className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-emerald-500" />}
         </Button>
         <Button
           size="sm"
@@ -206,7 +246,13 @@ function AddClientForm({ onAdded }: { onAdded: () => void }) {
   );
 }
 
-export function ClientList({ clients: initial }: { clients: ClientItem[] }) {
+export function ClientList({
+  clients: initial,
+  employees = [],
+}: {
+  clients: ClientItem[];
+  employees?: Employee[];
+}) {
   const [clients, setClients] = useState(initial);
 
   return (
@@ -224,6 +270,7 @@ export function ClientList({ clients: initial }: { clients: ClientItem[] }) {
             <ClientRow
               key={c.id}
               client={c}
+              employees={employees}
               onDeleted={() => setClients((prev) => prev.filter((x) => x.id !== c.id))}
             />
           ))}

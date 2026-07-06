@@ -473,7 +473,7 @@ export function VercelV0Chat({
               Pastāsti, kas šodien aizņēma papildu laiku
             </h1>
             <p className="mt-3 text-sm font-light leading-6 tracking-[0.01em] text-muted-foreground">
-              Apraksti situāciju saviem vārdiem vai ierunā to. Shadowy izveidos melnraksta ierakstus pārskatīšanai
+              Raksti vai ierunā situāciju saviem vārdiem. Ja darbs bija saistīts ar klientu — piemin klienta nosaukumu un aptuveno laiku.
             </p>
           </div>
 

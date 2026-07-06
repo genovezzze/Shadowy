@@ -13,6 +13,7 @@ const confirmedTicketSchema = smartLogDraftSchema.extend({
   estimated_time_minutes: z.number().int().min(1).max(1440),
   workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   confirmed: z.literal(true),
+  client_id: z.string().nullable().optional(),
 });
 
 const saveSchema = z.object({
@@ -38,13 +39,20 @@ export async function saveConfirmedSmartLogTickets(input: {
     };
   }
 
-  const employee = await prisma.user.findFirst({
-    where: {
-      id: session.userId,
-      organizationId: session.organizationId,
-    },
-    select: { managerId: true, name: true },
-  });
+  const [employee, orgClients] = await Promise.all([
+    prisma.user.findFirst({
+      where: { id: session.userId, organizationId: session.organizationId },
+      select: { managerId: true, name: true },
+    }),
+    prisma.client.findMany({
+      where: {
+        organizationId: session.organizationId,
+        status: "active",
+        assignments: { some: { employeeId: session.userId } },
+      },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   if (!employee?.managerId) {
     return {
@@ -68,25 +76,37 @@ export async function saveConfirmedSmartLogTickets(input: {
 
   try {
     await prisma.$transaction(async (tx) => {
+      const clientNameMap = new Map(orgClients.map((c) => [c.name.toLowerCase(), c.id]));
+
       await tx.invisibleWorkEntry.createMany({
-        data: parsed.data.tickets.map((ticket) => ({
-          organizationId: session.organizationId,
-          employeeId: session.userId,
-          managerId,
-          title: ticket.title,
-          category: SMART_LOG_CATEGORY_LABELS[ticket.category],
-          description: ticket.description,
-          clientName: ticket.client_name || null,
-          workDate: new Date(`${ticket.workDate}T12:00:00.000Z`),
-          durationMinutes: ticket.estimated_time_minutes,
-          status: "APPROVED" as const,
-          source: parsed.data.source === "voice" ? "ai_voice" : "ai_text",
-          originalInput: parsed.data.originalInput,
-          isOutsideRole: ticket.is_outside_role,
-          roleRelation: ticket.role_relation || null,
-          businessImpact: ticket.business_impact || null,
-          confidenceScore: ticket.confidence_score,
-        })),
+        data: parsed.data.tickets.map((ticket) => {
+          // Use explicitly set clientId, or auto-match by name from AI
+          const resolvedClientId =
+            ticket.client_id ||
+            (ticket.client_name
+              ? (clientNameMap.get(ticket.client_name.toLowerCase()) ?? null)
+              : null);
+
+          return {
+            organizationId: session.organizationId,
+            employeeId: session.userId,
+            managerId,
+            title: ticket.title,
+            category: SMART_LOG_CATEGORY_LABELS[ticket.category],
+            description: ticket.description,
+            clientName: ticket.client_name || null,
+            clientId: resolvedClientId,
+            workDate: new Date(`${ticket.workDate}T12:00:00.000Z`),
+            durationMinutes: ticket.estimated_time_minutes,
+            status: "APPROVED" as const,
+            source: parsed.data.source === "voice" ? "ai_voice" : "ai_text",
+            originalInput: parsed.data.originalInput,
+            isOutsideRole: ticket.is_outside_role,
+            roleRelation: ticket.role_relation || null,
+            businessImpact: ticket.business_impact || null,
+            confidenceScore: ticket.confidence_score,
+          };
+        }),
       });
 
       await tx.notification.create({

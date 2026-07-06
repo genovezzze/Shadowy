@@ -45,10 +45,10 @@ export async function updateEntry(formData: FormData) {
     return { ok: false as const, error: "Ieraksts nav atrasts." };
   }
 
-  if (entry.status !== "PENDING" && entry.status !== "RETURNED") {
+  if (entry.status === "REJECTED") {
     return {
       ok: false as const,
-      error: "Var rediģēt tikai ierakstus, kas gaida izskatīšanu vai nosūtīti atpakaļ.",
+      error: "Noraidītus ierakstus nevar rediģēt.",
     };
   }
 
@@ -60,7 +60,8 @@ export async function updateEntry(formData: FormData) {
       description: parsed.data.description.trim(),
       workDate: parsed.data.workDate,
       durationMinutes: parsed.data.durationMinutes,
-      ...(entry.status === "RETURNED" && { status: "PENDING", managerComment: null }),
+      // If returned, mark as approved again (resubmitted); otherwise keep current status
+      ...(entry.status === "RETURNED" && { status: "APPROVED", managerComment: null }),
     },
   });
 
@@ -70,6 +71,52 @@ export async function updateEntry(formData: FormData) {
   revalidatePath("/manager/dashboard");
   revalidatePath("/admin/entries");
   revalidatePath("/admin/dashboard");
+  return { ok: true as const };
+}
+
+const addTimeSchema = z.object({
+  entryId: z.string().min(1),
+  minutes: z.coerce.number().int().min(1).max(1440),
+  comment: z.string().trim().max(500).optional(),
+});
+
+export async function addTimeLog(input: {
+  entryId: string;
+  minutes: number;
+  comment?: string;
+}) {
+  const session = await requireUser(["EMPLOYEE"]);
+  const parsed = addTimeSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: "Nepareizi dati." };
+  }
+
+  const entry = await prisma.invisibleWorkEntry.findFirst({
+    where: {
+      id: parsed.data.entryId,
+      employeeId: session.userId,
+      organizationId: session.organizationId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+
+  if (!entry) {
+    return { ok: false as const, error: "Ieraksts nav atrasts." };
+  }
+
+  await prisma.workEntryTimeLog.create({
+    data: {
+      entryId: parsed.data.entryId,
+      minutes: parsed.data.minutes,
+      comment: parsed.data.comment || null,
+      createdById: session.userId,
+    },
+  });
+
+  revalidatePath("/employee/history");
+  revalidatePath("/manager/entries");
+  revalidatePath("/manager/dashboard");
   return { ok: true as const };
 }
 
@@ -84,14 +131,14 @@ export async function deleteEntry(entryId: string) {
     return { ok: false as const, error: "Ieraksts nav atrasts." };
   }
 
-  if (entry.status !== "PENDING" && entry.status !== "RETURNED") {
-    return {
-      ok: false as const,
-      error: "Var dzēst tikai ierakstus, kas gaida izskatīšanu vai nosūtīti atpakaļ.",
-    };
+  if (entry.status === "REJECTED") {
+    return { ok: false as const, error: "Noraidītus ierakstus nevar dzēst." };
   }
 
-  await prisma.invisibleWorkEntry.delete({ where: { id: entryId } });
+  await prisma.invisibleWorkEntry.update({
+    where: { id: entryId },
+    data: { deletedAt: new Date(), deletedBy: session.userId },
+  });
 
   revalidatePath("/employee/history");
   revalidatePath("/employee/dashboard");

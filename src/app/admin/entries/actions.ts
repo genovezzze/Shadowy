@@ -7,13 +7,13 @@ import { requireUser } from "@/lib/auth";
 
 const schema = z.object({
   entryId: z.string().min(1),
-  action: z.enum(["APPROVE", "REJECT", "RETURN"]),
+  action: z.enum(["REJECT", "RETURN"]),
   comment: z.string().max(2000).optional().default(""),
 });
 
 export async function reviewEntryAsAdmin(input: {
   entryId: string;
-  action: "APPROVE" | "REJECT" | "RETURN";
+  action: "REJECT" | "RETURN";
   comment?: string;
 }) {
   const session = await requireUser(["ADMIN"]);
@@ -37,15 +37,11 @@ export async function reviewEntryAsAdmin(input: {
     };
   }
 
-  const status =
-    action === "APPROVE" ? "APPROVED" : action === "REJECT" ? "REJECTED" : "RETURNED";
+  const status = action === "REJECT" ? "REJECTED" : "RETURNED";
 
   await prisma.invisibleWorkEntry.update({
     where: { id: entry.id },
-    data: {
-      status,
-      managerComment: action === "APPROVE" ? null : comment.trim(),
-    },
+    data: { status, managerComment: comment.trim() },
   });
 
   revalidatePath("/admin/entries");

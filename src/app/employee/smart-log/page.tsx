@@ -5,13 +5,22 @@ import { SmartWorkLog } from "@/components/entries/smart-work-log";
 
 export default async function SmartLogPage() {
   const session = await requireUser(["EMPLOYEE"]);
-  const employee = await prisma.user.findFirst({
-    where: {
-      id: session.userId,
-      organizationId: session.organizationId,
-    },
-    select: { managerId: true },
-  });
+
+  const [employee, clients] = await Promise.all([
+    prisma.user.findFirst({
+      where: { id: session.userId, organizationId: session.organizationId },
+      select: { managerId: true },
+    }),
+    prisma.client.findMany({
+      where: {
+        organizationId: session.organizationId,
+        status: "active",
+        assignments: { some: { employeeId: session.userId } },
+      },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
+    }),
+  ]);
 
   if (!employee?.managerId) {
     return (
@@ -26,5 +35,5 @@ export default async function SmartLogPage() {
     );
   }
 
-  return <SmartWorkLog />;
+  return <SmartWorkLog clients={clients} />;
 }

@@ -6,6 +6,9 @@ import { EntryCard } from "@/components/entries/entry-card";
 import { EntriesFilter } from "@/components/entries/entries-filter";
 import { Pagination } from "@/components/entries/pagination";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
+import { AddTimeButton } from "@/components/entries/add-time-button";
+import { EditEntryButton } from "@/components/entries/edit-entry-button";
+import { DeleteEntryButton } from "@/components/entries/delete-entry-button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { resolveWorkType } from "@/lib/work-type";
@@ -44,6 +47,7 @@ export default async function EmployeeHistoryPage({
     orderBy: { createdAt: "desc" },
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
+    include: { timeLogs: { select: { minutes: true } } },
   });
 
   const duties = user?.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
@@ -91,32 +95,48 @@ export default async function EmployeeHistoryPage({
         )
       ) : (
         <div className="grid gap-4">
-          {entries.map((e: typeof entries[number]) => (
-            <EntryCard
-              key={e.id}
-              title={e.title}
-              category={e.category}
-              description={e.description}
-              clientName={e.clientName}
-              workDate={e.workDate}
-              durationMinutes={e.durationMinutes}
-              status={e.status}
-              managerComment={e.managerComment}
-              workType={resolveWorkType(e.isOutsideRole, e.category, e.title, duties)}
-              footer={
-                e.status === "PENDING" || e.status === "RETURNED" ? (
-                  <EmployeeEntryActions
-                    entryId={e.id}
-                    title={e.title}
-                    category={e.category}
-                    description={e.description}
-                    workDate={e.workDate.toISOString().slice(0, 10)}
-                    durationMinutes={e.durationMinutes}
-                  />
-                ) : null
-              }
-            />
-          ))}
+          {entries.map((e) => {
+            const totalMinutes = e.durationMinutes + e.timeLogs.reduce((s, l) => s + l.minutes, 0);
+            return (
+              <EntryCard
+                key={e.id}
+                title={e.title}
+                category={e.category}
+                description={e.description}
+                clientName={e.clientName}
+                workDate={e.workDate}
+                durationMinutes={totalMinutes}
+                status={e.status}
+                managerComment={e.managerComment}
+                workType={resolveWorkType(e.isOutsideRole, e.category, e.title, duties)}
+                footer={
+                  e.status === "PENDING" || e.status === "RETURNED" ? (
+                    <EmployeeEntryActions
+                      entryId={e.id}
+                      title={e.title}
+                      category={e.category}
+                      description={e.description}
+                      workDate={e.workDate.toISOString().slice(0, 10)}
+                      durationMinutes={e.durationMinutes}
+                    />
+                  ) : e.status === "APPROVED" ? (
+                    <div className="flex items-center gap-2">
+                      <AddTimeButton entryId={e.id} />
+                      <EditEntryButton
+                        entryId={e.id}
+                        title={e.title}
+                        category={e.category}
+                        description={e.description}
+                        workDate={e.workDate.toISOString().slice(0, 10)}
+                        durationMinutes={e.durationMinutes}
+                      />
+                      <DeleteEntryButton entryId={e.id} />
+                    </div>
+                  ) : null
+                }
+              />
+            );
+          })}
         </div>
       )}
 

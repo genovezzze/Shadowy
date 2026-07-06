@@ -33,14 +33,6 @@ export function ReviewActions({ entryId }: ReviewActionsProps) {
       <div className="flex flex-wrap items-center gap-2">
         <Button
           size="sm"
-          variant="success"
-          onClick={() => act("APPROVE")}
-          disabled={pending}
-        >
-          Apstiprināt
-        </Button>
-        <Button
-          size="sm"
           variant="outline"
           onClick={() => setMode("return")}
           disabled={pending}

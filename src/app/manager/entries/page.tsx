@@ -28,20 +28,24 @@ export default async function ManagerEntriesPage({
 
   const [pending, reviewed, team] = await Promise.all([
     prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: session.organizationId, managerId: session.userId, status: "PENDING", ...filter },
-      orderBy: { createdAt: "asc" },
+      where: { organizationId: session.organizationId, managerId: session.userId, status: { in: ["APPROVED", "PENDING"] }, ...filter },
+      orderBy: { createdAt: "desc" },
+      take: 100,
       include: { employee: { include: { workRole: { include: { duties: true } } } } },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: {
         organizationId: session.organizationId,
         managerId: session.userId,
-        status: { in: ["APPROVED", "REJECTED", "RETURNED"] },
+        status: { in: ["REJECTED", "RETURNED"] },
         ...filter,
       },
       orderBy: { updatedAt: "desc" },
       take: 50,
-      include: { employee: { include: { workRole: { include: { duties: true } } } } },
+      include: {
+        employee: { include: { workRole: { include: { duties: true } } } },
+        timeLogs: { select: { minutes: true } },
+      },
     }),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, managerId: session.userId, role: "EMPLOYEE" },
@@ -77,7 +81,7 @@ export default async function ManagerEntriesPage({
 
       <section className="mb-10">
         <h2 className="text-base font-semibold mb-3">
-          Gaida izskatīšanu ({pending.length})
+          Jaunākie ieraksti ({pending.length})
         </h2>
         <PendingEntriesList
           entries={pending.map((e: any) => ({
@@ -97,30 +101,33 @@ export default async function ManagerEntriesPage({
       </section>
 
       <section>
-        <h2 className="text-base font-semibold mb-3">Jau izskatītie</h2>
+        <h2 className="text-base font-semibold mb-3">Nosūtīti atpakaļ / noraidīti</h2>
         {reviewed.length === 0 ? (
           <EmptyState
             icon={<FileText className="h-5 w-5" />}
-            title="Vēl nav izskatītu ierakstu"
-            description="Apstiprinātie, noraidītie un atpakaļ nosūtītie ieraksti parādīsies šeit."
+            title="Nav atgrieztu vai noraidītu ierakstu"
+            description="Ieraksti, kurus nosūtīsiet atpakaļ vai noraidīsiet, parādīsies šeit."
           />
         ) : (
           <div className="grid gap-4">
-            {reviewed.map((e: typeof reviewed[number]) => (
-              <EntryCard
-                key={e.id}
-                title={e.title}
-                category={e.category}
-                description={e.description}
-                clientName={e.clientName}
-                workDate={e.workDate}
-                durationMinutes={e.durationMinutes}
-                status={e.status}
-                employeeName={e.employee.name}
-                managerComment={e.managerComment}
-                workType={getWorkType(e)}
-              />
-            ))}
+            {reviewed.map((e) => {
+              const totalMinutes = e.durationMinutes + e.timeLogs.reduce((s, l) => s + l.minutes, 0);
+              return (
+                <EntryCard
+                  key={e.id}
+                  title={e.title}
+                  category={e.category}
+                  description={e.description}
+                  clientName={e.clientName}
+                  workDate={e.workDate}
+                  durationMinutes={totalMinutes}
+                  status={e.status}
+                  employeeName={e.employee.name}
+                  managerComment={e.managerComment}
+                  workType={getWorkType(e)}
+                />
+              );
+            })}
           </div>
         )}
       </section>
