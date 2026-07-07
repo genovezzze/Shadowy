@@ -32,6 +32,7 @@ export default async function ManagerEmployeeDetail({
     select: {
       id: true, title: true, category: true, description: true,
       clientName: true, clientId: true,
+      client: { select: { name: true } },
       workDate: true, durationMinutes: true, status: true, managerComment: true,
     },
   });
@@ -97,7 +98,7 @@ export default async function ManagerEmployeeDetail({
               title={e.title}
               category={e.category}
               description={e.description}
-              clientName={e.clientName}
+              clientName={e.clientName ?? e.client?.name ?? undefined}
               clientHref={e.clientId ? `/manager/clients/${e.clientId}` : undefined}
               workDate={e.workDate}
               durationMinutes={e.durationMinutes}

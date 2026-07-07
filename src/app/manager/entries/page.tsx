@@ -31,7 +31,7 @@ export default async function ManagerEntriesPage({
       where: { organizationId: session.organizationId, managerId: session.userId, status: { in: ["APPROVED", "PENDING"] }, ...filter },
       orderBy: { createdAt: "desc" },
       take: 100,
-      include: { employee: { include: { workRole: { include: { duties: true } } } } },
+      include: { employee: { include: { workRole: { include: { duties: true } } } }, client: { select: { name: true } } },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: {
@@ -44,6 +44,7 @@ export default async function ManagerEntriesPage({
       take: 50,
       include: {
         employee: { include: { workRole: { include: { duties: true } } } },
+        client: { select: { name: true } },
         timeLogs: { select: { minutes: true } },
       },
     }),
@@ -90,7 +91,7 @@ export default async function ManagerEntriesPage({
             title: e.title,
             category: e.category,
             description: e.description,
-            clientName: e.clientName,
+            clientName: e.clientName ?? e.client?.name ?? null,
             workDate: e.workDate.toISOString(),
             durationMinutes: e.durationMinutes,
             status: e.status,
@@ -118,7 +119,7 @@ export default async function ManagerEntriesPage({
                   title={e.title}
                   category={e.category}
                   description={e.description}
-                  clientName={e.clientName}
+                  clientName={e.clientName ?? e.client?.name ?? undefined}
                   workDate={e.workDate}
                   durationMinutes={totalMinutes}
                   status={e.status}

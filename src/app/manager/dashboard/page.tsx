@@ -51,6 +51,7 @@ type ApprovedEntry = {
   title: string;
   category: string;
   clientName: string | null;
+  clientId: string | null;
   durationMinutes: number;
   workDate: Date;
   createdAt: Date;
@@ -222,6 +223,7 @@ export default async function ManagerDashboard({
         title: true,
         category: true,
         clientName: true,
+        clientId: true,
         durationMinutes: true,
         workDate: true,
         createdAt: true,
@@ -248,15 +250,19 @@ export default async function ManagerDashboard({
   ]);
 
   // --- Core aggregation ---
-  const clientMinutes = new Map<string, number>();
+  const clientMinById = new Map<string, number>();   // clientId → minutes
+  const clientMinByName = new Map<string, number>(); // clientName.lower → minutes
   const categoryCount = new Map<string, number>();
   let totalMinutes = 0;
   let extraMinutes = 0;
 
   for (const e of approved) {
     totalMinutes += e.durationMinutes;
-    if (e.clientName) {
-      clientMinutes.set(e.clientName, (clientMinutes.get(e.clientName) ?? 0) + e.durationMinutes);
+    if (e.clientId) {
+      clientMinById.set(e.clientId, (clientMinById.get(e.clientId) ?? 0) + e.durationMinutes);
+    } else if (e.clientName) {
+      const key = e.clientName.toLowerCase();
+      clientMinByName.set(key, (clientMinByName.get(key) ?? 0) + e.durationMinutes);
     }
     categoryCount.set(e.category, (categoryCount.get(e.category) ?? 0) + 1);
     if (isExtraEntry(e)) extraMinutes += e.durationMinutes;
@@ -274,7 +280,7 @@ export default async function ManagerDashboard({
 
   // --- Client rows ---
   const clientRows = clients.map((c) => {
-    const used = clientMinutes.get(c.name) ?? 0;
+    const used = (clientMinById.get(c.id) ?? 0) + (clientMinByName.get(c.name.toLowerCase()) ?? 0);
     const overrun =
       c.freeMinutesPerMonth !== null ? Math.max(0, used - c.freeMinutesPerMonth) : 0;
     return {
@@ -287,10 +293,11 @@ export default async function ManagerDashboard({
     };
   }).sort((a, b) => b.usedMinutes - a.usedMinutes);
 
+  const registeredClientNames = new Set(clients.map((c) => c.name.toLowerCase()));
   const untrackedNames = [...new Set(
     approved
-      .map((e) => e.clientName)
-      .filter((n): n is string => !!n && !clients.some((c) => c.name === n))
+      .filter((e) => e.clientName && !e.clientId && !registeredClientNames.has(e.clientName.toLowerCase()))
+      .map((e) => e.clientName as string)
   )];
 
   const topCategories = Array.from(categoryCount.entries())
