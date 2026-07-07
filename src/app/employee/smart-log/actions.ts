@@ -75,7 +75,7 @@ export async function saveConfirmedSmartLogTickets(input: {
 
   try {
     await prisma.$transaction(async (tx) => {
-      const clientNameMap = new Map(orgClients.map((c) => [c.name.toLowerCase(), c.id]));
+      const clientNameMap = new Map(orgClients.map((c) => [c.name.replace(/''/g, '"').toLowerCase(), c.id]));
 
       await tx.invisibleWorkEntry.createMany({
         data: parsed.data.tickets.map((ticket) => {
@@ -83,7 +83,7 @@ export async function saveConfirmedSmartLogTickets(input: {
           const resolvedClientId =
             ticket.client_id ||
             (ticket.client_name
-              ? (clientNameMap.get(ticket.client_name.toLowerCase()) ?? null)
+              ? (clientNameMap.get(ticket.client_name.replace(/''/g, '"').toLowerCase()) ?? null)
               : null);
 
           return {
