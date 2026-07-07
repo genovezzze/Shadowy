@@ -7,6 +7,8 @@ import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { SectionDivider } from "@/components/dashboard/section-divider";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
+import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
+import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import {
@@ -205,7 +207,12 @@ export default async function ManagerDashboard({
   const periodStart = getPeriodStart(period);
   const periodFilter = periodStart ? { gte: periodStart } : undefined;
 
-  const [teamCount, clients, approved, pending, pendingCount] = await Promise.all([
+  const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000);
+
+  const nowDate = new Date();
+  const currentMonthStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), 1));
+
+  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries] = await Promise.all([
     prisma.user.count({ where: { organizationId: orgId, managerId } }),
     prisma.client.findMany({
       where: { organizationId: orgId },
@@ -247,6 +254,19 @@ export default async function ManagerDashboard({
     prisma.invisibleWorkEntry.count({
       where: { organizationId: orgId, managerId, status: "PENDING", deletedAt: null },
     }),
+    prisma.user.findMany({
+      where: { organizationId: orgId, managerId, role: "EMPLOYEE" },
+      select: { id: true, name: true },
+      orderBy: { name: "asc" },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { organizationId: orgId, managerId, deletedAt: null, workDate: { gte: eightWeeksAgo } },
+      select: { employeeId: true, workDate: true, durationMinutes: true },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: currentMonthStart } },
+      select: { clientId: true, clientName: true, durationMinutes: true },
+    }),
   ]);
 
   // --- Core aggregation ---
@@ -271,6 +291,60 @@ export default async function ManagerDashboard({
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
 
+  // --- Team activity analytics ---
+  const todayMidnightMs = Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), nowDate.getUTCDate());
+  const todayDow = (nowDate.getUTCDay() + 6) % 7;
+  const thisWeekMonMs = todayMidnightMs - todayDow * 86400000;
+
+  const weekSlots = Array.from({ length: 8 }, (_, i) => {
+    const startMs = thisWeekMonMs - (7 - i) * 7 * 86400000;
+    const d = new Date(startMs);
+    return {
+      startMs,
+      endMs: startMs + 7 * 86400000,
+      label: `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}`,
+    };
+  });
+
+  // Adoption rate: active this week
+  const thisWeekActiveIds = new Set(
+    recentHeatmapEntries
+      .filter(e => e.workDate.getTime() >= weekSlots[7].startMs)
+      .map(e => e.employeeId)
+  );
+
+  // Silent employees: no entries in last 14 days
+  const fourteenDaysAgoMs = todayMidnightMs - 14 * 86400000;
+  const activeInLast14 = new Set(
+    recentHeatmapEntries.filter(e => e.workDate.getTime() >= fourteenDaysAgoMs).map(e => e.employeeId)
+  );
+  const silentMembers = teamMembers.filter(m => !activeInLast14.has(m.id));
+
+  // Heatmap: per-employee per-week presence
+  const empWeekSet = new Map<string, Set<number>>();
+  for (const e of recentHeatmapEntries) {
+    const wMs = e.workDate.getTime();
+    const idx = weekSlots.findIndex(w => wMs >= w.startMs && wMs < w.endMs);
+    if (idx === -1) continue;
+    if (!empWeekSet.has(e.employeeId)) empWeekSet.set(e.employeeId, new Set());
+    empWeekSet.get(e.employeeId)!.add(idx);
+  }
+  const heatmapRows = teamMembers.map(m => ({
+    id: m.id,
+    name: m.name,
+    weeks: weekSlots.map((_, i) => empWeekSet.get(m.id)?.has(i) ?? false),
+  }));
+
+  // Workload balance: total hours per employee in selected period
+  const empMinMap = new Map<string, number>();
+  for (const e of approved) empMinMap.set(e.employee.id, (empMinMap.get(e.employee.id) ?? 0) + e.durationMinutes);
+  const workloadRows = teamMembers
+    .map(m => ({ id: m.id, name: m.name, hours: Math.round(((empMinMap.get(m.id) ?? 0) / 60) * 10) / 10 }))
+    .filter(m => m.hours > 0)
+    .sort((a, b) => b.hours - a.hours);
+  const avgWorkload = workloadRows.length > 0 ? workloadRows.reduce((s, m) => s + m.hours, 0) / workloadRows.length : 0;
+  const maxWorkload = workloadRows[0]?.hours ?? 0;
+
   // --- Analytics ---
   const weeklyTrendData = buildWeeklyTrendData(approved, period);
   const employeeBreakdown = buildEmployeeBreakdown(approved);
@@ -293,6 +367,39 @@ export default async function ManagerDashboard({
     };
   }).sort((a, b) => b.usedMinutes - a.usedMinutes);
 
+  // --- Client budget forecast ---
+  const monthClientById = new Map<string, number>();
+  const monthClientByName = new Map<string, number>();
+  for (const e of currentMonthEntries) {
+    if (e.clientId) {
+      monthClientById.set(e.clientId, (monthClientById.get(e.clientId) ?? 0) + e.durationMinutes);
+    } else if (e.clientName) {
+      const key = e.clientName.replace(/''/g, '"').toLowerCase();
+      monthClientByName.set(key, (monthClientByName.get(key) ?? 0) + e.durationMinutes);
+    }
+  }
+  const daysSoFar = nowDate.getUTCDate();
+  const daysInMonth = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, 0)).getUTCDate();
+  const daysRemaining = daysInMonth - daysSoFar;
+  type ClientForecast = { id: string; name: string; daysLeft: number; usedMin: number; freeMin: number; dailyRateH: number };
+  const clientForecasts: ClientForecast[] = [];
+  for (const c of clients) {
+    if (c.freeMinutesPerMonth === null) continue;
+    const usedMin =
+      (monthClientById.get(c.id) ?? 0) +
+      (monthClientByName.get(c.name.replace(/''/g, '"').toLowerCase()) ?? 0);
+    if (usedMin >= c.freeMinutesPerMonth || usedMin === 0 || daysSoFar === 0) continue;
+    const dailyRate = usedMin / daysSoFar;
+    const projectedTotal = usedMin + dailyRate * daysRemaining;
+    if (projectedTotal > c.freeMinutesPerMonth) {
+      const minutesLeft = c.freeMinutesPerMonth - usedMin;
+      const daysLeft = Math.max(0, Math.floor(minutesLeft / dailyRate));
+      const dailyRateH = Math.round((dailyRate / 60) * 10) / 10;
+      clientForecasts.push({ id: c.id, name: c.name, daysLeft, usedMin, freeMin: c.freeMinutesPerMonth, dailyRateH });
+    }
+  }
+  clientForecasts.sort((a, b) => a.daysLeft - b.daysLeft);
+
   const registeredClientNames = new Set(clients.map((c) => c.name.toLowerCase()));
   const untrackedNames = [...new Set(
     approved
@@ -302,7 +409,29 @@ export default async function ManagerDashboard({
 
   const topCategories = Array.from(categoryCount.entries())
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 5);
+    .slice(0, 6);
+
+  const categoryItems = topCategories.map(([cat, count]) => {
+    const pct = approved.length > 0 ? Math.round((count / approved.length) * 100) : 0;
+    const titleMap = new Map<string, number>();
+    for (const e of approved) {
+      if (e.category === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
+    }
+    const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const maxCnt = sorted[0]?.[1] ?? 1;
+    return {
+      name: cat,
+      count,
+      pct,
+      isPattern: cat === patternCategory,
+      titles: sorted.map(([title, cnt]) => ({
+        title,
+        count: cnt,
+        pct: Math.round((cnt / count) * 100),
+        barPct: Math.round((cnt / maxCnt) * 100),
+      })),
+    };
+  });
 
   const noClientCount = approved.filter((e) => !e.clientName).length;
 
@@ -355,6 +484,97 @@ export default async function ManagerDashboard({
       </div>
 
       <CostCalculatorWidget extraMinutes={extraMinutes} />
+
+      {/* ── Komanda ── */}
+      {teamMembers.length > 0 && (
+        <>
+          <SectionDivider label="Komanda" />
+          <div className="mb-6 space-y-4">
+            {/* Adoption rate */}
+            <div className={`flex items-center justify-between gap-4 rounded-xl border px-5 py-3.5 ${
+              thisWeekActiveIds.size === teamMembers.length
+                ? "border-emerald-500/30 bg-emerald-500/5"
+                : thisWeekActiveIds.size === 0
+                ? "border-amber-500/30 bg-amber-500/5"
+                : "border-border bg-card"
+            }`}>
+              <div className="text-sm">
+                <span className="font-medium">Aktivitāte šonedēļ — </span>
+                <span className="font-semibold text-foreground">{thisWeekActiveIds.size}</span>
+                <span className="text-muted-foreground"> / {teamMembers.length} darbinieki</span>
+              </div>
+              <div className="flex items-center gap-1 shrink-0">
+                {teamMembers.map(m => (
+                  <div
+                    key={m.id}
+                    title={`${m.name}: ${thisWeekActiveIds.has(m.id) ? "aktīvs" : "nav ierakstu"}`}
+                    className={`h-2.5 w-2.5 rounded-full ${thisWeekActiveIds.has(m.id) ? "bg-emerald-500" : "bg-muted-foreground/30"}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Silent employees */}
+            {silentMembers.length > 0 && (
+              <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.04] px-5 py-3.5">
+                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
+                <p className="text-sm">
+                  <span className="font-medium">Nav logojuši 14+ dienas: </span>
+                  <span className="text-muted-foreground">{silentMembers.map(m => m.name).join(", ")}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Heatmap + Workload */}
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <Card className="p-5">
+                <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                  Aktivitātes karte (8 nedēļas)
+                </div>
+                <TeamHeatmap rows={heatmapRows} weekLabels={weekSlots.map(w => w.label)} />
+              </Card>
+
+              {workloadRows.length > 0 && (
+                <Card className="p-5">
+                  <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
+                    Darba noslodze ({periodLabel(period)})
+                  </div>
+                  <div className="space-y-2.5">
+                    {workloadRows.map(emp => {
+                      const pct = maxWorkload > 0 ? Math.round((emp.hours / maxWorkload) * 100) : 0;
+                      const overloaded = avgWorkload > 0 && emp.hours > avgWorkload * 2 && workloadRows.length > 1;
+                      return (
+                        <div key={emp.id} className="flex items-center gap-3">
+                          <div className="w-28 shrink-0 truncate text-xs">{emp.name}</div>
+                          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full ${overloaded ? "bg-amber-500/70" : "bg-foreground/60"}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <div className={`w-10 shrink-0 text-right text-xs tabular-nums ${overloaded ? "text-amber-500 font-semibold" : "text-muted-foreground"}`}>
+                            {emp.hours}h
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {workloadRows.length > 1 && (
+                      <div className="pt-1.5 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
+                        <span>Vidēji: {Math.round(avgWorkload * 10) / 10}h</span>
+                        {maxWorkload > avgWorkload * 2 && (
+                          <span className="text-amber-500 flex items-center gap-1">
+                            <AlertTriangle className="h-3 w-3" /> Nevienmērīga slodze
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              )}
+            </div>
+          </div>
+        </>
+      )}
 
       {/* Analytics */}
       {approved.length > 0 && (
@@ -418,6 +638,51 @@ export default async function ManagerDashboard({
       {/* Client table */}
       <SectionDivider label="Klienti" />
       <div className="mb-8">
+        {clientForecasts.length > 0 && (
+          <Card className="mb-3 overflow-hidden p-0">
+            <div className="flex items-center gap-2 border-b border-border/60 px-5 py-3">
+              <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
+              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                Budžeta brīdinājumi
+              </span>
+              <span className="ml-auto text-xs text-muted-foreground">{clientForecasts.length} klients/-i</span>
+            </div>
+            <div className="divide-y divide-border/30">
+              {clientForecasts.map((f) => {
+                const usedPct = Math.min(100, Math.round((f.usedMin / f.freeMin) * 100));
+                const urgent = f.daysLeft === 0;
+                const soon = f.daysLeft <= 2;
+                return (
+                  <div key={f.id} className="flex items-center gap-4 px-5 py-3.5">
+                    <div className="w-40 shrink-0 min-w-0">
+                      <div className="truncate text-sm font-medium">{f.name}</div>
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        {formatDurationLV(f.usedMin)} / {formatDurationLV(f.freeMin)} · {f.dailyRateH}h/d.
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${urgent ? "bg-rose-500/70" : soon ? "bg-amber-500/70" : "bg-amber-400/50"}`}
+                          style={{ width: `${usedPct}%` }}
+                        />
+                      </div>
+                      <div className="mt-1 text-[10px] text-muted-foreground">{usedPct}% no mēneša limita</div>
+                    </div>
+                    <div className={`shrink-0 text-right text-xs font-semibold tabular-nums ${urgent ? "text-rose-400" : "text-amber-500"}`}>
+                      {urgent ? "Šodien" : `~${Math.max(1, f.daysLeft)} d.`}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="border-t border-border/40 bg-muted/10 px-5 py-2.5">
+              <p className="text-[11px] text-muted-foreground">
+                Prognoze balstīta uz šī mēneša vidējo tempu ({daysSoFar} dienas).
+              </p>
+            </div>
+          </Card>
+        )}
         {clientRows.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
@@ -519,33 +784,11 @@ export default async function ManagerDashboard({
       </div>
 
       {/* Top categories */}
-      {topCategories.length > 0 && (
+      {categoryItems.length > 0 && (
         <>
           <SectionDivider label="Kategorijas" />
-          <Card className="mb-8 p-5">
-            <div className="space-y-3">
-              {topCategories.map(([cat, count], i) => {
-                const pct = approved.length > 0 ? Math.round((count / approved.length) * 100) : 0;
-                const isPattern = cat === patternCategory;
-                return (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className={`w-40 shrink-0 truncate text-xs ${isPattern ? "font-medium text-amber-500" : "text-muted-foreground"}`}>
-                      {cat}
-                      {isPattern && " ⚠"}
-                    </div>
-                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full ${isPattern ? "bg-amber-500/70" : "bg-foreground/60"}`}
-                        style={{ width: `${pct}%` }}
-                      />
-                    </div>
-                    <div className="text-xs text-muted-foreground w-16 text-right tabular-nums">
-                      {count} · {pct}%
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <Card className="mb-8 p-4">
+            <CategoryList items={categoryItems} patternCategory={patternCategory} />
           </Card>
         </>
       )}
