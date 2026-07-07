@@ -441,7 +441,11 @@ export default async function ManagerDashboard({
                 <tbody className="divide-y divide-border">
                   {clientRows.map((c) => (
                     <tr key={c.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="px-5 py-3 font-medium">{c.name}</td>
+                      <td className="px-5 py-3 font-medium">
+                        <Link href={`/manager/clients/${c.id}`} className="hover:underline hover:text-foreground transition-colors">
+                          {c.name}
+                        </Link>
+                      </td>
                       <td className="px-4 py-3 text-right tabular-nums">
                         {c.usedMinutes > 0 ? formatDurationLV(c.usedMinutes) : "—"}
                       </td>

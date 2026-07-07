@@ -49,11 +49,13 @@ export function buildEntryWhere(
   const dateFilter: Prisma.DateTimeFilter = {};
   if (sp.from) {
     const d = new Date(sp.from);
-    if (!Number.isNaN(d.getTime())) dateFilter.gte = d;
+    const y = d.getFullYear();
+    if (!Number.isNaN(d.getTime()) && y >= 2000 && y <= 2100) dateFilter.gte = d;
   }
   if (sp.to) {
     const d = new Date(sp.to);
-    if (!Number.isNaN(d.getTime())) {
+    const y = d.getFullYear();
+    if (!Number.isNaN(d.getTime()) && y >= 2000 && y <= 2100) {
       d.setHours(23, 59, 59, 999);
       dateFilter.lte = d;
     }

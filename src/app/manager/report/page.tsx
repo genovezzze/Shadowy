@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
@@ -482,7 +483,13 @@ export default async function ManagerReportPage({
                 <tbody className="divide-y divide-border print:divide-gray-100">
                   {clientData.map((c) => (
                     <tr key={c.id} className="hover:bg-muted/20 transition-colors print:hover:bg-transparent">
-                      <td className="px-5 py-3 font-medium">{c.name}</td>
+                      <td className="px-5 py-3 font-medium">
+                        {c.registered ? (
+                          <Link href={`/manager/clients/${c.id}`} className="hover:underline hover:text-foreground transition-colors print:no-underline">
+                            {c.name}
+                          </Link>
+                        ) : c.name}
+                      </td>
                       <td className="px-4 py-3 text-right tabular-nums">{`${Math.round((c.minutes / 60) * 10) / 10}h`}</td>
                       <td className="px-4 py-3 text-right tabular-nums text-muted-foreground print:text-gray-400">
                         {c.registered ? (c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞") : "—"}

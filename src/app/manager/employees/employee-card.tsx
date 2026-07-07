@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@/components/ui/label";
 import { updateEmployee, deleteEmployee } from "./actions";
-import { Pencil, Trash2, X, Check } from "lucide-react";
+import { Pencil, Trash2, X, Check, Briefcase } from "lucide-react";
 
 function initials(name: string) {
   return name
@@ -26,9 +26,10 @@ interface EmployeeCardProps {
   email: string;
   title: string | null;
   entryCount: number;
+  workRoleName?: string | null;
 }
 
-export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCardProps) {
+export function EmployeeCard({ id, name, email, title, entryCount, workRoleName }: EmployeeCardProps) {
   const router = useRouter();
   const [mode, setMode] = useState<"view" | "edit" | "delete">("view");
   const [pending, startTransition] = useTransition();
@@ -108,8 +109,14 @@ export function EmployeeCard({ id, name, email, title, entryCount }: EmployeeCar
           <div className="text-xs text-muted-foreground">
             {email}{title ? ` · ${title}` : ""}
           </div>
-          <div className="text-xs text-muted-foreground mt-0.5">
-            Ieraksti: {entryCount}
+          <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+            <span className="text-xs text-muted-foreground">Ieraksti: {entryCount}</span>
+            {workRoleName && (
+              <span className="inline-flex items-center gap-1 text-xs text-primary/70 bg-primary/10 rounded-full px-2 py-0.5">
+                <Briefcase className="h-3 w-3" />
+                {workRoleName}
+              </span>
+            )}
           </div>
           {error && mode === "view" && <div className="text-xs text-destructive mt-1">{error}</div>}
         </div>

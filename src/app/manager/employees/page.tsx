@@ -16,7 +16,10 @@ export default async function ManagerEmployeesPage() {
       role: "EMPLOYEE",
     },
     orderBy: { createdAt: "desc" },
-    include: { _count: { select: { submittedEntries: true } } },
+    include: {
+      _count: { select: { submittedEntries: true } },
+      workRole: { select: { name: true } },
+    },
   });
 
   return (
@@ -63,6 +66,7 @@ export default async function ManagerEmployeesPage() {
                 email={e.email}
                 title={e.title}
                 entryCount={e._count.submittedEntries}
+                workRoleName={e.workRole?.name ?? null}
               />
             ))
           )}
