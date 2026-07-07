@@ -48,7 +48,6 @@ export async function saveConfirmedSmartLogTickets(input: {
       where: {
         organizationId: session.organizationId,
         status: "active",
-        assignments: { some: { employeeId: session.userId } },
       },
       select: { id: true, name: true },
     }),
