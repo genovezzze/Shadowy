@@ -31,8 +31,8 @@ export async function createEntry(formData: FormData) {
     title: formData.get("title"),
     category: formData.get("category"),
     description: formData.get("description"),
-    clientName: formData.get("clientName"),
-    clientId: formData.get("clientId") || undefined,
+    clientName: formData.get("clientName") ?? undefined,
+    clientId: formData.get("clientId") ?? undefined,
     workDate: formData.get("workDate"),
     durationMinutes: formData.get("durationMinutes"),
   });
