@@ -67,7 +67,17 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">5. Sīkdatnes</h2>
+            <h2 className="text-lg font-semibold tracking-tight">5. Datu glabāšanas vieta un drošība</h2>
+            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
+              <li>Visi dati tiek glabāti datubāzē Eiropas Savienības teritorijā (Frankfurtē, Vācijā), atbilstoši GDPR prasībām.</li>
+              <li>Savienojumi ar serveriem ir šifrēti (SSL/TLS).</li>
+              <li>Paroles tiek glabātas tikai vienvirziena šifrētā (hash) veidā - Shadowy komanda tās neredz.</li>
+              <li>Katras organizācijas dati ir stingri nodalīti un nav pieejami citām organizācijām.</li>
+            </ul>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-semibold tracking-tight">6. Sīkdatnes</h2>
             <p className="mt-3 text-muted-foreground">
               Shadowy izmanto vienu funkcionālu sesijas sīkdatni (httpOnly), lai noturētu jūsu pieslēgšanos.
               Netiek izmantotas reklāmu vai trešo pušu analītikas sīkdatnes.
@@ -75,7 +85,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">6. Kontakti</h2>
+            <h2 className="text-lg font-semibold tracking-tight">7. Kontakti</h2>
             <p className="mt-3 text-muted-foreground">
               Par jautājumiem par datiem, privātumu vai šo politiku rakstiet uz{" "}
               <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 text-foreground">
@@ -94,7 +104,7 @@ export default function PrivacyPage() {
 
         <div className="mt-10 space-y-8 text-sm leading-relaxed">
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">7. Pakalpojuma apraksts</h2>
+            <h2 className="text-lg font-semibold tracking-tight">8. Pakalpojuma apraksts</h2>
             <p className="mt-3 text-muted-foreground">
               Shadowy ir rīks darba ierakstu apkopošanai, apstiprināšanai un bonusu pārvaldībai. Pilota
               perioda laikā pakalpojums tiek nodrošināts bez maksas un var tikt mainīts vai pārtraukts
@@ -103,7 +113,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">8. Lietotāju pienākumi</h2>
+            <h2 className="text-lg font-semibold tracking-tight">9. Lietotāju pienākumi</h2>
             <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
               <li>Organizācijas administrators ir atbildīgs par lietotāju kontu pārvaldību savā organizācijā.</li>
               <li>Konta piekļuves dati nav jānodod trešajām personām.</li>
@@ -112,7 +122,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">9. Pieejamība un atbildība</h2>
+            <h2 className="text-lg font-semibold tracking-tight">10. Pieejamība un atbildība</h2>
             <p className="mt-3 text-muted-foreground">
               Pilota laikā pakalpojums tiek nodrošināts &quot;kā ir&quot;, bez garantijām par nepārtrauktu pieejamību.
               Shadowy nav atbildīgs par neiegūto peļņu vai netiešiem zaudējumiem, kas radušies pakalpojuma
@@ -121,7 +131,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">10. Pilota pārtraukšana un dati</h2>
+            <h2 className="text-lg font-semibold tracking-tight">11. Pilota pārtraukšana un dati</h2>
             <p className="mt-3 text-muted-foreground">
               Jūs vai Shadowy var pārtraukt pilota dalību jebkurā brīdī. Pēc pārtraukšanas jūsu organizācijas
               dati tiks glabāti līdz 30 dienām, lai jūs varētu pieprasīt eksportu, pēc tam tie tiek dzēsti.
@@ -129,7 +139,7 @@ export default function PrivacyPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold tracking-tight">11. Piemērojamie tiesību akti</h2>
+            <h2 className="text-lg font-semibold tracking-tight">12. Piemērojamie tiesību akti</h2>
             <p className="mt-3 text-muted-foreground">
               Šiem noteikumiem piemēro Latvijas Republikas tiesību aktus.
             </p>

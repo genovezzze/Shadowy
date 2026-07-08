@@ -182,7 +182,7 @@ export function PrivacyTrustSection() {
             </p>
           </div>
           <p className="text-center text-xs font-medium tracking-[0.01em] text-white/35 sm:text-right">
-            GDPR atbilstoši · Serveri ES robežās · Datus var dzēst jebkurā brīdī
+            GDPR atbilstoši · Serveri Eiropas Savienībā · Datus var dzēst jebkurā brīdī
           </p>
         </div>
       </div>

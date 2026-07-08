@@ -8,10 +8,11 @@ import { EmphasizedText } from "@/components/landing/emphasized-text";
 const solutionCards = [
   {
     number: "01",
-    title: "Darbinieks apraksta situāciju",
+    title: "Darbinieks apraksta AI čatā",
     description:
-      "Darbinieks apraksta saviem vārdiem vai ierunā, kas šodien traucēja pabeigt pamatdarbu vai bija ārpus viņa lomas",
+      "Nav jāaizpilda manuāli nekādas formas - darbinieks vienkārši apraksta saviem vārdiem vai ierunā AI čatā, kas šodien traucēja pabeigt pamatdarbu vai bija ārpus viņa lomas",
     examples: [
+      "Nav manuālas fiksācijas",
       "Palīdzēju kolēģim",
       "Gaidīju informāciju",
       "Fokuss tika pārtraukts",
@@ -43,6 +44,8 @@ const solutionCards = [
 ] as const;
 
 const importantSolutionPhrases = [
+  "Nav jāaizpilda manuāli nekādas formas",
+  "AI čatā",
   "saviem vārdiem",
   "kas šodien traucēja",
   "melnraksta ierakstus",
@@ -89,7 +92,7 @@ export function SolutionSection() {
         <header className="mx-auto max-w-none text-center">
           <h2
             id="solution-heading"
-            className="text-balance font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.25rem)] lg:whitespace-nowrap"
+            className="text-balance font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.25rem)] xl:whitespace-nowrap"
           >
             Bez garām formām.{" "}
             <span className="bg-gradient-to-r from-emerald-300 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
