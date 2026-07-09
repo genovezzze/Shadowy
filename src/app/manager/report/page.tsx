@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
+import { normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
@@ -221,17 +222,17 @@ export default async function ManagerReportPage({
     if (e.clientId) {
       clientMinMap.set(e.clientId, (clientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.replace(/''/g, '"').toLowerCase();
+      const key = normalizeClientName(e.clientName);
       const existing = clientNameMinMap.get(key);
       clientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
     } else {
       noClientCount++;
     }
   }
-  const registeredClientLower = new Set(clients.map((c) => c.name.replace(/''/g, '"').toLowerCase()));
+  const registeredClientLower = new Set(clients.map((c) => normalizeClientName(c.name)));
   const clientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
   for (const c of clients) {
-    const nameMinutes = clientNameMinMap.get(c.name.replace(/''/g, '"').toLowerCase())?.minutes ?? 0;
+    const nameMinutes = clientNameMinMap.get(normalizeClientName(c.name))?.minutes ?? 0;
     const minutes = (clientMinMap.get(c.id) ?? 0) + nameMinutes;
     if (minutes === 0) continue;
     const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;

@@ -8,6 +8,7 @@ import {
   SMART_LOG_CATEGORY_LABELS,
   smartLogDraftSchema,
 } from "@/lib/smart-log";
+import { normalizeClientName } from "@/lib/client-name";
 
 const confirmedTicketSchema = smartLogDraftSchema.extend({
   estimated_time_minutes: z.number().int().min(1).max(1440),
@@ -75,7 +76,7 @@ export async function saveConfirmedSmartLogTickets(input: {
 
   try {
     await prisma.$transaction(async (tx) => {
-      const clientNameMap = new Map(orgClients.map((c) => [c.name.replace(/''/g, '"').toLowerCase(), c.id]));
+      const clientNameMap = new Map(orgClients.map((c) => [normalizeClientName(c.name), c.id]));
 
       await tx.invisibleWorkEntry.createMany({
         data: parsed.data.tickets.map((ticket) => {
@@ -83,7 +84,7 @@ export async function saveConfirmedSmartLogTickets(input: {
           const resolvedClientId =
             ticket.client_id ||
             (ticket.client_name
-              ? (clientNameMap.get(ticket.client_name.replace(/''/g, '"').toLowerCase()) ?? null)
+              ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
               : null);
 
           return {

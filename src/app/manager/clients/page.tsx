@@ -6,6 +6,7 @@ import { LinkEntriesButton } from "@/components/clients/link-entries-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FileSpreadsheet } from "lucide-react";
+import { normalizeClientName } from "@/lib/client-name";
 
 export default async function ManagerClientsPage() {
   const session = await requireUser(["MANAGER", "ADMIN"]);
@@ -43,7 +44,7 @@ export default async function ManagerClientsPage() {
     if (e.clientId) {
       minutesById.set(e.clientId, (minutesById.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.toLowerCase().trim();
+      const key = normalizeClientName(e.clientName);
       minutesByNameLower.set(key, (minutesByNameLower.get(key) ?? 0) + e.durationMinutes);
     }
   }
@@ -53,7 +54,7 @@ export default async function ManagerClientsPage() {
     name: c.name,
     freeMinutesPerMonth: c.freeMinutesPerMonth,
     status: c.status,
-    totalMinutes: (minutesById.get(c.id) ?? 0) + (minutesByNameLower.get(c.name.toLowerCase().trim()) ?? 0),
+    totalMinutes: (minutesById.get(c.id) ?? 0) + (minutesByNameLower.get(normalizeClientName(c.name)) ?? 0),
     assignedEmployeeIds: c.assignments.map((a) => a.employeeId),
   }));
 

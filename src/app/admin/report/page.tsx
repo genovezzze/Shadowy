@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
+import { normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText, UserCog } from "lucide-react";
@@ -124,25 +125,27 @@ export default async function AdminReportPage({
     if (e.clientId) {
       adminClientMinMap.set(e.clientId, (adminClientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.toLowerCase();
+      const key = normalizeClientName(e.clientName);
       const existing = adminClientNameMinMap.get(key);
       adminClientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
     } else {
       adminNoClientCount++;
     }
   }
-  const registeredClientLower = new Set(clients.map((c) => c.name.toLowerCase()));
+  const registeredClientLower = new Set(clients.map((c) => normalizeClientName(c.name)));
   const adminClientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
   for (const c of clients) {
-    const nameEntry = adminClientNameMinMap.get(c.name.toLowerCase());
+    const nameEntry = adminClientNameMinMap.get(normalizeClientName(c.name));
     const minutes = (adminClientMinMap.get(c.id) ?? 0) + (nameEntry?.minutes ?? 0);
     if (minutes === 0) continue;
     const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;
     adminClientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
   }
+  const DEFAULT_FREE_MINUTES = 60;
   for (const [nameLower, { minutes, displayName }] of adminClientNameMinMap.entries()) {
     if (!registeredClientLower.has(nameLower)) {
-      adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: null, overrun: 0, eur: 0, registered: false });
+      const overrun = Math.max(0, minutes - DEFAULT_FREE_MINUTES);
+      adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: DEFAULT_FREE_MINUTES, overrun, eur: Math.round((overrun / 60) * 20), registered: false });
     }
   }
   adminClientData.sort((a, b) => b.minutes - a.minutes);
@@ -332,13 +335,13 @@ export default async function AdminReportPage({
                       <td className="px-5 py-3 font-medium">{c.name}</td>
                       <td className="px-4 py-3 text-right tabular-nums">{`${Math.round((c.minutes / 60) * 10) / 10}h`}</td>
                       <td className="px-4 py-3 text-right tabular-nums text-muted-foreground print:text-gray-400">
-                        {c.registered ? (c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞") : "—"}
+                        {c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        {c.registered && c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                        {c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
                       </td>
                       <td className="px-5 py-3 text-right tabular-nums">
-                        {c.registered && c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                        {c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
                       </td>
                     </tr>
                   ))}

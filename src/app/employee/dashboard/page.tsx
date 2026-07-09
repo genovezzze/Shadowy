@@ -16,6 +16,7 @@ import { EmployeeEntryActions } from "@/components/entries/employee-entry-action
 import { SectionDivider } from "@/components/dashboard/section-divider";
 import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
+import { normalizeClientName } from "@/lib/client-name";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const LV_DAYS = ["P", "O", "T", "C", "Pk", "S", "Sv"];
@@ -248,7 +249,7 @@ export default async function EmployeeDashboard() {
       const name = existing?.name ?? (e.client?.name ?? e.clientName ?? e.clientId);
       clientMinById.set(e.clientId, { name, minutes: (existing?.minutes ?? 0) + e.durationMinutes });
     } else if (e.clientName) {
-      const key = e.clientName.replace(/''/g, '"').toLowerCase();
+      const key = normalizeClientName(e.clientName);
       const existing = clientMinByName.get(key);
       clientMinByName.set(key, { name: existing?.name ?? e.clientName, minutes: (existing?.minutes ?? 0) + e.durationMinutes });
     }

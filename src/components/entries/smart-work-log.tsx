@@ -31,6 +31,7 @@ import {
   saveConfirmedSmartLogTickets,
   type ConfirmedSmartLogTicket,
 } from "@/app/employee/smart-log/actions";
+import { normalizeClientName } from "@/lib/client-name";
 
 interface ClientOption {
   id: string;
@@ -311,7 +312,7 @@ export function SmartWorkLog({ clients = [] }: { clients?: ClientOption[] }) {
       }
 
       const clientNameMap = new Map(
-        clients.map((c) => [c.name.toLowerCase(), c.id])
+        clients.map((c) => [normalizeClientName(c.name), c.id])
       );
       setTickets(
         parsed.data.tickets.map((ticket, index) => ({
@@ -321,7 +322,7 @@ export function SmartWorkLog({ clients = [] }: { clients?: ClientOption[] }) {
           confirmed: ticket.estimated_time_minutes !== null,
           editing: false,
           client_id: ticket.client_name
-            ? (clientNameMap.get(ticket.client_name.toLowerCase()) ?? null)
+            ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
             : null,
         }))
       );

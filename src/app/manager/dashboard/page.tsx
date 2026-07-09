@@ -11,6 +11,7 @@ import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
+import { normalizeClientName } from "@/lib/client-name";
 import {
   AlertTriangle,
   Building2,
@@ -281,7 +282,7 @@ export default async function ManagerDashboard({
     if (e.clientId) {
       clientMinById.set(e.clientId, (clientMinById.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.toLowerCase();
+      const key = normalizeClientName(e.clientName);
       clientMinByName.set(key, (clientMinByName.get(key) ?? 0) + e.durationMinutes);
     }
     categoryCount.set(e.category, (categoryCount.get(e.category) ?? 0) + 1);
@@ -354,7 +355,7 @@ export default async function ManagerDashboard({
 
   // --- Client rows ---
   const clientRows = clients.map((c) => {
-    const used = (clientMinById.get(c.id) ?? 0) + (clientMinByName.get(c.name.toLowerCase()) ?? 0);
+    const used = (clientMinById.get(c.id) ?? 0) + (clientMinByName.get(normalizeClientName(c.name)) ?? 0);
     const overrun =
       c.freeMinutesPerMonth !== null ? Math.max(0, used - c.freeMinutesPerMonth) : 0;
     return {
@@ -374,7 +375,7 @@ export default async function ManagerDashboard({
     if (e.clientId) {
       monthClientById.set(e.clientId, (monthClientById.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.replace(/''/g, '"').toLowerCase();
+      const key = normalizeClientName(e.clientName);
       monthClientByName.set(key, (monthClientByName.get(key) ?? 0) + e.durationMinutes);
     }
   }
@@ -387,7 +388,7 @@ export default async function ManagerDashboard({
     if (c.freeMinutesPerMonth === null) continue;
     const usedMin =
       (monthClientById.get(c.id) ?? 0) +
-      (monthClientByName.get(c.name.replace(/''/g, '"').toLowerCase()) ?? 0);
+      (monthClientByName.get(normalizeClientName(c.name)) ?? 0);
     if (usedMin >= c.freeMinutesPerMonth || usedMin === 0 || daysSoFar === 0) continue;
     const dailyRate = usedMin / daysSoFar;
     const projectedTotal = usedMin + dailyRate * daysRemaining;
@@ -400,10 +401,10 @@ export default async function ManagerDashboard({
   }
   clientForecasts.sort((a, b) => a.daysLeft - b.daysLeft);
 
-  const registeredClientNames = new Set(clients.map((c) => c.name.toLowerCase()));
+  const registeredClientNames = new Set(clients.map((c) => normalizeClientName(c.name)));
   const untrackedNames = [...new Set(
     approved
-      .filter((e) => e.clientName && !e.clientId && !registeredClientNames.has(e.clientName.toLowerCase()))
+      .filter((e) => e.clientName && !e.clientId && !registeredClientNames.has(normalizeClientName(e.clientName)))
       .map((e) => e.clientName as string)
   )];
 

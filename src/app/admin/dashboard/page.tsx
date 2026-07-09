@@ -5,6 +5,7 @@ import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/entries/status-badge";
 import { formatDateTimeLV, formatDurationLV } from "@/lib/utils";
+import { normalizeClientName } from "@/lib/client-name";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AlertTriangle, FileText, UserCog, Users, Clock, Timer, TrendingUp } from "lucide-react";
 import { GettingStarted } from "@/components/dashboard/getting-started";
@@ -167,7 +168,7 @@ export default async function AdminDashboard({
     if (e.clientId) {
       monthClientByIdA.set(e.clientId, (monthClientByIdA.get(e.clientId) ?? 0) + e.durationMinutes);
     } else if (e.clientName) {
-      const key = e.clientName.replace(/''/g, '"').toLowerCase();
+      const key = normalizeClientName(e.clientName);
       monthClientByNameA.set(key, (monthClientByNameA.get(key) ?? 0) + e.durationMinutes);
     }
   }
@@ -180,7 +181,7 @@ export default async function AdminDashboard({
     if (c.freeMinutesPerMonth === null) continue;
     const usedMin =
       (monthClientByIdA.get(c.id) ?? 0) +
-      (monthClientByNameA.get(c.name.replace(/''/g, '"').toLowerCase()) ?? 0);
+      (monthClientByNameA.get(normalizeClientName(c.name)) ?? 0);
     if (usedMin >= c.freeMinutesPerMonth || usedMin === 0 || daysSoFarA === 0) continue;
     const dailyRate = usedMin / daysSoFarA;
     const projectedTotal = usedMin + dailyRate * daysRemainingA;

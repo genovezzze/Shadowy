@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { normalizeClientName } from "@/lib/client-name";
 
 // Link entries to existing registered clients by name match
 export async function linkEntriesToClients(): Promise<{ ok: true; linked: number; skipped: number } | { ok: false; error: string }> {
@@ -23,13 +24,13 @@ export async function linkEntriesToClients(): Promise<{ ok: true; linked: number
     }),
   ]);
 
-  const clientByName = new Map(clients.map((c) => [c.name.toLowerCase().trim(), c.id]));
+  const clientByName = new Map(clients.map((c) => [normalizeClientName(c.name), c.id]));
 
   let linked = 0;
   let skipped = 0;
 
   for (const entry of entries) {
-    const key = entry.clientName!.toLowerCase().trim();
+    const key = normalizeClientName(entry.clientName!);
     const clientId = clientByName.get(key);
     if (clientId) {
       await prisma.invisibleWorkEntry.update({
@@ -68,12 +69,12 @@ export async function importClientsFromEntries(): Promise<{ ok: true; created: n
     }),
   ]);
 
-  const existingLower = new Set(existingClients.map((c) => c.name.toLowerCase().trim()));
+  const existingLower = new Set(existingClients.map((c) => normalizeClientName(c.name)));
 
   // Collect unique names not already registered
   const toCreate = new Map<string, string>(); // lower → original name
   for (const e of entries) {
-    const key = e.clientName!.toLowerCase().trim();
+    const key = normalizeClientName(e.clientName!);
     if (!existingLower.has(key) && !toCreate.has(key)) {
       toCreate.set(key, e.clientName!.trim());
     }
@@ -104,13 +105,13 @@ export async function importClientsFromEntries(): Promise<{ ok: true; created: n
     where: { organizationId: session.organizationId },
     select: { id: true, name: true },
   });
-  const clientByName = new Map(allClients.map((c) => [c.name.toLowerCase().trim(), c.id]));
+  const clientByName = new Map(allClients.map((c) => [normalizeClientName(c.name), c.id]));
   const remaining = await prisma.invisibleWorkEntry.findMany({
     where: { organizationId: session.organizationId, clientId: null, clientName: { not: null } },
     select: { id: true, clientName: true },
   });
   for (const e of remaining) {
-    const clientId = clientByName.get(e.clientName!.toLowerCase().trim());
+    const clientId = clientByName.get(normalizeClientName(e.clientName!));
     if (clientId) {
       await prisma.invisibleWorkEntry.update({ where: { id: e.id }, data: { clientId } });
     }

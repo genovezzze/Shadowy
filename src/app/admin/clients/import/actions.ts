@@ -4,6 +4,7 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { normalizeClientName } from "@/lib/client-name";
 
 const assignmentSchema = z.object({
   clientId: z.string().cuid().nullable(),
@@ -53,17 +54,16 @@ export async function confirmImport(input: {
   const validClientIds = new Set(validClients.map((c) => c.id));
 
   // Create missing clients (or reuse if already exists by name)
-  const createdByName = new Map<string, string>(); // lowercase name → id
+  const createdByName = new Map<string, string>(); // normalized name → id
   if (newClientAssignments.length > 0) {
-    const names = newClientAssignments.map((a) => a.clientName);
-    const alreadyExist = await prisma.client.findMany({
-      where: { organizationId: session.organizationId, name: { in: names } },
+    const allOrgClients = await prisma.client.findMany({
+      where: { organizationId: session.organizationId },
       select: { id: true, name: true },
     });
-    for (const c of alreadyExist) createdByName.set(c.name.toLowerCase(), c.id);
+    for (const c of allOrgClients) createdByName.set(normalizeClientName(c.name), c.id);
 
     for (const { clientName } of newClientAssignments) {
-      const key = clientName.toLowerCase();
+      const key = normalizeClientName(clientName);
       if (!createdByName.has(key)) {
         const created = await prisma.client.create({
           data: { name: clientName, organizationId: session.organizationId, status: "active" },
@@ -85,7 +85,7 @@ export async function confirmImport(input: {
   }
 
   for (const { clientName, employeeIds } of newClientAssignments) {
-    const clientId = createdByName.get(clientName.toLowerCase());
+    const clientId = createdByName.get(normalizeClientName(clientName));
     if (!clientId) continue;
     for (const empId of employeeIds) {
       if (validEmployeeIds.has(empId)) rows.push({ clientId, employeeId: empId });
