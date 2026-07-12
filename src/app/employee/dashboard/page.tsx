@@ -17,6 +17,7 @@ import { SectionDivider } from "@/components/dashboard/section-divider";
 import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
 import { normalizeClientName } from "@/lib/client-name";
+import { DailyDigestCard } from "@/components/dashboard/daily-digest-card";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const LV_DAYS = ["P", "O", "T", "C", "Pk", "S", "Sv"];
@@ -63,6 +64,7 @@ export default async function EmployeeDashboard() {
   const session = await requireUser(["EMPLOYEE"]);
 
   const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10);
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 86400000);
   const sixtyDaysAgo = new Date(now.getTime() - 60 * 86400000);
 
@@ -81,6 +83,7 @@ export default async function EmployeeDashboard() {
     prisma.invisibleWorkEntry.findMany({
       where: baseWhere,
       select: {
+        id: true,
         createdAt: true,
         workDate: true,
         status: true,
@@ -166,7 +169,6 @@ export default async function EmployeeDashboard() {
   }
 
   // ── Focus heatmap ─────────────────────────────────────────────────────────
-  const todayStr = now.toISOString().slice(0, 10);
   const nowDayUTC = now.getUTCDay();
   const daysSinceMon = (nowDayUTC + 6) % 7;
   const heatmapStartMs = now.getTime() - (daysSinceMon + 21) * 86400000;
@@ -260,6 +262,22 @@ export default async function EmployeeDashboard() {
   ].sort((a, b) => b.minutes - a.minutes).slice(0, 5);
   const maxClientMin = clientDist[0]?.minutes ?? 1;
 
+  // ── Today digest ──────────────────────────────────────────────────────────
+  const todayEntries = allEntries.filter((e: EntrySlice) => e.workDate.toISOString().slice(0, 10) === todayStr);
+  const todayDigest = {
+    totalCount: todayEntries.length,
+    totalMinutes: todayEntries.reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0),
+    outsideRoleMinutes: todayEntries
+      .filter((e: EntrySlice) => e.isOutsideRole)
+      .reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0),
+    entries: todayEntries.map((e: EntrySlice) => ({
+      id: e.id,
+      title: e.title,
+      category: e.category,
+      durationMinutes: e.durationMinutes,
+    })),
+  };
+
   return (
     <>
       {/* ── Header ── */}
@@ -302,6 +320,8 @@ export default async function EmployeeDashboard() {
           </Button>
         </CardContent>
       </Card>
+
+      <DailyDigestCard {...todayDigest} />
 
       {/* ── Status KPIs ── */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">

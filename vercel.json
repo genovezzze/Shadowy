@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/weekly-report",
       "schedule": "0 7 * * 1"
+    },
+    {
+      "path": "/api/cron/weekly-employee-digest",
+      "schedule": "5 7 * * 1"
     }
   ]
 }

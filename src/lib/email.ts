@@ -1,7 +1,30 @@
 import "server-only";
 import { getSiteUrl } from "@/lib/site-url";
+import { formatDurationLV } from "@/lib/utils";
 
 const RESEND_API_URL = "https://api.resend.com/emails";
+const REPLY_TO = process.env.EMAIL_REPLY_TO ?? "artemijlucin@gmail.com";
+
+/** Best-effort plain-text fallback derived from an email's HTML body. */
+function htmlToText(html: string): string {
+  return html
+    .replace(/<style[\s\S]*?<\/style>/gi, "")
+    .replace(/<a\s+[^>]*href="([^"]*)"[^>]*>([\s\S]*?)<\/a>/gi, (_m, href, label) => {
+      const cleanLabel = label.replace(/<[^>]+>/g, "").trim();
+      return `${cleanLabel}: ${href}`;
+    })
+    .replace(/<(br|\/p|\/div|\/tr|\/h[1-6])\s*\/?>/gi, "\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
 
 /**
  * Send an email via Resend if RESEND_API_KEY is configured.
@@ -25,7 +48,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from, to, subject, html }),
+    body: JSON.stringify({ from, to, subject, html, text: htmlToText(html), reply_to: REPLY_TO }),
   });
 
   if (!res.ok) {
@@ -252,6 +275,131 @@ export async function sendWeeklyManagerReport(opts: {
       <p>
         <a href="${appUrl}/manager/entries" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
           Apskatīt komandas ierakstus →
+        </a>
+      </p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">
+        Shadowy · Šis e-pasts tiek sūtīts katru pirmdienu automātiski.
+      </p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}
+
+export async function sendWeeklyEmployeeDigest(opts: {
+  to: string;
+  employeeName: string;
+  orgName: string;
+  weekEntries: number;
+  weekMinutes: number;
+  helpedCount: number;
+  entriesTrend: string | null;
+  hoursTrend: string | null;
+  topCategoryLabel: string | null;
+  recommendation: string;
+  categoryBreakdown: { label: string; count: number; minutes: number }[];
+  clientBreakdown: { name: string; minutes: number }[];
+  entryList: { title: string; category: string; durationMinutes: number }[];
+  entryListMoreCount: number;
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const subject = `Shadowy - tava nedēļa`;
+
+  const listSection = (title: string, rows: string) =>
+    rows
+      ? `
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:8px">${title}</div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">${rows}</table>
+      </div>`
+      : "";
+
+  const categoryRows = opts.categoryBreakdown
+    .map(
+      (c) => `
+        <tr>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(c.label)}</td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${c.count} · ${formatDurationLV(c.minutes)}</td>
+        </tr>`
+    )
+    .join("");
+
+  const clientRows = opts.clientBreakdown
+    .map(
+      (c) => `
+        <tr>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(c.name)}</td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${formatDurationLV(c.minutes)}</td>
+        </tr>`
+    )
+    .join("");
+
+  const entryRows =
+    opts.entryList
+      .map(
+        (e) => `
+        <tr>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(e.title)}<br/><span style="color:#aaa;font-size:12px">${escapeHtml(e.category)}</span></td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap;vertical-align:top">${formatDurationLV(e.durationMinutes)}</td>
+        </tr>`
+      )
+      .join("") +
+    (opts.entryListMoreCount > 0
+      ? `<tr><td colspan="2" style="padding:6px 0;border-top:1px solid #eee;color:#aaa;font-size:12px">+${opts.entryListMoreCount} citi ieraksti</td></tr>`
+      : "");
+
+  const trendLine =
+    opts.entriesTrend || opts.hoursTrend
+      ? `
+      <p style="color:#888;font-size:13px;margin-bottom:16px">
+        ${[opts.entriesTrend, opts.hoursTrend].filter(Boolean).join(" · ")}
+      </p>`
+      : "";
+
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
+      <div style="margin-bottom:24px">
+        <h2 style="margin:0 0 4px">Tava nedēļa</h2>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · Sveiks, ${escapeHtml(opts.employeeName)}!</p>
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
+        <tr>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:33%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${opts.weekEntries}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Ieraksti nedēļā</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:33%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${formatDurationLV(opts.weekMinutes)}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Nostrādāts</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:33%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${opts.helpedCount}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Reizes palīdzēji</div>
+          </td>
+        </tr>
+      </table>
+
+      ${trendLine}
+
+      ${opts.topCategoryLabel ? `
+        <p style="color:#555;font-size:14px;margin-bottom:16px">
+          Visvairāk laika šonedēļ aizņēma: <strong>${escapeHtml(opts.topCategoryLabel)}</strong>.
+        </p>
+      ` : ""}
+
+      <p style="color:#3b3b3b;background:#f5f5f5;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
+        💡 ${escapeHtml(opts.recommendation)}
+      </p>
+
+      ${listSection("Sadalījums pa kategorijām", categoryRows)}
+      ${listSection("Sadalījums pa klientiem", clientRows)}
+      ${listSection("Ieraksti šonedēļ", entryRows)}
+
+      <p>
+        <a href="${appUrl}/employee/dashboard" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Apskatīt pārskatu →
         </a>
       </p>
       <p style="color:#aaa;font-size:12px;margin-top:24px">
