@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendWeeklyEmployeeDigest } from "@/lib/email";
+import { sendWeeklyEmployeeDigest, sendEmptyWeekNudge } from "@/lib/email";
 import {
   groupByCategory,
   groupByClient,
@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
     select: { id: true, name: true, email: true, organizationId: true },
   });
 
-  let sent = 0;
+  let digestsSent = 0;
+  let nudgesSent = 0;
 
   await Promise.all(
     employees.map(async (employee) => {
@@ -73,7 +74,15 @@ export async function GET(req: NextRequest) {
         }),
       ]);
 
-      if (weekEntries.length === 0) return;
+      if (weekEntries.length === 0) {
+        await sendEmptyWeekNudge({
+          to: employee.email,
+          employeeName: employee.name ?? "",
+          orgName: org.name,
+        });
+        nudgesSent++;
+        return;
+      }
 
       const grouped = groupByCategory(weekEntries);
       const top = topCategory(grouped);
@@ -119,9 +128,9 @@ export async function GET(req: NextRequest) {
         entryListMoreCount: Math.max(0, weekEntries.length - entryList.length),
       });
 
-      sent++;
+      digestsSent++;
     })
   );
 
-  return NextResponse.json({ ok: true, sent });
+  return NextResponse.json({ ok: true, digestsSent, nudgesSent });
 }

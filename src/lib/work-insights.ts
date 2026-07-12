@@ -24,6 +24,31 @@ export function categoryLabel(category: string): string {
   return SMART_LOG_CATEGORY_LABELS[category as SmartLogCategory] ?? category;
 }
 
+type MinimalTitledEntry = { category: string; title: string; durationMinutes: number };
+export type CategoryBreakdownDetailed = CategoryBreakdown & {
+  topTitles: { title: string; count: number }[];
+};
+
+/** Like groupByCategory, but also surfaces the most common entry titles per category (same "drill-down" data as the report page's category list). */
+export function groupByCategoryWithTitles(
+  entries: MinimalTitledEntry[],
+  titleLimit = 3
+): CategoryBreakdownDetailed[] {
+  const grouped = groupByCategory(entries);
+  return grouped.map((g) => {
+    const titleCounts = new Map<string, number>();
+    for (const e of entries) {
+      if (e.category !== g.category) continue;
+      titleCounts.set(e.title, (titleCounts.get(e.title) ?? 0) + 1);
+    }
+    const topTitles = [...titleCounts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, titleLimit)
+      .map(([title, count]) => ({ title, count }));
+    return { ...g, topTitles };
+  });
+}
+
 type MinimalClientEntry = { clientId: string | null; clientName: string | null; durationMinutes: number };
 export type ClientBreakdown = { name: string; minutes: number };
 
@@ -44,6 +69,21 @@ export function groupByClient(entries: MinimalClientEntry[]): ClientBreakdown[] 
     }
   }
   return [...byId.values(), ...byName.values()].sort((a, b) => b.minutes - a.minutes);
+}
+
+type MinimalEmployeeEntry = { employeeId: string; employeeName: string; durationMinutes: number };
+export type EmployeeBreakdown = { employeeId: string; name: string; count: number; minutes: number };
+
+/** Groups entries by employee, for team-wide manager reports. */
+export function groupByEmployee(entries: MinimalEmployeeEntry[]): EmployeeBreakdown[] {
+  const map = new Map<string, EmployeeBreakdown>();
+  for (const e of entries) {
+    const cur = map.get(e.employeeId) ?? { employeeId: e.employeeId, name: e.employeeName, count: 0, minutes: 0 };
+    cur.count += 1;
+    cur.minutes += e.durationMinutes;
+    map.set(e.employeeId, cur);
+  }
+  return Array.from(map.values()).sort((a, b) => b.minutes - a.minutes);
 }
 
 /** Percentage week-over-week change (for continuous values like minutes), or null with no prior week. */

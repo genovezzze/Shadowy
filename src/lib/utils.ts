@@ -33,6 +33,10 @@ export function formatDurationLV(minutes: number) {
   return `${hours} h ${rest} min`;
 }
 
+export function pluralEntriesLV(n: number) {
+  return n === 1 ? "1 ieraksts" : `${n} ieraksti`;
+}
+
 export function slugify(input: string) {
   return input
     .toLowerCase()
