@@ -15,6 +15,12 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const MAX_ENTRY_ROWS = 8;
+// Resend caps at 10 req/s; stay well under that even for larger teams.
+const SEND_DELAY_MS = 150;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -39,13 +45,14 @@ export async function GET(req: NextRequest) {
 
   let digestsSent = 0;
   let nudgesSent = 0;
+  let failed = 0;
 
-  await Promise.all(
-    employees.map(async (employee) => {
-      if (!employee.email) return;
-      const org = orgById.get(employee.organizationId);
-      if (!org) return;
+  for (const employee of employees) {
+    if (!employee.email) continue;
+    const org = orgById.get(employee.organizationId);
+    if (!org) continue;
 
+    try {
       const [weekEntries, prevWeekEntries] = await Promise.all([
         prisma.invisibleWorkEntry.findMany({
           where: {
@@ -81,56 +88,59 @@ export async function GET(req: NextRequest) {
           orgName: org.name,
         });
         nudgesSent++;
-        return;
+      } else {
+        const grouped = groupByCategory(weekEntries);
+        const top = topCategory(grouped);
+        const weekMinutes = weekEntries.reduce((s, e) => s + e.durationMinutes, 0);
+        const helpedCount = grouped.find((g) => g.category === "helping_colleague")?.count ?? 0;
+
+        const prevWeekMinutes = prevWeekEntries.reduce((s, e) => s + e.durationMinutes, 0);
+
+        const clientEntries = weekEntries.map((e) => ({
+          clientId: e.clientId,
+          clientName: e.client?.name ?? e.clientName,
+          durationMinutes: e.durationMinutes,
+        }));
+
+        const sortedByDuration = [...weekEntries].sort((a, b) => b.durationMinutes - a.durationMinutes);
+        const entryList = sortedByDuration.slice(0, MAX_ENTRY_ROWS).map((e) => ({
+          title: e.title,
+          category: categoryLabel(e.category),
+          durationMinutes: e.durationMinutes,
+        }));
+
+        await sendWeeklyEmployeeDigest({
+          to: employee.email,
+          employeeName: employee.name ?? "",
+          orgName: org.name,
+          weekEntries: weekEntries.length,
+          weekMinutes,
+          helpedCount,
+          entriesTrend: weekCountTrend(weekEntries.length, prevWeekEntries.length),
+          hoursTrend: weekTrend(weekMinutes, prevWeekMinutes),
+          topCategoryLabel: top ? categoryLabel(top.category) : null,
+          recommendation: weeklyRecommendation(grouped),
+          categoryBreakdown: grouped.map((g) => ({
+            label: categoryLabel(g.category),
+            count: g.count,
+            minutes: g.minutes,
+          })),
+          clientBreakdown: groupByClient(clientEntries).map((c) => ({
+            name: c.name,
+            minutes: c.minutes,
+          })),
+          entryList,
+          entryListMoreCount: Math.max(0, weekEntries.length - entryList.length),
+        });
+        digestsSent++;
       }
+    } catch (err) {
+      failed++;
+      console.error(`[weekly-employee-digest] Failed for employee ${employee.id}:`, err);
+    }
 
-      const grouped = groupByCategory(weekEntries);
-      const top = topCategory(grouped);
-      const weekMinutes = weekEntries.reduce((s, e) => s + e.durationMinutes, 0);
-      const helpedCount = grouped.find((g) => g.category === "helping_colleague")?.count ?? 0;
+    await sleep(SEND_DELAY_MS);
+  }
 
-      const prevWeekMinutes = prevWeekEntries.reduce((s, e) => s + e.durationMinutes, 0);
-
-      const clientEntries = weekEntries.map((e) => ({
-        clientId: e.clientId,
-        clientName: e.client?.name ?? e.clientName,
-        durationMinutes: e.durationMinutes,
-      }));
-
-      const sortedByDuration = [...weekEntries].sort((a, b) => b.durationMinutes - a.durationMinutes);
-      const entryList = sortedByDuration.slice(0, MAX_ENTRY_ROWS).map((e) => ({
-        title: e.title,
-        category: categoryLabel(e.category),
-        durationMinutes: e.durationMinutes,
-      }));
-
-      await sendWeeklyEmployeeDigest({
-        to: employee.email,
-        employeeName: employee.name ?? "",
-        orgName: org.name,
-        weekEntries: weekEntries.length,
-        weekMinutes,
-        helpedCount,
-        entriesTrend: weekCountTrend(weekEntries.length, prevWeekEntries.length),
-        hoursTrend: weekTrend(weekMinutes, prevWeekMinutes),
-        topCategoryLabel: top ? categoryLabel(top.category) : null,
-        recommendation: weeklyRecommendation(grouped),
-        categoryBreakdown: grouped.map((g) => ({
-          label: categoryLabel(g.category),
-          count: g.count,
-          minutes: g.minutes,
-        })),
-        clientBreakdown: groupByClient(clientEntries).map((c) => ({
-          name: c.name,
-          minutes: c.minutes,
-        })),
-        entryList,
-        entryListMoreCount: Math.max(0, weekEntries.length - entryList.length),
-      });
-
-      digestsSent++;
-    })
-  );
-
-  return NextResponse.json({ ok: true, digestsSent, nudgesSent });
+  return NextResponse.json({ ok: true, digestsSent, nudgesSent, failed });
 }

@@ -7,6 +7,12 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const DEFAULT_HOURLY_RATE_EUR = 20;
+// Resend caps at 10 req/s; stay well under that even for larger orgs.
+const SEND_DELAY_MS = 150;
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
@@ -29,15 +35,16 @@ export async function GET(req: NextRequest) {
   });
 
   let sent = 0;
+  let failed = 0;
 
   const orgs = await prisma.organization.findMany({ select: { id: true, name: true, defaultHourlyRate: true } });
   const orgById = new Map(orgs.map((o) => [o.id, o]));
 
-  await Promise.all(
-    managers.map(async (manager) => {
-      if (!manager.email) return;
-      const org = orgById.get(manager.organizationId);
+  for (const manager of managers) {
+    if (!manager.email) continue;
+    const org = orgById.get(manager.organizationId);
 
+    try {
       const [pendingCount, teamEmployees, weekApproved, prevWeekApproved, weekActiveEmployeeIds] = await Promise.all([
         prisma.invisibleWorkEntry.count({
           where: {
@@ -145,8 +152,13 @@ export async function GET(req: NextRequest) {
       });
 
       sent++;
-    })
-  );
+    } catch (err) {
+      failed++;
+      console.error(`[weekly-report] Failed for manager ${manager.id}:`, err);
+    }
 
-  return NextResponse.json({ ok: true, sent });
+    await sleep(SEND_DELAY_MS);
+  }
+
+  return NextResponse.json({ ok: true, sent, failed });
 }
