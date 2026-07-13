@@ -5,6 +5,7 @@ import { normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText, UserCog } from "lucide-react";
+import { categoryLabel } from "@/lib/work-insights";
 
 function getPeriodStart(period: string): Date {
   const now = new Date();
@@ -111,7 +112,7 @@ export default async function AdminReportPage({
   // Top categories
   const catMap = new Map<string, number>();
   for (const e of approved) catMap.set(e.category, (catMap.get(e.category) ?? 0) + 1);
-  const topCats = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const topCats = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
 
   // Weekly activity
   const weeklyData = buildWeeklyData(allEntries, periodStart);
@@ -369,7 +370,7 @@ export default async function AdminReportPage({
                 return (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-4 text-xs text-muted-foreground">{i + 1}.</div>
-                    <div className="w-36 text-sm truncate">{cat}</div>
+                    <div className="w-36 text-sm truncate">{categoryLabel(cat)}</div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden print:bg-gray-100">
                       <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
                     </div>

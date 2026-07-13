@@ -11,6 +11,7 @@ import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { ClientMonthChart } from "@/components/clients/client-month-chart";
 import { AlertTriangle, ArrowLeft, Clock, TrendingUp, Users, FileText } from "lucide-react";
+import { categoryLabel } from "@/lib/work-insights";
 
 const HOURLY_RATE_EUR = 20;
 
@@ -129,8 +130,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
     catMap.set(e.category, (catMap.get(e.category) ?? 0) + entryMin(e));
   }
   const catRows = Array.from(catMap.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 7);
+    .sort((a, b) => b[1] - a[1]);
   const maxCatMin = catRows[0]?.[1] ?? 1;
 
   // Extra work (outside role)
@@ -231,7 +231,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                   {catRows.map(([cat, minutes]) => (
                     <div key={cat}>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="truncate text-muted-foreground">{cat}</span>
+                        <span className="truncate text-muted-foreground">{categoryLabel(cat)}</span>
                         <span className="shrink-0 ml-2 font-medium">{formatDurationLV(minutes)}</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">

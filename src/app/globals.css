@@ -203,6 +203,26 @@
 
   .app-shell ::-webkit-scrollbar-thumb { @apply bg-black/10 dark:bg-white/[0.08]; }
   .app-shell ::-webkit-scrollbar-thumb:hover { @apply bg-black/20 dark:bg-white/[0.14]; }
+
+  /* Radix Select hides the native scrollbar by default (relies on its scroll
+     buttons instead) — force it back on so long option lists are draggable. */
+  [data-radix-select-viewport] {
+    scrollbar-width: thin !important;
+    -ms-overflow-style: auto !important;
+  }
+  [data-radix-select-viewport]::-webkit-scrollbar {
+    display: block !important;
+    width: 6px !important;
+  }
+  [data-radix-select-viewport]::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  [data-radix-select-viewport]::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-white/20;
+  }
+  [data-radix-select-viewport]::-webkit-scrollbar-thumb:hover {
+    @apply bg-white/30;
+  }
 }
 
 @layer utilities {

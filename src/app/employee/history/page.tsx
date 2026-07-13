@@ -31,13 +31,29 @@ export default async function EmployeeHistoryPage({
   const session = await requireUser(["EMPLOYEE"]);
   const where = { employeeId: session.userId, ...buildEntryWhere(searchParams) };
 
-  const [total, user] = await Promise.all([
+  const [total, user, clientSource] = await Promise.all([
     prisma.invisibleWorkEntry.count({ where }),
     prisma.user.findUnique({
       where: { id: session.userId },
       include: { workRole: { include: { duties: true } } },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { employeeId: session.userId, deletedAt: null },
+      select: { clientId: true, clientName: true, client: { select: { name: true } } },
+    }),
   ]);
+
+  const clientOptionMap = new Map<string, string>();
+  for (const e of clientSource) {
+    if (e.clientId) {
+      clientOptionMap.set(`id:${e.clientId}`, e.client?.name ?? e.clientName ?? e.clientId);
+    } else if (e.clientName) {
+      clientOptionMap.set(`name:${e.clientName}`, e.clientName);
+    }
+  }
+  const clientOptions = Array.from(clientOptionMap.entries())
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const page = Math.min(parsePage(searchParams.page), totalPages);
@@ -80,7 +96,7 @@ export default async function EmployeeHistoryPage({
       />
 
       {entries.length > 0 || filtered ? (
-        <EntriesFilter categories={SMART_LOG_CATEGORIES.map((c) => c.label)} />
+        <EntriesFilter categories={SMART_LOG_CATEGORIES.map((c) => c.label)} clients={clientOptions} />
       ) : null}
 
       {entries.length === 0 ? (

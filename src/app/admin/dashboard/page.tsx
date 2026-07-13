@@ -15,6 +15,7 @@ import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-wid
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
+import { categoryLabel } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -138,7 +139,6 @@ export default async function AdminDashboard({
   }
   const categoryItemsA = [...categoryCountA.entries()]
     .sort((a, b) => b[1] - a[1])
-    .slice(0, 6)
     .map(([cat, count]) => {
       const pct = approvedEntries.length > 0 ? Math.round((count / approvedEntries.length) * 100) : 0;
       const titleMap = new Map<string, number>();
@@ -148,7 +148,7 @@ export default async function AdminDashboard({
       const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
       const maxCnt = sorted[0]?.[1] ?? 1;
       return {
-        name: cat,
+        name: categoryLabel(cat),
         count,
         pct,
         isPattern: false,
@@ -577,7 +577,7 @@ export default async function AdminDashboard({
                 <div className="min-w-0">
                   <div className="truncate text-sm font-medium">{e.title}</div>
                   <div className="mt-0.5 text-xs text-muted-foreground">
-                    {e.employee.name} · {e.category} · {formatDurationLV(e.durationMinutes)} ·{" "}
+                    {e.employee.name} · {categoryLabel(e.category)} · {formatDurationLV(e.durationMinutes)} ·{" "}
                     {formatDateTimeLV(e.updatedAt)}
                   </div>
                 </div>

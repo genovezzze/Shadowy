@@ -12,6 +12,7 @@ export interface EntrySearchParams {
   status?: string;
   category?: string;
   employee?: string;
+  client?: string;
   from?: string;
   to?: string;
 }
@@ -46,6 +47,13 @@ export function buildEntryWhere(
     where.employeeId = sp.employee;
   }
 
+  const client = sp.client?.trim();
+  if (client?.startsWith("id:")) {
+    where.clientId = client.slice(3);
+  } else if (client?.startsWith("name:")) {
+    where.clientName = { equals: client.slice(5), mode: "insensitive" };
+  }
+
   const dateFilter: Prisma.DateTimeFilter = {};
   if (sp.from) {
     const d = new Date(sp.from);
@@ -69,7 +77,7 @@ export function buildEntryWhere(
 
 export function hasActiveFilters(sp: EntrySearchParams): boolean {
   return Boolean(
-    sp.q || sp.status || sp.category || sp.employee || sp.from || sp.to
+    sp.q || sp.status || sp.category || sp.employee || sp.client || sp.from || sp.to
   );
 }
 

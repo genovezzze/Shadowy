@@ -26,7 +26,7 @@ export default async function ManagerEntriesPage({
   const filterParams: EntrySearchParams = { ...searchParams, status: undefined };
   const filter = buildEntryWhere(filterParams);
 
-  const [pending, reviewed, team] = await Promise.all([
+  const [pending, reviewed, team, clientSource] = await Promise.all([
     prisma.invisibleWorkEntry.findMany({
       where: { organizationId: session.organizationId, managerId: session.userId, status: { in: ["APPROVED", "PENDING"] }, ...filter },
       orderBy: { createdAt: "desc" },
@@ -53,7 +53,23 @@ export default async function ManagerEntriesPage({
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { organizationId: session.organizationId, managerId: session.userId, deletedAt: null },
+      select: { clientId: true, clientName: true, client: { select: { name: true } } },
+    }),
   ]);
+
+  const clientOptionMap = new Map<string, string>();
+  for (const e of clientSource) {
+    if (e.clientId) {
+      clientOptionMap.set(`id:${e.clientId}`, e.client?.name ?? e.clientName ?? e.clientId);
+    } else if (e.clientName) {
+      clientOptionMap.set(`name:${e.clientName}`, e.clientName);
+    }
+  }
+  const clientOptions = Array.from(clientOptionMap.entries())
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   function getWorkType(entry: typeof pending[number]) {
     const duties = entry.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
@@ -77,6 +93,7 @@ export default async function ManagerEntriesPage({
       <EntriesFilter
         categories={SMART_LOG_CATEGORIES.map((c) => c.label)}
         employees={team}
+        clients={clientOptions}
         showStatus={false}
       />
 

@@ -6,6 +6,7 @@ import { normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
+import { categoryLabel } from "@/lib/work-insights";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText } from "lucide-react";
 
 function getPeriodStart(period: string): Date {
@@ -89,7 +90,7 @@ function generateRecommendations(data: {
   if (data.topCategory && data.topCategoryPct > 35) {
     recs.push({
       tone: "info",
-      text: `Kategorija "${data.topCategory}" veido ${data.topCategoryPct}% no visiem ierakstiem. Apsveriet, vai šo darbu var formalizēt vai automatizēt.`,
+      text: `Kategorija "${categoryLabel(data.topCategory)}" veido ${data.topCategoryPct}% no visiem ierakstiem. Apsveriet, vai šo darbu var formalizēt vai automatizēt.`,
     });
   }
 
@@ -200,7 +201,7 @@ export default async function ManagerReportPage({
   // Top categories
   const catMap = new Map<string, number>();
   for (const e of approved) catMap.set(e.category, (catMap.get(e.category) ?? 0) + 1);
-  const topCats = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const topCats = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
   const topCategory = topCats[0]?.[0] ?? null;
   const topCategoryPct = topCats[0] ? Math.round((topCats[0][1] / totalApproved) * 100) : 0;
 
@@ -441,7 +442,7 @@ export default async function ManagerReportPage({
                 return (
                   <div key={i} className="flex items-center gap-3">
                     <div className="w-4 text-xs text-muted-foreground print:text-gray-400">{i + 1}.</div>
-                    <div className="w-36 text-sm truncate">{cat}</div>
+                    <div className="w-36 text-sm truncate">{categoryLabel(cat)}</div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden print:bg-gray-100">
                       <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
                     </div>

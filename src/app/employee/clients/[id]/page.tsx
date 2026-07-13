@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { formatDurationLV } from "@/lib/utils";
 import { ClientMonthChart } from "@/components/clients/client-month-chart";
 import { ArrowLeft, Clock, FileText } from "lucide-react";
+import { categoryLabel } from "@/lib/work-insights";
 
 function getYearMonth(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -94,7 +95,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
   for (const e of entries) {
     catMap.set(e.category, (catMap.get(e.category) ?? 0) + entryMin(e));
   }
-  const catRows = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]).slice(0, 6);
+  const catRows = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
   const maxCatMin = catRows[0]?.[1] ?? 1;
 
   const limitMin = client.freeMinutesPerMonth ?? null;
@@ -187,7 +188,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
                     {catRows.map(([cat, minutes]) => (
                       <div key={cat}>
                         <div className="flex justify-between text-xs mb-1">
-                          <span className="truncate text-muted-foreground">{cat}</span>
+                          <span className="truncate text-muted-foreground">{categoryLabel(cat)}</span>
                           <span className="shrink-0 ml-2 font-medium">{formatDurationLV(minutes)}</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">

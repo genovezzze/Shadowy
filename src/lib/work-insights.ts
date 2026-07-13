@@ -105,22 +105,30 @@ export function weekCountTrend(current: number, previous: number): string | null
 const RECOMMENDATIONS: Record<SmartLogCategory, string> = {
   helping_colleague:
     "Šonedēļ daudz palīdzēji kolēģiem — pārliecinies, ka vadītājs to redz, jo šis darbs bieži paliek nepamanīts.",
-  waiting_for_information:
-    "Liela daļa laika aizgāja gaidot informāciju — pieraksti, no kā tieši gaidīji, lai vadītājs varētu risināt šo šķērsli.",
   urgent_extra_task:
     "Daudz steidzamu papildu uzdevumu — ja tas atkārtojas arī nākamnedēļ, runā ar vadītāju par darba slodzi.",
   repeated_questions:
     "Daudz atkārtotu jautājumu no kolēģiem — varbūt vērts sagatavot īsu instrukciju vai FAQ, lai ietaupītu laiku nākotnē.",
   fixing_mistakes:
     "Liela daļa laika aizgāja kļūdu labošanai — apsver, vai procesu, kurā šīs kļūdas rodas, var uzlabot.",
-  coordination:
-    "Daudz laika pavadīts koordinācijā — pārbaudi, vai šo darbu var samazināt ar skaidrākiem procesiem.",
   work_outside_role:
     "Liela daļa darba bija ārpus tavas lomas — vērts to pārrunāt ar vadītāju.",
   onboarding:
     "Daudz laika veltīts jaunu cilvēku ievadīšanai darbā — vērtīgs ieguldījums komandā, kas reti tiek pamanīts.",
-  team_support:
-    "Daudz laika pavadīts, atbalstot komandu — šis darbs bieži paliek neredzams, bet ir svarīgs.",
+  statistics_reports:
+    "Liela daļa laika aizgāja statistikas pārskatu sagatavošanai — apsver, vai daļu no šī darba var automatizēt vai veidot pēc gatavas veidnes.",
+  payroll_calculation:
+    "Daudz laika veltīts algu aprēķiniem — ja tas atkārtojas katru nedēļu ar līdzīgu apjomu, vērts pārrunāt ar vadītāju par slodzes sadalījumu.",
+  payment_preparation:
+    "Liela daļa laika aizgāja maksājumu sagatavošanai — pārbaudi, vai šo procesu var paātrināt ar skaidrākiem šabloniem.",
+  invoicing:
+    "Daudz laika pavadīts rēķinu izrakstīšanā — apsver, vai atkārtotus rēķinus var sagatavot pēc veidnes.",
+  legal_documents:
+    "Liela daļa laika aizgāja juridisko dokumentu sagatavošanai — šis darbs bieži prasa īpašu uzmanību, pārliecinies, ka tam ir pietiekami daudz laika.",
+  client_communication:
+    "Daudz laika pavadīts saziņā ar klientiem — vērtīgs darbs, kas bieži paliek neredzams budžetā.",
+  client_meeting:
+    "Daudz laika aizņēmušas klātienes tikšanās ar klientiem — apsver, vai daļu no tām var apvienot vai risināt attālināti.",
   other:
     "Turpini pierakstīt savu neredzamo darbu — tas palīdz iegūt skaidrāku ainu par nedēļu.",
 };

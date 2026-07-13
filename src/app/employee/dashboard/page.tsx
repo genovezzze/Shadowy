@@ -18,6 +18,7 @@ import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
 import { normalizeClientName } from "@/lib/client-name";
 import { DailyDigestCard } from "@/components/dashboard/daily-digest-card";
+import { categoryLabel } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const LV_DAYS = ["P", "O", "T", "C", "Pk", "S", "Sv"];
@@ -130,7 +131,7 @@ export default async function EmployeeDashboard() {
     categoryMap.set(e.category, (categoryMap.get(e.category) ?? 0) + 1);
   }
   const categoryData = Array.from(categoryMap.entries())
-    .map(([name, value], i) => ({ name, value, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }))
+    .map(([name, value], i) => ({ name: categoryLabel(name), value, color: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }))
     .sort((a, b) => b.value - a.value);
 
   const monthlyHours = Array.from({ length: 6 }, (_, i) => {

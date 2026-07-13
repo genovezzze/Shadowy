@@ -30,14 +30,30 @@ export default async function AdminEntriesPage({
     ...buildEntryWhere(searchParams),
   };
 
-  const [total, employees] = await Promise.all([
+  const [total, employees, clientSource] = await Promise.all([
     prisma.invisibleWorkEntry.count({ where }),
     prisma.user.findMany({
       where: { organizationId: session.organizationId, role: "EMPLOYEE" },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { organizationId: session.organizationId, deletedAt: null },
+      select: { clientId: true, clientName: true, client: { select: { name: true } } },
+    }),
   ]);
+
+  const clientOptionMap = new Map<string, string>();
+  for (const e of clientSource) {
+    if (e.clientId) {
+      clientOptionMap.set(`id:${e.clientId}`, e.client?.name ?? e.clientName ?? e.clientId);
+    } else if (e.clientName) {
+      clientOptionMap.set(`name:${e.clientName}`, e.clientName);
+    }
+  }
+  const clientOptions = Array.from(clientOptionMap.entries())
+    .map(([value, label]) => ({ value, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const page = Math.min(parsePage(searchParams.page), totalPages);
@@ -69,6 +85,7 @@ export default async function AdminEntriesPage({
       <EntriesFilter
         categories={SMART_LOG_CATEGORIES.map((c) => c.label)}
         employees={employees}
+        clients={clientOptions}
       />
 
       <div className="mb-3 text-sm text-muted-foreground">

@@ -12,6 +12,7 @@ import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { normalizeClientName } from "@/lib/client-name";
+import { categoryLabel } from "@/lib/work-insights";
 import {
   AlertTriangle,
   Building2,
@@ -409,8 +410,7 @@ export default async function ManagerDashboard({
   )];
 
   const topCategories = Array.from(categoryCount.entries())
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, 6);
+    .sort((a, b) => b[1] - a[1]);
 
   const categoryItems = topCategories.map(([cat, count]) => {
     const pct = approved.length > 0 ? Math.round((count / approved.length) * 100) : 0;
@@ -421,7 +421,7 @@ export default async function ManagerDashboard({
     const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
     const maxCnt = sorted[0]?.[1] ?? 1;
     return {
-      name: cat,
+      name: categoryLabel(cat),
       count,
       pct,
       isPattern: cat === patternCategory,
@@ -805,7 +805,7 @@ export default async function ManagerDashboard({
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-xs text-muted-foreground">
-                        {e.employee.name} · {e.category}
+                        {e.employee.name} · {categoryLabel(e.category)}
                         {e.clientName ? ` · ${e.clientName}` : ""}
                       </div>
                       <div className="mt-0.5 text-sm font-medium truncate">{e.title}</div>

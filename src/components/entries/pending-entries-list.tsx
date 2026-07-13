@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ChevronDown, Pencil } from "lucide-react";
 import { cn, formatDurationLV } from "@/lib/utils";
 import { editEntry } from "@/app/manager/entries/actions";
+import { categoryLabel } from "@/lib/work-insights";
 
 export interface PendingEntry {
   id: string;
@@ -157,7 +158,7 @@ function GroupCard({ group }: { group: EmployeeGroup }) {
                     key={cat}
                     className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground"
                   >
-                    {cat}
+                    {categoryLabel(cat)}
                   </span>
                 ))}
                 {group.categories.length > 3 && (

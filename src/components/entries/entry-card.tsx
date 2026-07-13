@@ -4,6 +4,7 @@ import { StatusBadge } from "./status-badge";
 import { WorkTypeBadge } from "./work-type-badge";
 import { formatDateLV, formatDurationLV } from "@/lib/utils";
 import type { WorkType } from "@/lib/work-type";
+import { categoryLabel } from "@/lib/work-insights";
 
 type EntryStatus = "PENDING" | "APPROVED" | "REJECTED" | "RETURNED";
 
@@ -42,7 +43,7 @@ export function EntryCard({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span>{category}</span>
+              <span>{categoryLabel(category)}</span>
               {clientName ? (
                 <>
                   <span>·</span>

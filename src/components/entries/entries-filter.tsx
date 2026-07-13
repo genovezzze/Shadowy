@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { statusLabel } from "@/lib/i18n";
 import type { EntryStatus } from "@prisma/client";
+import { categoryLabel } from "@/lib/work-insights";
 
 const STATUSES: EntryStatus[] = ["PENDING", "APPROVED", "REJECTED", "RETURNED"];
 
@@ -17,19 +18,21 @@ const ALL_VALUE = "__all__";
 interface EntriesFilterProps {
   categories: string[];
   employees?: { id: string; name: string }[];
+  clients?: { value: string; label: string }[];
   showStatus?: boolean;
 }
 
 export function EntriesFilter({
   categories,
   employees,
+  clients,
   showStatus = true,
 }: EntriesFilterProps) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
 
-  const hasFilters = ["q", "status", "category", "employee", "from", "to"].some(
+  const hasFilters = ["q", "status", "category", "employee", "client", "from", "to"].some(
     (k) => params.get(k)
   );
 
@@ -100,12 +103,31 @@ export function EntriesFilter({
             <SelectItem value={ALL_VALUE}>Visas kategorijas</SelectItem>
             {categories.map((c) => (
               <SelectItem key={c} value={c}>
-                {c}
+                {categoryLabel(c)}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
+
+      {clients && clients.length > 0 ? (
+        <div className="grid gap-1.5">
+          <Label htmlFor="client">Klients</Label>
+          <Select name="client" defaultValue={params.get("client") || ALL_VALUE}>
+            <SelectTrigger id="client">
+              <SelectValue placeholder="Visi klienti" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_VALUE}>Visi klienti</SelectItem>
+              {clients.map((c) => (
+                <SelectItem key={c.value} value={c.value}>
+                  {c.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : null}
 
       {employees ? (
         <div className="grid gap-1.5">
