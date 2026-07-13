@@ -113,7 +113,7 @@ export function EmailSettingsForm({
         checked={emailDailyReminder}
         onChange={setEmailDailyReminder}
         label="Ikdienas atgādinājumi"
-        description="Darbinieki saņem e-pastu darba dienas sākumā (7:00) un tie, kas vēl neko nav pierakstījuši, arī pēcpusdienā (16:00)."
+        description="Darbinieki saņem e-pastu darba dienas sākumā (7:00), un tie, kas vēl neko nav pierakstījuši, arī pusdienlaikā (12:00) un pēcpusdienā (16:00)."
       />
 
       {error && (
