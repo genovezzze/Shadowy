@@ -58,6 +58,7 @@ model Organization {
   emailOnNewEntry      Boolean  @default(true)
   emailOnEntryApproved Boolean  @default(false)
   emailWeeklySummary   Boolean  @default(true)
+  emailDailyReminder   Boolean  @default(true)
 
   // Default hourly rate for cost calculations (EUR)
   defaultHourlyRate Decimal? @db.Decimal(10, 2)

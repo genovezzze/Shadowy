@@ -8,6 +8,14 @@
     {
       "path": "/api/cron/weekly-employee-digest",
       "schedule": "15 6 * * 1"
+    },
+    {
+      "path": "/api/cron/daily-morning-reminder",
+      "schedule": "0 4 * * 1-5"
+    },
+    {
+      "path": "/api/cron/daily-evening-reminder",
+      "schedule": "0 13 * * 1-5"
     }
   ]
 }

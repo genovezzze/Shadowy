@@ -13,6 +13,7 @@ export default async function AdminSettingsPage() {
       emailOnNewEntry: true,
       emailOnEntryApproved: true,
       emailWeeklySummary: true,
+      emailDailyReminder: true,
     },
   });
 
@@ -33,6 +34,7 @@ export default async function AdminSettingsPage() {
             emailOnNewEntry={org?.emailOnNewEntry ?? true}
             emailOnEntryApproved={org?.emailOnEntryApproved ?? false}
             emailWeeklySummary={org?.emailWeeklySummary ?? true}
+            emailDailyReminder={org?.emailDailyReminder ?? true}
           />
         </CardContent>
       </Card>

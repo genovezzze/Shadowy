@@ -365,6 +365,68 @@ export async function sendWeeklyManagerReport(opts: {
   await sendEmail(opts.to, subject, html);
 }
 
+export async function sendMorningReminder(opts: {
+  to: string;
+  employeeName: string;
+  orgName: string;
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const subject = `Shadowy - labrīt!`;
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
+      <div style="margin-bottom:16px">
+        <h2 style="margin:0 0 4px">Labrīt, ${escapeHtml(opts.employeeName)}! ☀️</h2>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)}</p>
+      </div>
+
+      <p style="color:#333;font-size:14px">
+        Vēl viena darba diena priekšā — neaizmirsti šodien pierakstīt neredzamo darbu, kas paliek ārpus ierastajiem uzdevumiem.
+      </p>
+
+      <p>
+        <a href="${appUrl}/employee/new-entry" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Pievienot ierakstu →
+        </a>
+      </p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">
+        Shadowy · Šis e-pasts tiek sūtīts katru darba dienu no rīta automātiski.
+      </p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}
+
+export async function sendEveningReminder(opts: {
+  to: string;
+  employeeName: string;
+  orgName: string;
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const subject = `Shadowy - neaizmirsti pierakstīt šodienas darbu`;
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
+      <div style="margin-bottom:16px">
+        <h2 style="margin:0 0 4px">Diena tuvojas noslēgumam</h2>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · Sveiks, ${escapeHtml(opts.employeeName)}!</p>
+      </div>
+
+      <p style="color:#333;font-size:14px">
+        Shadowy sistēmā no tevis šodien vēl nav neviena ieraksta. Pirms beidz darba dienu — neaizmirsti pierakstīt to, kas šodien aizņēma laiku ārpus ierastā.
+      </p>
+
+      <p>
+        <a href="${appUrl}/employee/new-entry" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Pievienot ierakstu →
+        </a>
+      </p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">
+        Shadowy · Šis e-pasts tiek sūtīts katru darba dienu pēcpusdienā automātiski, ja vēl nav neviena ieraksta.
+      </p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}
+
 export async function sendEmptyWeekNudge(opts: {
   to: string;
   employeeName: string;

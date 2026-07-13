@@ -8,6 +8,7 @@ interface EmailSettingsFormProps {
   emailOnNewEntry: boolean;
   emailOnEntryApproved: boolean;
   emailWeeklySummary: boolean;
+  emailDailyReminder: boolean;
 }
 
 function Toggle({
@@ -55,10 +56,12 @@ export function EmailSettingsForm({
   emailOnNewEntry: initNewEntry,
   emailOnEntryApproved: initApproved,
   emailWeeklySummary: initWeekly,
+  emailDailyReminder: initDailyReminder,
 }: EmailSettingsFormProps) {
   const [emailOnNewEntry, setEmailOnNewEntry] = useState(initNewEntry);
   const [emailOnEntryApproved, setEmailOnEntryApproved] = useState(initApproved);
   const [emailWeeklySummary, setEmailWeeklySummary] = useState(initWeekly);
+  const [emailDailyReminder, setEmailDailyReminder] = useState(initDailyReminder);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
@@ -71,6 +74,7 @@ export function EmailSettingsForm({
         emailOnNewEntry,
         emailOnEntryApproved,
         emailWeeklySummary,
+        emailDailyReminder,
       });
       if (result.ok) {
         setSaved(true);
@@ -103,6 +107,13 @@ export function EmailSettingsForm({
         onChange={setEmailWeeklySummary}
         label="Nedēļas kopsavilkums"
         description="Vadītājs saņem iknedēļas e-pasta kopsavilkumu par komandas aktivitāti."
+      />
+      <Toggle
+        id="emailDailyReminder"
+        checked={emailDailyReminder}
+        onChange={setEmailDailyReminder}
+        label="Ikdienas atgādinājumi"
+        description="Darbinieki saņem e-pastu darba dienas sākumā (7:00) un tie, kas vēl neko nav pierakstījuši, arī pēcpusdienā (16:00)."
       />
 
       {error && (

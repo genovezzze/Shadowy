@@ -129,6 +129,8 @@ const RECOMMENDATIONS: Record<SmartLogCategory, string> = {
     "Daudz laika pavadīts saziņā ar klientiem — vērtīgs darbs, kas bieži paliek neredzams budžetā.",
   client_meeting:
     "Daudz laika aizņēmušas klātienes tikšanās ar klientiem — apsver, vai daļu no tām var apvienot vai risināt attālināti.",
+  hortus_digital_communication:
+    "Liela daļa laika aizgāja saziņai ar Hortus Digital — vērtīgs darbs, kas bieži paliek neredzams budžetā.",
   other:
     "Turpini pierakstīt savu neredzamo darbu — tas palīdz iegūt skaidrāku ainu par nedēļu.",
 };

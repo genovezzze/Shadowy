@@ -14,6 +14,7 @@ export const SMART_LOG_CATEGORIES = [
   { value: "legal_documents", label: "juridisko dokumentu sagatavošana" },
   { value: "client_communication", label: "saziņa ar klientu" },
   { value: "client_meeting", label: "klātienes tikšanās ar klientiem" },
+  { value: "hortus_digital_communication", label: "saziņa ar Hortus Digital" },
   { value: "other", label: "cits" },
 ] as const;
 
@@ -31,6 +32,7 @@ export const smartLogCategorySchema = z.enum([
   "legal_documents",
   "client_communication",
   "client_meeting",
+  "hortus_digital_communication",
   "other",
 ]);
 
