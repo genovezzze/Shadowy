@@ -1,4 +1,5 @@
 import type { Prisma, EntryStatus } from "@prisma/client";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const STATUSES = new Set<EntryStatus>([
   "PENDING",
@@ -39,8 +40,15 @@ export function buildEntryWhere(
     where.status = sp.status as EntryStatus;
   }
 
-  if (sp.category?.trim()) {
-    where.category = sp.category;
+  const categoryFilter = sp.category?.trim();
+  if (categoryFilter) {
+    // Older entries can store the category as its Latvian label instead of the
+    // canonical key (or vice versa) — match either form so the filter doesn't
+    // silently miss half the matching rows.
+    const key = normalizeCategoryKey(categoryFilter);
+    const label = categoryLabel(key);
+    const variants = Array.from(new Set([categoryFilter, key, label]));
+    where.category = variants.length > 1 ? { in: variants } : variants[0];
   }
 
   if (sp.employee?.trim()) {

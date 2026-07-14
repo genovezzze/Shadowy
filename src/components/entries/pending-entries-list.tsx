@@ -10,7 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { ChevronDown, Pencil } from "lucide-react";
 import { cn, formatDurationLV } from "@/lib/utils";
 import { editEntry } from "@/app/manager/entries/actions";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 export interface PendingEntry {
   id: string;
@@ -70,7 +70,8 @@ function groupByEmployee(entries: PendingEntry[]): EmployeeGroup[] {
     const g = map.get(e.employeeId)!;
     g.entries.push(e);
     g.totalMinutes += e.durationMinutes;
-    if (!g.categories.includes(e.category)) g.categories.push(e.category);
+    const categoryKey = normalizeCategoryKey(e.category);
+    if (!g.categories.includes(categoryKey)) g.categories.push(categoryKey);
   }
   for (const g of map.values()) {
     g.dateRange = shortDateRange(g.entries);

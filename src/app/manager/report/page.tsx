@@ -6,7 +6,7 @@ import { normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText } from "lucide-react";
 
 function getPeriodStart(period: string): Date {
@@ -200,7 +200,10 @@ export default async function ManagerReportPage({
 
   // Top categories
   const catMap = new Map<string, number>();
-  for (const e of approved) catMap.set(e.category, (catMap.get(e.category) ?? 0) + 1);
+  for (const e of approved) {
+    const key = normalizeCategoryKey(e.category);
+    catMap.set(key, (catMap.get(key) ?? 0) + 1);
+  }
   const topCats = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
   const topCategory = topCats[0]?.[0] ?? null;
   const topCategoryPct = topCats[0] ? Math.round((topCats[0][1] / totalApproved) * 100) : 0;

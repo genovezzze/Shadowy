@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { formatDurationLV } from "@/lib/utils";
 import { ClientMonthChart } from "@/components/clients/client-month-chart";
 import { ArrowLeft, Clock, FileText } from "lucide-react";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 function getYearMonth(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -93,7 +93,8 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
 
   const catMap = new Map<string, number>();
   for (const e of entries) {
-    catMap.set(e.category, (catMap.get(e.category) ?? 0) + entryMin(e));
+    const key = normalizeCategoryKey(e.category);
+    catMap.set(key, (catMap.get(key) ?? 0) + entryMin(e));
   }
   const catRows = Array.from(catMap.entries()).sort((a, b) => b[1] - a[1]);
   const maxCatMin = catRows[0]?.[1] ?? 1;

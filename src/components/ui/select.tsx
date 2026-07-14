@@ -74,7 +74,8 @@ const SelectContent = React.forwardRef<
       position={position}
       sideOffset={6}
       className={cn(
-        "glass relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+        "glass relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+        "max-h-[var(--radix-select-content-available-height)]",
         "dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-foreground dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_-16px_rgba(0,0,0,0.8)]",
         position === "popper" &&
           "w-full min-w-[var(--radix-select-trigger-width)] translate-y-1",
@@ -84,7 +85,7 @@ const SelectContent = React.forwardRef<
     >
       <SelectPrimitive.Viewport
         className={cn(
-          "max-h-96 p-1 pr-2",
+          "max-h-[var(--radix-select-content-available-height)] p-1 pr-2",
           position === "popper" && "w-full min-w-[var(--radix-select-trigger-width)]"
         )}
       >

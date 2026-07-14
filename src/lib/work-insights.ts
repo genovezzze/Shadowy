@@ -1,5 +1,20 @@
-import { SMART_LOG_CATEGORY_LABELS, type SmartLogCategory } from "@/lib/smart-log";
+import { SMART_LOG_CATEGORIES, SMART_LOG_CATEGORY_LABELS, type SmartLogCategory } from "@/lib/smart-log";
 import { normalizeClientName } from "@/lib/client-name";
+
+const LABEL_TO_KEY: Record<string, SmartLogCategory> = Object.fromEntries(
+  SMART_LOG_CATEGORIES.map((c) => [c.label.toLowerCase(), c.value])
+) as Record<string, SmartLogCategory>;
+
+/**
+ * Older entries (manual or pre-migration AI parses) can store the category as
+ * its Latvian label text ("darba algas aprēķini") instead of the canonical key
+ * ("payroll_calculation"). Collapse both forms to the same key before grouping,
+ * so they don't show up as two separate rows that happen to render identically.
+ */
+export function normalizeCategoryKey(category: string): string {
+  if (category in SMART_LOG_CATEGORY_LABELS) return category;
+  return LABEL_TO_KEY[category.trim().toLowerCase()] ?? category;
+}
 
 type MinimalEntry = { category: string; durationMinutes: number };
 
@@ -8,10 +23,11 @@ export type CategoryBreakdown = { category: string; count: number; minutes: numb
 export function groupByCategory(entries: MinimalEntry[]): CategoryBreakdown[] {
   const map = new Map<string, CategoryBreakdown>();
   for (const e of entries) {
-    const cur = map.get(e.category) ?? { category: e.category, count: 0, minutes: 0 };
+    const key = normalizeCategoryKey(e.category);
+    const cur = map.get(key) ?? { category: key, count: 0, minutes: 0 };
     cur.count += 1;
     cur.minutes += e.durationMinutes;
-    map.set(e.category, cur);
+    map.set(key, cur);
   }
   return Array.from(map.values()).sort((a, b) => b.minutes - a.minutes);
 }
@@ -38,7 +54,7 @@ export function groupByCategoryWithTitles(
   return grouped.map((g) => {
     const titleCounts = new Map<string, number>();
     for (const e of entries) {
-      if (e.category !== g.category) continue;
+      if (normalizeCategoryKey(e.category) !== g.category) continue;
       titleCounts.set(e.title, (titleCounts.get(e.title) ?? 0) + 1);
     }
     const topTitles = [...titleCounts.entries()]

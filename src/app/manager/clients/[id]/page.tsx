@@ -11,7 +11,7 @@ import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { ClientMonthChart } from "@/components/clients/client-month-chart";
 import { AlertTriangle, ArrowLeft, Clock, TrendingUp, Users, FileText } from "lucide-react";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const HOURLY_RATE_EUR = 20;
 
@@ -127,7 +127,8 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
   // By category
   const catMap = new Map<string, number>();
   for (const e of entries) {
-    catMap.set(e.category, (catMap.get(e.category) ?? 0) + entryMin(e));
+    const key = normalizeCategoryKey(e.category);
+    catMap.set(key, (catMap.get(key) ?? 0) + entryMin(e));
   }
   const catRows = Array.from(catMap.entries())
     .sort((a, b) => b[1] - a[1]);

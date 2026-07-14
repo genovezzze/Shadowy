@@ -12,7 +12,7 @@ import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { normalizeClientName } from "@/lib/client-name";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import {
   AlertTriangle,
   Building2,
@@ -286,7 +286,8 @@ export default async function ManagerDashboard({
       const key = normalizeClientName(e.clientName);
       clientMinByName.set(key, (clientMinByName.get(key) ?? 0) + e.durationMinutes);
     }
-    categoryCount.set(e.category, (categoryCount.get(e.category) ?? 0) + 1);
+    const categoryKey = normalizeCategoryKey(e.category);
+    categoryCount.set(categoryKey, (categoryCount.get(categoryKey) ?? 0) + 1);
     if (isExtraEntry(e)) extraMinutes += e.durationMinutes;
   }
 
@@ -416,7 +417,7 @@ export default async function ManagerDashboard({
     const pct = approved.length > 0 ? Math.round((count / approved.length) * 100) : 0;
     const titleMap = new Map<string, number>();
     for (const e of approved) {
-      if (e.category === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
+      if (normalizeCategoryKey(e.category) === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
     }
     const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
     const maxCnt = sorted[0]?.[1] ?? 1;

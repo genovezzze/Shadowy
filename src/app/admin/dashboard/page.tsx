@@ -15,7 +15,7 @@ import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-wid
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
 import { resolveWorkType } from "@/lib/work-type";
-import { categoryLabel } from "@/lib/work-insights";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -135,7 +135,8 @@ export default async function AdminDashboard({
   // --- Category breakdown ---
   const categoryCountA = new Map<string, number>();
   for (const e of approvedEntries) {
-    categoryCountA.set(e.category, (categoryCountA.get(e.category) ?? 0) + 1);
+    const key = normalizeCategoryKey(e.category);
+    categoryCountA.set(key, (categoryCountA.get(key) ?? 0) + 1);
   }
   const categoryItemsA = [...categoryCountA.entries()]
     .sort((a, b) => b[1] - a[1])
@@ -143,7 +144,7 @@ export default async function AdminDashboard({
       const pct = approvedEntries.length > 0 ? Math.round((count / approvedEntries.length) * 100) : 0;
       const titleMap = new Map<string, number>();
       for (const e of approvedEntries) {
-        if (e.category === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
+        if (normalizeCategoryKey(e.category) === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
       }
       const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
       const maxCnt = sorted[0]?.[1] ?? 1;
