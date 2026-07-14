@@ -13,6 +13,8 @@ import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { normalizeClientName } from "@/lib/client-name";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
+import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
+import { buildClientMatrix } from "@/lib/client-matrix";
 import {
   AlertTriangle,
   Building2,
@@ -370,6 +372,18 @@ export default async function ManagerDashboard({
     };
   }).sort((a, b) => b.usedMinutes - a.usedMinutes);
 
+  // --- Client x Employee matrix ---
+  const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
+    approved.map((e) => ({
+      clientId: e.clientId,
+      clientName: e.clientName,
+      employeeId: e.employee.id,
+      employeeName: e.employee.name,
+      durationMinutes: e.durationMinutes,
+    })),
+    clients,
+  );
+
   // --- Client budget forecast ---
   const monthClientById = new Map<string, number>();
   const monthClientByName = new Map<string, number>();
@@ -634,6 +648,16 @@ export default async function ManagerDashboard({
               </div>
             </div>
           )}
+        </>
+      )}
+
+      {/* Client x Employee matrix */}
+      {matrixRows.length > 0 && (
+        <>
+          <SectionDivider label="Noslodze pa darbiniekiem" />
+          <div className="mb-8">
+            <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
+          </div>
         </>
       )}
 

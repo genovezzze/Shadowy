@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Legend, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
+import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface WorkTypeDataPoint {
@@ -48,7 +48,6 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
   }
 
   const isDark = resolvedTheme !== "light";
-  const textColor = isDark ? "#9ca3af" : "#8a94a6";
   const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
   const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
 
@@ -58,12 +57,12 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
         <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={280}>
+        <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie
               data={data.map((d) => ({ ...d, fill: d.color }))}
               cx="50%"
-              cy="38%"
+              cy="50%"
               innerRadius={48}
               outerRadius={68}
               dataKey="value"
@@ -80,15 +79,20 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
               }}
               formatter={(value) => [value, ""]}
             />
-            <Legend
-              iconType="circle"
-              iconSize={7}
-              formatter={(v) => (
-                <span style={{ color: textColor, fontSize: 11 }}>{v}</span>
-              )}
-            />
           </PieChart>
         </ResponsiveContainer>
+
+        <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1.5">
+          {data.map((d) => (
+            <div key={d.name} className="flex items-center gap-1.5">
+              <span
+                className="h-1.5 w-1.5 shrink-0 rounded-full"
+                style={{ backgroundColor: d.color }}
+              />
+              <span className="text-[11px] text-muted-foreground">{d.name}</span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

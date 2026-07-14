@@ -18,6 +18,7 @@ import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
 import { normalizeClientName } from "@/lib/client-name";
 import { DailyDigestCard } from "@/components/dashboard/daily-digest-card";
+import { CategoryMatrix, type MatrixAxis } from "@/components/dashboard/category-matrix";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
@@ -263,6 +264,62 @@ export default async function EmployeeDashboard() {
     ...Array.from(clientMinByName.values()),
   ].sort((a, b) => b.minutes - a.minutes).slice(0, 5);
   const maxClientMin = clientDist[0]?.minutes ?? 1;
+
+  // ── Personal matrices: category × client, category × month ──────────────
+  const categoryMinutesMap = new Map<string, number>();
+  for (const e of approvedEntries) {
+    const key = normalizeCategoryKey(e.category);
+    categoryMinutesMap.set(key, (categoryMinutesMap.get(key) ?? 0) + e.durationMinutes);
+  }
+  const categoryAxis: MatrixAxis[] = Array.from(categoryMinutesMap.entries())
+    .sort((a, b) => b[1] - a[1])
+    .map(([key]) => ({ key, label: categoryLabel(key) }));
+
+  const clientKeyed = new Map<string, { label: string; minutes: number }>();
+  for (const e of approvedEntries) {
+    let key: string | null = null;
+    let label = "";
+    if (e.clientId) {
+      key = `id:${e.clientId}`;
+      label = e.client?.name ?? e.clientName ?? e.clientId;
+    } else if (e.clientName) {
+      key = `name:${normalizeClientName(e.clientName)}`;
+      label = e.clientName;
+    }
+    if (!key) continue;
+    const cur = clientKeyed.get(key) ?? { label, minutes: 0 };
+    cur.minutes += e.durationMinutes;
+    clientKeyed.set(key, cur);
+  }
+  const clientAxis: MatrixAxis[] = Array.from(clientKeyed.entries())
+    .sort((a, b) => b[1].minutes - a[1].minutes)
+    .slice(0, 6)
+    .map(([key, v]) => ({ key, label: v.label }));
+
+  const catClientMinutes: Record<string, Record<string, number>> = {};
+  for (const e of approvedEntries) {
+    let key: string | null = null;
+    if (e.clientId) key = `id:${e.clientId}`;
+    else if (e.clientName) key = `name:${normalizeClientName(e.clientName)}`;
+    if (!key || !clientAxis.some((c) => c.key === key)) continue;
+    const catKey = normalizeCategoryKey(e.category);
+    catClientMinutes[catKey] ??= {};
+    catClientMinutes[catKey][key] = (catClientMinutes[catKey][key] ?? 0) + e.durationMinutes;
+  }
+
+  const monthAxis: MatrixAxis[] = Array.from({ length: 6 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+    return { key: `${d.getFullYear()}-${d.getMonth()}`, label: LV_MONTHS[d.getMonth()] };
+  });
+  const catMonthMinutes: Record<string, Record<string, number>> = {};
+  for (const e of approvedEntries) {
+    const catKey = normalizeCategoryKey(e.category);
+    const d = e.workDate;
+    const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
+    if (!monthAxis.some((m) => m.key === monthKey)) continue;
+    catMonthMinutes[catKey] ??= {};
+    catMonthMinutes[catKey][monthKey] = (catMonthMinutes[catKey][monthKey] ?? 0) + e.durationMinutes;
+  }
 
   // ── Today digest ──────────────────────────────────────────────────────────
   const todayEntries = allEntries.filter((e: EntrySlice) => e.workDate.toISOString().slice(0, 10) === todayStr);
@@ -532,6 +589,31 @@ export default async function EmployeeDashboard() {
               </div>
             </CardContent>
           </Card>
+        </>
+      )}
+
+      {/* ── Personal matrices ── */}
+      {categoryAxis.length > 0 && (
+        <>
+          <SectionDivider label="Kategorijas dziļumā" />
+          <div className="grid gap-4 mb-8">
+            {clientAxis.length > 0 && (
+              <CategoryMatrix
+                title="Kategorija × Klients"
+                description="Kurš klients dod visvairāk katras kategorijas darba tieši tev."
+                rows={categoryAxis}
+                cols={clientAxis}
+                minutes={catClientMinutes}
+              />
+            )}
+            <CategoryMatrix
+              title="Kategorija × Mēnesis"
+              description="Kā tavs fokuss pa kategorijām mainījies pēdējo 6 mēnešu laikā."
+              rows={categoryAxis}
+              cols={monthAxis}
+              minutes={catMonthMinutes}
+            />
+          </div>
         </>
       )}
 

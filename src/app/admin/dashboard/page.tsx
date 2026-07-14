@@ -1,5 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
+import { buildClientMatrix } from "@/lib/client-matrix";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { Card } from "@/components/ui/card";
@@ -18,6 +20,7 @@ import { resolveWorkType } from "@/lib/work-type";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
+const HOURLY_RATE_EUR = 20;
 
 function getPeriodStart(period: string): Date | undefined {
   const now = new Date();
@@ -97,8 +100,12 @@ export default async function AdminDashboard({
           category: true,
           title: true,
           employeeId: true,
+          clientId: true,
+          clientName: true,
           employee: {
             select: {
+              id: true,
+              name: true,
               workRole: { select: { duties: { select: { text: true } } } },
             },
           },
@@ -131,6 +138,18 @@ export default async function AdminDashboard({
       extraMinutes += e.durationMinutes;
     }
   }
+
+  // --- Client x Employee matrix ---
+  const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
+    approvedEntries.map((e) => ({
+      clientId: e.clientId,
+      clientName: e.clientName,
+      employeeId: e.employeeId,
+      employeeName: e.employee.name,
+      durationMinutes: e.durationMinutes,
+    })),
+    orgClients,
+  );
 
   // --- Category breakdown ---
   const categoryCountA = new Map<string, number>();
@@ -334,6 +353,16 @@ export default async function AdminDashboard({
           data={monthlyData}
         />
       </div>
+
+      {/* Client x Employee matrix */}
+      {matrixRows.length > 0 && (
+        <>
+          <SectionDivider label="Noslodze pa darbiniekiem" />
+          <div className="mb-8">
+            <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
+          </div>
+        </>
+      )}
 
       {/* ── Manager performance ── */}
       {managerStats.length > 0 && (

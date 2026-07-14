@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -109,7 +110,12 @@ export function EmployeeRow({
   return (
     <tr>
       <td className="px-4 py-3">
-        <div className="font-medium leading-snug">{name}</div>
+        <Link
+          href={`/manager/employee/${id}`}
+          className="font-medium leading-snug hover:underline underline-offset-4"
+        >
+          {name}
+        </Link>
         <div className="text-xs text-muted-foreground">{email}</div>
       </td>
       <td className="px-4 py-3 text-muted-foreground">{title ?? "-"}</td>
