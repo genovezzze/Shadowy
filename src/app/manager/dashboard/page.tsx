@@ -17,10 +17,8 @@ import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-mat
 import { buildClientMatrix } from "@/lib/client-matrix";
 import {
   AlertTriangle,
-  Building2,
   Clock,
   FileText,
-  Plus,
   Timer,
   TrendingUp,
   Users,
@@ -357,21 +355,6 @@ export default async function ManagerDashboard({
   const avgApprovalDays = computeAvgApprovalDays(approved);
   const maxEmpExtraH = employeeBreakdown[0]?.extraH ?? 1;
 
-  // --- Client rows ---
-  const clientRows = clients.map((c) => {
-    const used = (clientMinById.get(c.id) ?? 0) + (clientMinByName.get(normalizeClientName(c.name)) ?? 0);
-    const overrun =
-      c.freeMinutesPerMonth !== null ? Math.max(0, used - c.freeMinutesPerMonth) : 0;
-    return {
-      id: c.id,
-      name: c.name,
-      usedMinutes: used,
-      freeMinutes: c.freeMinutesPerMonth,
-      overrunMinutes: overrun,
-      overrunEur: Math.round((overrun / 60) * HOURLY_RATE_EUR),
-    };
-  }).sort((a, b) => b.usedMinutes - a.usedMinutes);
-
   // --- Client x Employee matrix ---
   const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
     approved.map((e) => ({
@@ -417,13 +400,6 @@ export default async function ManagerDashboard({
   }
   clientForecasts.sort((a, b) => a.daysLeft - b.daysLeft);
 
-  const registeredClientNames = new Set(clients.map((c) => normalizeClientName(c.name)));
-  const untrackedNames = [...new Set(
-    approved
-      .filter((e) => e.clientName && !e.clientId && !registeredClientNames.has(normalizeClientName(e.clientName)))
-      .map((e) => e.clientName as string)
-  )];
-
   const topCategories = Array.from(categoryCount.entries())
     .sort((a, b) => b[1] - a[1]);
 
@@ -448,8 +424,6 @@ export default async function ManagerDashboard({
       })),
     };
   });
-
-  const noClientCount = approved.filter((e) => !e.clientName).length;
 
   return (
     <>
@@ -661,11 +635,11 @@ export default async function ManagerDashboard({
         </>
       )}
 
-      {/* Client table */}
-      <SectionDivider label="Klienti" />
-      <div className="mb-8">
-        {clientForecasts.length > 0 && (
-          <Card className="mb-3 overflow-hidden p-0">
+      {/* Client budget forecast */}
+      {clientForecasts.length > 0 && (
+        <>
+          <SectionDivider label="Klientu budžets" />
+          <Card className="mb-8 overflow-hidden p-0">
             <div className="flex items-center gap-2 border-b border-border/60 px-5 py-3">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
               <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
@@ -708,106 +682,8 @@ export default async function ManagerDashboard({
               </p>
             </div>
           </Card>
-        )}
-        {clientRows.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center gap-3 p-8 text-center">
-              <Building2 className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">
-                Nav pievienotu klientu. Pievienojiet klientus, lai redzētu laika sadalījumu un pārsniegumu.
-              </p>
-              <Button asChild size="sm" variant="outline">
-                <Link href="/manager/clients">
-                  <Plus className="h-4 w-4" /> Pievienot klientus
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        ) : (
-          <Card className="overflow-hidden p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/30">
-                    <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground">Klients</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Ierakstīts</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Bezmaksas limits</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">Pārsniegums</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">~EUR</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border">
-                  {clientRows.map((c) => (
-                    <tr key={c.id} className="hover:bg-muted/20 transition-colors">
-                      <td className="px-5 py-3 font-medium">
-                        <Link href={`/manager/clients/${c.id}`} className="hover:underline hover:text-foreground transition-colors">
-                          {c.name}
-                        </Link>
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {c.usedMinutes > 0 ? formatDurationLV(c.usedMinutes) : "—"}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums text-muted-foreground">
-                        {c.freeMinutes !== null ? formatDurationLV(c.freeMinutes) : "∞"}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {c.overrunMinutes > 0 ? (
-                          <span className="font-semibold text-amber-500">
-                            +{formatDurationLV(c.overrunMinutes)}
-                          </span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-right tabular-nums">
-                        {c.overrunEur > 0 ? (
-                          <span className="font-semibold text-amber-500">€{c.overrunEur}</span>
-                        ) : (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                {clientRows.some((c) => c.overrunEur > 0) && (
-                  <tfoot>
-                    <tr className="border-t border-border bg-muted/20">
-                      <td colSpan={3} className="px-5 py-2.5 text-xs text-muted-foreground">
-                        Kopā pārsniegums (€{HOURLY_RATE_EUR}/h likme)
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-sm font-semibold tabular-nums text-amber-500">
-                        +{formatDurationLV(clientRows.reduce((s, c) => s + c.overrunMinutes, 0))}
-                      </td>
-                      <td className="px-4 py-2.5 text-right text-sm font-semibold tabular-nums text-amber-500">
-                        €{clientRows.reduce((s, c) => s + c.overrunEur, 0)}
-                      </td>
-                    </tr>
-                  </tfoot>
-                )}
-              </table>
-            </div>
-            {(untrackedNames.length > 0 || noClientCount > 0) && (
-              <div className="border-t border-border px-5 py-3 flex items-start gap-2 bg-amber-500/5">
-                <AlertTriangle className="h-4 w-4 text-amber-500 shrink-0 mt-0.5" />
-                <div className="text-xs text-muted-foreground">
-                  {noClientCount > 0 && (
-                    <span>{noClientCount} ieraksts bez klienta. </span>
-                  )}
-                  {untrackedNames.length > 0 && (
-                    <span>
-                      Klienti bez ierakstīta limita:{" "}
-                      <Link href="/manager/clients" className="underline hover:text-foreground">
-                        {untrackedNames.slice(0, 3).join(", ")}
-                        {untrackedNames.length > 3 ? ` +${untrackedNames.length - 3}` : ""}
-                      </Link>
-                    </span>
-                  )}
-                </div>
-              </div>
-            )}
-          </Card>
-        )}
-      </div>
+        </>
+      )}
 
       {/* Top categories */}
       {categoryItems.length > 0 && (

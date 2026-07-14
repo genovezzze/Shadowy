@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertTriangle, Maximize2, Search, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -84,7 +85,13 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps
                 className="px-5 py-3 font-medium truncate max-w-[140px] sticky left-0 bg-inherit"
                 title={row.clientName}
               >
-                {row.clientName}
+                {row.clientId.startsWith("name:") ? (
+                  row.clientName
+                ) : (
+                  <Link href={`/manager/clients/${row.clientId}`} className="hover:underline underline-offset-4">
+                    {row.clientName}
+                  </Link>
+                )}
               </td>
               {employees.map((emp) => {
                 const min = row.byEmployee[emp.id] ?? 0;
