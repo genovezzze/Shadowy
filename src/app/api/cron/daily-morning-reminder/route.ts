@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  console.log("[cron] daily-morning-reminder started");
 
   const orgs = await prisma.organization.findMany({
     where: { emailDailyReminder: true },
@@ -53,5 +54,6 @@ export async function GET(req: NextRequest) {
     await sleep(SEND_DELAY_MS);
   }
 
+  console.log(`[cron] daily-morning-reminder done: sent=${sent} failed=${failed}`);
   return NextResponse.json({ ok: true, sent, failed });
 }

@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  console.log("[cron] daily-evening-reminder started");
 
   const todayStart = new Date();
   todayStart.setUTCHours(0, 0, 0, 0);
@@ -71,5 +72,6 @@ export async function GET(req: NextRequest) {
     await sleep(SEND_DELAY_MS);
   }
 
+  console.log(`[cron] daily-evening-reminder done: sent=${sent} skipped=${skipped} failed=${failed}`);
   return NextResponse.json({ ok: true, sent, skipped, failed });
 }

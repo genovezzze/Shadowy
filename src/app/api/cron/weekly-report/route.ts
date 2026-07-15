@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
   if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  console.log("[cron] weekly-report started");
 
   const weekAgo = new Date(Date.now() - 7 * 86400000);
   const twoWeeksAgo = new Date(Date.now() - 14 * 86400000);
@@ -160,5 +161,6 @@ export async function GET(req: NextRequest) {
     await sleep(SEND_DELAY_MS);
   }
 
+  console.log(`[cron] weekly-report done: sent=${sent} failed=${failed}`);
   return NextResponse.json({ ok: true, sent, failed });
 }

@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Image from "next/image";
 import * as Sentry from "@sentry/nextjs";
 import { Button } from "@/components/ui/button";
+import { recoverFromChunkLoadError } from "@/lib/chunk-error";
 
 export default function Error({
   error,
@@ -15,6 +16,7 @@ export default function Error({
   useEffect(() => {
     console.error(error);
     Sentry.captureException(error);
+    recoverFromChunkLoadError(error);
   }, [error]);
 
   return (
