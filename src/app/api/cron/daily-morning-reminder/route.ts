@@ -15,7 +15,10 @@ function sleep(ms: number) {
 export async function GET(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  if (!cronSecret || authHeader?.trim() !== `Bearer ${cronSecret.trim()}`) {
+    console.warn(
+      `[cron] daily-morning-reminder unauthorized: secretConfigured=${!!cronSecret} authHeaderLen=${authHeader?.length ?? 0}`
+    );
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   console.log("[cron] daily-morning-reminder started");
