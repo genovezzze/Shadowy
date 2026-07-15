@@ -13,6 +13,7 @@ function overrunEur(minutes: number, rateEur: number): number {
 }
 
 const MAX_EMP_COLS = 8;
+const PREVIEW_ROWS = 5;
 
 function cellClasses(minutes: number, rowMax: number, overLimit: boolean): string {
   if (!minutes || !rowMax) return "";
@@ -33,20 +34,26 @@ interface MatrixTableProps {
   employees: MatrixEmployee[];
   hiddenCount: number;
   rateEur: number;
+  compact?: boolean;
 }
 
-function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps) {
+function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixTableProps) {
+  const cellPad = compact ? "px-2 py-1.5" : "px-2 py-3";
+  const namePad = compact ? "px-3 py-1.5" : "px-5 py-3";
+  const numPad = compact ? "px-3 py-1.5" : "px-4 py-3";
+  const textSize = compact ? "text-xs" : "text-sm";
+
   return (
-    <table className="w-full text-sm">
+    <table className={`w-full ${textSize}`}>
       <thead>
         <tr className="border-b border-border bg-muted/30">
-          <th className="px-5 py-3 text-left text-xs font-medium text-muted-foreground w-36 sticky left-0 bg-inherit">
+          <th className={`${namePad} text-left text-xs font-medium text-muted-foreground ${compact ? "w-28" : "w-36"} sticky left-0 bg-inherit`}>
             Klients
           </th>
           {employees.map((emp) => (
             <th
               key={emp.id}
-              className="px-2 py-3 text-center text-xs font-medium text-muted-foreground min-w-[68px]"
+              className={`${cellPad} text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[52px]" : "min-w-[68px]"}`}
             >
               <span className="block truncate max-w-[80px] mx-auto" title={emp.name}>
                 {emp.name.split(" ")[0]}
@@ -54,17 +61,19 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps
             </th>
           ))}
           {hiddenCount > 0 && (
-            <th className="px-2 py-3 text-center text-xs text-muted-foreground/50">
+            <th className={`${cellPad} text-center text-xs text-muted-foreground/50`}>
               +{hiddenCount}
             </th>
           )}
-          <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+          <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
             Kopā
           </th>
-          <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
-            Limits
-          </th>
-          <th className="px-4 py-3 text-right text-xs font-medium text-muted-foreground">
+          {!compact && (
+            <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
+              Limits
+            </th>
+          )}
+          <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
             Statuss
           </th>
         </tr>
@@ -82,7 +91,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps
               className={`transition-colors hover:bg-muted/20 ${overLimit ? "bg-amber-500/[0.02]" : ""}`}
             >
               <td
-                className="px-5 py-3 font-medium truncate max-w-[140px] sticky left-0 bg-inherit"
+                className={`${namePad} font-medium truncate max-w-[140px] sticky left-0 bg-inherit`}
                 title={row.clientName}
               >
                 {row.clientId.startsWith("name:") ? (
@@ -97,7 +106,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps
                 const min = row.byEmployee[emp.id] ?? 0;
                 const cls = cellClasses(min, rowMax, overLimit);
                 return (
-                  <td key={emp.id} className="px-2 py-3 text-center">
+                  <td key={emp.id} className={`${cellPad} text-center`}>
                     {min > 0 ? (
                       <span
                         className={`inline-block rounded px-1.5 py-0.5 text-xs tabular-nums font-medium ${cls}`}
@@ -111,24 +120,28 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur }: MatrixTableProps
                 );
               })}
               {hiddenCount > 0 && (
-                <td className="px-2 py-3 text-center text-muted-foreground/25 text-xs">…</td>
+                <td className={`${cellPad} text-center text-muted-foreground/25 text-xs`}>…</td>
               )}
-              <td className="px-4 py-3 text-right text-xs tabular-nums font-medium">
+              <td className={`${numPad} text-right text-xs tabular-nums font-medium`}>
                 {Math.round((row.totalMinutes / 60) * 10) / 10}h
               </td>
-              <td className="px-4 py-3 text-right text-xs tabular-nums text-muted-foreground">
-                {row.freeMinutes !== null
-                  ? `${Math.round((row.freeMinutes / 60) * 10) / 10}h`
-                  : "∞"}
-              </td>
-              <td className="px-4 py-3 text-right">
+              {!compact && (
+                <td className={`${numPad} text-right text-xs tabular-nums text-muted-foreground`}>
+                  {row.freeMinutes !== null
+                    ? `${Math.round((row.freeMinutes / 60) * 10) / 10}h`
+                    : "∞"}
+                </td>
+              )}
+              <td className={`${numPad} text-right`}>
                 {overLimit ? (
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 tabular-nums whitespace-nowrap">
                     <AlertTriangle className="h-3 w-3" />
                     +{Math.round((row.overrunMinutes / 60) * 10) / 10}h
-                    <span className="font-normal text-amber-500/70">
-                      · −€{overrunEur(row.overrunMinutes, rateEur)}
-                    </span>
+                    {!compact && (
+                      <span className="font-normal text-amber-500/70">
+                        · −€{overrunEur(row.overrunMinutes, rateEur)}
+                      </span>
+                    )}
                   </span>
                 ) : row.freeMinutes !== null ? (
                   <span className="text-xs text-emerald-500 font-medium">OK</span>
@@ -193,11 +206,13 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
   const hiddenCount = employees.length - visibleEmps.length;
   const overrunCount = rows.filter((r) => r.overrunMinutes > 0).length;
   const totalOverrunEur = rows.reduce((s, r) => s + overrunEur(r.overrunMinutes, hourlyRateEur), 0);
+  const previewRows = rows.slice(0, PREVIEW_ROWS);
+  const remainingCount = rows.length - previewRows.length;
 
   return (
     <>
       <Card className="overflow-hidden p-0">
-        <div className="flex items-center justify-between gap-2 border-b border-border/60 px-5 py-2.5">
+        <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
           {overrunCount > 0 ? (
             <div className="flex items-center gap-2">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
@@ -207,23 +222,20 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
               </span>
             </div>
           ) : (
-            <span />
+            <span className="text-xs text-muted-foreground">{rows.length} klienti</span>
           )}
-          <button
-            type="button"
-            onClick={() => setOpen(true)}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-          >
-            <Maximize2 className="h-3.5 w-3.5" />
-            Atvērt pilnā skatā
-          </button>
         </div>
         <div className="overflow-x-auto">
-          <MatrixTable rows={rows} employees={visibleEmps} hiddenCount={hiddenCount} rateEur={hourlyRateEur} />
+          <MatrixTable rows={previewRows} employees={visibleEmps} hiddenCount={hiddenCount} rateEur={hourlyRateEur} compact />
         </div>
-        <div className="border-t border-border/40 bg-muted/10 px-5 py-2.5">
-          <Legend />
-        </div>
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          className="flex w-full items-center justify-center gap-2 border-t border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-600 transition-colors hover:bg-amber-500/20 dark:text-amber-400"
+        >
+          <Maximize2 className="h-4 w-4" />
+          {remainingCount > 0 ? `Skatīt visus ${rows.length} klientus pilnā skatā` : "Atvērt pilnā skatā"}
+        </button>
       </Card>
 
       <Dialog.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>

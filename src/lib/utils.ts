@@ -11,6 +11,7 @@ export function formatDateLV(date: Date | string) {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
+    timeZone: "Europe/Riga",
   }).format(d);
 }
 
@@ -22,6 +23,7 @@ export function formatDateTimeLV(date: Date | string) {
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    timeZone: "Europe/Riga",
   }).format(d);
 }
 

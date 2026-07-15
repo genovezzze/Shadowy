@@ -1,8 +1,10 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
+import { ClientOverrunWidget } from "@/components/dashboard/client-overrun-widget";
 import { buildClientMatrix } from "@/lib/client-matrix";
 import { KpiCard } from "@/components/dashboard/kpi-card";
+import { EntriesBreakdownCard } from "@/components/dashboard/entries-breakdown-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/entries/status-badge";
@@ -59,12 +61,15 @@ export default async function AdminDashboard({
   const nowDateA = new Date();
   const currentMonthStartA = new Date(Date.UTC(nowDateA.getUTCFullYear(), nowDateA.getUTCMonth(), 1));
 
-  const [managers, employees, totalEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries] =
+  const [managers, employees, totalEntries, allTimeEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries] =
     await Promise.all([
       prisma.user.count({ where: { organizationId: orgId, role: "MANAGER" } }),
       prisma.user.count({ where: { organizationId: orgId, role: "EMPLOYEE" } }),
       prisma.invisibleWorkEntry.count({
         where: { organizationId: orgId, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+      }),
+      prisma.invisibleWorkEntry.count({
+        where: { organizationId: orgId },
       }),
       prisma.invisibleWorkEntry.count({
         where: { organizationId: orgId, status: "PENDING" },
@@ -102,6 +107,7 @@ export default async function AdminDashboard({
           employeeId: true,
           clientId: true,
           clientName: true,
+          workDate: true,
           employee: {
             select: {
               id: true,
@@ -132,12 +138,16 @@ export default async function AdminDashboard({
     ]);
 
   let extraMinutes = 0;
+  const extraByDayA = new Map<string, number>();
   for (const e of approvedEntries) {
     const duties = e.employee.workRole?.duties.map((d: { text: string }) => d.text) ?? [];
     if (resolveWorkType(e.isOutsideRole, e.category, e.title, duties) === "extra") {
       extraMinutes += e.durationMinutes;
+      const dayKey = e.workDate.toISOString().slice(0, 10);
+      extraByDayA.set(dayKey, (extraByDayA.get(dayKey) ?? 0) + e.durationMinutes);
     }
   }
+  const extraDailyBreakdownA = Array.from(extraByDayA.entries()).map(([date, minutes]) => ({ date, minutes }));
 
   // --- Client x Employee matrix ---
   const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
@@ -149,6 +159,12 @@ export default async function AdminDashboard({
       durationMinutes: e.durationMinutes,
     })),
     orgClients,
+  );
+  const overrunClientsA = matrixRows.filter((r) => r.overrunMinutes > 0);
+  const overrunClientCountA = overrunClientsA.length;
+  const totalOverrunEurA = overrunClientsA.reduce(
+    (s, r) => s + Math.round((r.overrunMinutes / 60) * HOURLY_RATE_EUR),
+    0
   );
 
   // --- Category breakdown ---
@@ -297,6 +313,21 @@ export default async function AdminDashboard({
 
   const monthlyData = buildMonthlyData(allEntries);
 
+  // --- Entries breakdown (today / yesterday / week / month / etc.) ---
+  const todayStartA = new Date(Date.UTC(nowDateA.getUTCFullYear(), nowDateA.getUTCMonth(), nowDateA.getUTCDate()));
+  const yesterdayStartA = new Date(todayStartA.getTime() - 86400000);
+  const sevenDaysAgoA = new Date(todayStartA.getTime() - 7 * 86400000);
+  const thirtyDaysAgoA = new Date(todayStartA.getTime() - 30 * 86400000);
+  const ninetyDaysAgoA = new Date(todayStartA.getTime() - 90 * 86400000);
+  const entriesBreakdown = [
+    { label: "Šodien", value: allEntries.filter((e) => e.createdAt >= todayStartA).length },
+    { label: "Vakar", value: allEntries.filter((e) => e.createdAt >= yesterdayStartA && e.createdAt < todayStartA).length },
+    { label: "Pēdējās 7 dienas", value: allEntries.filter((e) => e.createdAt >= sevenDaysAgoA).length },
+    { label: "Pēdējās 30 dienas", value: allEntries.filter((e) => e.createdAt >= thirtyDaysAgoA).length },
+    { label: "Pēdējās 90 dienas", value: allEntries.filter((e) => e.createdAt >= ninetyDaysAgoA).length },
+    { label: "Kopā (viss laiks)", value: allTimeEntries },
+  ];
+
   const glassInner = "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden";
 
   return (
@@ -327,11 +358,11 @@ export default async function AdminDashboard({
       <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard formal label="Vadītāji" value={managers} icon={<UserCog className="h-5 w-5" />} />
         <KpiCard formal label="Darbinieki" value={employees} icon={<Users className="h-5 w-5" />} />
-        <KpiCard
-          formal
+        <EntriesBreakdownCard
           label={period === "all" ? "Visi ieraksti" : "Ieraksti periodā"}
           value={totalEntries}
           icon={<FileText className="h-5 w-5" />}
+          breakdown={entriesBreakdown}
         />
         <KpiCard
           formal
@@ -341,7 +372,13 @@ export default async function AdminDashboard({
         />
       </div>
 
-      <CostCalculatorWidget extraMinutes={extraMinutes} />
+      <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdownA} />
+      <ClientOverrunWidget
+        overrunCount={overrunClientCountA}
+        totalClients={matrixRows.length}
+        totalOverrunEur={totalOverrunEurA}
+        anchorHref="#client-employee-matrix"
+      />
 
       {/* ── Section divider ── */}
       <SectionDivider label="Aktivitāte" />
@@ -358,7 +395,7 @@ export default async function AdminDashboard({
       {matrixRows.length > 0 && (
         <>
           <SectionDivider label="Noslodze pa darbiniekiem" />
-          <div className="mb-8">
+          <div id="client-employee-matrix" className="mb-8 scroll-mt-20">
             <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
           </div>
         </>

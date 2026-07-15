@@ -1,14 +1,45 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Card } from "@/components/ui/card";
-import { Settings2, TrendingUp } from "lucide-react";
+import { ChevronDown, Settings2, TrendingUp } from "lucide-react";
+import { formatDurationLV } from "@/lib/utils";
+
+const LV_DAYS_SHORT = ["Pirm", "Otr", "Tre", "Ceturt", "Piekt", "Sest", "Svētd"];
+
+function mondayKey(dateStr: string): string {
+  const d = new Date(`${dateStr}T12:00:00Z`);
+  const dow = (d.getUTCDay() + 6) % 7; // 0 = Monday
+  return new Date(d.getTime() - dow * 86400000).toISOString().slice(0, 10);
+}
+
+function dateLabel(dateStr: string): string {
+  const d = new Date(`${dateStr}T12:00:00Z`);
+  return `${String(d.getUTCDate()).padStart(2, "0")}.${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
+function weekdayShort(dateStr: string): string {
+  const d = new Date(`${dateStr}T12:00:00Z`);
+  return LV_DAYS_SHORT[(d.getUTCDay() + 6) % 7];
+}
+
+function weekRangeLabel(mondayStr: string): string {
+  const start = new Date(`${mondayStr}T12:00:00Z`);
+  const end = new Date(start.getTime() + 6 * 86400000);
+  return `${dateLabel(start.toISOString().slice(0, 10))}–${dateLabel(end.toISOString().slice(0, 10))}`;
+}
+
+interface DailyBreakdownEntry {
+  date: string; // YYYY-MM-DD
+  minutes: number;
+}
 
 interface Props {
   extraMinutes: number;
+  dailyBreakdown?: DailyBreakdownEntry[];
 }
 
-export function CostCalculatorWidget({ extraMinutes }: Props) {
+export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Props) {
   const [mode, setMode] = useState<"hourly" | "monthly">("hourly");
   const [hourlyStr, setHourlyStr] = useState("20");
   const [monthlyStr, setMonthlyStr] = useState("");
@@ -16,6 +47,8 @@ export function CostCalculatorWidget({ extraMinutes }: Props) {
   const [editing, setEditing] = useState(false);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
   const [mounted, setMounted] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [breakdownView, setBreakdownView] = useState<"day" | "week">("week");
   const buttonRef = useRef<HTMLButtonElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -82,6 +115,31 @@ export function CostCalculatorWidget({ extraMinutes }: Props) {
       ? `€${monthlyStr}/mēn → €${derivedHourly}/h`
       : `€${hourlyStr}/h`;
 
+  const breakdownRows = useMemo(() => {
+    const clean = dailyBreakdown.filter((d) => d.minutes > 0);
+    if (breakdownView === "day") {
+      return [...clean]
+        .sort((a, b) => b.date.localeCompare(a.date))
+        .slice(0, 30)
+        .map((d) => ({
+          key: d.date,
+          label: `${weekdayShort(d.date)}, ${dateLabel(d.date)}`,
+          minutes: d.minutes,
+        }));
+    }
+    const byWeek = new Map<string, number>();
+    for (const d of clean) {
+      const wk = mondayKey(d.date);
+      byWeek.set(wk, (byWeek.get(wk) ?? 0) + d.minutes);
+    }
+    return Array.from(byWeek.entries())
+      .sort((a, b) => b[0].localeCompare(a[0]))
+      .slice(0, 12)
+      .map(([wk, minutes]) => ({ key: wk, label: weekRangeLabel(wk), minutes }));
+  }, [dailyBreakdown, breakdownView]);
+
+  const maxBreakdownMinutes = Math.max(1, ...breakdownRows.map((r) => r.minutes));
+
   if (extraMinutes === 0) return null;
 
   return (
@@ -107,16 +165,74 @@ export function CostCalculatorWidget({ extraMinutes }: Props) {
             )}
           </div>
 
-          <button
-            ref={buttonRef}
-            type="button"
-            onClick={openPopup}
-            className="flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground sm:self-auto"
-          >
-            <Settings2 className="h-3.5 w-3.5" />
-            <span>{mode === "monthly" && monthlyStr ? `€${monthlyStr}/mēn` : `€${hourlyStr}/h`}</span>
-          </button>
+          <div className="flex shrink-0 items-center gap-2 self-start sm:self-auto">
+            {breakdownRows.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setDetailsOpen((v) => !v)}
+                className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              >
+                <span>Detalizēti</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
+              </button>
+            )}
+            <button
+              ref={buttonRef}
+              type="button"
+              onClick={openPopup}
+              className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+            >
+              <Settings2 className="h-3.5 w-3.5" />
+              <span>{mode === "monthly" && monthlyStr ? `€${monthlyStr}/mēn` : `€${hourlyStr}/h`}</span>
+            </button>
+          </div>
         </div>
+
+        {detailsOpen && breakdownRows.length > 0 && (
+          <div className="border-t border-amber-500/20 p-5 pt-4 dark:border-amber-500/15">
+            <div className="mb-3 flex overflow-hidden rounded-md border border-border text-xs w-fit">
+              {(["week", "day"] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  onClick={() => setBreakdownView(v)}
+                  className={`px-3 py-1.5 text-center transition-colors ${
+                    breakdownView === v
+                      ? "bg-foreground text-background font-medium"
+                      : "bg-background text-muted-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  {v === "week" ? "Pa nedēļām" : "Pa dienām"}
+                </button>
+              ))}
+            </div>
+
+            <div className="max-h-72 space-y-1.5 overflow-y-auto pr-1">
+              {breakdownRows.map((row) => {
+                const rowHours = Math.round((row.minutes / 60) * 10) / 10;
+                const rowCost = Math.round(rowHours * effectiveHourly);
+                const barPct = Math.round((row.minutes / maxBreakdownMinutes) * 100);
+                return (
+                  <div key={row.key} className="flex items-center gap-3 text-sm">
+                    <span className="w-24 shrink-0 text-muted-foreground">{row.label}</span>
+                    <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted/60">
+                      <div
+                        className="h-full rounded-full bg-amber-500/60"
+                        style={{ width: `${barPct}%` }}
+                      />
+                    </div>
+                    <span className="w-20 shrink-0 text-right text-muted-foreground tabular-nums">
+                      {formatDurationLV(row.minutes)}
+                    </span>
+                    <span className="w-16 shrink-0 text-right font-medium tabular-nums">
+                      €{rowCost.toLocaleString("de-DE")}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </Card>
 
       {editing && mounted && (

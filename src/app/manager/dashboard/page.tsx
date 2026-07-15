@@ -14,6 +14,8 @@ import { formatDurationLV } from "@/lib/utils";
 import { normalizeClientName } from "@/lib/client-name";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
+import { ClientOverrunWidget } from "@/components/dashboard/client-overrun-widget";
+import { EntriesBreakdownCard } from "@/components/dashboard/entries-breakdown-card";
 import { buildClientMatrix } from "@/lib/client-matrix";
 import {
   AlertTriangle,
@@ -210,11 +212,12 @@ export default async function ManagerDashboard({
   const periodFilter = periodStart ? { gte: periodStart } : undefined;
 
   const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000);
+  const twelveMonthsAgo = new Date(Date.now() - 365 * 86400000);
 
   const nowDate = new Date();
   const currentMonthStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), 1));
 
-  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries] = await Promise.all([
+  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear] = await Promise.all([
     prisma.user.count({ where: { organizationId: orgId, managerId } }),
     prisma.client.findMany({
       where: { organizationId: orgId },
@@ -269,6 +272,16 @@ export default async function ManagerDashboard({
       where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: currentMonthStart } },
       select: { clientId: true, clientName: true, durationMinutes: true },
     }),
+    prisma.invisibleWorkEntry.count({
+      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+    }),
+    prisma.invisibleWorkEntry.count({
+      where: { organizationId: orgId, managerId, deletedAt: null },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: { organizationId: orgId, managerId, deletedAt: null, createdAt: { gte: twelveMonthsAgo } },
+      select: { createdAt: true },
+    }),
   ]);
 
   // --- Core aggregation ---
@@ -277,6 +290,7 @@ export default async function ManagerDashboard({
   const categoryCount = new Map<string, number>();
   let totalMinutes = 0;
   let extraMinutes = 0;
+  const extraByDay = new Map<string, number>();
 
   for (const e of approved) {
     totalMinutes += e.durationMinutes;
@@ -288,11 +302,31 @@ export default async function ManagerDashboard({
     }
     const categoryKey = normalizeCategoryKey(e.category);
     categoryCount.set(categoryKey, (categoryCount.get(categoryKey) ?? 0) + 1);
-    if (isExtraEntry(e)) extraMinutes += e.durationMinutes;
+    if (isExtraEntry(e)) {
+      extraMinutes += e.durationMinutes;
+      const dayKey = e.workDate.toISOString().slice(0, 10);
+      extraByDay.set(dayKey, (extraByDay.get(dayKey) ?? 0) + e.durationMinutes);
+    }
   }
+  const extraDailyBreakdown = Array.from(extraByDay.entries()).map(([date, minutes]) => ({ date, minutes }));
 
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
   const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
+
+  // --- Entries breakdown (today / yesterday / week / month / etc.) ---
+  const todayStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), nowDate.getUTCDate()));
+  const yesterdayStart = new Date(todayStart.getTime() - 86400000);
+  const sevenDaysAgo = new Date(todayStart.getTime() - 7 * 86400000);
+  const thirtyDaysAgo = new Date(todayStart.getTime() - 30 * 86400000);
+  const ninetyDaysAgo = new Date(todayStart.getTime() - 90 * 86400000);
+  const teamEntriesBreakdown = [
+    { label: "Šodien", value: teamEntriesLastYear.filter((e) => e.createdAt >= todayStart).length },
+    { label: "Vakar", value: teamEntriesLastYear.filter((e) => e.createdAt >= yesterdayStart && e.createdAt < todayStart).length },
+    { label: "Pēdējās 7 dienas", value: teamEntriesLastYear.filter((e) => e.createdAt >= sevenDaysAgo).length },
+    { label: "Pēdējās 30 dienas", value: teamEntriesLastYear.filter((e) => e.createdAt >= thirtyDaysAgo).length },
+    { label: "Pēdējās 90 dienas", value: teamEntriesLastYear.filter((e) => e.createdAt >= ninetyDaysAgo).length },
+    { label: "Kopā (viss laiks)", value: allTimeTeamEntries },
+  ];
 
   // --- Team activity analytics ---
   const todayMidnightMs = Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), nowDate.getUTCDate());
@@ -365,6 +399,12 @@ export default async function ManagerDashboard({
       durationMinutes: e.durationMinutes,
     })),
     clients,
+  );
+  const overrunClients = matrixRows.filter((r) => r.overrunMinutes > 0);
+  const overrunClientCount = overrunClients.length;
+  const totalOverrunEur = overrunClients.reduce(
+    (s, r) => s + Math.round((r.overrunMinutes / 60) * HOURLY_RATE_EUR),
+    0
   );
 
   // --- Client budget forecast ---
@@ -454,7 +494,6 @@ export default async function ManagerDashboard({
           { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā" },
           { label: "Kopā stundas", value: `${totalHours}h`, icon: Clock, sub: "ierakstītas" },
           { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts" },
-          { label: "Gaida", value: pendingCount, icon: AlertTriangle, sub: "apstiprinājumu" },
           {
             label: "Izskatīšana",
             value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "—",
@@ -471,9 +510,21 @@ export default async function ManagerDashboard({
             <div className="text-xs text-muted-foreground">{k.sub}</div>
           </Card>
         ))}
+        <EntriesBreakdownCard
+          label="Visi ieraksti"
+          value={totalTeamEntries}
+          icon={<FileText className="h-5 w-5" />}
+          breakdown={teamEntriesBreakdown}
+        />
       </div>
 
-      <CostCalculatorWidget extraMinutes={extraMinutes} />
+      <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdown} />
+      <ClientOverrunWidget
+        overrunCount={overrunClientCount}
+        totalClients={matrixRows.length}
+        totalOverrunEur={totalOverrunEur}
+        anchorHref="#client-employee-matrix"
+      />
 
       {/* ── Komanda ── */}
       {teamMembers.length > 0 && (
@@ -629,7 +680,7 @@ export default async function ManagerDashboard({
       {matrixRows.length > 0 && (
         <>
           <SectionDivider label="Noslodze pa darbiniekiem" />
-          <div className="mb-8">
+          <div id="client-employee-matrix" className="mb-8 scroll-mt-20">
             <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
           </div>
         </>
