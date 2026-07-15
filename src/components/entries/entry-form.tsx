@@ -16,12 +16,27 @@ interface ClientOption {
   name: string;
 }
 
-export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
+interface EntryFormInitialValues {
+  title?: string;
+  category?: string;
+  description?: string;
+  durationMinutes?: number;
+  clientId?: string | null;
+  clientName?: string | null;
+}
+
+export function EntryForm({
+  clients = [],
+  initialValues,
+}: {
+  clients?: ClientOption[];
+  initialValues?: EntryFormInitialValues;
+}) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [category, setCategory] = useState("");
-  const [clientId, setClientId] = useState("");
+  const [category, setCategory] = useState(initialValues?.category ?? "");
+  const [clientId, setClientId] = useState(initialValues?.clientId ?? "");
 
   async function onSubmit(formData: FormData) {
     setError(null);
@@ -51,6 +66,11 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
           action={onSubmit}
           className="grid grid-cols-1 gap-5"
         >
+          {initialValues ? (
+            <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+              Lauki aizpildīti no iepriekšējā ieraksta — pārbaudiet un pielāgojiet pirms iesniegšanas.
+            </div>
+          ) : null}
           <div className="grid gap-2">
             <Label htmlFor="title">Nosaukums</Label>
             <Input
@@ -58,6 +78,7 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
               name="title"
               required
               maxLength={120}
+              defaultValue={initialValues?.title}
               placeholder="Īsi aprakstiet, ko paveicāt"
             />
           </div>
@@ -104,6 +125,7 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
                 id="clientName"
                 name="clientName"
                 maxLength={120}
+                defaultValue={initialValues?.clientName ?? undefined}
                 placeholder="Neobligāti"
               />
             )}
@@ -118,6 +140,7 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
               min={1}
               max={1440}
               required
+              defaultValue={initialValues?.durationMinutes}
               placeholder="piem., 30"
             />
             <p className="text-xs text-muted-foreground">
@@ -133,6 +156,7 @@ export function EntryForm({ clients = [] }: { clients?: ClientOption[] }) {
               required
               minLength={10}
               maxLength={2000}
+              defaultValue={initialValues?.description}
               placeholder="Pastāstiet vairāk: kam palīdzējāt, kāds bija konteksts, kāpēc tas bija nepieciešams."
             />
           </div>

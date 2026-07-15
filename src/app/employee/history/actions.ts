@@ -13,6 +13,8 @@ const updateSchema = z.object({
     .string()
     .min(10, "Lūdzu, aprakstiet vismaz dažus teikumus.")
     .max(2000),
+  clientName: z.string().trim().max(120).optional(),
+  clientId: z.string().optional(),
   workDate: z.coerce.date(),
   durationMinutes: z.coerce
     .number()
@@ -29,6 +31,8 @@ export async function updateEntry(formData: FormData) {
     title: formData.get("title"),
     category: formData.get("category"),
     description: formData.get("description"),
+    clientName: formData.get("clientName") ?? undefined,
+    clientId: formData.get("clientId") ?? undefined,
     workDate: formData.get("workDate"),
     durationMinutes: formData.get("durationMinutes"),
   });
@@ -52,12 +56,23 @@ export async function updateEntry(formData: FormData) {
     };
   }
 
+  // Resolve clientId: verify it belongs to this org
+  let resolvedClientId: string | null = null;
+  if (parsed.data.clientId) {
+    const client = await prisma.client.findFirst({
+      where: { id: parsed.data.clientId, organizationId: session.organizationId },
+    });
+    resolvedClientId = client?.id ?? null;
+  }
+
   await prisma.invisibleWorkEntry.update({
     where: { id: parsed.data.entryId },
     data: {
       title: parsed.data.title.trim(),
       category: parsed.data.category,
       description: parsed.data.description.trim(),
+      clientName: resolvedClientId ? null : parsed.data.clientName || null,
+      clientId: resolvedClientId,
       workDate: parsed.data.workDate,
       durationMinutes: parsed.data.durationMinutes,
       // If returned, mark as approved again (resubmitted); otherwise keep current status

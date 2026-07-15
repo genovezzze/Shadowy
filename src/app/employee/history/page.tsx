@@ -13,7 +13,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { resolveWorkType } from "@/lib/work-type";
 import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
-import { Download } from "lucide-react";
+import { Download, Copy } from "lucide-react";
 import {
   buildEntryWhere,
   buildExportHref,
@@ -54,6 +54,18 @@ export default async function EmployeeHistoryPage({
   const clientOptions = Array.from(clientOptionMap.entries())
     .map(([value, label]) => ({ value, label }))
     .sort((a, b) => a.label.localeCompare(b.label));
+
+  const editableClients = await prisma.client.findMany({
+    where: {
+      organizationId: session.organizationId,
+      status: "active",
+      ...(user?.canSeeAllClients
+        ? {}
+        : { assignments: { some: { employeeId: session.userId } } }),
+    },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const page = Math.min(parsePage(searchParams.page), totalPages);
@@ -134,29 +146,43 @@ export default async function EmployeeHistoryPage({
                 managerComment={e.managerComment}
                 workType={resolveWorkType(e.isOutsideRole, e.category, e.title, duties)}
                 footer={
-                  e.status === "PENDING" || e.status === "RETURNED" ? (
-                    <EmployeeEntryActions
-                      entryId={e.id}
-                      title={e.title}
-                      category={e.category}
-                      description={e.description}
-                      workDate={e.workDate.toISOString().slice(0, 10)}
-                      durationMinutes={e.durationMinutes}
-                    />
-                  ) : e.status === "APPROVED" ? (
-                    <div className="flex items-center gap-2">
-                      <AddTimeButton entryId={e.id} />
-                      <EditEntryButton
+                  <div className="flex flex-wrap items-center gap-2">
+                    {e.status === "PENDING" || e.status === "RETURNED" ? (
+                      <EmployeeEntryActions
                         entryId={e.id}
                         title={e.title}
                         category={e.category}
                         description={e.description}
                         workDate={e.workDate.toISOString().slice(0, 10)}
                         durationMinutes={e.durationMinutes}
+                        clients={editableClients}
+                        clientId={e.clientId}
+                        clientName={e.clientName}
                       />
-                      <DeleteEntryButton entryId={e.id} />
-                    </div>
-                  ) : null
+                    ) : e.status === "APPROVED" ? (
+                      <>
+                        <AddTimeButton entryId={e.id} />
+                        <EditEntryButton
+                          entryId={e.id}
+                          title={e.title}
+                          category={e.category}
+                          description={e.description}
+                          workDate={e.workDate.toISOString().slice(0, 10)}
+                          durationMinutes={e.durationMinutes}
+                          clients={editableClients}
+                          clientId={e.clientId}
+                          clientName={e.clientName}
+                        />
+                        <DeleteEntryButton entryId={e.id} />
+                      </>
+                    ) : null}
+                    <Button asChild variant="outline" size="sm">
+                      <Link href={`/employee/new-entry?copyFrom=${e.id}`}>
+                        <Copy className="h-3.5 w-3.5" />
+                        Kopēt
+                      </Link>
+                    </Button>
+                  </div>
                 }
               />
             );

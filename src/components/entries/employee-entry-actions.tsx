@@ -7,8 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ClientCombobox } from "@/components/ui/client-combobox";
 import { updateEntry, deleteEntry } from "@/app/employee/history/actions";
 import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
+
+interface ClientOption {
+  id: string;
+  name: string;
+}
 
 interface EmployeeEntryActionsProps {
   entryId: string;
@@ -17,6 +23,9 @@ interface EmployeeEntryActionsProps {
   description: string;
   workDate: string;
   durationMinutes: number;
+  clients?: ClientOption[];
+  clientId?: string | null;
+  clientName?: string | null;
 }
 
 export function EmployeeEntryActions({
@@ -26,17 +35,24 @@ export function EmployeeEntryActions({
   description,
   workDate,
   durationMinutes,
+  clients = [],
+  clientId,
+  clientName,
 }: EmployeeEntryActionsProps) {
   const [editOpen, setEditOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [selectedClientId, setSelectedClientId] = useState(clientId ?? "");
 
   const today = new Date().toISOString().slice(0, 10);
 
   function handleEdit(formData: FormData) {
     setError(null);
     formData.set("entryId", entryId);
+    if (selectedClientId && selectedClientId !== "__none__") {
+      formData.set("clientId", selectedClientId);
+    }
     startTransition(async () => {
       const result = await updateEntry(formData);
       if (!result.ok) {
@@ -105,6 +121,24 @@ export function EmployeeEntryActions({
                     max={today}
                   />
                 </div>
+              </div>
+              <div className="grid gap-2">
+                <Label>Klients</Label>
+                {clients.length > 0 ? (
+                  <ClientCombobox
+                    clients={clients}
+                    value={selectedClientId}
+                    onChange={setSelectedClientId}
+                  />
+                ) : (
+                  <Input
+                    id="edit-clientName"
+                    name="clientName"
+                    maxLength={120}
+                    defaultValue={clientName ?? ""}
+                    placeholder="Neobligāti"
+                  />
+                )}
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-duration">Ilgums (minūtēs)</Label>

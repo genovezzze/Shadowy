@@ -20,7 +20,12 @@ export function DeleteEntryButton({ entryId }: { entryId: string }) {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+        <Button
+          variant="ghost"
+          size="sm"
+          aria-label="Dzēst ierakstu"
+          className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+        >
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </Dialog.Trigger>

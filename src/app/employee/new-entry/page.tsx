@@ -5,7 +5,11 @@ import { EntryForm } from "@/components/entries/entry-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { CheckCircle2, Circle } from "lucide-react";
 
-export default async function NewEntryPage() {
+export default async function NewEntryPage({
+  searchParams,
+}: {
+  searchParams: { copyFrom?: string };
+}) {
   const session = await requireUser(["EMPLOYEE"]);
 
   const employee = await prisma.user.findUnique({
@@ -29,6 +33,28 @@ export default async function NewEntryPage() {
   });
   const duties = employee?.workRole?.duties ?? [];
 
+  let initialValues;
+  if (searchParams.copyFrom) {
+    const source = await prisma.invisibleWorkEntry.findFirst({
+      where: {
+        id: searchParams.copyFrom,
+        employeeId: session.userId,
+        deletedAt: null,
+      },
+      select: {
+        title: true,
+        category: true,
+        description: true,
+        durationMinutes: true,
+        clientId: true,
+        clientName: true,
+      },
+    });
+    if (source) {
+      initialValues = source;
+    }
+  }
+
   return (
     <>
       <PageHeader
@@ -48,7 +74,7 @@ export default async function NewEntryPage() {
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <EntryForm clients={clients} />
+          <EntryForm clients={clients} initialValues={initialValues} />
 
           {/* Duties sidebar */}
           <div className="rounded-xl border border-border bg-card p-5 h-fit">

@@ -11,8 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer, Flame, Zap, TrendingUp } from "lucide-react";
+import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer, Flame, Zap, TrendingUp, Copy } from "lucide-react";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
+import { AddTimeButton } from "@/components/entries/add-time-button";
+import { EditEntryButton } from "@/components/entries/edit-entry-button";
+import { DeleteEntryButton } from "@/components/entries/delete-entry-button";
 import { SectionDivider } from "@/components/dashboard/section-divider";
 import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
@@ -100,9 +103,21 @@ export default async function EmployeeDashboard() {
     }),
     prisma.user.findUnique({
       where: { id: session.userId },
-      select: { workRole: { select: { duties: { select: { text: true } } } } },
+      select: { workRole: { select: { duties: { select: { text: true } } } }, canSeeAllClients: true },
     }),
   ]);
+
+  const editableClients = await prisma.client.findMany({
+    where: {
+      organizationId: session.organizationId,
+      status: "active",
+      ...(userWithRole?.canSeeAllClients
+        ? {}
+        : { assignments: { some: { employeeId: session.userId } } }),
+    },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
 
   const monthlyData = buildMonthlyData(allEntries);
 
@@ -649,16 +664,43 @@ export default async function EmployeeDashboard() {
               status={e.status}
               managerComment={e.managerComment}
               footer={
-                e.status === "PENDING" || e.status === "RETURNED" ? (
-                  <EmployeeEntryActions
-                    entryId={e.id}
-                    title={e.title}
-                    category={e.category}
-                    description={e.description}
-                    workDate={e.workDate.toISOString().slice(0, 10)}
-                    durationMinutes={e.durationMinutes}
-                  />
-                ) : null
+                <div className="flex flex-wrap items-center gap-2">
+                  {e.status === "PENDING" || e.status === "RETURNED" ? (
+                    <EmployeeEntryActions
+                      entryId={e.id}
+                      title={e.title}
+                      category={e.category}
+                      description={e.description}
+                      workDate={e.workDate.toISOString().slice(0, 10)}
+                      durationMinutes={e.durationMinutes}
+                      clients={editableClients}
+                      clientId={e.clientId}
+                      clientName={e.clientName}
+                    />
+                  ) : e.status === "APPROVED" ? (
+                    <>
+                      <AddTimeButton entryId={e.id} />
+                      <EditEntryButton
+                        entryId={e.id}
+                        title={e.title}
+                        category={e.category}
+                        description={e.description}
+                        workDate={e.workDate.toISOString().slice(0, 10)}
+                        durationMinutes={e.durationMinutes}
+                        clients={editableClients}
+                        clientId={e.clientId}
+                        clientName={e.clientName}
+                      />
+                      <DeleteEntryButton entryId={e.id} />
+                    </>
+                  ) : null}
+                  <Button asChild variant="outline" size="sm">
+                    <Link href={`/employee/new-entry?copyFrom=${e.id}`}>
+                      <Copy className="h-3.5 w-3.5" />
+                      Kopēt
+                    </Link>
+                  </Button>
+                </div>
               }
             />
           ))}

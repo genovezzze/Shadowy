@@ -7,9 +7,15 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ClientCombobox } from "@/components/ui/client-combobox";
 import { updateEntry } from "@/app/employee/history/actions";
 import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 import { Pencil } from "lucide-react";
+
+interface ClientOption {
+  id: string;
+  name: string;
+}
 
 interface EditEntryButtonProps {
   entryId: string;
@@ -18,6 +24,9 @@ interface EditEntryButtonProps {
   description: string;
   workDate: string;
   durationMinutes: number;
+  clients?: ClientOption[];
+  clientId?: string | null;
+  clientName?: string | null;
 }
 
 export function EditEntryButton({
@@ -27,16 +36,23 @@ export function EditEntryButton({
   description,
   workDate,
   durationMinutes,
+  clients = [],
+  clientId,
+  clientName,
 }: EditEntryButtonProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
+  const [selectedClientId, setSelectedClientId] = useState(clientId ?? "");
 
   const today = new Date().toISOString().slice(0, 10);
 
   function handleEdit(formData: FormData) {
     setError(null);
     formData.set("entryId", entryId);
+    if (selectedClientId && selectedClientId !== "__none__") {
+      formData.set("clientId", selectedClientId);
+    }
     startTransition(async () => {
       const result = await updateEntry(formData);
       if (!result.ok) {
@@ -91,6 +107,24 @@ export function EditEntryButton({
                   max={today}
                 />
               </div>
+            </div>
+            <div className="grid gap-2">
+              <Label>Klients</Label>
+              {clients.length > 0 ? (
+                <ClientCombobox
+                  clients={clients}
+                  value={selectedClientId}
+                  onChange={setSelectedClientId}
+                />
+              ) : (
+                <Input
+                  id="edit-clientName"
+                  name="clientName"
+                  maxLength={120}
+                  defaultValue={clientName ?? ""}
+                  placeholder="Neobligāti"
+                />
+              )}
             </div>
             <div className="grid gap-2">
               <Label htmlFor="edit-duration">Ilgums (minūtēs)</Label>
