@@ -6,6 +6,10 @@
  * SIA"Ganri" or SIA''Ganri'' (the SIA-strip must run before quotes are
  * removed, otherwise "SIA" and the name collapse into one word and the
  * leading-SIA regex no longer matches).
+ *
+ * All whitespace is stripped (not just collapsed) so free-typed variants
+ * like "Tech Gym" and "Techgym" — which employees enter inconsistently
+ * when a client isn't picked from the combobox — resolve to the same key.
  */
 export function normalizeClientName(name: string): string {
   return name
@@ -14,7 +18,6 @@ export function normalizeClientName(name: string): string {
     .replace(/^sia[\s"“”'‘’«»´`]+/i, "")
     .replace(/[\s"“”'‘’«»´`]+sia$/i, "")
     .replace(/["“”'‘’«»´`]/g, "")
-    .trim()
-    .replace(/\s+/g, " ")
+    .replace(/\s+/g, "")
     .toLowerCase();
 }

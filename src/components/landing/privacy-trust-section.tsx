@@ -1,44 +1,7 @@
 "use client";
 
-import React from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
-import { EtheralShadow } from "@/components/ui/etheral-shadow";
-
-function EtheralShadowBackground() {
-  const prefersReduced = useReducedMotion();
-  const [show, setShow] = React.useState(false);
-
-  React.useEffect(() => {
-    // Only show on desktop screens
-    if (window.innerWidth < 640) return;
-    // Skip on reduced-motion preference
-    if (prefersReduced) return;
-    // Skip on low-end devices (2 or fewer CPU cores)
-    if (navigator.hardwareConcurrency !== undefined && navigator.hardwareConcurrency <= 2) return;
-    setShow(true);
-  }, [prefersReduced]);
-
-  if (!show) return null;
-
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <motion.div
-        className="absolute inset-y-0 -left-48 -right-48"
-        animate={{ x: [0, 200, 0] }}
-        transition={{ duration: 90, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <EtheralShadow
-          color="rgba(90, 90, 98, 1)"
-          animation={{ scale: 50, speed: 40 }}
-          noise={{ opacity: 0, scale: 1 }}
-          sizing="fill"
-          style={{ opacity: 0.38 }}
-        />
-      </motion.div>
-    </div>
-  );
-}
 
 const visibleItems = [
   "Apstiprinātus ierakstus",
@@ -59,24 +22,8 @@ export function PrivacyTrustSection() {
     <section
       id="privatums"
       aria-labelledby="privacy-trust-heading"
-      className="relative overflow-hidden bg-[#07090c] py-14 scroll-mt-24 sm:mx-4 sm:rounded-[28px] sm:border sm:border-white/[0.07] sm:py-20 md:py-24 lg:mx-7"
+      className="relative py-14 scroll-mt-24 sm:py-20 md:py-24"
     >
-      {/* Mobile top fade */}
-      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-10 h-20 bg-gradient-to-b from-[#07090c] to-transparent sm:hidden" />
-      <EtheralShadowBackground />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-30"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.07) 0.7px, transparent 0.8px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent, black 18%, black 82%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent, black 18%, black 82%, transparent)",
-        }}
-      />
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         <header className="mx-auto max-w-6xl text-center">
           <h2

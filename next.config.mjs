@@ -19,6 +19,13 @@ const nextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        // Decorative marketing preview embedded via <iframe> on the landing
+        // page - relax framing to same-origin only (still blocks any other
+        // site from framing it).
+        source: "/preview/:path*",
+        headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
+      },
     ];
   },
 };

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { EmphasizedText } from "@/components/landing/emphasized-text";
 import { cn } from "@/lib/utils";
@@ -80,19 +80,65 @@ const importantStoryPhrases = [
   "ko var uzlabot",
 ] as const;
 
+const mobileCardVariants: Variants = {
+  enter: (direction: number) => ({
+    x: direction * 120,
+    rotate: direction * 3,
+    scale: 0.96,
+    opacity: 0,
+    filter: "blur(5px)",
+  }),
+  center: {
+    x: 0,
+    rotate: 0,
+    scale: 1,
+    opacity: 1,
+    filter: "blur(0px)",
+    transition: { type: "spring", stiffness: 300, damping: 28 },
+  },
+  exit: (direction: number) => ({
+    x: direction * -260,
+    rotate: direction * -7,
+    scale: 0.9,
+    opacity: 0,
+    filter: "blur(7px)",
+    transition: { duration: 0.32, ease: [0.4, 0, 1, 1] },
+  }),
+};
+
+const desktopCardVariants: Variants = {
+  enter: { opacity: 0 },
+  center: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.16 } },
+};
+
 export function AnnaStoryCarousel() {
   const [activeIndex, setActiveIndex] = React.useState(0);
+  const [direction, setDirection] = React.useState(1);
+  const [isMobile, setIsMobile] = React.useState(false);
   const activeSlide = slides[activeIndex];
 
-  const showSlide = React.useCallback((index: number) => {
-    setActiveIndex((index + slides.length) % slides.length);
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    const updateMobileState = () => setIsMobile(mediaQuery.matches);
+
+    updateMobileState();
+    mediaQuery.addEventListener("change", updateMobileState);
+    return () => mediaQuery.removeEventListener("change", updateMobileState);
   }, []);
 
+  const showSlide = React.useCallback((index: number) => {
+    setDirection(index >= activeIndex ? 1 : -1);
+    setActiveIndex((index + slides.length) % slides.length);
+  }, [activeIndex]);
+
   const showNext = React.useCallback(() => {
+    setDirection(1);
     setActiveIndex((current) => (current + 1) % slides.length);
   }, []);
 
   const showPrevious = React.useCallback(() => {
+    setDirection(-1);
     setActiveIndex(
       (current) => (current - 1 + slides.length) % slides.length,
     );
@@ -102,7 +148,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative overflow-hidden bg-[#07090c] py-14 sm:-mt-px sm:mx-4 sm:rounded-[32px] sm:border sm:border-white/[0.08] sm:py-24 md:py-32 lg:mx-7"
+      className="relative overflow-hidden bg-[#07090c] py-8 sm:-mt-px sm:mx-4 sm:rounded-[32px] sm:border sm:border-white/[0.08] sm:py-24 md:py-32 lg:mx-7"
     >
       <div
         aria-hidden
@@ -141,15 +187,37 @@ export function AnnaStoryCarousel() {
           </p>
         </header>
 
-        <div className="mx-auto mt-8 max-w-3xl md:mt-10">
+        <div className="mx-auto mt-5 max-w-3xl md:mt-10">
           <div className="relative overflow-hidden rounded-[20px] border border-white/[0.1] bg-white/[0.035] p-1.5 shadow-[0_24px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)] backdrop-blur-xl sm:rounded-[24px] sm:p-2">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_12%_18%,rgba(52,211,153,0.07),transparent_72%),radial-gradient(70%_60%_at_90%_90%,rgba(59,130,246,0.07),transparent_70%)]"
             />
 
-            <div className="relative grid overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#090d11]/95 sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]">
-              <div className="relative h-[240px] overflow-hidden sm:h-[260px] lg:h-auto">
+            <AnimatePresence initial={false} custom={direction} mode="popLayout">
+              <motion.div
+                key={activeIndex}
+                custom={direction}
+                variants={isMobile ? mobileCardVariants : desktopCardVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="relative grid cursor-grab overflow-hidden rounded-[16px] border border-white/[0.06] bg-[#090d11]/95 active:cursor-grabbing sm:cursor-auto sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]"
+                drag={isMobile ? "x" : false}
+                dragConstraints={{ left: 0, right: 0 }}
+                dragElastic={0.12}
+                dragMomentum={false}
+                dragDirectionLock
+                onDragEnd={(_, info) => {
+                  if (info.offset.x < -50 || info.velocity.x < -500) {
+                    showNext();
+                  } else if (info.offset.x > 50 || info.velocity.x > 500) {
+                    showPrevious();
+                  }
+                }}
+                style={{ touchAction: "pan-y" }}
+              >
+              <div className="relative h-[220px] overflow-hidden sm:h-[260px] lg:h-auto">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeSlide.image}
@@ -171,11 +239,11 @@ export function AnnaStoryCarousel() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative min-h-[380px] sm:min-h-[360px] lg:min-h-0">
+              <div className="relative min-h-[290px] sm:min-h-[360px] lg:min-h-0">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
-                    className="absolute inset-4 flex flex-col sm:inset-5"
+                    className="absolute inset-3 flex flex-col sm:inset-5"
                     aria-live="polite"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -209,7 +277,7 @@ export function AnnaStoryCarousel() {
                       </span>
                     </div>
 
-                    <h3 className="mt-3 text-balance font-accent text-xl font-bold leading-tight tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[1.35rem]">
+                    <h3 className="mt-2 text-balance font-accent text-lg font-bold leading-tight tracking-[0.015em] text-white [font-synthesis:weight] sm:mt-3 sm:text-[1.35rem]">
                       {activeIndex === 0 ? (
                         <>
                           {"Iepaz\u012bsties ar "}
@@ -239,7 +307,7 @@ export function AnnaStoryCarousel() {
                       )}
                     </h3>
 
-                    <div className="mt-3 space-y-2.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:text-base sm:leading-relaxed">
+                    <div className="mt-2 space-y-1.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:mt-3 sm:space-y-2.5 sm:text-base sm:leading-relaxed">
                       {activeSlide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>
                           <EmphasizedText
@@ -250,7 +318,7 @@ export function AnnaStoryCarousel() {
                       ))}
                     </div>
 
-                    <div className="mt-3 flex flex-wrap gap-1.5">
+                    <div className="mt-2 flex flex-wrap gap-1.5 sm:mt-3">
                       {activeSlide.tags.map((tag) => (
                         <span
                           key={tag}
@@ -261,28 +329,43 @@ export function AnnaStoryCarousel() {
                       ))}
                     </div>
 
-                    <div className="mt-auto flex items-center gap-2 pt-4">
+                    <div className="mt-auto flex items-center gap-2 pt-2 sm:pt-4">
+                      <div className="flex items-center gap-2 text-xs font-medium tracking-[0.04em] text-white/45 sm:hidden">
+                        <span>Velc, lai turpinātu</span>
+                        <motion.span
+                          aria-hidden
+                          animate={{ x: [0, 6, 0] }}
+                          transition={{
+                            duration: 1.6,
+                            ease: "easeInOut",
+                            repeat: Infinity,
+                          }}
+                        >
+                          <ArrowRight className="size-3.5 text-emerald-300/70" />
+                        </motion.span>
+                      </div>
                       <button
                         type="button"
                         onClick={showPrevious}
                         aria-label="Iepriekšējais stāsta slaids"
-                        className="group inline-flex size-11 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:size-10"
+                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:inline-flex sm:size-10"
                       >
-                        <ArrowLeft className="size-5 transition-transform group-hover:-translate-x-0.5" />
+                        <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5 sm:size-5" />
                       </button>
                       <button
                         type="button"
                         onClick={showNext}
                         aria-label="Nākamais stāsta slaids"
-                        className="group inline-flex size-11 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:size-10"
+                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:inline-flex sm:size-10"
                       >
-                        <ArrowRight className="size-5 transition-transform group-hover:translate-x-0.5" />
+                        <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 sm:size-5" />
                       </button>
                     </div>
                   </motion.div>
                 </AnimatePresence>
               </div>
-            </div>
+              </motion.div>
+            </AnimatePresence>
           </div>
 
           <div

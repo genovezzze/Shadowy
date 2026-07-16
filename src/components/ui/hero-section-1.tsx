@@ -22,6 +22,8 @@ import { WhatToLogSection } from "@/components/landing/what-to-log-section";
 import { PilotResultsSection } from "@/components/landing/pilot-results-section";
 import { PrivacyTrustSection } from "@/components/landing/privacy-trust-section";
 import { ClosingSections } from "@/components/landing/closing-sections";
+import { LiveDashboardPreview } from "@/components/landing/live-dashboard-preview";
+import { MobileDashboardPreview } from "@/components/landing/mobile-dashboard-preview";
 import { cn } from "@/lib/utils";
 
 const transitionVariants: { item: Variants } = {
@@ -78,7 +80,7 @@ export function HeroSection() {
         </div>
 
         <section>
-          <div className="relative pt-28 sm:pt-32 md:pt-36">
+          <div className="relative pt-16 sm:pt-32 md:pt-36">
             <AnimatedGroup
               variants={{
                 container: {
@@ -107,13 +109,23 @@ export function HeroSection() {
               className="absolute inset-0 -z-10 h-full w-full [background:radial-gradient(115%_95%_at_50%_100%,transparent_0%,rgba(7,8,9,.16)_50%,#070809_90%)]"
             />
 
-            <div className="mx-auto max-w-[1500px] px-4 sm:px-6">
-              <div className="font-accent font-light text-center sm:mx-auto lg:mr-auto lg:mt-0">
-                <AnimatedGroup variants={transitionVariants}>
-                  <h1 className="mx-auto mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
-                    Pārvērtiet neredzamo darbu redzamās izmaksās un labākos lēmumos
+            <div className="flex min-h-[85svh] flex-col justify-center sm:block sm:min-h-0">
+              <div className="mx-auto -translate-y-28 max-w-[1500px] px-4 pb-0 sm:translate-y-0 sm:px-6">
+                <div className="mx-auto w-full max-w-[460px] translate-x-4 font-accent font-light text-left sm:max-w-none sm:translate-x-0 sm:text-center lg:mr-auto lg:mt-0">
+                <AnimatedGroup
+                  variants={transitionVariants}
+                  className="translate-x-2 sm:translate-x-0"
+                >
+                  <h1 className="mx-0 mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mx-auto sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
+                    <span className="sm:hidden">
+                      Padariet neredzamo{" "}
+                      <span className="bg-[linear-gradient(90deg,#6ee7b7_0%,#ffffff_100%)] bg-clip-text text-transparent">
+                        darbu redzamu
+                      </span>
+                    </span>
+                    <span className="hidden sm:inline">Pārvērtiet neredzamo darbu redzamās izmaksās un labākos lēmumos</span>
                   </h1>
-                  <p className="mx-auto mt-6 max-w-3xl text-balance text-base leading-7 tracking-[0.01em] text-white/55 sm:mt-8 sm:text-lg sm:leading-relaxed md:text-xl">
+                  <p className="mx-0 mt-6 max-w-3xl text-balance text-base leading-7 tracking-[0.01em] text-white/55 sm:mx-auto sm:mt-8 sm:text-lg sm:leading-relaxed md:text-xl">
                     Shadowy parāda, kur komandā{" "}
                     <strong className="font-semibold text-white/75 [font-synthesis:weight]">
                       pazūd laiks, nauda un fokuss
@@ -137,35 +149,41 @@ export function HeroSection() {
                     },
                     ...transitionVariants,
                   }}
-                  className="mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 md:flex-row"
+                  className="mt-8 flex w-full flex-col items-center justify-center gap-3 [&>div]:w-full [&>div]:self-start sm:mt-10 sm:[&>div]:w-auto sm:[&>div]:self-auto md:flex-row"
                 >
                   <ButtonColorful
                     type="button"
                     label="Sākt 30 dienu bezmaksas pilotu"
                     onClick={() => {
-                      window.location.href = "/register";
+                      if (window.location.hash !== "#pilots") {
+                        window.history.pushState(null, "", "#pilots");
+                      }
+
+                      document.getElementById("pilots")?.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start",
+                      });
                     }}
-                    className="h-[52px] w-full max-w-sm rounded-xl px-6 text-[14px] font-bold sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="h-[52px] w-[92%] max-w-full rounded-xl px-6 text-[14px] font-bold sm:w-auto sm:px-7 sm:text-[15px]"
                   />
                   <Link
                     href="#hidden-cost-calculator"
-                    className="inline-flex h-[52px] w-full max-w-sm items-center justify-center rounded-xl border border-white/[0.14] bg-white/[0.025] px-6 text-[14px] font-bold text-white/82 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="hidden h-[52px] w-full max-w-sm items-center justify-center rounded-xl border border-white/[0.14] bg-white/[0.025] px-6 text-[14px] font-bold text-white/82 transition hover:border-white/25 hover:bg-white/[0.06] hover:text-white sm:inline-flex sm:w-auto sm:px-7 sm:text-[15px]"
                   >
                     Aprēķināt slēptā darba izmaksas
                   </Link>
                 </AnimatedGroup>
-                <p className="mx-auto mt-4 flex max-w-sm items-start justify-center gap-2 text-balance text-center text-sm leading-6 tracking-[0.01em] text-white/55 sm:mt-5 sm:max-w-none sm:items-center sm:text-base">
-                  <CheckCircle2 className="mt-1 size-4 shrink-0 text-emerald-400 sm:mt-0" />
-                  <span>
-                    <strong className="font-bold text-white/72 [font-synthesis:weight]">
-                      Bez kredītkartes. Bez saistībām.
-                    </strong>{" "}
-                    Iestatīšana{" "}
-                    <strong className="font-bold text-white/72 [font-synthesis:weight]">
-                      līdz 10 minūtēm.
-                    </strong>
-                  </span>
+                <p className="mx-auto mt-4 hidden max-w-sm text-balance text-center text-sm leading-6 tracking-[0.01em] text-white/55 sm:mt-5 sm:block sm:max-w-none sm:text-base">
+                  <CheckCircle2 className="mb-0.5 mr-1.5 inline-block size-4 shrink-0 align-middle text-emerald-400" />
+                  <strong className="font-bold text-white/72 [font-synthesis:weight]">
+                    Bez kredītkartes. Bez saistībām.
+                  </strong>{" "}
+                  Iestatīšana{" "}
+                  <strong className="font-bold text-white/72 [font-synthesis:weight]">
+                    līdz 10 minūtēm.
+                  </strong>
                 </p>
+              </div>
               </div>
             </div>
 
@@ -182,19 +200,16 @@ export function HeroSection() {
                 ...transitionVariants,
               }}
             >
-              <div className="relative mt-10 overflow-hidden px-4 pb-10 sm:mt-12 sm:px-6 sm:pb-16 md:mt-20">
+              <div className="relative -mt-[32svh] overflow-visible px-4 pb-10 sm:mt-12 sm:overflow-hidden sm:px-6 sm:pb-16 md:mt-20">
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_bottom,transparent_0%,transparent_68%,rgba(7,9,12,0.45)_84%,#07090c_100%)]"
                 />
-                <div className="relative mx-auto max-w-6xl overflow-hidden rounded-xl border bg-background p-1.5 shadow-lg shadow-zinc-950/15 ring-1 ring-background sm:rounded-2xl sm:p-4 dark:shadow-[inset_0_1px_rgba(255,255,255,0.2)]">
-                  <Image
-                    className="relative aspect-video w-full rounded-lg border border-border/25 object-cover sm:rounded-2xl"
-                    src="/images/shadowy-dashboard.png"
-                    alt="Shadowy darba pārskats klēpjdatora ekrānā"
-                    width={1672}
-                    height={941}
-                  />
+                <div className="hidden sm:block relative mx-auto max-w-4xl overflow-hidden rounded-xl border bg-background p-1.5 shadow-lg shadow-zinc-950/15 ring-1 ring-background sm:rounded-2xl sm:p-4 dark:shadow-[inset_0_1px_rgba(255,255,255,0.2)]">
+                  <LiveDashboardPreview />
+                </div>
+                <div className="sm:hidden">
+                  <MobileDashboardPreview />
                 </div>
               </div>
             </AnimatedGroup>

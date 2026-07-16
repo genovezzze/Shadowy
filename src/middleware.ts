@@ -10,6 +10,7 @@ const PUBLIC_PATHS = [
   "/accept-invite",
   "/privacy",
   "/hero-demo",
+  "/preview/mobile-demo",
 ];
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME ?? "shadowy_session";
 
