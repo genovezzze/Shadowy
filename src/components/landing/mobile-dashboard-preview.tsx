@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import { BatteryFull, SignalHigh, Wifi } from "lucide-react";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 
 // Real mobile viewport the /preview/mobile-demo route is rendered at, so
 // the actual responsive (sm:/md:) Tailwind breakpoints in the real app
@@ -15,9 +14,6 @@ const SCREEN_H = STATUS_BAR_H + PHONE_H;
 export function MobileDashboardPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
-  const reduceMotion = useReducedMotion();
-  const { scrollY } = useScroll();
-  const phoneY = useTransform(scrollY, [0, 320], [0, -220]);
 
   useEffect(() => {
     function update() {
@@ -31,14 +27,10 @@ export function MobileDashboardPreview() {
   }, []);
 
   return (
-    <motion.div
+    <div
       aria-hidden
       className="relative mx-auto w-full max-w-[320px] select-none"
-      style={{
-        aspectRatio: `${PHONE_W} / ${SCREEN_H}`,
-        marginBottom: reduceMotion ? 0 : -220,
-        y: reduceMotion ? 0 : phoneY,
-      }}
+      style={{ aspectRatio: `${PHONE_W} / ${SCREEN_H}` }}
     >
       {/* Phone bezel - black with a 3D metallic edge */}
       <div
@@ -84,6 +76,6 @@ export function MobileDashboardPreview() {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
