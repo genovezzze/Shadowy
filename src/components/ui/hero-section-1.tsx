@@ -109,14 +109,14 @@ export function HeroSection() {
               className="absolute inset-0 -z-10 h-full w-full [background:radial-gradient(115%_95%_at_50%_100%,transparent_0%,rgba(7,8,9,.16)_50%,#070809_90%)]"
             />
 
-            <div className="flex min-h-[85svh] flex-col justify-center sm:block sm:min-h-0">
-              <div className="relative -top-8 mx-auto max-w-[1500px] px-4 pb-0 sm:top-0 sm:px-6">
-                <div className="relative left-4 mx-auto w-full max-w-[460px] font-accent font-light text-left sm:left-0 sm:max-w-none sm:text-center lg:mr-auto lg:mt-0">
+            <div className="pt-28 sm:block sm:pt-0">
+              <div className="relative mx-auto max-w-[1500px] px-4 pb-0 sm:px-6">
+                <div className="relative left-2 mx-auto w-full max-w-[460px] font-accent font-light text-left sm:left-0 sm:max-w-none sm:text-center lg:mr-auto lg:mt-0">
                 <AnimatedGroup
                   variants={transitionVariants}
-                  className="relative z-20 translate-x-2 sm:translate-x-0"
+                  className="relative z-20 sm:translate-x-0"
                 >
-                  <h1 className="mx-0 mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mx-auto sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
+                  <h1 className="mx-0 mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.15rem,9vw,3.2rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mx-auto sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
                     <span className="sm:hidden">
                       Padariet neredzamo{" "}
                       <span className="bg-[linear-gradient(90deg,#6ee7b7_0%,#ffffff_100%)] bg-clip-text text-transparent">
@@ -201,7 +201,7 @@ export function HeroSection() {
               }}
               className="relative z-[45]"
             >
-              <div className="relative -mt-40 overflow-visible px-4 pb-10 sm:mt-12 sm:overflow-hidden sm:px-6 sm:pb-16 md:mt-20">
+              <div className="relative mt-6 overflow-visible px-4 pb-10 sm:mt-12 sm:overflow-hidden sm:px-6 sm:pb-16 md:mt-20">
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0 z-10 hidden bg-[linear-gradient(to_bottom,transparent_0%,transparent_68%,rgba(7,9,12,0.45)_84%,#07090c_100%)] sm:block"

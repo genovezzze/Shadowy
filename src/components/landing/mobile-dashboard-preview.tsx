@@ -23,13 +23,13 @@ export function MobileDashboardPreview() {
   const [scale, setScale] = useState(0);
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const phoneTargetY = useTransform(scrollY, [100, 500], [0, -260], {
+  const phoneTargetY = useTransform(scrollY, [0, 400], [0, -190], {
     clamp: true,
   });
   const phoneY = useSpring(phoneTargetY, {
-    stiffness: 140,
-    damping: 28,
-    mass: 0.35,
+    stiffness: 420,
+    damping: 46,
+    mass: 0.2,
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export function MobileDashboardPreview() {
       className="pointer-events-none relative mx-auto w-full max-w-[320px] select-none"
       style={{
         aspectRatio: `${PHONE_W} / ${SCREEN_H}`,
-        marginBottom: reduceMotion ? 0 : -260,
+        marginBottom: reduceMotion ? 0 : -140,
         willChange: "transform",
         y: reduceMotion ? 0 : phoneY,
       }}
