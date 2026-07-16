@@ -13,7 +13,12 @@ export default function MobileDemoPage() {
       {/* Decorative iframe preview - hide scrollbars so it reads as a real
           device screenshot instead of a scrollable web page. */}
       <style>{`
-        html, body { overflow: hidden !important; scrollbar-width: none; }
+        html, body { overflow: hidden !important; scrollbar-width: none; overscroll-behavior: none; }
+        .app-shell main {
+          overflow: hidden !important;
+          overscroll-behavior: none;
+          touch-action: none;
+        }
         html::-webkit-scrollbar, body::-webkit-scrollbar { display: none; }
         *::-webkit-scrollbar { display: none; }
         * { scrollbar-width: none; }

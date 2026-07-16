@@ -110,7 +110,7 @@ export function HeroSection() {
             />
 
             <div className="flex min-h-[85svh] flex-col justify-center sm:block sm:min-h-0">
-              <div className="mx-auto -translate-y-28 max-w-[1500px] px-4 pb-0 sm:translate-y-0 sm:px-6">
+              <div className="mx-auto -translate-y-16 max-w-[1500px] px-4 pb-0 sm:translate-y-0 sm:px-6">
                 <div className="mx-auto w-full max-w-[460px] translate-x-4 font-accent font-light text-left sm:max-w-none sm:translate-x-0 sm:text-center lg:mr-auto lg:mt-0">
                 <AnimatedGroup
                   variants={transitionVariants}

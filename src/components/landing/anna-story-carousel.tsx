@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, MoveHorizontal } from "lucide-react";
 import { EmphasizedText } from "@/components/landing/emphasized-text";
 import { cn } from "@/lib/utils";
 
@@ -239,7 +239,7 @@ export function AnnaStoryCarousel() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative min-h-[290px] sm:min-h-[360px] lg:min-h-0">
+              <div className="relative min-h-[400px] sm:min-h-[360px] lg:min-h-0">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
@@ -330,19 +330,19 @@ export function AnnaStoryCarousel() {
                     </div>
 
                     <div className="mt-auto flex items-center gap-2 pt-2 sm:pt-4">
-                      <div className="flex items-center gap-2 text-xs font-medium tracking-[0.04em] text-white/45 sm:hidden">
-                        <span>Velc, lai turpinātu</span>
+                      <div className="flex w-full items-center gap-2.5 border-t border-white/[0.09] pt-3 text-sm font-bold tracking-[0.025em] text-white/80 sm:hidden">
                         <motion.span
                           aria-hidden
-                          animate={{ x: [0, 6, 0] }}
+                          animate={{ x: [-4, 4, -4] }}
                           transition={{
-                            duration: 1.6,
+                            duration: 1.4,
                             ease: "easeInOut",
                             repeat: Infinity,
                           }}
                         >
-                          <ArrowRight className="size-3.5 text-emerald-300/70" />
+                          <MoveHorizontal className="size-5 text-emerald-300" />
                         </motion.span>
+                        <span>Velc kartīti, lai turpinātu</span>
                       </div>
                       <button
                         type="button"
