@@ -79,7 +79,7 @@ export function HeroSection() {
           <div className="absolute left-[-14rem] top-[-31rem] h-[80rem] w-[35rem] -rotate-45 rounded-full bg-[radial-gradient(68.54%_68.72%_at_55.02%_31.46%,rgba(255,255,255,.055)_0,rgba(255,255,255,.012)_50%,transparent_80%)]" />
         </div>
 
-        <section>
+        <section className="relative z-20">
           <div className="relative pt-16 sm:pt-32 md:pt-36">
             <AnimatedGroup
               variants={{
@@ -110,11 +110,11 @@ export function HeroSection() {
             />
 
             <div className="flex min-h-[85svh] flex-col justify-center sm:block sm:min-h-0">
-              <div className="relative z-20 mx-auto -translate-y-16 max-w-[1500px] px-4 pb-0 sm:translate-y-0 sm:px-6">
-                <div className="mx-auto w-full max-w-[460px] translate-x-4 font-accent font-light text-left sm:max-w-none sm:translate-x-0 sm:text-center lg:mr-auto lg:mt-0">
+              <div className="relative -top-8 mx-auto max-w-[1500px] px-4 pb-0 sm:top-0 sm:px-6">
+                <div className="relative left-4 mx-auto w-full max-w-[460px] font-accent font-light text-left sm:left-0 sm:max-w-none sm:text-center lg:mr-auto lg:mt-0">
                 <AnimatedGroup
                   variants={transitionVariants}
-                  className="translate-x-2 sm:translate-x-0"
+                  className="relative z-20 translate-x-2 sm:translate-x-0"
                 >
                   <h1 className="mx-0 mt-4 max-w-6xl text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_42%,rgba(226,232,240,.82)_70%,rgba(148,163,184,.52)_100%)] bg-clip-text text-[clamp(2.35rem,10vw,3.6rem)] font-bold leading-[0.98] tracking-[0.005em] text-transparent [font-synthesis:weight] sm:mx-auto sm:mt-8 sm:text-[clamp(3.2rem,7vw,5rem)] lg:mt-16 lg:text-[clamp(4rem,5.4vw,5.8rem)]">
                     <span className="sm:hidden">
@@ -149,7 +149,7 @@ export function HeroSection() {
                     },
                     ...transitionVariants,
                   }}
-                  className="mt-8 flex w-full flex-col items-center justify-center gap-3 [&>div]:w-full [&>div]:self-start sm:mt-10 sm:[&>div]:w-auto sm:[&>div]:self-auto md:flex-row"
+                  className="relative z-40 mt-8 flex w-full flex-col items-center justify-center gap-3 [&>div]:w-full [&>div]:self-start sm:mt-10 sm:[&>div]:w-auto sm:[&>div]:self-auto md:flex-row"
                 >
                   <ButtonColorful
                     type="button"
@@ -164,7 +164,7 @@ export function HeroSection() {
                         block: "start",
                       });
                     }}
-                    className="h-[52px] w-[92%] max-w-full rounded-xl px-6 text-[14px] font-bold sm:w-auto sm:px-7 sm:text-[15px]"
+                    className="h-[52px] w-[92%] max-w-full touch-pan-y rounded-xl px-6 text-[14px] font-bold sm:w-auto sm:px-7 sm:text-[15px]"
                   />
                   <Link
                     href="#hidden-cost-calculator"
@@ -199,11 +199,12 @@ export function HeroSection() {
                 },
                 ...transitionVariants,
               }}
+              className="relative z-[45]"
             >
-              <div className="relative -mt-56 overflow-visible px-4 pb-10 sm:mt-12 sm:overflow-hidden sm:px-6 sm:pb-16 md:mt-20">
+              <div className="relative -mt-40 overflow-visible px-4 pb-10 sm:mt-12 sm:overflow-hidden sm:px-6 sm:pb-16 md:mt-20">
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute inset-0 z-10 bg-[linear-gradient(to_bottom,transparent_0%,transparent_68%,rgba(7,9,12,0.45)_84%,#07090c_100%)]"
+                  className="pointer-events-none absolute inset-0 z-10 hidden bg-[linear-gradient(to_bottom,transparent_0%,transparent_68%,rgba(7,9,12,0.45)_84%,#07090c_100%)] sm:block"
                 />
                 <div className="hidden sm:block relative mx-auto max-w-4xl overflow-hidden rounded-xl border bg-background p-1.5 shadow-lg shadow-zinc-950/15 ring-1 ring-background sm:rounded-2xl sm:p-4 dark:shadow-[inset_0_1px_rgba(255,255,255,0.2)]">
                   <LiveDashboardPreview />
@@ -273,7 +274,7 @@ function HeroHeader() {
     <header>
       <nav
         data-state={menuOpen ? "active" : "inactive"}
-        className="group fixed z-20 w-full px-2 sm:px-3"
+        className="group fixed z-50 w-full px-2 sm:px-3"
       >
         <div
           className={cn(

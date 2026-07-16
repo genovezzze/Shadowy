@@ -239,11 +239,11 @@ export function AnnaStoryCarousel() {
                 </AnimatePresence>
               </div>
 
-              <div className="relative min-h-[400px] sm:min-h-[360px] lg:min-h-0">
+              <div className="relative h-[320px] sm:h-[360px] lg:h-full">
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
-                    className="absolute inset-3 flex flex-col sm:inset-5"
+                    className="relative flex h-full flex-col p-3 sm:p-5"
                     aria-live="polite"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -322,14 +322,14 @@ export function AnnaStoryCarousel() {
                       {activeSlide.tags.map((tag) => (
                         <span
                           key={tag}
-                          className="rounded-full border border-white/[0.09] bg-white/[0.045] px-2.5 py-1 text-[11px] font-medium text-white/65"
+                          className="rounded-full border border-white/[0.09] bg-white/[0.045] px-2 py-1 text-[11px] font-medium text-white/65 sm:px-2.5"
                         >
                           {tag}
                         </span>
                       ))}
                     </div>
 
-                    <div className="mt-auto flex items-center gap-2 pt-2 sm:pt-4">
+                    <div className="mt-auto flex items-center gap-2 pt-3 sm:pt-4">
                       <div className="flex w-full items-center gap-2.5 border-t border-white/[0.09] pt-3 text-sm font-bold tracking-[0.025em] text-white/80 sm:hidden">
                         <motion.span
                           aria-hidden
