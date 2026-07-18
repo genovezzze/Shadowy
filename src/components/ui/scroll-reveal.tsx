@@ -26,7 +26,6 @@ export function ScrollReveal({
   duration = 0.72,
   className,
   effect = "rise",
-  disableOnMobile = false,
 }: ScrollRevealProps) {
   const reduceMotion = useReducedMotion();
   const [isMobile, setIsMobile] = React.useState(false);
@@ -54,13 +53,15 @@ export function ScrollReveal({
     <motion.div
       className={className}
       initial={skipAnimation ? false : hiddenStates[effect]}
-      // When mobile detected after mount, force-snap to visible instantly
-      animate={disableOnMobile && isMobile ? visibleState : undefined}
+      // Mobile is detected after hydration. Always force hidden SSR content
+      // back to its visible state when motion is skipped, otherwise sections
+      // that mounted with an initial variant can remain transparent forever.
+      animate={skipAnimation ? visibleState : undefined}
       whileInView={skipAnimation ? undefined : visibleState}
       viewport={skipAnimation ? undefined : { once: true, amount: 0.08 }}
       transition={{
-        duration: disableOnMobile && isMobile ? 0 : duration,
-        delay: disableOnMobile && isMobile ? 0 : delay,
+        duration: skipAnimation ? 0 : duration,
+        delay: skipAnimation ? 0 : delay,
         ease: [0.22, 1, 0.36, 1],
       }}
     >
