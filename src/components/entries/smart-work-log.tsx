@@ -54,7 +54,13 @@ function roleLabel(value: boolean | null) {
   return "Saistība ar lomu nav skaidra";
 }
 
-export function SmartWorkLog({ clients = [] }: { clients?: ClientOption[] }) {
+export function SmartWorkLog({
+  clients = [],
+  preview = false,
+}: {
+  clients?: ClientOption[];
+  preview?: boolean;
+}) {
   const [description, setDescription] = useState("");
   const [inputSource, setInputSource] = useState<"text" | "voice">("text");
   const [tickets, setTickets] = useState<ReviewTicket[]>([]);
@@ -411,6 +417,8 @@ export function SmartWorkLog({ clients = [] }: { clients?: ClientOption[] }) {
         className={
           hasResults
             ? "mx-auto w-full max-w-4xl pt-2"
+            : preview
+              ? "mx-auto flex min-h-[580px] w-full flex-col items-center justify-center"
             : "w-full sm:mx-auto sm:flex sm:min-h-[calc(100vh-4rem)] sm:flex-col sm:items-center sm:justify-center"
         }
       >

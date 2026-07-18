@@ -13,6 +13,17 @@ const formatEuro = (value: number) =>
     maximumFractionDigits: 0,
   }).format(value)}`;
 
+const lostMoney = [
+  { left: "3%", size: "1.6rem", delay: "0s", dur: "3.6s", tone: "text-emerald-300/70" },
+  { left: "17%", size: "1.1rem", delay: "1.3s", dur: "4.3s", tone: "text-white/35" },
+  { left: "31%", size: "1.9rem", delay: "0.5s", dur: "3.9s", tone: "text-emerald-400/65" },
+  { left: "45%", size: "1.2rem", delay: "2.1s", dur: "4.6s", tone: "text-rose-300/55" },
+  { left: "58%", size: "1.5rem", delay: "0.9s", dur: "3.4s", tone: "text-emerald-300/60" },
+  { left: "71%", size: "1.1rem", delay: "1.8s", dur: "4.1s", tone: "text-white/30" },
+  { left: "84%", size: "1.7rem", delay: "0.3s", dur: "3.8s", tone: "text-rose-300/55" },
+  { left: "95%", size: "1.2rem", delay: "2.4s", dur: "4.4s", tone: "text-emerald-300/55" },
+] as const;
+
 function CardGrid() {
   return (
     <div
@@ -56,8 +67,8 @@ function CostInput({
 
   return (
     <label htmlFor={id} className="block">
-      <span className="flex h-10 items-start justify-between gap-3">
-        <span className="max-w-[10rem] font-display text-sm font-medium leading-5 normal-case tracking-[0.01em] text-white/62">
+      <span className="flex min-h-[2.75rem] items-start justify-between gap-3">
+        <span className="max-w-[11rem] font-display text-sm font-medium leading-[1.15] normal-case tracking-[0.01em] text-white/62">
           {label}
         </span>
         <span className="flex shrink-0 items-baseline gap-1 whitespace-nowrap font-display text-sm font-bold leading-5 text-white/88">
@@ -108,13 +119,15 @@ export function HiddenCostSection() {
       label: "Mēneša slēptās izmaksas",
       value: monthlyCost,
       icon: CalendarRange,
-      valueClassName: "text-[#54f5a9]",
+      valueClassName:
+        "text-[#42ff9f] drop-shadow-[0_0_14px_rgba(66,255,159,0.48)]",
     },
     {
       label: "Gada slēptās izmaksas",
       value: yearlyCost,
       icon: TrendingUp,
-      valueClassName: "text-[#ff626d]",
+      valueClassName:
+        "text-[#ff3f62] drop-shadow-[0_0_14px_rgba(255,63,98,0.5)]",
     },
   ] as const;
 
@@ -122,39 +135,71 @@ export function HiddenCostSection() {
     <section
       id="hidden-cost"
       aria-labelledby="hidden-cost-heading"
-      className="relative overflow-hidden border-y border-white/[0.07] bg-[#06090b] py-16 scroll-mt-24 sm:py-20 md:py-24"
+      className="relative overflow-hidden bg-[#070809] py-16 scroll-mt-24 sm:py-20 md:py-24"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(45%_70%_at_12%_35%,rgba(255,255,255,0.035),transparent_72%),radial-gradient(45%_70%_at_92%_78%,rgba(113,113,122,0.045),transparent_74%)]"
-      />
-
-      <div className="relative mx-auto grid max-w-[1500px] gap-10 px-5 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:items-start lg:gap-16 xl:px-14">
-        <div>
+      <div className="relative mx-auto grid max-w-[1500px] gap-10 px-5 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center lg:gap-14 xl:px-14">
+        <div className="min-w-0 lg:order-2">
           <h2
             id="hidden-cost-heading"
-            className="max-w-xl bg-gradient-to-r from-white from-[0%] via-zinc-300 via-[45%] to-zinc-700 to-[100%] bg-clip-text text-balance font-accent text-[clamp(2rem,6vw,5rem)] font-bold leading-[0.98] tracking-[-0.02em] text-transparent"
+            className="max-w-lg bg-gradient-to-r from-white from-[0%] via-zinc-300 via-[45%] to-zinc-500 to-[100%] bg-clip-text text-balance font-accent text-[clamp(2.25rem,4.4vw,3.75rem)] font-bold leading-[1.02] tracking-[-0.02em] text-transparent"
           >
-            Neredzamais darbs nav bezmaksas
+            <span className="sm:hidden">
+              <span className="block">Neredzamais darbs</span>
+              <span className="mobile-free-accent mt-1 inline-block">
+                nav bezmaksas
+              </span>
+            </span>
+            <span className="hidden sm:inline">
+              Neredzamais darbs{" "}
+              <span className="mobile-free-accent inline-block">
+                nav bezmaksas
+              </span>
+            </span>
           </h2>
-          <p className="mt-6 max-w-[36rem] font-accent text-base font-light leading-[1.65] text-white/68 sm:mt-8 sm:text-xl lg:text-[clamp(1.4rem,1.65vw,1.75rem)]">
+          <p className="mt-5 max-w-[34rem] text-pretty font-accent text-base font-light leading-[1.6] text-white/70 sm:mt-6 sm:text-lg lg:text-xl lg:leading-[1.65]">
             Katra stunda, kas veltīta palīdzībai kolēģiem, jauno darbinieku
             ievadīšanai, steidzamu uzdevumu koordinēšanai vai darbam ārpus
             oficiālās lomas,{" "}
-            <strong className="font-bold text-white">
+            <strong className="font-semibold text-white">
               uzņēmumam maksā naudu
             </strong>
             . Ja šis darbs netiek fiksēts,{" "}
-            <strong className="font-bold text-white">
+            <strong className="font-semibold text-white">
               uzņēmums neredz, kur pazūd laiks un nauda
             </strong>
           </p>
 
+          {/* money slipping away */}
+          <div
+            aria-hidden
+            className="pointer-events-none relative mt-8 h-40 overflow-hidden sm:mt-10"
+            style={{
+              maskImage:
+                "linear-gradient(to bottom, transparent 0%, black 22%, black 74%, transparent 100%)",
+              WebkitMaskImage:
+                "linear-gradient(to bottom, transparent 0%, black 22%, black 74%, transparent 100%)",
+            }}
+          >
+            {lostMoney.map((c, i) => (
+              <span
+                key={i}
+                className={`animate-money-fall absolute top-0 select-none font-bold ${c.tone}`}
+                style={{
+                  left: c.left,
+                  fontSize: c.size,
+                  animationDelay: c.delay,
+                  animationDuration: c.dur,
+                }}
+              >
+                €
+              </span>
+            ))}
+          </div>
         </div>
 
         <div
           id="hidden-cost-calculator"
-          className="relative overflow-hidden rounded-[18px] border border-white/[0.1] bg-[#08090a] p-5 font-display font-medium shadow-[0_16px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.02)] sm:p-6"
+          className="relative min-w-0 overflow-hidden rounded-[18px] border border-white/[0.1] bg-[#08090a] p-5 font-display font-medium shadow-[0_16px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.02)] sm:p-6 lg:order-1"
         >
           <CardGrid />
           <div className="relative">
@@ -229,8 +274,10 @@ export function HiddenCostSection() {
                       className="mt-0.5 size-3 shrink-0 text-white/55"
                       aria-hidden
                     />
-                    <span className="whitespace-nowrap text-[12px] font-medium leading-5 text-white/82 xl:text-[13px] 2xl:text-sm">
-                      {result.label}
+                    <span className="text-[12px] font-medium leading-4 text-white/82 xl:text-[13px] 2xl:text-sm">
+                      {result.label.split(" ").slice(0, -1).join(" ")}
+                      <br />
+                      {result.label.split(" ").slice(-1).join(" ")}
                     </span>
                   </div>
                   <p

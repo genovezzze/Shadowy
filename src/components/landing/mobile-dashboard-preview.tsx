@@ -6,7 +6,6 @@ import {
   motion,
   useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 
@@ -23,13 +22,8 @@ export function MobileDashboardPreview() {
   const [scale, setScale] = useState(0);
   const reduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
-  const phoneTargetY = useTransform(scrollY, [0, 400], [0, -190], {
+  const phoneY = useTransform(scrollY, [0, 400], [0, -190], {
     clamp: true,
-  });
-  const phoneY = useSpring(phoneTargetY, {
-    stiffness: 420,
-    damping: 46,
-    mass: 0.2,
   });
 
   useEffect(() => {

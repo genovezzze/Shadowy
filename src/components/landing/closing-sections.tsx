@@ -11,7 +11,6 @@ import {
 } from "lucide-react";
 import { PilotForm } from "@/app/pilot-form";
 import { FaqSection } from "@/components/landing/faq-section";
-import { ApplicationProcessSection } from "@/components/landing/application-process-section";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
 
 const processSteps = [
@@ -157,15 +156,11 @@ export function ClosingSections() {
         </div>
       </section>
 
-      <ScrollReveal effect="tilt">
-        <ApplicationProcessSection />
-      </ScrollReveal>
-
       <ScrollReveal effect="fade" duration={2.2}>
       <section
         id="pilots"
         aria-labelledby="pilot-heading-visible"
-        className="relative mt-8 overflow-hidden bg-[#07090c] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-10 lg:mx-7"
+        className="relative mt-8 overflow-hidden bg-[#070809] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-10 lg:mx-7"
       >
         <div
           aria-hidden
@@ -182,7 +177,7 @@ export function ClosingSections() {
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_78%_at_50%_46%,transparent_20%,rgba(7,9,12,0.28)_68%,rgba(7,9,12,0.82)_100%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_78%_at_50%_46%,transparent_20%,rgba(7,8,9,0.28)_68%,rgba(7,8,9,0.82)_100%)]"
         />
         <div
           aria-hidden
@@ -191,7 +186,7 @@ export function ClosingSections() {
         <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
           <h2
             id="pilot-heading-visible"
-            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[2rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(2rem,4vw,2.65rem)] lg:whitespace-nowrap"
+            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[2rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(2rem,4vw,2.65rem)]"
           >
             Izmēģiniet pilotu bez riska
           </h2>
@@ -231,7 +226,7 @@ export function ClosingSections() {
             </p>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-white/[0.1] bg-[#07090c]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] sm:p-5">
+          <div className="mt-6 rounded-2xl border border-white/[0.1] bg-[#070809]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] sm:p-5">
             <h3 className="font-accent text-lg font-bold tracking-[0.035em] text-white">
               Pieteikt pilotu
             </h3>
@@ -303,7 +298,7 @@ export function ClosingSections() {
       <section
         id="faq"
         aria-labelledby="faq-heading"
-        className="relative mt-12 bg-[#07090c] py-16 scroll-mt-24 sm:mt-16 sm:py-20 md:py-24"
+        className="relative mt-12 bg-[#070809] py-16 scroll-mt-24 sm:mt-16 sm:py-20 md:py-24"
       >
         <DottedBackground />
         <div className="relative mx-auto max-w-3xl px-5 sm:px-6">
@@ -312,7 +307,10 @@ export function ClosingSections() {
               id="faq-heading"
               className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,3.4vw,2.8rem)]"
             >
-              Biežāk uzdotie jautājumi
+              Biežāk uzdotie{" "}
+              <span className="animate-business-heading-gradient bg-clip-text text-transparent">
+                jautājumi
+              </span>
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-balance font-accent text-sm font-light text-white/55 sm:text-lg">
               Viss, kas jums jāzina par pilotu, datiem un Shadowy darbību
@@ -374,7 +372,7 @@ export function ClosingSections() {
       <ScrollReveal effect="rise">
       <footer className="relative bg-black">
         <div className="relative mx-auto max-w-6xl px-5 pb-6 pt-8 sm:px-6 sm:pt-10">
-          <div className="grid gap-10 sm:gap-8 md:grid-cols-[1.35fr_0.65fr_0.8fr]">
+          <div className="grid gap-10 sm:gap-8 lg:grid-cols-[1.35fr_0.65fr_0.8fr]">
             <div className="max-w-md">
               <Link href="/" className="inline-flex items-center gap-2">
                 <Image

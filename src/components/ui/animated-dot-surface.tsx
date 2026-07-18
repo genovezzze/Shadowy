@@ -19,6 +19,8 @@ export function AnimatedDotSurface({ className }: { className?: string }) {
     let width = 0;
     let height = 0;
     let frame = 0;
+    let isVisible = false;
+    let lastPaint = 0;
 
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
@@ -68,7 +70,7 @@ export function AnimatedDotSurface({ className }: { className?: string }) {
           if (primaryWave > 0.78) {
             context.fillStyle = `rgba(110, 231, 183, ${alpha * 0.72})`;
           } else if (primaryWave < -0.78) {
-            context.fillStyle = `rgba(96, 165, 250, ${alpha * 0.65})`;
+            context.fillStyle = `rgba(52, 211, 153, ${alpha * 0.52})`;
           } else {
             context.fillStyle = `rgba(255, 255, 255, ${alpha})`;
           }
@@ -77,22 +79,45 @@ export function AnimatedDotSurface({ className }: { className?: string }) {
         }
       }
 
-      if (!reducedMotion) {
-        frame = window.requestAnimationFrame(draw);
+    };
+
+    const tick = (time: number) => {
+      if (!isVisible) return;
+
+      // 30 fps is enough for the subtle background wave and leaves the main
+      // thread free for native scrolling, especially on high-DPI phones.
+      if (time - lastPaint >= 1000 / 30) {
+        draw(time);
+        lastPaint = time;
       }
+      frame = window.requestAnimationFrame(tick);
     };
 
     const resizeObserver = new ResizeObserver(() => {
       resize();
-      if (reducedMotion) draw(0);
+      if (reducedMotion || isVisible) draw(0);
     });
 
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        window.cancelAnimationFrame(frame);
+
+        if (isVisible) {
+          if (reducedMotion) draw(0);
+          else frame = window.requestAnimationFrame(tick);
+        }
+      },
+      { rootMargin: "120px 0px" },
+    );
+
     resizeObserver.observe(canvas);
+    visibilityObserver.observe(canvas);
     resize();
-    frame = window.requestAnimationFrame(draw);
 
     return () => {
       resizeObserver.disconnect();
+      visibilityObserver.disconnect();
       window.cancelAnimationFrame(frame);
     };
   }, []);

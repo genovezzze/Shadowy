@@ -48,7 +48,7 @@ export function LiveDashboardPreview() {
         />
         <div className="min-w-0 flex-1 overflow-hidden">
           <div className="mx-auto max-w-6xl px-8 py-10">
-            <SmartWorkLog clients={[]} />
+            <SmartWorkLog clients={[]} preview />
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { motion } from "framer-motion";
 import { BellOff, Eye, Layers, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -39,6 +40,8 @@ function FeatureCard({
   index: number;
 }) {
   const isTopRow = index < 2;
+  const gradientId = `employee-icon-gradient-${useId().replace(/:/g, "")}`;
+
   return (
     <div
       className={cn(
@@ -66,8 +69,30 @@ function FeatureCard({
       />
 
       {/* icon */}
-      <div className="relative mb-4 text-emerald-300 sm:mb-5">
-        <Icon className="size-5 sm:size-6" strokeWidth={1.6} aria-hidden />
+      <div className="relative mb-4 sm:mb-5">
+        <svg aria-hidden className="absolute size-0">
+          <defs>
+            <linearGradient
+              id={gradientId}
+              x1="-100%"
+              y1="0%"
+              x2="0%"
+              y2="100%"
+            >
+              <stop offset="0%" stopColor="#115e59" />
+              <stop offset="38%" stopColor="#0d9488" />
+              <stop offset="58%" stopColor="#6ee7b7" />
+              <stop offset="76%" stopColor="#67e8f9" />
+              <stop offset="100%" stopColor="#0f8f7b" />
+            </linearGradient>
+          </defs>
+        </svg>
+        <Icon
+          className="size-5 sm:size-6"
+          stroke={`url(#${gradientId})`}
+          strokeWidth={1.8}
+          aria-hidden
+        />
       </div>
 
       {/* title with animated left bar */}
@@ -90,18 +115,13 @@ export function EmployeeValueSection() {
   return (
     <section
       aria-labelledby="employee-value-heading"
-      className="relative overflow-hidden bg-[#07090c] py-12 sm:py-20 md:py-24"
+      className="relative overflow-hidden bg-[#070809] py-12 sm:py-20 md:py-24"
     >
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-48 top-1/3 size-[400px] rounded-full bg-emerald-500/[0.06] blur-[130px] hidden sm:block"
-      />
-
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
 
           {/* Left: text */}
-          <div>
+          <div className="min-w-0">
             <h2
               id="employee-value-heading"
               className="text-balance font-accent text-[1.9rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.5vw,3.5rem)]"
@@ -118,7 +138,7 @@ export function EmployeeValueSection() {
 
           {/* Right: 2×2 grid with hover effects */}
           <motion.div
-            className="grid grid-cols-1 rounded-2xl border border-white/[0.08] overflow-hidden sm:grid-cols-2"
+            className="min-w-0 grid grid-cols-1 rounded-2xl border border-white/[0.08] overflow-hidden sm:grid-cols-2"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, amount: 0.12 }}

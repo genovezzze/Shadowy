@@ -140,7 +140,10 @@ function TypewriterPlaceholder() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 px-4 py-4">
+    <div
+      aria-hidden
+      className="pointer-events-none absolute inset-0 px-4 py-4 [backface-visibility:hidden] [contain:paint] [transform:translateZ(0)]"
+    >
       <span className="font-accent text-lg font-light leading-7 tracking-[0.01em] text-neutral-500">
         {typedText}
         <span
@@ -335,14 +338,14 @@ export function VercelV0Chat({
         )}
       </div>
 
-      <div className="flex items-center justify-between gap-3 p-3 pt-1">
-        <div className="flex items-center gap-2">
+      <div className="isolate relative z-10 flex items-center justify-between gap-3 p-3 pt-1 [backface-visibility:hidden] [transform:translateZ(0)]">
+        <div className="flex w-[96px] shrink-0 items-center">
           <button
             type="button"
             onClick={isRecording ? onStopRecording : onStartRecording}
             disabled={disabled && !isRecording}
             className={cn(
-              "group flex h-9 items-center gap-2 rounded-lg px-2.5 text-sm transition-colors",
+              "group flex h-9 w-full items-center justify-start gap-2 rounded-lg px-2.5 text-sm transition-colors",
               "hover:bg-neutral-200 disabled:pointer-events-none disabled:opacity-50",
               "dark:hover:bg-neutral-800",
               isRecording && "bg-red-500/10 text-red-500"
@@ -354,13 +357,13 @@ export function VercelV0Chat({
             ) : (
               <Mic className="h-4 w-4" />
             )}
-            <span className="text-sm font-light tracking-[0.01em]">
+            <span className="block w-[56px] whitespace-nowrap text-left text-sm font-light tracking-[0.01em]">
               {isRecording ? "Pabeigt" : "Ierunāt"}
             </span>
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3">
           <span className="text-sm tabular-nums text-muted-foreground">
             {value.length}/4000
           </span>

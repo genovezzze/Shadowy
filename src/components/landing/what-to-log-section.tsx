@@ -40,10 +40,10 @@ export function WhatToLogSection() {
   return (
     <section
       aria-labelledby="what-to-log-heading"
-      className="relative overflow-hidden bg-[#07090c] py-14 sm:py-16"
+      className="relative overflow-hidden bg-[#070809] py-14 sm:py-16"
     >
       <div className="relative mx-auto max-w-4xl px-5 sm:px-6">
-        <div className="mb-8 text-center">
+        <div className="mb-8 text-left sm:text-center">
           <h2
             id="what-to-log-heading"
             className="text-balance font-accent text-[1.6rem] font-bold tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,4vw,3rem)]"
@@ -70,16 +70,12 @@ export function WhatToLogSection() {
         >
           {/* Jāfiksē */}
           <motion.div
-            className="relative overflow-hidden rounded-xl border border-white/[0.18] bg-[#08090a] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24),0_0_60px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.07)] sm:p-6"
+            className="relative overflow-hidden rounded-xl border border-white/[0.18] bg-[#08090a] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)] sm:p-6"
             variants={{
               hidden: { opacity: 0, x: -24 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
             }}
           >
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_0%,rgba(255,255,255,0.04),transparent_70%)]"
-            />
             <HatchPattern />
             <div className="relative">
               <p className="mb-5 font-accent text-base font-bold tracking-[0.04em] text-white/55">

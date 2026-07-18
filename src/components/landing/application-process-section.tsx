@@ -37,7 +37,7 @@ export function ApplicationProcessSection() {
     <section
       id="pieteikuma-process"
       aria-labelledby="application-process-heading"
-      className="relative mt-12 overflow-hidden bg-[#07090c] py-14 sm:mt-16 sm:py-16"
+      className="relative mt-12 overflow-hidden bg-[#070809] py-14 sm:mt-16 sm:py-16"
     >
       <div
         aria-hidden

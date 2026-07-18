@@ -17,7 +17,6 @@ const visibleState = {
   x: 0,
   y: 0,
   scale: 1,
-  rotateX: 0,
   filter: "blur(0px)",
 } as const;
 
@@ -40,16 +39,16 @@ export function ScrollReveal({
   }, []);
 
   const hiddenStates = {
-    rise: { opacity: 0, y: 52 },
-    focus: { opacity: 0, y: 20, scale: 0.975, filter: "blur(12px)" },
-    unfold: { opacity: 0, y: 28, scale: 0.985, rotateX: 5 },
-    zoom: { opacity: 0, scale: 0.93 },
-    blur: { opacity: 0, y: 22, filter: "blur(14px)" },
-    tilt: { opacity: 0, y: 40, rotateX: 7, scale: 0.97 },
-    fade: { opacity: 0 },
+    rise: { opacity: 0, y: 26, filter: "blur(2px)" },
+    focus: { opacity: 0, y: 16, scale: 0.988, filter: "blur(3px)" },
+    unfold: { opacity: 0, y: 20, scale: 0.992, filter: "blur(2px)" },
+    zoom: { opacity: 0, scale: 0.975, filter: "blur(3px)" },
+    blur: { opacity: 0, y: 16, filter: "blur(6px)" },
+    tilt: { opacity: 0, y: 22, scale: 0.988, filter: "blur(2px)" },
+    fade: { opacity: 0, filter: "blur(2px)" },
   } as const;
 
-  const skipAnimation = reduceMotion || (disableOnMobile && isMobile);
+  const skipAnimation = reduceMotion || isMobile;
 
   return (
     <motion.div
@@ -58,7 +57,7 @@ export function ScrollReveal({
       // When mobile detected after mount, force-snap to visible instantly
       animate={disableOnMobile && isMobile ? visibleState : undefined}
       whileInView={skipAnimation ? undefined : visibleState}
-      viewport={skipAnimation ? undefined : { once: false, amount: 0.08 }}
+      viewport={skipAnimation ? undefined : { once: true, amount: 0.08 }}
       transition={{
         duration: disableOnMobile && isMobile ? 0 : duration,
         delay: disableOnMobile && isMobile ? 0 : delay,

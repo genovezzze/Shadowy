@@ -201,6 +201,7 @@ function SceneSaglabats({ lt }: { lt: number }) {
 
 export function AIDraftAnimation() {
   const [time, setTime] = useState(0)
+  const [isVisible, setIsVisible] = useState(false)
   const startRef = useRef<number | null>(null)
   const rafRef = useRef<number | null>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -227,14 +228,35 @@ export function AIDraftAnimation() {
   }, [])
 
   useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsVisible(entry.isIntersecting),
+      { rootMargin: "120px 0px" },
+    )
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    if (!isVisible || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return
+    }
+
+    startRef.current = null
+    let lastUpdate = 0
     const tick = (ts: number) => {
       if (startRef.current === null) startRef.current = ts
-      setTime((ts - startRef.current) / 1000)
+      if (ts - lastUpdate >= 1000 / 30) {
+        setTime((ts - startRef.current) / 1000)
+        lastUpdate = ts
+      }
       rafRef.current = requestAnimationFrame(tick)
     }
     rafRef.current = requestAnimationFrame(tick)
     return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
-  }, [])
+  }, [isVisible])
 
   const { name, lt, dur } = sceneAt(time)
 
