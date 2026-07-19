@@ -9,7 +9,7 @@ import { normalizeClientName } from "@/lib/client-name";
 export async function linkEntriesToClients(): Promise<{ ok: true; linked: number; skipped: number } | { ok: false; error: string }> {
   const session = await requireUser(["ADMIN"]);
 
-  const [clients, entries] = await Promise.all([
+  const [clients, entries, aliases] = await Promise.all([
     prisma.client.findMany({
       where: { organizationId: session.organizationId },
       select: { id: true, name: true },
@@ -22,9 +22,16 @@ export async function linkEntriesToClients(): Promise<{ ok: true; linked: number
       },
       select: { id: true, clientName: true },
     }),
+    prisma.clientAlias.findMany({
+      where: { organizationId: session.organizationId },
+      select: { normalized: true, clientId: true },
+    }),
   ]);
 
   const clientByName = new Map(clients.map((c) => [normalizeClientName(c.name), c.id]));
+  for (const a of aliases) {
+    if (!clientByName.has(a.normalized)) clientByName.set(a.normalized, a.clientId);
+  }
 
   let linked = 0;
   let skipped = 0;
@@ -101,11 +108,20 @@ export async function importClientsFromEntries(): Promise<{ ok: true; created: n
   }
 
   // Also link any remaining unlinked entries that now match existing clients
-  const allClients = await prisma.client.findMany({
-    where: { organizationId: session.organizationId },
-    select: { id: true, name: true },
-  });
+  const [allClients, aliases] = await Promise.all([
+    prisma.client.findMany({
+      where: { organizationId: session.organizationId },
+      select: { id: true, name: true },
+    }),
+    prisma.clientAlias.findMany({
+      where: { organizationId: session.organizationId },
+      select: { normalized: true, clientId: true },
+    }),
+  ]);
   const clientByName = new Map(allClients.map((c) => [normalizeClientName(c.name), c.id]));
+  for (const a of aliases) {
+    if (!clientByName.has(a.normalized)) clientByName.set(a.normalized, a.clientId);
+  }
   const remaining = await prisma.invisibleWorkEntry.findMany({
     where: { organizationId: session.organizationId, clientId: null, clientName: { not: null } },
     select: { id: true, clientName: true },

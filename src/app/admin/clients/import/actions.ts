@@ -56,11 +56,20 @@ export async function confirmImport(input: {
   // Create missing clients (or reuse if already exists by name)
   const createdByName = new Map<string, string>(); // normalized name → id
   if (newClientAssignments.length > 0) {
-    const allOrgClients = await prisma.client.findMany({
-      where: { organizationId: session.organizationId },
-      select: { id: true, name: true },
-    });
+    const [allOrgClients, orgAliases] = await Promise.all([
+      prisma.client.findMany({
+        where: { organizationId: session.organizationId },
+        select: { id: true, name: true },
+      }),
+      prisma.clientAlias.findMany({
+        where: { organizationId: session.organizationId },
+        select: { normalized: true, clientId: true },
+      }),
+    ]);
     for (const c of allOrgClients) createdByName.set(normalizeClientName(c.name), c.id);
+    for (const a of orgAliases) {
+      if (!createdByName.has(a.normalized)) createdByName.set(a.normalized, a.clientId);
+    }
 
     for (const { clientName } of newClientAssignments) {
       const key = normalizeClientName(clientName);

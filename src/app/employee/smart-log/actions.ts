@@ -40,7 +40,7 @@ export async function saveConfirmedSmartLogTickets(input: {
     };
   }
 
-  const [employee, orgClients] = await Promise.all([
+  const [employee, orgClients, orgAliases] = await Promise.all([
     prisma.user.findFirst({
       where: { id: session.userId, organizationId: session.organizationId },
       select: { managerId: true, name: true },
@@ -51,6 +51,10 @@ export async function saveConfirmedSmartLogTickets(input: {
         status: "active",
       },
       select: { id: true, name: true },
+    }),
+    prisma.clientAlias.findMany({
+      where: { organizationId: session.organizationId },
+      select: { normalized: true, clientId: true },
     }),
   ]);
 
@@ -77,6 +81,11 @@ export async function saveConfirmedSmartLogTickets(input: {
   try {
     await prisma.$transaction(async (tx) => {
       const clientNameMap = new Map(orgClients.map((c) => [normalizeClientName(c.name), c.id]));
+      // Alias spellings resolve to their target client (aliases win only where
+      // no registered client name already occupies the key).
+      for (const a of orgAliases) {
+        if (!clientNameMap.has(a.normalized)) clientNameMap.set(a.normalized, a.clientId);
+      }
 
       await tx.invisibleWorkEntry.createMany({
         data: parsed.data.tickets.map((ticket) => {

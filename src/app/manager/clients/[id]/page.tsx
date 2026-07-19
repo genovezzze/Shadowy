@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
 import { ClientMonthChart } from "@/components/clients/client-month-chart";
+import { ClientAliasManager } from "@/components/clients/client-alias-manager";
 import { AlertTriangle, ArrowLeft, Clock, TrendingUp, Users, FileText } from "lucide-react";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
@@ -41,6 +42,9 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
 
   const client = await prisma.client.findFirst({
     where: { id: params.id, organizationId: session.organizationId },
+    include: {
+      aliases: { select: { id: true, name: true }, orderBy: { name: "asc" } },
+    },
   });
   if (!client) notFound();
 
@@ -208,6 +212,14 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
           </CardContent>
         </Card>
       )}
+
+      <div className="mb-8">
+        <ClientAliasManager
+          clientId={client.id}
+          clientName={client.name}
+          aliases={client.aliases}
+        />
+      </div>
 
       {entries.length === 0 ? (
         <EmptyState

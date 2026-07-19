@@ -249,11 +249,28 @@ model Client {
 
   entries     InvisibleWorkEntry[]
   assignments ClientEmployee[]
+  aliases     ClientAlias[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([organizationId, name])
+  @@index([organizationId])
+}
+
+model ClientAlias {
+  id             String @id @default(cuid())
+  organizationId String
+  clientId       String
+  client         Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  name       String @db.VarChar(120) // display form entered by admin
+  normalized String @db.VarChar(160) // normalizeClientName(name) — matching key
+
+  createdAt DateTime @default(now())
+
+  @@unique([organizationId, normalized])
+  @@index([clientId])
   @@index([organizationId])
 }
 
