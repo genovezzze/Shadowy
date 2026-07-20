@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils";
 
 const slides = [
   {
-    image: "/images/anna/anna-1.png",
+    image: "/images/anna/anna-1.webp",
     title: "Iepazīsties ar Annu",
     role: "Grāmatvede",
     paragraphs: [
@@ -19,7 +19,7 @@ const slides = [
     tags: ["Nodokļi", "Atskaites", "Grāmatvedība"],
   },
   {
-    image: "/images/anna/anna-2.png",
+    image: "/images/anna/anna-2.webp",
     title: "Bet fokuss bieži tiek pārtraukts",
     role: "Neredzamā slodze",
     paragraphs: [
@@ -32,7 +32,7 @@ const slides = [
     ],
   },
   {
-    image: "/images/anna/anna-3.png",
+    image: "/images/anna/anna-3.webp",
     title: "Darbs notiek, bet netiek fiksēts",
     role: "Neredzamais ieguldījums",
     paragraphs: [
@@ -42,7 +42,7 @@ const slides = [
     tags: ["Nav datos", "Nav atskaitē", "Nav redzams vadībai"],
   },
   {
-    image: "/images/anna/anna-4.png",
+    image: "/images/anna/anna-4.webp",
     title: "Te palīdz Shadowy",
     role: "Risinājums",
     paragraphs: [
@@ -56,7 +56,7 @@ const slides = [
     ],
   },
   {
-    image: "/images/anna/anna-5.png",
+    image: "/images/anna/anna-5.webp",
     title: "Rezultāts",
     role: "Redzamas izmaksas",
     paragraphs: [

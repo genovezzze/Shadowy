@@ -129,7 +129,7 @@ export function PilotResultsSection() {
               >
                 <motion.article
                   className="relative z-10 flex min-h-[140px] flex-col gap-2.5 overflow-hidden rounded-[12px] border border-emerald-300/[0.15] bg-[#080b0e] bg-cover bg-center p-3.5 shadow-[0_18px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors hover:border-emerald-300/30 sm:h-full sm:min-h-[145px] sm:p-3.5"
-                  style={{ backgroundImage: "url('/images/cards_back.png?v=3')" }}
+                  style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: {

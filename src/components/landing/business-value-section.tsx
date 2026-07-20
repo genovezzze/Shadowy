@@ -49,7 +49,7 @@ export function BusinessValueSection() {
               <motion.article
                 key={card.title}
                 className="relative overflow-hidden rounded-[10px] border border-white/[0.11] bg-[#080a0d] bg-cover bg-center p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.035),0_14px_40px_rgba(0,0,0,0.18)] transition-colors duration-300 hover:border-white/[0.2] sm:p-6"
-                style={{ backgroundImage: "url('/images/cards_back.png?v=3')" }}
+                style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
                 variants={{
                   hidden: {
                     opacity: 0,
@@ -105,7 +105,7 @@ export function BusinessValueSection() {
           >
             <div
               className="animate-value-card-float relative min-w-0 flex-1 overflow-hidden rounded-xl border border-emerald-400/20 bg-cover bg-center p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] sm:p-4"
-              style={{ backgroundImage: "url('/images/cards_back.png?v=3')" }}
+              style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
             >
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-black/20" />
               <div className="relative">
@@ -134,7 +134,7 @@ export function BusinessValueSection() {
 
             <div
               className="animate-value-card-float relative min-w-0 flex-1 overflow-hidden rounded-xl border border-emerald-400/20 bg-cover bg-center p-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] [animation-delay:-2.2s] sm:p-4"
-              style={{ backgroundImage: "url('/images/cards_back.png?v=3')" }}
+              style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
             >
               <div aria-hidden className="pointer-events-none absolute inset-0 bg-black/20" />
               <div className="relative">

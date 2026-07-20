@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import {
   ArrowUpRight,
   CheckCircle2,
@@ -15,17 +16,39 @@ import { Button } from "@/components/ui/button";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { GradientButton } from "@/components/ui/gradient-button";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
-import { AnnaStoryCarousel } from "@/components/landing/anna-story-carousel";
-import { HiddenCostSection } from "@/components/landing/hidden-cost-section";
-import { SolutionSection } from "@/components/landing/solution-section";
-import { BusinessValueSection } from "@/components/landing/business-value-section";
-import { EmployeeValueSection } from "@/components/landing/employee-value-section";
-import { WhatToLogSection } from "@/components/landing/what-to-log-section";
-import { PilotResultsSection } from "@/components/landing/pilot-results-section";
-import { PrivacyTrustSection } from "@/components/landing/privacy-trust-section";
-import { ClosingSections } from "@/components/landing/closing-sections";
 import { LiveDashboardPreview } from "@/components/landing/live-dashboard-preview";
 import { MobileDashboardPreview } from "@/components/landing/mobile-dashboard-preview";
+
+// Below-the-fold sections are code-split into their own chunks so the hero
+// hydrates without parsing all section JS up front. ssr stays enabled (default)
+// so the server-rendered HTML — and therefore the visual output — is unchanged.
+const AnnaStoryCarousel = dynamic(() =>
+  import("@/components/landing/anna-story-carousel").then((m) => m.AnnaStoryCarousel),
+);
+const HiddenCostSection = dynamic(() =>
+  import("@/components/landing/hidden-cost-section").then((m) => m.HiddenCostSection),
+);
+const SolutionSection = dynamic(() =>
+  import("@/components/landing/solution-section").then((m) => m.SolutionSection),
+);
+const BusinessValueSection = dynamic(() =>
+  import("@/components/landing/business-value-section").then((m) => m.BusinessValueSection),
+);
+const EmployeeValueSection = dynamic(() =>
+  import("@/components/landing/employee-value-section").then((m) => m.EmployeeValueSection),
+);
+const WhatToLogSection = dynamic(() =>
+  import("@/components/landing/what-to-log-section").then((m) => m.WhatToLogSection),
+);
+const PilotResultsSection = dynamic(() =>
+  import("@/components/landing/pilot-results-section").then((m) => m.PilotResultsSection),
+);
+const PrivacyTrustSection = dynamic(() =>
+  import("@/components/landing/privacy-trust-section").then((m) => m.PrivacyTrustSection),
+);
+const ClosingSections = dynamic(() =>
+  import("@/components/landing/closing-sections").then((m) => m.ClosingSections),
+);
 import { cn } from "@/lib/utils";
 
 const transitionVariants: { item: Variants } = {
@@ -176,7 +199,7 @@ export function HeroSection() {
                 >
                   <div
                     className="mobile-hero-cta-shell !w-[88%] !self-center sm:!w-auto sm:!self-auto"
-                    style={{ backgroundImage: "url('/images/cards_back.png?v=3')" }}
+                    style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
                   >
                     <GradientButton
                       type="button"

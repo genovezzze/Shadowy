@@ -16,17 +16,17 @@ const inter = Inter({
 const neueHaas = localFont({
   src: [
     {
-      path: "../../public/fonts/NeueHaasDisplayMediu.ttf",
+      path: "../../public/fonts/NeueHaasDisplayMediu.woff2",
       weight: "500",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NeueHaasDisplayBold.ttf",
+      path: "../../public/fonts/NeueHaasDisplayBold.woff2",
       weight: "700",
       style: "normal",
     },
     {
-      path: "../../public/fonts/NeueHaasDisplayLight.ttf",
+      path: "../../public/fonts/NeueHaasDisplayLight.woff2",
       weight: "300",
       style: "normal",
     },
@@ -37,7 +37,7 @@ const neueHaas = localFont({
 });
 
 const neueHaasLight = localFont({
-  src: "../../public/fonts/NeueHaasDisplayLight.ttf",
+  src: "../../public/fonts/NeueHaasDisplayLight.woff2",
   weight: "300",
   style: "normal",
   variable: "--font-accent",

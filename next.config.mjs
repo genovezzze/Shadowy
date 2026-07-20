@@ -13,11 +13,30 @@ const nextConfig = {
   // Keep development artifacts separate so `next build` cannot invalidate
   // CSS and JS chunks served by a running `next dev` process.
   distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
+  // Serve next/image assets as AVIF (smallest) with WebP fallback; browsers
+  // without support fall back to the original automatically.
+  images: {
+    formats: ["image/avif", "image/webp"],
+  },
   async headers() {
     return [
       {
         source: "/:path*",
         headers: securityHeaders,
+      },
+      {
+        // Static marketing assets are content-versioned (?v= query / stable
+        // filenames), so they can be cached aggressively.
+        source: "/images/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        source: "/fonts/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
       },
       {
         // Decorative marketing preview embedded via <iframe> on the landing
