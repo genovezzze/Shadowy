@@ -2,7 +2,6 @@
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
@@ -10,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import { resetPassword } from "./actions";
 
 export function ResetForm({ token }: { token: string }) {
-  const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(false);
@@ -20,10 +18,11 @@ export function ResetForm({ token }: { token: string }) {
     startTransition(async () => {
       const res = await resetPassword(token, formData);
       if (!res.ok) setError(res.error);
-      else {
-        setDone(true);
-        router.refresh();
-      }
+      // No router.refresh() here: the token is single-use and was just
+      // consumed, so re-running the server component would re-check it,
+      // find it spent, and replace this success state with the
+      // "link expired" error — even though the password did change.
+      else setDone(true);
     });
   }
 
