@@ -308,7 +308,6 @@ export default async function EmployeeDashboard() {
   }
   const clientAxis: MatrixAxis[] = Array.from(clientKeyed.entries())
     .sort((a, b) => b[1].minutes - a[1].minutes)
-    .slice(0, 6)
     .map(([key, v]) => ({ key, label: v.label }));
 
   const catClientMinutes: Record<string, Record<string, number>> = {};
@@ -619,6 +618,7 @@ export default async function EmployeeDashboard() {
                 rows={categoryAxis}
                 cols={clientAxis}
                 minutes={catClientMinutes}
+                unit="klientus"
               />
             )}
             <CategoryMatrix
@@ -627,6 +627,8 @@ export default async function EmployeeDashboard() {
               rows={categoryAxis}
               cols={monthAxis}
               minutes={catMonthMinutes}
+              previewCols={12}
+              previewRows={99}
             />
           </div>
         </>
