@@ -1,0 +1,71 @@
+name: Daily reminder emails
+
+# Why this exists:
+# Vercel's Hobby plan allows only 2 cron jobs. The 2 weekly digests occupy that
+# allowance (still defined in vercel.json), so the 3 daily reminders never fired
+# on Vercel. GitHub Actions triggers them instead — free and independent of the
+# Vercel plan limit. Each run just calls the existing secured cron endpoint.
+#
+# Times are UTC (same as Vercel cron), matching the original vercel.json schedule.
+# GitHub-scheduled runs can be delayed by a few minutes under load — fine for
+# reminders. NOTE: GitHub disables scheduled workflows after 60 days without any
+# repo activity; a normal commit cadence keeps them alive.
+
+on:
+  schedule:
+    - cron: "0 4 * * 1-5"   # morning  (Mon–Fri 04:00 UTC)
+    - cron: "0 9 * * 1-5"   # midday   (Mon–Fri 09:00 UTC)
+    - cron: "0 13 * * 1-5"  # evening  (Mon–Fri 13:00 UTC)
+  workflow_dispatch:
+    inputs:
+      path:
+        description: "Cron path to trigger manually (e.g. daily-morning-reminder)"
+        required: true
+        type: choice
+        options:
+          - daily-morning-reminder
+          - daily-midday-reminder
+          - daily-evening-reminder
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve endpoint from schedule
+        id: pick
+        run: |
+          case "${{ github.event.schedule }}" in
+            "0 4 * * 1-5")  path="daily-morning-reminder" ;;
+            "0 9 * * 1-5")  path="daily-midday-reminder" ;;
+            "0 13 * * 1-5") path="daily-evening-reminder" ;;
+            *)              path="${{ github.event.inputs.path }}" ;;
+          esac
+          if [ -z "$path" ]; then
+            echo "Could not resolve a cron path" >&2
+            exit 1
+          fi
+          echo "path=$path" >> "$GITHUB_OUTPUT"
+          echo "Resolved endpoint: $path"
+
+      - name: Call cron endpoint
+        env:
+          BASE_URL: ${{ vars.CRON_BASE_URL || 'https://www.shadowy.lv' }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$CRON_SECRET" ]; then
+            echo "::error::CRON_SECRET repository secret is not set" >&2
+            exit 1
+          fi
+          url="${BASE_URL}/api/cron/${{ steps.pick.outputs.path }}"
+          echo "POST-less GET $url"
+          code=$(curl -sS -o response.json -w '%{http_code}' \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "$url")
+          echo "HTTP $code"
+          echo "Response:"
+          cat response.json || true
+          echo
+          if [ "$code" != "200" ]; then
+            echo "::error::Endpoint returned HTTP $code" >&2
+            exit 1
+          fi
