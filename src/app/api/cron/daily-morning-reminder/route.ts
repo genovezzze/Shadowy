@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendMorningReminder } from "@/lib/email";
+import { sendMorningReminder, isDemoEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
   let failed = 0;
 
   for (const employee of employees) {
-    if (!employee.email) continue;
+    if (!employee.email || isDemoEmail(employee.email)) continue;
     const org = orgById.get(employee.organizationId);
     if (!org) continue;
 

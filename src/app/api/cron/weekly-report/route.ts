@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
-import { sendWeeklyManagerReport } from "@/lib/email";
+import { sendWeeklyManagerReport, isDemoEmail } from "@/lib/email";
 import { groupByCategoryWithTitles, groupByClient, groupByEmployee, categoryLabel, weekTrend, weekCountTrend } from "@/lib/work-insights";
 
 export const runtime = "nodejs";
@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
   const orgById = new Map(orgs.map((o) => [o.id, o]));
 
   for (const manager of managers) {
-    if (!manager.email) continue;
+    if (!manager.email || isDemoEmail(manager.email)) continue;
     const org = orgById.get(manager.organizationId);
 
     try {

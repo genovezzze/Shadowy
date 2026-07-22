@@ -58,6 +58,15 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   }
 }
 
+/**
+ * Seed/demo accounts (…@demo.lv) hard-bounce and end up on Resend's
+ * suppression list — skip them in automated sends to save quota and keep
+ * delivery logs clean.
+ */
+export function isDemoEmail(email: string): boolean {
+  return email.toLowerCase().endsWith("@demo.lv");
+}
+
 /** Escape user-controlled text before interpolating it into an HTML email. */
 function escapeHtml(value: string): string {
   return value
