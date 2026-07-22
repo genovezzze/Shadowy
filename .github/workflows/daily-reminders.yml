@@ -6,20 +6,27 @@ name: Daily reminder emails
 # on Vercel. GitHub Actions triggers them instead — free and independent of the
 # Vercel plan limit. Each run just calls the existing secured cron endpoint.
 #
-# Times are UTC (same as Vercel cron), matching the original vercel.json schedule.
-# GitHub-scheduled runs can be delayed by a few minutes under load — fine for
-# reminders. NOTE: GitHub disables scheduled workflows after 60 days without any
-# repo activity; a normal commit cadence keeps them alive.
+# TIMEZONE: GitHub cron is always UTC and does NOT observe daylight saving.
+# The morning reminder must land at 08:30 Europe/Riga year-round, and Riga is
+# UTC+3 in summer (EEST) / UTC+2 in winter (EET). So we wake the workflow at both
+# candidate UTC times (05:30 and 06:30) and only actually send when the real
+# Europe/Riga clock reads 08:30 — DST-proof, and never double-sends because only
+# one of the two candidates matches on any given day.
+# Midday/evening keep their original fixed-UTC schedule.
+#
+# NOTE: GitHub disables scheduled workflows after 60 days without any repo
+# activity; a normal commit cadence keeps them alive.
 
 on:
   schedule:
-    - cron: "0 4 * * 1-5"   # morning  (Mon–Fri 04:00 UTC)
-    - cron: "0 9 * * 1-5"   # midday   (Mon–Fri 09:00 UTC)
-    - cron: "0 13 * * 1-5"  # evening  (Mon–Fri 13:00 UTC)
+    - cron: "30 5 * * 1-5"  # morning candidate A — 08:30 Riga while EEST (summer)
+    - cron: "30 6 * * 1-5"  # morning candidate B — 08:30 Riga while EET  (winter)
+    - cron: "0 9 * * 1-5"   # midday  (Mon–Fri 09:00 UTC)
+    - cron: "0 13 * * 1-5"  # evening (Mon–Fri 13:00 UTC)
   workflow_dispatch:
     inputs:
       path:
-        description: "Cron path to trigger manually (e.g. daily-morning-reminder)"
+        description: "Cron path to trigger manually"
         required: true
         type: choice
         options:
@@ -34,20 +41,29 @@ jobs:
       - name: Resolve endpoint from schedule
         id: pick
         run: |
-          case "${{ github.event.schedule }}" in
-            "0 4 * * 1-5")  path="daily-morning-reminder" ;;
+          sched="${{ github.event.schedule }}"
+          path=""
+          case "$sched" in
+            "30 5 * * 1-5"|"30 6 * * 1-5")
+              # Morning: only send if it is really 08:30 in Riga (handles DST).
+              riga="$(TZ='Europe/Riga' date +%H:%M)"
+              if [ "$riga" = "08:30" ]; then
+                path="daily-morning-reminder"
+              else
+                echo "Riga local time is $riga (not 08:30) — skipping this candidate trigger."
+              fi
+              ;;
             "0 9 * * 1-5")  path="daily-midday-reminder" ;;
             "0 13 * * 1-5") path="daily-evening-reminder" ;;
             *)              path="${{ github.event.inputs.path }}" ;;
           esac
-          if [ -z "$path" ]; then
-            echo "Could not resolve a cron path" >&2
-            exit 1
-          fi
           echo "path=$path" >> "$GITHUB_OUTPUT"
-          echo "Resolved endpoint: $path"
+          if [ -n "$path" ]; then
+            echo "Resolved endpoint: $path"
+          fi
 
       - name: Call cron endpoint
+        if: steps.pick.outputs.path != ''
         env:
           BASE_URL: ${{ vars.CRON_BASE_URL || 'https://www.shadowy.lv' }}
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -57,7 +73,7 @@ jobs:
             exit 1
           fi
           url="${BASE_URL}/api/cron/${{ steps.pick.outputs.path }}"
-          echo "POST-less GET $url"
+          echo "GET $url"
           code=$(curl -sS -o response.json -w '%{http_code}' \
             -H "Authorization: Bearer ${CRON_SECRET}" \
             "$url")
