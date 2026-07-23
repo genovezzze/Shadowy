@@ -9,9 +9,11 @@ name: Daily reminder emails
 # TIMEZONE: GitHub cron is always UTC and does NOT observe daylight saving.
 # The morning reminder must land at 08:30 Europe/Riga year-round, and Riga is
 # UTC+3 in summer (EEST) / UTC+2 in winter (EET). So we wake the workflow at both
-# candidate UTC times (05:30 and 06:30) and only actually send when the real
-# Europe/Riga clock reads 08:30 — DST-proof, and never double-sends because only
-# one of the two candidates matches on any given day.
+# candidate UTC times (05:30 and 06:30) and only actually send from the candidate
+# that matches Riga's CURRENT UTC offset — DST-proof, and never double-sends
+# because exactly one candidate matches on any given day. (Comparing the wall
+# clock to "08:30" exactly does not work: GitHub routinely fires schedules
+# 1-2 hours late, so the equality check silently skipped the send.)
 # Midday/evening keep their original fixed-UTC schedule.
 #
 # NOTE: GitHub disables scheduled workflows after 60 days without any repo
@@ -45,12 +47,15 @@ jobs:
           path=""
           case "$sched" in
             "30 5 * * 1-5"|"30 6 * * 1-5")
-              # Morning: only send if it is really 08:30 in Riga (handles DST).
-              riga="$(TZ='Europe/Riga' date +%H:%M)"
-              if [ "$riga" = "08:30" ]; then
+              # Morning: send from the candidate matching Riga's current UTC
+              # offset (+0300 summer → 05:30 UTC, +0200 winter → 06:30 UTC).
+              # Delay-proof: correct even when GitHub fires the schedule late.
+              offset="$(TZ='Europe/Riga' date +%z)"
+              if { [ "$sched" = "30 5 * * 1-5" ] && [ "$offset" = "+0300" ]; } || \
+                 { [ "$sched" = "30 6 * * 1-5" ] && [ "$offset" = "+0200" ]; }; then
                 path="daily-morning-reminder"
               else
-                echo "Riga local time is $riga (not 08:30) — skipping this candidate trigger."
+                echo "Riga UTC offset is $offset — this candidate belongs to the other DST period; skipping."
               fi
               ;;
             "0 9 * * 1-5")  path="daily-midday-reminder" ;;
