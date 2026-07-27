@@ -243,7 +243,7 @@ export function HeroSection() {
   // turns an ancestor into a scroll container, which silently kills the
   // position:sticky pin below it.
   return (
-    <div className="relative isolate min-h-screen min-h-[100svh] overflow-x-clip bg-[#070809] text-foreground">
+    <div className="relative isolate min-h-[100svh] overflow-x-clip bg-[#070809] text-foreground">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 top-0 -z-20 h-[980px]"
@@ -301,7 +301,17 @@ export function HeroSection() {
             ref={pinRunwayRef}
             className="sticky top-0 z-0 h-[100svh] sm:static sm:z-20 sm:h-auto motion-safe:sm:h-[200vh]"
           >
-            <div className="sticky top-0 flex h-screen h-[100svh] items-start justify-center overflow-hidden px-5 pb-16 pt-[33vh] sm:items-center sm:px-6 sm:py-24">
+            {/* svh only, and never alongside h-screen. Tailwind emits
+                .h-screen after .h-[100svh], so the pair silently resolved to
+                100vh - the large viewport, the one you get once the browser
+                chrome is gone. With the bars still up that made the hero taller
+                than the screen, and the first swipe went into collapsing them
+                and letting the lockup settle into its real place instead of
+                into scrolling. Sized to the small viewport it fits from the
+                first paint: the bars still retract, but nothing resizes when
+                they do. pt is svh too, so the lockup keeps its position
+                relative to the box it sits in. */}
+            <div className="sticky top-0 flex h-[100svh] items-start justify-center overflow-hidden px-5 pb-16 pt-[33svh] sm:items-center sm:px-6 sm:py-24">
               <HeroVideoBackground />
 
               {/* Hover target is this wrapper, sized to its content rather than

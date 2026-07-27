@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -10,6 +10,15 @@ import { getSiteUrl } from "@/lib/site-url";
 const inter = Inter({
   subsets: ["latin", "latin-ext"],
   variable: "--font-sans",
+  display: "swap",
+});
+
+// latin-ext is not optional here: the terminal-styled copy this carries is
+// Latvian, and the base latin subset has none of its diacritics.
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -112,7 +121,7 @@ export default function RootLayout({
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable}`}
+      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable}`}
       suppressHydrationWarning
     >
       <body className="font-sans">

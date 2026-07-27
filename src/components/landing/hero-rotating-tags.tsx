@@ -1,10 +1,10 @@
 "use client";
 
 import React from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useReducedMotion } from "framer-motion";
 
 /**
- * The line under the hero lockup on phones, cycling through what the product
+ * The line under the hero lockup on phones, typing out what the product
  * surfaces. Phones are the one layout where the h1 is hidden at the top of the
  * page - it is repeated as plain text under the device mockup instead - so
  * without this the lockup sits alone above a full screen of empty footage.
@@ -20,45 +20,67 @@ const TAGS = [
   "Klientu patiesā cena",
 ];
 
-const INTERVAL_MS = 5000;
+// One phrase occupies exactly this long whatever its length: the hold is
+// whatever is left of the five seconds after typing and erasing it, so a long
+// entry does not quietly stretch its turn past a short one's.
+const CYCLE_MS = 5000;
+const TYPE_MS = 55;
+const ERASE_MS = 26;
 
 export function HeroRotatingTags() {
   const [index, setIndex] = React.useState(0);
+  const [typed, setTyped] = React.useState(0);
+  const [erasing, setErasing] = React.useState(false);
   const reduceMotion = useReducedMotion();
 
-  React.useEffect(() => {
-    const timer = window.setInterval(() => {
-      // A backgrounded tab keeps firing intervals. Swapping a line nobody can
-      // see is pure work, and the visitor returns mid-cycle either way.
-      if (document.visibilityState !== "visible") return;
-      setIndex((current) => (current + 1) % TAGS.length);
-    }, INTERVAL_MS);
+  const tag = TAGS[index];
 
-    return () => window.clearInterval(timer);
-  }, []);
+  React.useEffect(() => {
+    // Typing is motion, and a caret chattering away is exactly what the
+    // preference asks us to stop. The phrases still take their turn.
+    if (reduceMotion) {
+      const timer = window.setInterval(() => {
+        if (document.visibilityState !== "visible") return;
+        setIndex((current) => (current + 1) % TAGS.length);
+      }, CYCLE_MS);
+
+      return () => window.clearInterval(timer);
+    }
+
+    const hold = Math.max(
+      600,
+      CYCLE_MS - tag.length * (TYPE_MS + ERASE_MS),
+    );
+
+    const step = () => {
+      if (!erasing && typed < tag.length) return setTyped(typed + 1);
+      if (!erasing) return setErasing(true);
+      if (typed > 0) return setTyped(typed - 1);
+
+      setErasing(false);
+      setIndex((current) => (current + 1) % TAGS.length);
+    };
+
+    let delay = ERASE_MS;
+    if (!erasing) delay = typed < tag.length ? TYPE_MS : hold;
+
+    const timer = window.setTimeout(step, delay);
+    return () => window.clearTimeout(timer);
+  }, [typed, erasing, index, reduceMotion, tag]);
 
   return (
-    // Fixed height and an absolutely placed span: the outgoing and incoming
-    // phrases overlap during the swap, so neither the lockup above nor the
-    // hero's own centring ever shifts by a pixel.
-    // aria-hidden - the h1 already carries this message as a sentence, and a
-    // line that rewrites itself every five seconds is noise to a screen reader.
+    // Fixed height, so a line that is empty between phrases never collapses and
+    // shifts the lockup above it. aria-hidden - the h1 already carries this
+    // message as a sentence, and a line that retypes itself every five seconds
+    // is noise to a screen reader.
     <p
       aria-hidden
-      className="relative mx-auto mt-3 h-6 overflow-hidden text-center"
+      className="mt-3 flex h-6 items-center justify-center whitespace-nowrap font-mono text-[0.82rem] uppercase tracking-[0.18em] text-white/[0.62]"
     >
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.span
-          key={TAGS[index]}
-          initial={{ opacity: 0, y: reduceMotion ? 0 : 9 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: reduceMotion ? 0 : -9 }}
-          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
-          className="absolute inset-0 flex items-center justify-center whitespace-nowrap text-[0.95rem] font-light tracking-[0.06em] text-white/[0.62]"
-        >
-          {TAGS[index]}
-        </motion.span>
-      </AnimatePresence>
+      <span>{reduceMotion ? tag : tag.slice(0, typed)}</span>
+      {!reduceMotion && (
+        <span className="animate-hero-caret-blink ml-[0.14em] inline-block h-[0.95em] w-[0.45em] shrink-0 bg-white/50" />
+      )}
     </p>
   );
 }

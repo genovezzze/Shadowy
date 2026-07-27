@@ -1390,3 +1390,20 @@ input[type="checkbox"]:focus-visible {
   background: #e8e8e8;
   transform: translateY(0);
 }
+
+/* Terminal caret for the hero's rotating tag line. steps(1) so it snaps on and
+   off like a real cursor - an eased fade reads as a glow, not a blink. */
+@keyframes hero-caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.animate-hero-caret-blink {
+  animation: hero-caret-blink 1.05s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-caret-blink {
+    animation: none;
+  }
+}
