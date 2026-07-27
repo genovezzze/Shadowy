@@ -10,6 +10,7 @@ import { AnimatedGroup } from "@/components/ui/animated-group";
 import { Button } from "@/components/ui/button";
 import { ButtonColorful } from "@/components/ui/button-colorful";
 import { ScrollReveal } from "@/components/ui/scroll-reveal";
+import { HeroRotatingTags } from "@/components/landing/hero-rotating-tags";
 import { HeroVideoBackground } from "@/components/landing/hero-video-background";
 import { LiveDashboardPreview } from "@/components/landing/live-dashboard-preview";
 import { MobileDashboardPreview } from "@/components/landing/mobile-dashboard-preview";
@@ -170,8 +171,9 @@ export function HeroSection() {
   // 740px-tall phone the wordmark was still at ~90% when the device's top edge
   // sliced through it, and on a 932px one it had dimmed away in the open well
   // before the device arrived. The phone's edge reaches the lockup at ~0.57 of
-  // the hero height on every size, so the fade ends there and takes 0.13 of a
-  // screen - the same beat regardless of device.
+  // the hero height on every size; the rotating tag line hangs below the
+  // wordmark and is what the edge meets first, at ~0.53. The fade ends there
+  // and takes 0.13 of a screen - the same beat regardless of device.
   const heroHeightRef = React.useRef(0);
 
   React.useEffect(() => {
@@ -188,8 +190,8 @@ export function HeroSection() {
     const height = heroHeightRef.current;
     if (!height) return 1;
 
-    const start = height * 0.44;
-    const end = height * 0.57;
+    const start = height * 0.4;
+    const end = height * 0.53;
     return 1 - Math.min(1, Math.max(0, (value - start) / (end - start)));
   });
 
@@ -386,6 +388,11 @@ export function HeroSection() {
                     </span>
                   </span>
                 </div>
+
+                {/* Phones only - it fills the slot the hidden h1 leaves under
+                    the lockup. Mounted on the flag rather than hidden with
+                    sm:hidden so no timer runs for a line desktop never shows. */}
+                {previewMode === "mobile" && <HeroRotatingTags />}
 
                 {/* Kept in the DOM on every viewport so the server-rendered HTML
                     always carries exactly one h1 with the page's key sentence.
