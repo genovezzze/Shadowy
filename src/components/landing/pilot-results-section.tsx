@@ -58,7 +58,7 @@ export function PilotResultsSection() {
         >
           <div
             aria-hidden
-            className="pointer-events-none absolute bottom-6 left-[18px] top-6 w-px bg-gradient-to-b from-emerald-400/10 via-emerald-300/55 to-emerald-400/10 sm:hidden"
+            className="pointer-events-none absolute bottom-6 left-[18px] top-6 w-px bg-gradient-to-b from-slate-400/10 via-slate-300/55 to-slate-400/10 sm:hidden"
           />
 
           <svg
@@ -69,9 +69,9 @@ export function PilotResultsSection() {
           >
             <defs>
               <linearGradient id="pilot-result-path" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0%" stopColor="#34d399" stopOpacity="0.22" />
-                <stop offset="50%" stopColor="#5eead4" stopOpacity="0.75" />
-                <stop offset="100%" stopColor="#34d399" stopOpacity="0.28" />
+                <stop offset="0%" stopColor="#64748b" stopOpacity="0.22" />
+                <stop offset="50%" stopColor="#cbd5e1" stopOpacity="0.75" />
+                <stop offset="100%" stopColor="#64748b" stopOpacity="0.28" />
               </linearGradient>
             </defs>
             <path
@@ -99,20 +99,6 @@ export function PilotResultsSection() {
                 },
               }}
             />
-            <circle
-              className="animate-pilot-path-dot"
-              r="1.25"
-              fill="#6ee7b7"
-              stroke="#d1fae5"
-              strokeWidth="0.45"
-              vectorEffect="non-scaling-stroke"
-            >
-              <animateMotion
-                dur="12s"
-                repeatCount="indefinite"
-                path="M 23 13 C 52 13, 48 34, 77 34 C 49 34, 51 66, 23 66 C 52 66, 48 88, 77 88"
-              />
-            </circle>
           </svg>
 
           {results.map((result, i) => {
@@ -128,8 +114,10 @@ export function PilotResultsSection() {
                 )}
               >
                 <motion.article
-                  className="relative z-10 flex min-h-[140px] flex-col gap-2.5 overflow-hidden rounded-[12px] border border-emerald-300/[0.15] bg-[#080b0e] bg-cover bg-center p-3.5 shadow-[0_18px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors hover:border-emerald-300/30 sm:h-full sm:min-h-[145px] sm:p-3.5"
-                  style={{ backgroundImage: "url('/images/cards_back.webp?v=3')" }}
+                  // The green came from a background photo, so recolouring the
+                  // border alone would not have helped - it is replaced by a
+                  // slate gradient in the same tones as the section headings.
+                  className="relative z-10 flex min-h-[140px] flex-col gap-2.5 overflow-hidden rounded-[12px] border border-slate-300/[0.15] bg-[#080b0e] bg-[linear-gradient(135deg,rgba(148,163,184,0.16)_0%,rgba(71,85,105,0.10)_42%,rgba(15,23,42,0.04)_100%)] p-3.5 shadow-[0_18px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.05)] transition-colors hover:border-slate-300/30 sm:h-full sm:min-h-[145px] sm:p-3.5"
                   variants={{
                     hidden: { opacity: 0, y: 20 },
                     visible: {
@@ -142,7 +130,7 @@ export function PilotResultsSection() {
                   <div aria-hidden className="pointer-events-none absolute inset-0 bg-black/25" />
                   <div
                     aria-hidden
-                    className="animate-pilot-card-sheen pointer-events-none absolute -inset-y-8 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-emerald-200/10 to-transparent opacity-0"
+                    className="animate-pilot-card-sheen pointer-events-none absolute -inset-y-8 -left-1/2 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-slate-200/10 to-transparent opacity-0"
                     style={{ animationDelay: `${i * 2.8}s` }}
                   />
                   <div className="relative flex items-center gap-2.5">

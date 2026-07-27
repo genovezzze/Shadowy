@@ -98,10 +98,6 @@ export function ClosingSections() {
         className="hidden"
       >
         <DottedBackground />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-48 bottom-[-12rem] size-[430px] rounded-full bg-emerald-400/[0.06] blur-[130px]"
-        />
 
         <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
           <header className="text-center">
@@ -160,7 +156,7 @@ export function ClosingSections() {
       <section
         id="pilots"
         aria-labelledby="pilot-heading-visible"
-        className="relative mt-8 overflow-hidden bg-[#070809] py-8 scroll-mt-24 sm:mx-4 sm:mt-16 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-10 lg:mx-7"
+        className="relative mt-6 overflow-hidden bg-[#070809] py-6 scroll-mt-24 sm:mx-4 sm:mt-10 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-8 lg:mx-7"
       >
         <div
           aria-hidden
@@ -179,14 +175,10 @@ export function ClosingSections() {
           aria-hidden
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_78%_at_50%_46%,transparent_20%,rgba(7,8,9,0.28)_68%,rgba(7,8,9,0.82)_100%)]"
         />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute -left-40 top-1/4 size-[430px] rounded-full bg-emerald-400/[0.07] blur-[130px]"
-        />
         <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
           <h2
             id="pilot-heading-visible"
-            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[2rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(2rem,4vw,2.65rem)]"
+            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[1.6rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(1.75rem,2.8vw,2.1rem)]"
           >
             Izmēģiniet pilotu bez riska
           </h2>
@@ -226,11 +218,11 @@ export function ClosingSections() {
             </p>
           </div>
 
-          <div className="mt-6 rounded-2xl border border-white/[0.1] bg-[#070809]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)] sm:p-5">
-            <h3 className="font-accent text-lg font-bold tracking-[0.035em] text-white">
+          <div className="mt-4 rounded-2xl border border-white/[0.1] bg-[#070809]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)]">
+            <h3 className="font-accent text-base font-bold tracking-[0.035em] text-white">
               Pieteikt pilotu
             </h3>
-            <p className="mb-5 mt-1.5 text-sm tracking-[0.02em] text-white/48">
+            <p className="mb-4 mt-1 text-[0.8rem] tracking-[0.02em] text-white/48">
               Atbildēsim{" "}
               <strong className="font-bold text-white/62 [font-synthesis:weight]">
                 1-2 darba dienu laikā
@@ -411,11 +403,11 @@ export function ClosingSections() {
                   </span>
                   <span className="flex flex-col">
                     Artemijs Lučins
-                    <span className="text-[11px] text-white/30">Produkta un platformas vadība</span>
+                    <span className="text-[11px] text-white/30">Founder</span>
                   </span>
                 </a>
                 <a
-                  href="https://www.linkedin.com/in/līga-migoļa-694651406/"
+                  href="https://www.linkedin.com/company/shadowy/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group inline-flex w-fit items-center gap-2.5 text-[13px] text-white/55 transition hover:text-white"
@@ -423,10 +415,7 @@ export function ClosingSections() {
                   <span className="grid size-8 place-items-center rounded-lg border border-white/[0.08] bg-white/[0.025] transition group-hover:border-sky-300/20 group-hover:text-sky-300">
                     <Linkedin className="size-3.5" aria-hidden />
                   </span>
-                  <span className="flex flex-col">
-                    Līga Migoļa
-                    <span className="text-[11px] text-white/30">Pētniecība un komunikācija</span>
-                  </span>
+                  <span>Shadowy</span>
                 </a>
               </div>
             </div>

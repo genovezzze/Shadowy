@@ -5,7 +5,6 @@ import Image from "next/image";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { ArrowLeft, ArrowRight, MoveHorizontal } from "lucide-react";
 import { EmphasizedText } from "@/components/landing/emphasized-text";
-import { cn } from "@/lib/utils";
 
 const slides = [
   {
@@ -150,11 +149,6 @@ export function AnnaStoryCarousel() {
     };
   }, [activeIndex, resetIdleSwipePrompt]);
 
-  const showSlide = React.useCallback((index: number) => {
-    setDirection(index >= activeIndex ? 1 : -1);
-    setActiveIndex((index + slides.length) % slides.length);
-  }, [activeIndex]);
-
   const showNext = React.useCallback(() => {
     setDirection(1);
     setActiveIndex((current) => (current + 1) % slides.length);
@@ -171,7 +165,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative z-[46] overflow-hidden bg-[#070809] py-8 sm:-mt-px sm:mx-4 sm:rounded-[32px] sm:border sm:border-white/[0.08] sm:py-24 md:py-32 lg:mx-7"
+      className="relative z-[46] overflow-hidden bg-[#070809] py-8 sm:py-12 md:py-14"
     >
       <div
         aria-hidden
@@ -186,35 +180,26 @@ export function AnnaStoryCarousel() {
             "linear-gradient(to bottom, transparent, black 16%, black 84%, transparent)",
         }}
       />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -left-52 top-1/3 size-[430px] rounded-full bg-emerald-500/[0.09] blur-[120px] hidden sm:block"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -right-52 bottom-0 size-[480px] rounded-full bg-emerald-950/[0.18] blur-[130px] hidden sm:block"
-      />
-
       <div className="relative mx-auto max-w-7xl px-5 sm:px-6">
         <header className="mx-auto max-w-none text-center">
           <h2
             id="anna-story-heading"
-            className="text-balance font-accent text-[2rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.4rem,4.1vw,3.75rem)]"
+            className="text-balance font-accent text-[1.75rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2rem,3vw,2.75rem)]"
           >
             Kur pazūd laiks, nauda un komandas fokuss
           </h2>
-          <p className="mx-auto mt-5 max-w-5xl text-balance font-accent text-base font-light leading-7 tracking-[0.01em] text-white/72 sm:text-[clamp(1.05rem,1.5vw,1.4rem)] sm:text-white/80">
+          <p className="mx-auto mt-3 max-w-4xl text-balance font-accent text-[0.95rem] font-light leading-6 tracking-[0.01em] text-white/72 sm:text-[clamp(1rem,1.15vw,1.15rem)] sm:leading-[1.6] sm:text-white/80">
             Daļa darba notiek ārpus sistēmām - ārpus kalendāra, uzdevumiem un atskaitēm.
             <br className="hidden xl:block" />
             {" "}Katrs gadījums šķiet mazs, bet kopā tie kļūst par reālām izmaksām
           </p>
         </header>
 
-        <div className="mx-auto mt-5 max-w-3xl md:mt-10">
+        <div className="mx-auto mt-4 max-w-3xl md:mt-6">
           <div className="relative overflow-hidden rounded-[20px] border border-white/[0.1] bg-black p-1.5 shadow-[0_24px_90px_rgba(0,0,0,0.42),inset_0_1px_0_rgba(255,255,255,0.06)] sm:rounded-[24px] sm:p-2">
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_12%_18%,rgba(52,211,153,0.07),transparent_72%),radial-gradient(70%_60%_at_90%_90%,rgba(6,78,59,0.11),transparent_70%)]"
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(70%_55%_at_12%_18%,rgba(255,255,255,0.035),transparent_72%),radial-gradient(70%_60%_at_90%_90%,rgba(255,255,255,0.02),transparent_70%)]"
             />
 
             <motion.div
@@ -247,7 +232,7 @@ export function AnnaStoryCarousel() {
                 initial="enter"
                 animate="center"
                 exit="exit"
-                className="relative grid cursor-grab overflow-hidden rounded-[16px] border border-white/[0.06] bg-black active:cursor-grabbing sm:cursor-auto sm:rounded-[18px] lg:h-[370px] lg:grid-cols-[44%_56%]"
+                className="relative grid cursor-grab overflow-hidden rounded-[16px] border border-white/[0.06] bg-black active:cursor-grabbing sm:cursor-auto sm:rounded-[18px] lg:h-[298px] lg:grid-cols-[42%_58%]"
                 drag={isMobile ? "x" : false}
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.12}
@@ -291,7 +276,7 @@ export function AnnaStoryCarousel() {
                 <AnimatePresence initial={false} mode="sync">
                   <motion.div
                     key={activeIndex}
-                    className="relative flex h-full flex-col p-3 sm:p-5"
+                    className="relative flex h-full flex-col p-3 sm:p-4"
                     aria-live="polite"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -302,12 +287,12 @@ export function AnnaStoryCarousel() {
                       className="flex w-full max-w-[190px] items-center gap-2.5"
                       aria-label={`${activeIndex + 1}. no ${slides.length} stāsta soļiem`}
                     >
-                      <span className="font-accent text-[11px] font-semibold tabular-nums tracking-[0.16em] text-emerald-300">
+                      <span className="font-accent text-[11px] font-semibold tabular-nums tracking-[0.16em] text-slate-300">
                         {String(activeIndex + 1).padStart(2, "0")}
                       </span>
                       <div className="relative h-1.5 flex-1 overflow-hidden rounded-full bg-white/[0.08] ring-1 ring-inset ring-white/[0.04]">
                         <motion.div
-                          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-emerald-700 via-emerald-300 to-teal-200 shadow-[0_0_12px_rgba(110,231,183,0.6)]"
+                          className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-slate-600 via-slate-400 to-slate-200"
                           initial={false}
                           animate={{
                             width: `${((activeIndex + 1) / slides.length) * 100}%`,
@@ -335,29 +320,29 @@ export function AnnaStoryCarousel() {
                       </span>
                     </div>
 
-                    <h3 className="mt-2 text-balance font-accent text-lg font-bold leading-tight tracking-[0.015em] text-white [font-synthesis:weight] sm:mt-3 sm:text-[1.35rem]">
+                    <h3 className="mt-2 text-balance font-accent text-lg font-bold leading-tight tracking-[0.015em] text-white [font-synthesis:weight] sm:mt-2.5 sm:text-[1.2rem]">
                       {activeIndex === 0 ? (
                         <>
                           {"Iepaz\u012bsties ar "}
-                          <span className="text-emerald-300">Annu</span>
+                          <span className="text-slate-400">Annu</span>
                         </>
                       ) : activeIndex === 2 ? (
                         <>
                           {"Darbs "}
-                          <span className="text-emerald-300">notiek</span>
+                          <span className="text-slate-400">notiek</span>
                           {", bet "}
-                          <span className="text-emerald-300">
+                          <span className="text-slate-400">
                             {"netiek fiks\u0113ts"}
                           </span>
                         </>
                       ) : activeIndex === 3 ? (
                         <>
                           {"Te pal\u012bdz "}
-                          <span className="text-emerald-300">Shadowy</span>
+                          <span className="text-slate-400">Shadowy</span>
                         </>
                       ) : activeIndex === 4 ? (
                         <>
-                          <span className="text-emerald-300">Redzamas</span>
+                          <span className="text-slate-400">Redzamas</span>
                           {" izmaksas, lab\u0101ki l\u0113mumi"}
                         </>
                       ) : (
@@ -365,7 +350,7 @@ export function AnnaStoryCarousel() {
                       )}
                     </h3>
 
-                    <div className="mt-2 space-y-1.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:mt-3 sm:space-y-2.5 sm:text-base sm:leading-relaxed">
+                    <div className="mt-2 space-y-1.5 font-accent text-sm font-light leading-6 tracking-[0.01em] text-white/78 sm:mt-2 sm:space-y-2 sm:text-[0.95rem] sm:leading-[1.55]">
                       {activeSlide.paragraphs.map((paragraph) => (
                         <p key={paragraph}>
                           <EmphasizedText
@@ -387,7 +372,7 @@ export function AnnaStoryCarousel() {
                       ))}
                     </div>
 
-                    <div className="mt-auto flex items-center gap-2 pt-3 sm:pt-4">
+                    <div className="mt-auto flex items-center gap-2 pt-3 sm:pt-2">
                       <div className="flex w-full items-center gap-2.5 border-t border-white/[0.09] pt-3 text-sm font-bold tracking-[0.025em] text-white/80 sm:hidden">
                         <motion.span
                           aria-hidden
@@ -398,7 +383,7 @@ export function AnnaStoryCarousel() {
                             repeat: Infinity,
                           }}
                         >
-                          <MoveHorizontal className="size-5 text-emerald-300" />
+                          <MoveHorizontal className="size-5 text-white/70" />
                         </motion.span>
                         <span>Velc kartīti, lai turpinātu</span>
                       </div>
@@ -406,7 +391,7 @@ export function AnnaStoryCarousel() {
                         type="button"
                         onClick={showPrevious}
                         aria-label="Iepriekšējais stāsta slaids"
-                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:inline-flex sm:size-10"
+                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-white/30 hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:inline-flex sm:size-10"
                       >
                         <ArrowLeft className="size-4 transition-transform group-hover:-translate-x-0.5 sm:size-5" />
                       </button>
@@ -414,7 +399,7 @@ export function AnnaStoryCarousel() {
                         type="button"
                         onClick={showNext}
                         aria-label="Nākamais stāsta slaids"
-                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-emerald-300/30 hover:bg-emerald-300/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 sm:inline-flex sm:size-10"
+                        className="group hidden size-9 items-center justify-center rounded-full border border-white/[0.12] bg-white/[0.055] text-white transition-all hover:border-white/30 hover:bg-white/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 sm:inline-flex sm:size-10"
                       >
                         <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5 sm:size-5" />
                       </button>
@@ -427,28 +412,6 @@ export function AnnaStoryCarousel() {
             </motion.div>
           </div>
 
-          <div
-            className="mt-5 flex items-center justify-center gap-1.5"
-            aria-label="Stāsta slaidu navigācija"
-          >
-            {slides.map((slide, index) => (
-              <button
-                key={slide.title}
-                type="button"
-                onClick={() => showSlide(index)}
-                aria-label={`Atvērt ${index + 1}. slaidu`}
-                aria-current={index === activeIndex ? "true" : undefined}
-                className={cn(
-                  "h-1 rounded-full transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070809]",
-                  index === activeIndex
-                    ? "w-12 bg-gradient-to-r from-emerald-500 to-emerald-200 shadow-[0_0_14px_rgba(110,231,183,0.5)]"
-                    : index < activeIndex
-                      ? "w-6 bg-emerald-800/70 hover:bg-emerald-700"
-                      : "w-6 bg-white/15 hover:bg-white/35",
-                )}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </section>

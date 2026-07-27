@@ -216,7 +216,12 @@ export function AIDraftAnimation() {
     }
     const updateHeight = () => {
       if (!innerRef.current) return
-      setInnerH(innerRef.current.scrollHeight)
+      // The four scenes have different natural heights, so measuring each one
+      // made the card resize as the animation cycled. Locking to the tallest
+      // height seen keeps it fixed - it can grow into a taller scene once, but
+      // never shrinks back.
+      const measured = innerRef.current.scrollHeight
+      setInnerH((prev) => Math.max(prev, measured))
     }
     updateScale()
     updateHeight()

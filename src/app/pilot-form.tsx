@@ -21,7 +21,7 @@ const TEAM_SIZES = [
 ] as const;
 
 const fieldClassName =
-  "h-12 rounded-xl border-white/[0.12] bg-[#0c1014] px-3.5 font-accent text-base tracking-[0.01em] text-white shadow-none placeholder:text-white/32 focus-visible:border-emerald-300/35 focus-visible:ring-1 focus-visible:ring-emerald-300/25 sm:h-11 sm:rounded-lg sm:text-sm sm:tracking-[0.02em]";
+  "h-11 rounded-xl border-white/[0.12] bg-[#08090a] px-3.5 font-accent text-base tracking-[0.01em] text-white shadow-none placeholder:text-white/32 focus-visible:border-emerald-300/35 focus-visible:ring-1 focus-visible:ring-emerald-300/25 sm:h-10 sm:rounded-lg sm:text-sm sm:tracking-[0.02em]";
 
 export function PilotForm() {
   const [pending, startTransition] = useTransition();
@@ -54,9 +54,9 @@ export function PilotForm() {
   }
 
   return (
-    <form action={onSubmit} className="space-y-3.5">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="grid gap-1.5">
+    <form action={onSubmit} className="space-y-2.5">
+      <div className="grid gap-2.5 sm:grid-cols-2">
+        <div className="grid gap-1">
           <Label
             htmlFor="pilot-name"
             className="font-accent text-sm font-bold tracking-[0.015em] text-white/80"
@@ -73,7 +73,7 @@ export function PilotForm() {
           />
         </div>
 
-        <div className="grid gap-1.5">
+        <div className="grid gap-1">
           <Label
             htmlFor="pilot-company"
             className="font-accent text-sm font-bold tracking-[0.015em] text-white/80"
@@ -90,7 +90,7 @@ export function PilotForm() {
           />
         </div>
 
-        <div className="grid gap-1.5 sm:col-span-2">
+        <div className="grid gap-1 sm:col-span-2">
           <Label
             htmlFor="pilot-email"
             className="font-accent text-sm font-bold tracking-[0.015em] text-white/80"
@@ -107,7 +107,7 @@ export function PilotForm() {
           />
         </div>
 
-        <div className="grid gap-1.5 sm:col-span-2">
+        <div className="grid gap-1 sm:col-span-2">
           <Label
             htmlFor="pilot-size"
             className="font-accent text-sm font-bold tracking-[0.015em] text-white/80"
@@ -129,7 +129,7 @@ export function PilotForm() {
         </div>
       </div>
 
-      <div className="grid gap-1.5">
+      <div className="grid gap-1">
         <Label
           htmlFor="pilot-comment"
           className="font-accent text-sm font-bold tracking-[0.015em] text-white/80"
@@ -143,7 +143,7 @@ export function PilotForm() {
           rows={2}
           maxLength={1000}
           placeholder="Ko jūs vēlaties uzlabot komandā? Kādi ir galvenie izaicinājumi?"
-          className="min-h-28 w-full resize-y rounded-xl border border-white/[0.12] bg-[#0c1014] px-3.5 py-3 font-accent text-base font-light leading-6 tracking-[0.01em] text-white outline-none transition placeholder:text-white/32 focus:border-emerald-300/35 focus:ring-1 focus:ring-emerald-300/25 sm:min-h-24 sm:rounded-lg sm:text-sm sm:tracking-[0.02em]"
+          className="min-h-20 w-full resize-y rounded-xl border border-white/[0.12] bg-[#08090a] px-3.5 py-3 font-accent text-base font-light leading-6 tracking-[0.01em] text-white outline-none transition placeholder:text-white/32 focus:border-emerald-300/35 focus:ring-1 focus:ring-emerald-300/25 sm:min-h-[68px] sm:rounded-lg sm:text-sm sm:tracking-[0.02em]"
         />
       </div>
 
@@ -153,11 +153,11 @@ export function PilotForm() {
         </p>
       )}
 
-      <div className="flex justify-stretch border-t border-white/[0.09] pt-4 sm:justify-end">
+      <div className="flex justify-stretch border-t border-white/[0.09] pt-3 sm:justify-end">
         <button
           type="submit"
           disabled={pending}
-          className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-white/75 bg-white px-5 font-accent text-sm font-bold tracking-[0.025em] text-[#06110e] shadow-[0_0_22px_rgba(255,255,255,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(255,255,255,0.18)] disabled:pointer-events-none disabled:opacity-50 sm:h-11 sm:w-auto sm:rounded-lg"
+          className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/75 bg-white px-5 font-accent text-sm font-bold tracking-[0.025em] text-[#06110e] shadow-[0_0_22px_rgba(255,255,255,0.1)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(255,255,255,0.18)] disabled:pointer-events-none disabled:opacity-50 sm:h-10 sm:w-auto sm:rounded-lg"
         >
           {pending ? "Sūta..." : "Pieteikt pilotu"}
           {!pending && (

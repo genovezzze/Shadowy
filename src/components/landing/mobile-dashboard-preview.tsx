@@ -19,10 +19,23 @@ const SCREEN_H = STATUS_BAR_H + PHONE_H;
 
 export function MobileDashboardPreview() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(0);
   const reduceMotion = useReducedMotion();
-  const { scrollY } = useScroll();
-  const phoneY = useTransform(scrollY, [0, 400], [0, -190], {
+
+  // Tied to this element's own trip through the viewport rather than to
+  // absolute page scroll. The old [0, 400] window was spent before the phone
+  // ever came into view, so the transform sat clamped and nothing moved.
+  // The tracked element is the untransformed wrapper - measuring the phone
+  // itself would feed its own translation back into the measurement.
+  const { scrollYProgress } = useScroll({
+    target: trackRef,
+    offset: ["start end", "end start"],
+  });
+  // Clamped: the rise finishes halfway through the element's pass and then
+  // holds, so the phone stops climbing instead of drifting up for the whole
+  // scroll and opening a growing gap above the next section.
+  const phoneY = useTransform(scrollYProgress, [0, 0.5], [70, -170], {
     clamp: true,
   });
 
@@ -38,12 +51,16 @@ export function MobileDashboardPreview() {
   }, []);
 
   return (
+    <div ref={trackRef} className="relative">
     <motion.div
       aria-hidden
       className="pointer-events-none relative mx-auto w-full max-w-[320px] select-none"
       style={{
         aspectRatio: `${PHONE_W} / ${SCREEN_H}`,
-        marginBottom: reduceMotion ? 0 : -140,
+        // Pulls following content up under the risen phone. Kept modest so the
+        // gap below does not depend on how far the parallax has travelled -
+        // at a large value the next section ran into the phone mid-scroll.
+        marginBottom: reduceMotion ? 0 : -110,
         willChange: "transform",
         y: reduceMotion ? 0 : phoneY,
       }}
@@ -93,5 +110,6 @@ export function MobileDashboardPreview() {
         </div>
       </div>
     </motion.div>
+    </div>
   );
 }

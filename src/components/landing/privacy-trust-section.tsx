@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 
 const visibleItems = [
   "Apstiprinātus ierakstus",
@@ -22,112 +22,97 @@ export function PrivacyTrustSection() {
     <section
       id="privatums"
       aria-labelledby="privacy-trust-heading"
-      className="relative py-14 scroll-mt-24 sm:py-20 md:py-24"
+      className="relative py-10 scroll-mt-24 sm:py-12"
     >
-      <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
-        <header className="mx-auto max-w-5xl text-left">
+      <div className="relative mx-auto max-w-5xl px-5 sm:px-6">
+        <header className="text-center">
           <h2
             id="privacy-trust-heading"
-            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_38%,rgba(226,232,240,.8)_68%,rgba(100,116,139,.58)_100%)] bg-clip-text font-accent text-[2rem] font-bold leading-[1.06] tracking-[0.015em] text-transparent [font-synthesis:weight] sm:text-[clamp(2.4rem,4vw,3.75rem)]"
+            className="text-balance font-accent text-[1.6rem] font-bold leading-[1.1] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(1.9rem,2.6vw,2.4rem)]"
           >
-            Nav kontroles rīks.
-            <span className="mt-1 block lg:ml-2 lg:mt-0 lg:inline">
-              Tas ir par procesu uzlabošanu
-            </span>
+            Nav kontroles rīks.{" "}
+            <span className="text-white/45">Tas ir par procesu uzlabošanu</span>
           </h2>
 
-          <p className="mt-6 max-w-5xl font-accent text-base font-light leading-relaxed tracking-[0.012em] text-white/68 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-3xl text-balance font-accent text-[0.9rem] font-light leading-6 tracking-[0.012em] text-white/60 sm:text-[0.95rem] sm:leading-[1.55]">
             Shadowy neskatās, cik ilgi cilvēks sēž pie datora.{" "}
-            <strong className="font-bold text-white/82 [font-synthesis:weight]">
+            <strong className="font-semibold text-white/80 [font-synthesis:weight]">
               Mēs nesekojam katrai darbībai un neveidojam darbinieku reitingu.
-            </strong>{" "}
-            Shadowy palīdz saprast, kur darba procesā rodas{" "}
-            <strong className="font-bold text-white/82 [font-synthesis:weight]">
-              slēptā slodze, lieki pārtraukumi un neefektivitāte
             </strong>
           </p>
         </header>
 
+        {/* One panel split down the middle, rather than two separate boxes -
+            the pair is a single comparison, and as separate cards the short
+            lists left each box looking unfinished. */}
         <motion.div
-          className="mx-auto mt-12 grid max-w-5xl gap-5 [perspective:1200px] md:grid-cols-2"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.12 }}
-          variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.16 } },
-          }}
+          className="mt-6 grid grid-cols-1 overflow-hidden rounded-2xl border border-white/[0.1] bg-white/[0.012] sm:grid-cols-2"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
         >
-          <motion.article
-            className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
-            variants={{
-              hidden: {
-                opacity: 0,
-                y: 32,
-                scale: 0.96,
-              },
-              visible: {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-              },
-            }}
-            whileHover={{ y: -6 }}
-          >
-            <h3 className="font-accent text-xl font-bold tracking-[0.02em] text-white">
-              Ko vadītājs redz
-            </h3>
-            <ul className="mt-4 space-y-2 font-accent text-base font-medium leading-relaxed tracking-[0.012em] text-white/78 sm:text-lg">
+          <div className="border-b border-white/[0.08] px-5 py-5 sm:border-b-0 sm:border-r sm:px-6">
+            <div className="flex items-center gap-2.5">
+              <Eye className="size-4 shrink-0 text-white/70" aria-hidden />
+              <h3 className="font-accent text-sm font-bold tracking-[0.02em] text-white">
+                Ko vadītājs redz
+              </h3>
+            </div>
+            <ul className="mt-3.5 space-y-2">
               {visibleItems.map((item) => (
-                <li key={item}>{item}</li>
+                <li
+                  key={item}
+                  className="flex items-start gap-2.5 font-accent text-sm font-light leading-6 text-white/75"
+                >
+                  <span
+                    aria-hidden
+                    className="mt-[9px] size-1 shrink-0 rounded-full bg-white/50"
+                  />
+                  {item}
+                </li>
               ))}
             </ul>
-          </motion.article>
+          </div>
 
-          <motion.article
-            className="rounded-2xl border border-white/[0.1] bg-black/10 px-5 py-6 sm:px-9 sm:py-8"
-            variants={{
-              hidden: {
-                opacity: 0,
-                y: 32,
-                scale: 0.96,
-              },
-              visible: {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
-              },
-            }}
-            whileHover={{ y: -6 }}
-          >
-            <h3 className="font-accent text-xl font-bold tracking-[0.02em] text-white">
-              Ko vadītājs neredz
-            </h3>
-            <ul className="mt-4 space-y-2 font-accent text-base font-medium leading-relaxed tracking-[0.012em] text-white/62 sm:text-lg">
+          <div className="px-5 py-5 sm:px-6">
+            <div className="flex items-center gap-2.5">
+              <EyeOff className="size-4 shrink-0 text-white/35" aria-hidden />
+              <h3 className="font-accent text-sm font-bold tracking-[0.02em] text-white/45">
+                Ko vadītājs neredz
+              </h3>
+            </div>
+            <ul className="mt-3.5 space-y-2">
               {hiddenItems.map((item) => (
-                <li key={item}>{item}</li>
+                <li
+                  key={item}
+                  className="flex items-start gap-2.5 font-accent text-sm font-light leading-6 text-white/35"
+                >
+                  <span
+                    aria-hidden
+                    className="mt-[9px] size-1 shrink-0 rounded-full bg-white/20"
+                  />
+                  {item}
+                </li>
               ))}
             </ul>
-          </motion.article>
-        </motion.div>
+          </div>
 
-        <div className="mx-auto mt-5 flex max-w-5xl flex-col items-center justify-between gap-4 border-t border-white/[0.08] px-1 pt-5 sm:flex-row">
-          <div className="flex items-center gap-3 text-emerald-400/70">
-            <ShieldCheck className="size-5 shrink-0" aria-hidden />
-            <p className="font-accent text-sm font-medium tracking-[0.012em] sm:text-base">
-              Darbinieks pats kontrolē, ko iesniedz un ko apstiprina
+          {/* Trust strip lives inside the panel so the section reads as one
+              object instead of a box with a caption floating under it. */}
+          <div className="flex flex-col gap-2 border-t border-white/[0.08] bg-white/[0.015] px-5 py-3.5 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+            <div className="flex items-center gap-2.5 text-white/65">
+              <ShieldCheck className="size-4 shrink-0" aria-hidden />
+              <p className="font-accent text-[0.8rem] font-medium tracking-[0.012em]">
+                Darbinieks pats kontrolē, ko iesniedz un ko apstiprina
+              </p>
+            </div>
+            <p className="text-[0.75rem] font-medium tracking-[0.01em] text-white/35">
+              GDPR atbilstoši · Serveri Eiropas Savienībā · Datus var dzēst
+              jebkurā brīdī
             </p>
           </div>
-          <p className="text-center text-xs font-medium tracking-[0.01em] text-white/35 sm:text-right">
-            GDPR atbilstoši · Serveri Eiropas Savienībā
-            <span className="block sm:inline">
-              <span className="hidden sm:inline"> · </span>
-              Datus var dzēst jebkurā brīdī
-            </span>
-          </p>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

@@ -39,6 +39,14 @@ const nextConfig = {
         ],
       },
       {
+        // Hero background video and its poster - stable filenames, so a repeat
+        // visitor never re-downloads them.
+        source: "/videos/:path*",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
         // Decorative marketing preview embedded via <iframe> on the landing
         // page - relax framing to same-origin only (still blocks any other
         // site from framing it).

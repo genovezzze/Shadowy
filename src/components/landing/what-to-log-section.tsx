@@ -40,17 +40,17 @@ export function WhatToLogSection() {
   return (
     <section
       aria-labelledby="what-to-log-heading"
-      className="relative overflow-hidden bg-[#070809] py-14 sm:py-16"
+      className="relative overflow-hidden bg-[#070809] py-10 sm:py-12"
     >
       <div className="relative mx-auto max-w-4xl px-5 sm:px-6">
-        <div className="mb-8 text-left sm:text-center">
+        <div className="mb-5 text-left sm:text-center">
           <h2
             id="what-to-log-heading"
-            className="text-balance font-accent text-[1.6rem] font-bold tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2.25rem,4vw,3rem)]"
+            className="text-balance font-accent text-[1.4rem] font-bold tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(1.75rem,2.6vw,2.25rem)]"
           >
             Kas der fiksēšanai un kas ne?
           </h2>
-          <p className="mx-auto mt-4 max-w-xl font-accent text-base font-light leading-relaxed text-white/50 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-xl font-accent text-[0.9rem] font-light leading-6 text-white/50 sm:text-[0.95rem]">
             Shadowy nefiksē visu darbu. Shadowy fiksē situācijas,{" "}
             <strong className="font-medium text-white/68">
               kur pamatdarbs tiek traucēts vai rodas papildu slodze.
@@ -70,7 +70,7 @@ export function WhatToLogSection() {
         >
           {/* Jāfiksē */}
           <motion.div
-            className="relative overflow-hidden rounded-xl border border-white/[0.18] bg-[#08090a] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24)] sm:p-6"
+            className="relative overflow-hidden rounded-xl border border-white/[0.18] bg-[#08090a] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.24)] sm:p-6"
             variants={{
               hidden: { opacity: 0, x: -24 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
@@ -78,12 +78,12 @@ export function WhatToLogSection() {
           >
             <HatchPattern />
             <div className="relative">
-              <p className="mb-5 font-accent text-base font-bold tracking-[0.04em] text-white/55">
+              <p className="mb-3 font-accent text-sm font-bold tracking-[0.04em] text-white/55">
                 Jāfiksē
               </p>
-              <ul className="space-y-4">
+              <ul className="space-y-2">
                 {shouldLog.map((item) => (
-                  <li key={item} className="flex items-center gap-3 font-accent text-base font-light text-white/80">
+                  <li key={item} className="flex items-center gap-2.5 font-accent text-sm font-light text-white/80">
                     <Check className="size-4 shrink-0 text-emerald-300" strokeWidth={2.5} aria-hidden />
                     {item}
                   </li>
@@ -94,7 +94,7 @@ export function WhatToLogSection() {
 
           {/* Nav jāfiksē */}
           <motion.div
-            className="relative overflow-hidden rounded-xl border border-white/[0.1] bg-[#08090a] p-5 shadow-[0_16px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.02)] sm:p-6"
+            className="relative overflow-hidden rounded-xl border border-white/[0.1] bg-[#08090a] p-4 shadow-[0_16px_45px_rgba(0,0,0,0.24),inset_0_1px_0_rgba(255,255,255,0.02)] sm:p-6"
             variants={{
               hidden: { opacity: 0, x: 24 },
               visible: { opacity: 1, x: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
@@ -102,12 +102,12 @@ export function WhatToLogSection() {
           >
             <HatchPattern />
             <div className="relative">
-              <p className="mb-5 font-accent text-base font-bold tracking-[0.04em] text-white/40">
+              <p className="mb-3 font-accent text-sm font-bold tracking-[0.04em] text-white/40">
                 Nav jāfiksē
               </p>
-              <ul className="space-y-4">
+              <ul className="space-y-2">
                 {shouldNotLog.map((item) => (
-                  <li key={item} className="flex items-center gap-3 font-accent text-base font-light text-white/40">
+                  <li key={item} className="flex items-center gap-2.5 font-accent text-sm font-light text-white/40">
                     <X className="size-4 shrink-0 text-red-400/60" strokeWidth={2} aria-hidden />
                     {item}
                   </li>
