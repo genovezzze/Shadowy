@@ -17,6 +17,8 @@ import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-mat
 import { ClientOverrunWidget } from "@/components/dashboard/client-overrun-widget";
 import { EntriesBreakdownCard } from "@/components/dashboard/entries-breakdown-card";
 import { buildClientMatrix } from "@/lib/client-matrix";
+import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
+import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import {
   AlertTriangle,
   Clock,
@@ -202,7 +204,7 @@ function computeAvgApprovalDays(entries: ApprovedEntry[]): number | null {
 export default async function ManagerDashboard({
   searchParams,
 }: {
-  searchParams: { period?: string };
+  searchParams: { period?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
@@ -210,6 +212,7 @@ export default async function ManagerDashboard({
   const period = searchParams?.period ?? "30d";
   const periodStart = getPeriodStart(period);
   const periodFilter = periodStart ? { gte: periodStart } : undefined;
+  const clientMonth = resolveClientMonth(searchParams?.clientMonth);
 
   const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000);
   const twelveMonthsAgo = new Date(Date.now() - 365 * 86400000);
@@ -217,7 +220,7 @@ export default async function ManagerDashboard({
   const nowDate = new Date();
   const currentMonthStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), 1));
 
-  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear] = await Promise.all([
+  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear, clientMatrixEntries, clientMonthHistory] = await Promise.all([
     prisma.user.count({ where: { organizationId: orgId, managerId } }),
     prisma.client.findMany({
       where: { organizationId: orgId },
@@ -282,7 +285,39 @@ export default async function ManagerDashboard({
       where: { organizationId: orgId, managerId, deletedAt: null, createdAt: { gte: twelveMonthsAgo } },
       select: { createdAt: true },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        managerId,
+        status: "APPROVED",
+        deletedAt: null,
+        ...(clientMonth.isAll ? {} : { workDate: { gte: clientMonth.start!, lt: clientMonth.end! } }),
+        OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+      },
+      select: {
+        clientId: true,
+        clientName: true,
+        durationMinutes: true,
+        workDate: true,
+        employee: { select: { id: true, name: true } },
+      },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        managerId,
+        status: "APPROVED",
+        deletedAt: null,
+        OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+      },
+      select: { workDate: true },
+    }),
   ]);
+
+  const availableClientMonths = clientMonthOptions(
+    clientMonthHistory.map((entry) => entry.workDate),
+    clientMonth.key,
+  );
 
   // --- Core aggregation ---
   const clientMinById = new Map<string, number>();   // clientId → minutes
@@ -391,14 +426,16 @@ export default async function ManagerDashboard({
 
   // --- Client x Employee matrix ---
   const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
-    approved.map((e) => ({
+    clientMatrixEntries.map((e) => ({
       clientId: e.clientId,
       clientName: e.clientName,
       employeeId: e.employee.id,
       employeeName: e.employee.name,
       durationMinutes: e.durationMinutes,
+      workDate: e.workDate,
     })),
     clients,
+    { resetLimitMonthly: clientMonth.isAll },
   );
   const overrunClients = matrixRows.filter((r) => r.overrunMinutes > 0);
   const overrunClientCount = overrunClients.length;
@@ -449,7 +486,7 @@ export default async function ManagerDashboard({
     for (const e of approved) {
       if (normalizeCategoryKey(e.category) === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
     }
-    const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+    const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]);
     const maxCnt = sorted[0]?.[1] ?? 1;
     return {
       name: categoryLabel(cat),
@@ -519,12 +556,19 @@ export default async function ManagerDashboard({
       </div>
 
       <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdown} />
+      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />
       <ClientOverrunWidget
         overrunCount={overrunClientCount}
         totalClients={matrixRows.length}
         totalOverrunEur={totalOverrunEur}
-        anchorHref="#client-employee-matrix"
+        monthLabel={clientMonth.label}
+        detailEventName="client-employee-matrix:open"
       />
+      {matrixRows.length === 0 && (
+        <Card className="mb-8 p-5 text-center text-sm text-muted-foreground">
+          {clientMonth.label}: nav apstiprinātu ierakstu ar klientu.
+        </Card>
+      )}
 
       {/* ── Komanda ── */}
       {teamMembers.length > 0 && (
@@ -681,7 +725,15 @@ export default async function ManagerDashboard({
         <>
           <SectionDivider label="Noslodze pa darbiniekiem" />
           <div id="client-employee-matrix" className="mb-8 scroll-mt-20">
-            <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
+            <ClientEmployeeMatrix
+              rows={matrixRows}
+              employees={matrixEmployees}
+              hourlyRateEur={HOURLY_RATE_EUR}
+              monthLabel={clientMonth.label}
+              detailEventName="client-employee-matrix:open"
+              selectedMonth={clientMonth.key}
+              monthOptions={availableClientMonths}
+            />
           </div>
         </>
       )}

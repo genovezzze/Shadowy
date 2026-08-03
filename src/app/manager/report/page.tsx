@@ -3,6 +3,8 @@ import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
 import { normalizeClientName } from "@/lib/client-name";
+import { addMonthlyMinutes, clientMonthOptions, resolveClientMonth, sumMonthlyOverrun } from "@/lib/client-month";
+import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
@@ -104,7 +106,7 @@ function generateRecommendations(data: {
 export default async function ManagerReportPage({
   searchParams,
 }: {
-  searchParams: { period?: string };
+  searchParams: { period?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
@@ -112,8 +114,9 @@ export default async function ManagerReportPage({
   const period = searchParams?.period ?? "30d";
   const periodStart = getPeriodStart(period);
   const now = new Date();
+  const clientMonth = resolveClientMonth(searchParams?.clientMonth, now);
 
-  const [teamUsers, allEntries, reviewedEntries, org, clients] = await Promise.all([
+  const [teamUsers, allEntries, reviewedEntries, org, clients, clientMonthEntries, clientMonthHistory] = await Promise.all([
     prisma.user.findMany({
       where: { organizationId: orgId, managerId, role: "EMPLOYEE" },
       select: { id: true, name: true, workRole: { select: { duties: { select: { text: true } } } } },
@@ -144,7 +147,33 @@ export default async function ManagerReportPage({
       select: { id: true, name: true, freeMinutesPerMonth: true },
       orderBy: { name: "asc" },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        managerId,
+        status: "APPROVED",
+        deletedAt: null,
+        ...(clientMonth.isAll ? {} : { workDate: { gte: clientMonth.start!, lt: clientMonth.end! } }),
+      },
+      select: { clientId: true, clientName: true, durationMinutes: true, workDate: true },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        managerId,
+        status: "APPROVED",
+        deletedAt: null,
+        OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+      },
+      select: { workDate: true },
+    }),
   ]);
+
+  const availableClientMonths = clientMonthOptions(
+    clientMonthHistory.map((entry) => entry.workDate),
+    clientMonth.key,
+    now,
+  );
 
   const approved = allEntries.filter((e) => e.status === "APPROVED");
   const pending = allEntries.filter((e) => e.status === "PENDING");
@@ -221,14 +250,17 @@ export default async function ManagerReportPage({
   // Client analytics
   const clientMinMap = new Map<string, number>(); // clientId → minutes
   const clientNameMinMap = new Map<string, { minutes: number; displayName: string }>(); // clientName.lower → data
+  const clientMonthlyMap = new Map<string, Map<string, number>>();
   let noClientCount = 0;
-  for (const e of approved) {
+  for (const e of clientMonthEntries) {
     if (e.clientId) {
       clientMinMap.set(e.clientId, (clientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
+      addMonthlyMinutes(clientMonthlyMap, e.clientId, e.workDate, e.durationMinutes);
     } else if (e.clientName) {
       const key = normalizeClientName(e.clientName);
       const existing = clientNameMinMap.get(key);
       clientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
+      addMonthlyMinutes(clientMonthlyMap, `name:${key}`, e.workDate, e.durationMinutes);
     } else {
       noClientCount++;
     }
@@ -239,7 +271,11 @@ export default async function ManagerReportPage({
     const nameMinutes = clientNameMinMap.get(normalizeClientName(c.name))?.minutes ?? 0;
     const minutes = (clientMinMap.get(c.id) ?? 0) + nameMinutes;
     if (minutes === 0) continue;
-    const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;
+    const overrun = c.freeMinutesPerMonth !== null
+      ? clientMonth.isAll
+        ? sumMonthlyOverrun(clientMonthlyMap, [c.id, `name:${normalizeClientName(c.name)}`], c.freeMinutesPerMonth)
+        : Math.max(0, minutes - c.freeMinutesPerMonth)
+      : 0;
     clientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
   }
   for (const [nameLower, { minutes, displayName }] of clientNameMinMap.entries()) {
@@ -461,12 +497,13 @@ export default async function ManagerReportPage({
       )}
 
       {/* Client analytics */}
+      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />
       {(clientData.length > 0 || noClientCount > 0) && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-base font-semibold mb-0.5">Klienti</h2>
-              <p className="text-xs text-muted-foreground">Pārsniegums = Ierakstīts − Bezmaksas limits</p>
+              <p className="text-xs text-muted-foreground">{clientMonth.label} · pārsniegums = ierakstīts − bezmaksas limits</p>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">Stundas likme</div>

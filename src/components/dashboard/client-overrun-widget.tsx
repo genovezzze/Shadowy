@@ -1,3 +1,5 @@
+"use client";
+
 import { AlertTriangle } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
@@ -5,11 +7,23 @@ interface Props {
   overrunCount: number;
   totalClients: number;
   totalOverrunEur: number;
+  monthLabel: string;
   anchorHref?: string;
+  detailEventName?: string;
 }
 
-export function ClientOverrunWidget({ overrunCount, totalClients, totalOverrunEur, anchorHref }: Props) {
+export function ClientOverrunWidget({
+  overrunCount,
+  totalClients,
+  totalOverrunEur,
+  monthLabel,
+  anchorHref,
+  detailEventName,
+}: Props) {
   if (overrunCount === 0) return null;
+
+  const detailClasses =
+    "flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground sm:self-auto";
 
   return (
     <Card className="relative mb-8 border-red-500/20 bg-red-500/[0.03] p-0 dark:border-red-500/15">
@@ -21,20 +35,27 @@ export function ClientOverrunWidget({ overrunCount, totalClients, totalOverrunEu
               Klientu limitu pārsniegums
             </span>
           </div>
-          <div className="text-4xl font-bold tabular-nums">−€{totalOverrunEur.toLocaleString("de-DE")}</div>
+          <div className="text-4xl font-bold tabular-nums">
+            −€{totalOverrunEur.toLocaleString("de-DE")}
+          </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            {overrunCount} no {totalClients} {totalClients === 1 ? "klienta" : "klientiem"} pārsniedz mēneša limitu
+            {overrunCount} no {totalClients} {totalClients === 1 ? "klienta" : "klientiem"} pārsniedz mēneša limitu · {monthLabel}
           </p>
         </div>
 
-        {anchorHref && (
-          <a
-            href={anchorHref}
-            className="flex shrink-0 items-center gap-1.5 self-start rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground sm:self-auto"
+        {detailEventName ? (
+          <button
+            type="button"
+            onClick={() => window.dispatchEvent(new Event(detailEventName))}
+            className={detailClasses}
           >
             Skatīt detalizēti
+          </button>
+        ) : anchorHref ? (
+          <a href={anchorHref} className={detailClasses}>
+            Skatīt detalizēti
           </a>
-        )}
+        ) : null}
       </div>
     </Card>
   );

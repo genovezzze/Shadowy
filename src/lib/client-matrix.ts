@@ -17,6 +17,7 @@ type EntryInput = {
   employeeId: string;
   employeeName: string;
   durationMinutes: number;
+  workDate?: Date;
 };
 
 type ClientInput = {
@@ -28,12 +29,14 @@ type ClientInput = {
 export function buildClientMatrix(
   entries: EntryInput[],
   clients: ClientInput[],
+  options: { resetLimitMonthly?: boolean } = {},
 ): { rows: MatrixClientRow[]; employees: MatrixEmployee[] } {
   const clientById = new Map(clients.map((c) => [c.id, c]));
   const clientByNorm = new Map(clients.map((c) => [normalizeClientName(c.name), c]));
 
   // clientKey → { empId → minutes }
   const byClientEmp = new Map<string, Map<string, number>>();
+  const byClientMonth = new Map<string, Map<string, number>>();
   const clientMeta = new Map<string, { name: string; id: string; freeMinutes: number | null }>();
   const empNames = new Map<string, string>();
 
@@ -68,6 +71,14 @@ export function buildClientMatrix(
     }
     const empMap = byClientEmp.get(key)!;
     empMap.set(e.employeeId, (empMap.get(e.employeeId) ?? 0) + e.durationMinutes);
+    if (options.resetLimitMonthly) {
+      const date = e.workDate;
+      if (!date) throw new Error("workDate is required for all-time client limit calculations");
+      const monthKey = `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, "0")}`;
+      if (!byClientMonth.has(key)) byClientMonth.set(key, new Map());
+      const monthMap = byClientMonth.get(key)!;
+      monthMap.set(monthKey, (monthMap.get(monthKey) ?? 0) + e.durationMinutes);
+    }
     empNames.set(e.employeeId, e.employeeName);
   }
 
@@ -75,8 +86,14 @@ export function buildClientMatrix(
   for (const [key, empMap] of byClientEmp) {
     const meta = clientMeta.get(key)!;
     const total = [...empMap.values()].reduce((s, v) => s + v, 0);
-    const overrun =
-      meta.freeMinutes !== null ? Math.max(0, total - meta.freeMinutes) : 0;
+    const overrun = meta.freeMinutes === null
+      ? 0
+      : options.resetLimitMonthly
+        ? [...(byClientMonth.get(key)?.values() ?? [])].reduce(
+            (sum, monthMinutes) => sum + Math.max(0, monthMinutes - meta.freeMinutes!),
+            0,
+          )
+        : Math.max(0, total - meta.freeMinutes);
     const byEmployee: Record<string, number> = {};
     for (const [eid, min] of empMap) byEmployee[eid] = min;
     rows.push({

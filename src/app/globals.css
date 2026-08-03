@@ -2,6 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
+.sidebar-nav-icon {
+  transform-origin: center;
+  will-change: transform;
+}
+
+@keyframes nav-part-pop { 0%,100% { transform: scale(1) } 45% { transform: scale(.55) } 72% { transform: scale(1.12) } }
+@keyframes nav-part-slide-right { 0%,100% { transform: translateX(0) } 45% { transform: translateX(2.5px) } 72% { transform: translateX(1.5px) } }
+@keyframes nav-part-rise { 0%,100% { transform: translateY(0) } 45% { transform: translateY(-2.5px) } 72% { transform: translateY(.5px) } }
+@keyframes nav-part-drop { 0%,100% { transform: translateY(0) } 42% { transform: translateY(-2px) } 68% { transform: translateY(1.5px) } }
+@keyframes nav-part-spin { 0%,100% { transform: rotate(0) } 70% { transform: rotate(110deg) } 86% { transform: rotate(82deg) } }
+@keyframes nav-cog-turn { from { transform: rotate(0) } to { transform: rotate(360deg) } }
+@keyframes nav-part-draw { 0%,100% { stroke-dashoffset: 0; opacity: 1 } 35% { stroke-dashoffset: 12; opacity: .25 } 78% { stroke-dashoffset: 0; opacity: 1 } }
+@keyframes nav-part-bar { 0%,100% { transform: scaleY(1) } 35% { transform: scaleY(.12) } 75% { transform: scaleY(1.08) } }
+@keyframes nav-part-ring { 0%,100% { transform: scale(1); opacity: 1 } 45% { transform: scale(1.2); opacity: .55 } 75% { transform: scale(.96); opacity: 1 } }
+@keyframes nav-part-announce { 0%,100% { transform: translateX(0) rotate(0) } 38% { transform: translateX(1.5px) rotate(-7deg) } 62% { transform: translateX(-.5px) rotate(4deg) } }
+@keyframes nav-part-rewind { 0%,100% { transform: rotate(0) } 68% { transform: rotate(-75deg) } 86% { transform: rotate(-52deg) } }
+@keyframes nav-part-check { 0%,100% { stroke-dashoffset: 0 } 32% { stroke-dashoffset: 9 } 72% { stroke-dashoffset: 0 } }
+@keyframes nav-ai-swirl { 0%,100% { transform: rotate(0) } 65% { transform: rotate(190deg) } 84% { transform: rotate(155deg) } }
+
+.sidebar-nav-icon > * { transform-box: fill-box; transform-origin: center; }
+
+/* Dashboard: the four widgets wake up one after another. */
+.sidebar-nav-icon.is-animating[data-nav-motion="dashboard"] > rect { animation: nav-part-pop 520ms cubic-bezier(.22,1,.36,1) both; }
+.sidebar-nav-icon.is-animating[data-nav-motion="dashboard"] > rect:nth-child(2) { animation-delay: 45ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="dashboard"] > rect:nth-child(3) { animation-delay: 90ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="dashboard"] > rect:nth-child(4) { animation-delay: 135ms; }
+
+/* Managers: the complete cog rotates around its own center; the person stays still. */
+.sidebar-nav-icon.is-animating[data-nav-motion="manager"] > circle:first-child,
+.sidebar-nav-icon.is-animating[data-nav-motion="manager"] > path:nth-of-type(n+2) {
+  transform-box: view-box;
+  transform-origin: 18px 15px;
+  animation: nav-cog-turn 620ms cubic-bezier(.22,1,.36,1) both;
+}
+
+/* Team: only the second person steps out and returns. */
+.sidebar-nav-icon.is-animating[data-nav-motion="users"] > path:nth-of-type(n+2) { animation: nav-part-slide-right 560ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Client company: windows light up floor by floor. */
+.sidebar-nav-icon.is-animating[data-nav-motion="building"] > path:nth-of-type(n+4) { stroke-dasharray: 8; animation: nav-part-draw 520ms ease-out both; }
+.sidebar-nav-icon.is-animating[data-nav-motion="building"] > path:nth-of-type(5) { animation-delay: 45ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="building"] > path:nth-of-type(6) { animation-delay: 90ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="building"] > path:nth-of-type(7) { animation-delay: 135ms; }
+
+/* Document: its text is written line by line. */
+.sidebar-nav-icon.is-animating[data-nav-motion="document"] > path:nth-of-type(n+3) { stroke-dasharray: 12; animation: nav-part-draw 500ms ease-out both; }
+.sidebar-nav-icon.is-animating[data-nav-motion="document"] > path:nth-of-type(4) { animation-delay: 55ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="document"] > path:nth-of-type(5) { animation-delay: 110ms; }
+
+/* Gift: the lid and bow lift while the box remains still. */
+.sidebar-nav-icon.is-animating[data-nav-motion="gift"] > rect,
+.sidebar-nav-icon.is-animating[data-nav-motion="gift"] > path:last-child { animation: nav-part-rise 590ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Report: each column grows independently from its baseline. */
+.sidebar-nav-icon.is-animating[data-nav-motion="chart"] > line { transform-origin: center bottom; animation: nav-part-bar 560ms cubic-bezier(.22,1,.36,1) both; }
+.sidebar-nav-icon.is-animating[data-nav-motion="chart"] > line:nth-child(2) { animation-delay: 70ms; }
+.sidebar-nav-icon.is-animating[data-nav-motion="chart"] > line:nth-child(3) { animation-delay: 140ms; }
+
+/* Announcement: the horn speaks while the handle stays anchored. */
+.sidebar-nav-icon.is-animating[data-nav-motion="megaphone"] > path:first-child { animation: nav-part-announce 560ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Settings: the gear turns around its static center. */
+.sidebar-nav-icon.is-animating[data-nav-motion="settings"] > path:first-child { animation: nav-part-spin 620ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Profile: the person moves inside an unmoving outer circle. */
+.sidebar-nav-icon.is-animating[data-nav-motion="profile"] > :not(:last-child) { animation: nav-part-rise 540ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Role: only the briefcase handle lifts. */
+.sidebar-nav-icon.is-animating[data-nav-motion="briefcase"] > path:first-child { animation: nav-part-rise 560ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Inbox: the inner tray receives an item. */
+.sidebar-nav-icon.is-animating[data-nav-motion="inbox"] > polyline { animation: nav-part-drop 580ms cubic-bezier(.22,1,.36,1) both; }
+
+/* History: clock hands rewind while the clock outline remains fixed. */
+.sidebar-nav-icon.is-animating[data-nav-motion="history"] > path:last-child { animation: nav-part-rewind 600ms cubic-bezier(.22,1,.36,1) both; transform-origin: left center; }
+
+/* New entry: the plus turns inside its static circle. */
+.sidebar-nav-icon.is-animating[data-nav-motion="plus"] > path { animation: nav-part-spin 580ms cubic-bezier(.22,1,.36,1) both; }
+
+/* Recognition: the check mark is drawn inside the badge. */
+.sidebar-nav-icon.is-animating[data-nav-motion="badge"] > path:last-child { stroke-dasharray: 9; animation: nav-part-check 560ms ease-out both; }
+
+/* Shadowy AI is a single brand mark, so its internal swirl follows the mark's geometry. */
+.sidebar-nav-icon.is-animating[data-nav-motion="ai"] { animation: nav-ai-swirl 640ms cubic-bezier(.22,1,.36,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar-nav-icon.is-animating,
+  .sidebar-nav-icon.is-animating > * {
+    animation: none !important;
+  }
+}
+
 @layer base {
   @property --pos-x {
     syntax: "<percentage>";

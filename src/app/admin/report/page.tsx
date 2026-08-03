@@ -6,6 +6,8 @@ import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText, UserCog } from "lucide-react";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
+import { addMonthlyMinutes, clientMonthOptions, resolveClientMonth, sumMonthlyOverrun } from "@/lib/client-month";
+import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 
 function getPeriodStart(period: string): Date {
   const now = new Date();
@@ -40,15 +42,16 @@ function buildWeeklyData(entries: { createdAt: Date }[], from: Date) {
 export default async function AdminReportPage({
   searchParams,
 }: {
-  searchParams: { period?: string };
+  searchParams: { period?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["ADMIN"]);
   const orgId = session.organizationId;
   const period = searchParams?.period ?? "30d";
   const periodStart = getPeriodStart(period);
   const now = new Date();
+  const clientMonth = resolveClientMonth(searchParams?.clientMonth, now);
 
-  const [org, employees, managers, allEntries, reviewedAll, clients] = await Promise.all([
+  const [org, employees, managers, allEntries, reviewedAll, clients, clientMonthEntries, clientMonthHistory] = await Promise.all([
     prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } }),
     prisma.user.findMany({
       where: { organizationId: orgId, role: "EMPLOYEE" },
@@ -75,7 +78,31 @@ export default async function AdminReportPage({
       select: { id: true, name: true, freeMinutesPerMonth: true },
       orderBy: { name: "asc" },
     }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        status: "APPROVED",
+        deletedAt: null,
+        ...(clientMonth.isAll ? {} : { workDate: { gte: clientMonth.start!, lt: clientMonth.end! } }),
+      },
+      select: { clientId: true, clientName: true, durationMinutes: true, workDate: true },
+    }),
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId: orgId,
+        status: "APPROVED",
+        deletedAt: null,
+        OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+      },
+      select: { workDate: true },
+    }),
   ]);
+
+  const availableClientMonths = clientMonthOptions(
+    clientMonthHistory.map((entry) => entry.workDate),
+    clientMonth.key,
+    now,
+  );
 
   const approved = allEntries.filter((e) => e.status === "APPROVED");
   const totalApproved = approved.length || 1;
@@ -124,14 +151,17 @@ export default async function AdminReportPage({
   // Client analytics
   const adminClientMinMap = new Map<string, number>();
   const adminClientNameMinMap = new Map<string, { minutes: number; displayName: string }>();
+  const adminClientMonthlyMap = new Map<string, Map<string, number>>();
   let adminNoClientCount = 0;
-  for (const e of approved) {
+  for (const e of clientMonthEntries) {
     if (e.clientId) {
       adminClientMinMap.set(e.clientId, (adminClientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
+      addMonthlyMinutes(adminClientMonthlyMap, e.clientId, e.workDate, e.durationMinutes);
     } else if (e.clientName) {
       const key = normalizeClientName(e.clientName);
       const existing = adminClientNameMinMap.get(key);
       adminClientNameMinMap.set(key, { minutes: (existing?.minutes ?? 0) + e.durationMinutes, displayName: existing?.displayName ?? e.clientName });
+      addMonthlyMinutes(adminClientMonthlyMap, `name:${key}`, e.workDate, e.durationMinutes);
     } else {
       adminNoClientCount++;
     }
@@ -142,13 +172,19 @@ export default async function AdminReportPage({
     const nameEntry = adminClientNameMinMap.get(normalizeClientName(c.name));
     const minutes = (adminClientMinMap.get(c.id) ?? 0) + (nameEntry?.minutes ?? 0);
     if (minutes === 0) continue;
-    const overrun = c.freeMinutesPerMonth !== null ? Math.max(0, minutes - c.freeMinutesPerMonth) : 0;
+    const overrun = c.freeMinutesPerMonth !== null
+      ? clientMonth.isAll
+        ? sumMonthlyOverrun(adminClientMonthlyMap, [c.id, `name:${normalizeClientName(c.name)}`], c.freeMinutesPerMonth)
+        : Math.max(0, minutes - c.freeMinutesPerMonth)
+      : 0;
     adminClientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
   }
   const DEFAULT_FREE_MINUTES = 60;
   for (const [nameLower, { minutes, displayName }] of adminClientNameMinMap.entries()) {
     if (!registeredClientLower.has(nameLower)) {
-      const overrun = Math.max(0, minutes - DEFAULT_FREE_MINUTES);
+      const overrun = clientMonth.isAll
+        ? sumMonthlyOverrun(adminClientMonthlyMap, [`name:${nameLower}`], DEFAULT_FREE_MINUTES)
+        : Math.max(0, minutes - DEFAULT_FREE_MINUTES);
       adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: DEFAULT_FREE_MINUTES, overrun, eur: Math.round((overrun / 60) * 20), registered: false });
     }
   }
@@ -309,12 +345,13 @@ export default async function AdminReportPage({
       </section>
 
       {/* Client analytics */}
+      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />
       {(adminClientData.length > 0 || adminNoClientCount > 0) && (
         <section className="mb-8">
           <div className="flex items-center justify-between mb-3">
             <div>
               <h2 className="text-base font-semibold mb-0.5">Klienti</h2>
-              <p className="text-xs text-muted-foreground">Pārsniegums = Ierakstīts − Bezmaksas limits</p>
+              <p className="text-xs text-muted-foreground">{clientMonth.label} · pārsniegums = ierakstīts − bezmaksas limits</p>
             </div>
             <div className="text-right">
               <div className="text-xs text-muted-foreground">Stundas likme</div>

@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertTriangle, Maximize2, Search, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { MatrixClientRow, MatrixEmployee } from "@/lib/client-matrix";
+import type { ClientMonthOption } from "@/lib/client-month";
+import { ClientMonthDropdown } from "@/components/dashboard/client-month-selector";
 
 function overrunEur(minutes: number, rateEur: number): number {
   return Math.round((minutes / 60) * rateEur);
@@ -44,16 +46,16 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
   const textSize = compact ? "text-xs" : "text-sm";
 
   return (
-    <table className={`w-full ${textSize}`}>
+    <table className={`w-full border-separate border-spacing-0 ${textSize}`}>
       <thead>
-        <tr className="border-b border-border bg-muted/30">
-          <th className={`${namePad} text-left text-xs font-medium text-muted-foreground ${compact ? "w-28" : "w-36"} sticky left-0 bg-inherit`}>
+        <tr className="border-b border-border bg-muted">
+          <th className={`${namePad} sticky left-0 top-0 z-40 border-b border-border bg-muted text-left text-xs font-medium text-muted-foreground ${compact ? "w-28" : "w-36"}`}>
             Klients
           </th>
           {employees.map((emp) => (
             <th
               key={emp.id}
-              className={`${cellPad} text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[52px]" : "min-w-[68px]"}`}
+              className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[52px]" : "min-w-[68px]"}`}
             >
               <span className="block truncate max-w-[80px] mx-auto" title={emp.name}>
                 {emp.name.split(" ")[0]}
@@ -61,19 +63,19 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
             </th>
           ))}
           {hiddenCount > 0 && (
-            <th className={`${cellPad} text-center text-xs text-muted-foreground/50`}>
+            <th className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs text-muted-foreground/50`}>
               +{hiddenCount}
             </th>
           )}
-          <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
             Kopā
           </th>
           {!compact && (
-            <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
+            <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
               Limits
             </th>
           )}
-          <th className={`${numPad} text-right text-xs font-medium text-muted-foreground`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
             Statuss
           </th>
         </tr>
@@ -91,16 +93,23 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               className={`transition-colors hover:bg-muted/20 ${overLimit ? "bg-amber-500/[0.02]" : ""}`}
             >
               <td
-                className={`${namePad} font-medium truncate max-w-[140px] sticky left-0 bg-inherit`}
-                title={row.clientName}
+                className={`${namePad} sticky left-0 z-10 max-w-[140px] bg-inherit font-medium hover:z-50`}
               >
-                {row.clientId.startsWith("name:") ? (
-                  row.clientName
-                ) : (
-                  <Link href={`/manager/clients/${row.clientId}`} className="hover:underline underline-offset-4">
+                <div className="group relative min-w-0">
+                  {row.clientId.startsWith("name:") ? (
+                    <span className="block truncate">{row.clientName}</span>
+                  ) : (
+                    <Link href={`/manager/clients/${row.clientId}`} className="block truncate hover:underline underline-offset-4">
+                      {row.clientName}
+                    </Link>
+                  )}
+                  <span
+                    role="tooltip"
+                    className="pointer-events-none absolute left-0 top-full z-50 mt-1 hidden w-max max-w-72 whitespace-normal rounded-lg border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground shadow-xl group-hover:block"
+                  >
                     {row.clientName}
-                  </Link>
-                )}
+                  </span>
+                </div>
               </td>
               {employees.map((emp) => {
                 const min = row.byEmployee[emp.id] ?? 0;
@@ -128,7 +137,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               {!compact && (
                 <td className={`${numPad} text-right text-xs tabular-nums text-muted-foreground`}>
                   {row.freeMinutes !== null
-                    ? `${Math.round((row.freeMinutes / 60) * 10) / 10}h`
+                    ? `${Math.round((row.freeMinutes / 60) * 10) / 10}h/mēn.`
                     : "∞"}
                 </td>
               )}
@@ -188,11 +197,30 @@ interface ClientEmployeeMatrixProps {
   rows: MatrixClientRow[];
   employees: MatrixEmployee[];
   hourlyRateEur?: number;
+  monthLabel: string;
+  detailEventName?: string;
+  selectedMonth: string;
+  monthOptions: ClientMonthOption[];
 }
 
-export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: ClientEmployeeMatrixProps) {
+export function ClientEmployeeMatrix({
+  rows,
+  employees,
+  hourlyRateEur = 20,
+  monthLabel,
+  detailEventName,
+  selectedMonth,
+  monthOptions,
+}: ClientEmployeeMatrixProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (!detailEventName) return;
+    const openDetails = () => setOpen(true);
+    window.addEventListener(detailEventName, openDetails);
+    return () => window.removeEventListener(detailEventName, openDetails);
+  }, [detailEventName]);
 
   const filteredRows = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -219,6 +247,7 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
               <span className="text-xs text-muted-foreground">
                 {overrunCount} {overrunCount === 1 ? "klients pārsniedz" : "klienti pārsniedz"} mēneša limitu
                 {totalOverrunEur > 0 && ` · kopā −€${totalOverrunEur}`}
+                {` · ${monthLabel}`}
               </span>
             </div>
           ) : (
@@ -242,17 +271,18 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
           <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex h-[92vh] w-[96vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl focus:outline-none">
-            <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
+            <div className="relative z-40 flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-5 py-3">
               <div className="min-w-0">
                 <Dialog.Title className="text-sm font-semibold">
                   Noslodze pa darbiniekiem
                 </Dialog.Title>
                 <Dialog.Description className="text-xs text-muted-foreground">
-                  Visi darbinieki un klienti ({employees.length} darbinieki · {rows.length} klienti)
+                  {monthLabel} · visi darbinieki un klienti ({employees.length} darbinieki · {rows.length} klienti)
                   {totalOverrunEur > 0 && ` · kopā pārsniegums −€${totalOverrunEur}`}
                 </Dialog.Description>
               </div>
               <div className="flex shrink-0 items-center gap-2">
+                <ClientMonthDropdown selectedMonth={selectedMonth} options={monthOptions} compact />
                 <div className="relative">
                   <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
@@ -273,7 +303,7 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
                 </Dialog.Close>
               </div>
             </div>
-            <div className="flex-1 overflow-auto">
+            <div className="relative z-0 min-h-0 flex-1 isolate overflow-auto bg-card">
               {filteredRows.length > 0 ? (
                 <MatrixTable rows={filteredRows} employees={employees} hiddenCount={0} rateEur={hourlyRateEur} />
               ) : (
@@ -282,7 +312,7 @@ export function ClientEmployeeMatrix({ rows, employees, hourlyRateEur = 20 }: Cl
                 </p>
               )}
             </div>
-            <div className="border-t border-border/40 bg-muted/10 px-5 py-2.5">
+            <div className="relative z-40 shrink-0 border-t border-border/40 bg-card px-5 py-2.5">
               <Legend />
             </div>
           </Dialog.Content>

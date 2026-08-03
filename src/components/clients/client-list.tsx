@@ -22,6 +22,7 @@ interface ClientItem {
   name: string;
   freeMinutesPerMonth: number | null;
   totalMinutes: number;
+  overrunMinutes: number;
   status: string;
   assignedEmployeeIds: string[];
 }
@@ -59,10 +60,7 @@ function ClientRow({
     });
   }
 
-  const overrunMinutes =
-    client.freeMinutesPerMonth !== null
-      ? Math.max(0, client.totalMinutes - client.freeMinutesPerMonth)
-      : 0;
+  const overrunMinutes = client.overrunMinutes;
 
   function save() {
     const limit = limitStr.trim() === "" ? null : parseInt(limitStr, 10);

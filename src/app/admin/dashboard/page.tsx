@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
 import { ClientOverrunWidget } from "@/components/dashboard/client-overrun-widget";
 import { buildClientMatrix } from "@/lib/client-matrix";
+import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
+import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { KpiCard } from "@/components/dashboard/kpi-card";
 import { EntriesBreakdownCard } from "@/components/dashboard/entries-breakdown-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
@@ -48,20 +50,21 @@ function buildMonthlyData(entries: { createdAt: Date }[]) {
 export default async function AdminDashboard({
   searchParams,
 }: {
-  searchParams: { period?: string };
+  searchParams: { period?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["ADMIN"]);
   const orgId = session.organizationId;
   const period = searchParams?.period ?? "all";
   const periodStart = getPeriodStart(period);
   const periodFilter = periodStart ? { gte: periodStart } : undefined;
+  const clientMonth = resolveClientMonth(searchParams?.clientMonth);
 
   const twelveMonthsAgo = new Date(Date.now() - 365 * 86400000);
   const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000);
   const nowDateA = new Date();
   const currentMonthStartA = new Date(Date.UTC(nowDateA.getUTCFullYear(), nowDateA.getUTCMonth(), 1));
 
-  const [managers, employees, totalEntries, allTimeEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries] =
+  const [managers, employees, totalEntries, allTimeEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries, clientMatrixEntries, clientMonthHistory] =
     await Promise.all([
       prisma.user.count({ where: { organizationId: orgId, role: "MANAGER" } }),
       prisma.user.count({ where: { organizationId: orgId, role: "EMPLOYEE" } }),
@@ -135,7 +138,38 @@ export default async function AdminDashboard({
         where: { organizationId: orgId, status: "APPROVED", deletedAt: null, workDate: { gte: currentMonthStartA } },
         select: { clientId: true, clientName: true, durationMinutes: true },
       }),
+      prisma.invisibleWorkEntry.findMany({
+        where: {
+          organizationId: orgId,
+          status: "APPROVED",
+          deletedAt: null,
+          ...(clientMonth.isAll ? {} : { workDate: { gte: clientMonth.start!, lt: clientMonth.end! } }),
+          OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+        },
+        select: {
+          clientId: true,
+          clientName: true,
+          durationMinutes: true,
+          workDate: true,
+          employeeId: true,
+          employee: { select: { name: true } },
+        },
+      }),
+      prisma.invisibleWorkEntry.findMany({
+        where: {
+          organizationId: orgId,
+          status: "APPROVED",
+          deletedAt: null,
+          OR: [{ clientId: { not: null } }, { clientName: { not: null } }],
+        },
+        select: { workDate: true },
+      }),
     ]);
+
+  const availableClientMonths = clientMonthOptions(
+    clientMonthHistory.map((entry) => entry.workDate),
+    clientMonth.key,
+  );
 
   let extraMinutes = 0;
   const extraByDayA = new Map<string, number>();
@@ -151,14 +185,16 @@ export default async function AdminDashboard({
 
   // --- Client x Employee matrix ---
   const { rows: matrixRows, employees: matrixEmployees } = buildClientMatrix(
-    approvedEntries.map((e) => ({
+    clientMatrixEntries.map((e) => ({
       clientId: e.clientId,
       clientName: e.clientName,
       employeeId: e.employeeId,
       employeeName: e.employee.name,
       durationMinutes: e.durationMinutes,
+      workDate: e.workDate,
     })),
     orgClients,
+    { resetLimitMonthly: clientMonth.isAll },
   );
   const overrunClientsA = matrixRows.filter((r) => r.overrunMinutes > 0);
   const overrunClientCountA = overrunClientsA.length;
@@ -181,7 +217,7 @@ export default async function AdminDashboard({
       for (const e of approvedEntries) {
         if (normalizeCategoryKey(e.category) === cat) titleMap.set(e.title, (titleMap.get(e.title) ?? 0) + 1);
       }
-      const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+      const sorted = [...titleMap.entries()].sort((a, b) => b[1] - a[1]);
       const maxCnt = sorted[0]?.[1] ?? 1;
       return {
         name: categoryLabel(cat),
@@ -373,12 +409,19 @@ export default async function AdminDashboard({
       </div>
 
       <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdownA} />
+      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />
       <ClientOverrunWidget
         overrunCount={overrunClientCountA}
         totalClients={matrixRows.length}
         totalOverrunEur={totalOverrunEurA}
-        anchorHref="#client-employee-matrix"
+        monthLabel={clientMonth.label}
+        detailEventName="client-employee-matrix:open"
       />
+      {matrixRows.length === 0 && (
+        <Card className="mb-8 p-5 text-center text-sm text-muted-foreground">
+          {clientMonth.label}: nav apstiprinātu ierakstu ar klientu.
+        </Card>
+      )}
 
       {/* ── Section divider ── */}
       <SectionDivider label="Aktivitāte" />
@@ -396,7 +439,15 @@ export default async function AdminDashboard({
         <>
           <SectionDivider label="Noslodze pa darbiniekiem" />
           <div id="client-employee-matrix" className="mb-8 scroll-mt-20">
-            <ClientEmployeeMatrix rows={matrixRows} employees={matrixEmployees} hourlyRateEur={HOURLY_RATE_EUR} />
+            <ClientEmployeeMatrix
+              rows={matrixRows}
+              employees={matrixEmployees}
+              hourlyRateEur={HOURLY_RATE_EUR}
+              monthLabel={clientMonth.label}
+              detailEventName="client-employee-matrix:open"
+              selectedMonth={clientMonth.key}
+              monthOptions={availableClientMonths}
+            />
           </div>
         </>
       )}

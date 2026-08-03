@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState, type HTMLAttributes } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -26,12 +27,31 @@ import {
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
 
-type NavItem = { href: string; label: string; icon: any };
+type NavMotion =
+  | "dashboard"
+  | "manager"
+  | "users"
+  | "building"
+  | "document"
+  | "gift"
+  | "chart"
+  | "megaphone"
+  | "settings"
+  | "profile"
+  | "briefcase"
+  | "inbox"
+  | "history"
+  | "ai"
+  | "plus"
+  | "badge";
 
-function ShadowyNavIcon({ className }: { className?: string }) {
+type NavItem = { href: string; label: string; icon: any; motion: NavMotion };
+
+function ShadowyNavIcon({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
       aria-hidden
+      {...props}
       className={cn("inline-block bg-current", className)}
       style={{
         WebkitMaskImage: "url('/shadowy.svg')",
@@ -48,72 +68,112 @@ function ShadowyNavIcon({ className }: { className?: string }) {
 }
 
 const ADMIN_ONLY_NAV: NavItem[] = [
-  { href: "/admin/dashboard", label: "Pārskats", icon: LayoutDashboard },
-  { href: "/admin/managers", label: "Vadītāji", icon: UserCog },
-  { href: "/admin/employees", label: "Darbinieki", icon: Users },
-  { href: "/manager/clients", label: "Klienti", icon: Building2 },
-  { href: "/admin/entries", label: "Visi ieraksti", icon: FileText },
-  { href: "/admin/bonuses", label: "Bonusu pārskats", icon: Gift },
-  { href: "/admin/report", label: "Pilota atskaite", icon: BarChart2 },
-  { href: "/admin/announcements", label: "Paziņojumi", icon: Megaphone },
-  { href: "/admin/settings", label: "Iestatījumi", icon: Settings },
-  { href: "/admin/profile", label: "Mans profils", icon: UserCircle },
+  { href: "/admin/dashboard", label: "Pārskats", icon: LayoutDashboard, motion: "dashboard" },
+  { href: "/admin/managers", label: "Vadītāji", icon: UserCog, motion: "manager" },
+  { href: "/admin/employees", label: "Darbinieki", icon: Users, motion: "users" },
+  { href: "/manager/clients", label: "Klienti", icon: Building2, motion: "building" },
+  { href: "/admin/entries", label: "Visi ieraksti", icon: FileText, motion: "document" },
+  { href: "/admin/bonuses", label: "Bonusu pārskats", icon: Gift, motion: "gift" },
+  { href: "/admin/report", label: "Pilota atskaite", icon: BarChart2, motion: "chart" },
+  { href: "/admin/announcements", label: "Paziņojumi", icon: Megaphone, motion: "megaphone" },
+  { href: "/admin/settings", label: "Iestatījumi", icon: Settings, motion: "settings" },
+  { href: "/admin/profile", label: "Mans profils", icon: UserCircle, motion: "profile" },
 ];
 
 const ADMIN_MANAGER_NAV: NavItem[] = [
-  { href: "/admin/lomas", label: "Lomas", icon: Briefcase },
-  { href: "/admin/atzinibas", label: "Atzinības noteikumi", icon: Gift },
-  { href: "/admin/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },
-  { href: "/admin/komandas-ieraksti", label: "Komandas ieraksti", icon: FileText },
+  { href: "/admin/lomas", label: "Lomas", icon: Briefcase, motion: "briefcase" },
+  { href: "/admin/atzinibas", label: "Atzinības noteikumi", icon: Gift, motion: "gift" },
+  { href: "/admin/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox, motion: "inbox" },
+  { href: "/admin/komandas-ieraksti", label: "Komandas ieraksti", icon: FileText, motion: "document" },
 ];
 
 const MANAGER_NAV: NavItem[] = [
-  { href: "/manager/dashboard", label: "Pārskats", icon: LayoutDashboard },
-  { href: "/manager/employees", label: "Mana komanda", icon: Users },
-  { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText },
-  { href: "/manager/clients", label: "Klienti", icon: Building2 },
-  { href: "/manager/roles", label: "Lomas", icon: Briefcase },
-  { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift },
-  { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox },
-  { href: "/manager/report", label: "Pilota atskaite", icon: BarChart2 },
-  { href: "/manager/profile", label: "Mans profils", icon: UserCircle },
+  { href: "/manager/dashboard", label: "Pārskats", icon: LayoutDashboard, motion: "dashboard" },
+  { href: "/manager/employees", label: "Mana komanda", icon: Users, motion: "users" },
+  { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText, motion: "document" },
+  { href: "/manager/clients", label: "Klienti", icon: Building2, motion: "building" },
+  { href: "/manager/roles", label: "Lomas", icon: Briefcase, motion: "briefcase" },
+  { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift, motion: "gift" },
+  { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi", icon: Inbox, motion: "inbox" },
+  { href: "/manager/report", label: "Pilota atskaite", icon: BarChart2, motion: "chart" },
+  { href: "/manager/profile", label: "Mans profils", icon: UserCircle, motion: "profile" },
 ];
 
 const EMPLOYEE_NAV: NavItem[] = [
-  { href: "/employee/dashboard", label: "Pārskats", icon: LayoutDashboard },
-  { href: "/employee/history", label: "Vēsture", icon: History },
+  { href: "/employee/dashboard", label: "Pārskats", icon: LayoutDashboard, motion: "dashboard" },
+  { href: "/employee/history", label: "Vēsture", icon: History, motion: "history" },
   {
     href: "/employee/smart-log",
     label: "Shadowy AI ieraksts",
     icon: ShadowyNavIcon,
+    motion: "ai",
   },
-  { href: "/employee/new-entry", label: "Jauns ieraksts", icon: PlusCircle },
-  { href: "/employee/my-role", label: "Mana loma", icon: BadgeCheck },
-  { href: "/employee/bonuses", label: "Atzinība", icon: Gift },
-  { href: "/employee/profile", label: "Mans profils", icon: UserCircle },
+  { href: "/employee/new-entry", label: "Jauns ieraksts", icon: PlusCircle, motion: "plus" },
+  { href: "/employee/my-role", label: "Mana loma", icon: BadgeCheck, motion: "badge" },
+  { href: "/employee/bonuses", label: "Atzinība", icon: Gift, motion: "gift" },
+  { href: "/employee/profile", label: "Mans profils", icon: UserCircle, motion: "profile" },
 ];
 
 function NavLink({ item, pathname, pendingCount, onClose }: { item: NavItem; pathname: string; pendingCount?: number; onClose?: () => void }) {
   const active = pathname === item.href || pathname.startsWith(item.href + "/");
   const Icon = item.icon;
   const showBadge = (item.href === "/manager/entries" || item.href === "/admin/komandas-ieraksti") && (pendingCount ?? 0) > 0;
+  const [iconAnimating, setIconAnimating] = useState(false);
+  const hoverTimer = useRef<number | null>(null);
+  const finishTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (hoverTimer.current !== null) window.clearTimeout(hoverTimer.current);
+    if (finishTimer.current !== null) window.clearTimeout(finishTimer.current);
+  }, []);
+
+  const scheduleIconAnimation = () => {
+    if (iconAnimating || hoverTimer.current !== null) return;
+    hoverTimer.current = window.setTimeout(() => {
+      hoverTimer.current = null;
+      setIconAnimating(true);
+      finishTimer.current = window.setTimeout(() => {
+        finishTimer.current = null;
+        setIconAnimating(false);
+      }, 720);
+    }, 75);
+  };
+
+  const cancelScheduledAnimation = () => {
+    if (hoverTimer.current === null) return;
+    window.clearTimeout(hoverTimer.current);
+    hoverTimer.current = null;
+  };
 
   return (
     <Link
       href={item.href}
       onClick={onClose}
+      onMouseEnter={scheduleIconAnimation}
+      onMouseLeave={cancelScheduledAnimation}
       className={cn(
-        "group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[17px] font-medium transition-colors duration-150",
+        "sidebar-nav-link group relative flex items-center gap-3 overflow-hidden rounded-lg px-3 py-2.5 text-[17px] font-medium transition-[background-color,color,box-shadow] duration-200 ease-out",
         active
           ? "bg-sidebar-accent text-foreground dark:bg-white/[0.09]"
-          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground dark:hover:bg-white/[0.05]"
+          : "text-muted-foreground hover:bg-sidebar-accent/60 hover:text-foreground hover:shadow-[inset_0_0_0_1px_hsl(var(--sidebar-border)/0.45)] dark:hover:bg-white/[0.07] dark:hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.035)]"
       )}
     >
       {active && <span className="absolute left-0 top-[6px] bottom-[6px] w-[3px] rounded-r-full bg-foreground dark:bg-white/80" />}
-      <Icon className={cn("h-[18px] w-[18px] shrink-0 transition-colors", active ? "text-foreground" : "group-hover:text-foreground")} />
-      <span className="flex-1">{item.label}</span>
+      <span className="relative z-10 flex h-[18px] w-[18px] shrink-0 items-center justify-center">
+        <Icon
+          data-nav-motion={item.motion}
+          className={cn(
+            "sidebar-nav-icon h-[18px] w-[18px] transition-colors duration-200",
+            iconAnimating && "is-animating",
+            active ? "text-foreground" : "group-hover:text-foreground",
+          )}
+        />
+      </span>
+      <span className="relative z-10 flex-1">
+        {item.label}
+      </span>
       {showBadge && (
-        <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[11px] font-semibold text-white">
+        <span className="relative z-10 ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-orange-500 px-1.5 text-[11px] font-semibold text-white transition-transform duration-200 ease-out group-hover:scale-105">
           {pendingCount! > 99 ? "99+" : pendingCount}
         </span>
       )}

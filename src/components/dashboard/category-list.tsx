@@ -23,7 +23,7 @@ function DrillPanel({ item }: { item: CategoryItem }) {
     <div className="mx-1 mb-2 mt-1 rounded-xl border border-border/50 bg-muted/10 overflow-hidden">
       <div className="px-4 py-2.5 border-b border-border/40 flex items-center justify-between">
         <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">
-          Biežākie nosaukumi
+          Visi nosaukumi
         </span>
         <span className="text-[10px] text-muted-foreground/60">{item.count} ieraksti</span>
       </div>
