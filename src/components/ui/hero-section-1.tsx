@@ -169,7 +169,7 @@ export function HeroSection() {
   // two still finish together.
   const lockupEasing = isLogoSpinning
     ? "duration-500 ease-out"
-    : "duration-[900ms] ease-[cubic-bezier(0.22,1,0.36,1)]";
+    : "[transition-duration:900ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]";
 
   // Both layers are the logo shape punched out of a solid fill, cross-faded on
   // hover. A cross-fade is what makes the colour change reversible - you cannot
