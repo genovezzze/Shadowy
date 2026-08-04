@@ -174,13 +174,13 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
         <KpiCard
           icon={<TrendingUp className="h-4 w-4" />}
           label="Šomēnes"
-          value={thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "—"}
+          value={thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "-"}
           sub={limitMin !== null ? `limits: ${formatDurationLV(limitMin)}` : "bez limita"}
         />
         <KpiCard
           icon={<AlertTriangle className="h-4 w-4" />}
           label="Pārsniegums šomēnes"
-          value={thisMonthOverrun > 0 ? formatDurationLV(thisMonthOverrun) : "—"}
+          value={thisMonthOverrun > 0 ? formatDurationLV(thisMonthOverrun) : "-"}
           sub={thisMonthOverrun > 0 ? `~€${Math.round((thisMonthOverrun / 60) * HOURLY_RATE_EUR)}` : "ietilpst limitā"}
           warn={thisMonthOverrun > 0}
         />
@@ -315,7 +315,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                           {overrun > 0 ? <span className="font-semibold text-amber-500">+{formatDurationLV(overrun)}</span> : <span className="text-emerald-500 text-xs">Ietilpst</span>}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
-                          {eur > 0 ? <span className="font-semibold text-amber-500">€{eur}</span> : <span className="text-muted-foreground">—</span>}
+                          {eur > 0 ? <span className="font-semibold text-amber-500">€{eur}</span> : <span className="text-muted-foreground">-</span>}
                         </td>
                       </tr>
                     ))}

@@ -73,7 +73,7 @@ export function AssignEmployeesDialog({
             Piešķirt darbiniekiem
           </Dialog.Title>
           <Dialog.Description className="text-sm text-muted-foreground mb-4">
-            {clientName} — izvēlies, kuri darbinieki redz šo klientu.
+            {clientName} - izvēlies, kuri darbinieki redz šo klientu.
           </Dialog.Description>
 
           {employees.length === 0 ? (

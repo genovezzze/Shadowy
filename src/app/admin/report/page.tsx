@@ -379,10 +379,10 @@ export default async function AdminReportPage({
                         {c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        {c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                        {c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
                       </td>
                       <td className="px-5 py-3 text-right tabular-nums">
-                        {c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">—</span>}
+                        {c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
                       </td>
                     </tr>
                   ))}

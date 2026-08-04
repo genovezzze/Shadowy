@@ -18,10 +18,10 @@ function colorFor(cats: number, future: boolean) {
 
 function titleFor(date: string, cats: number, future: boolean) {
   if (future) return date;
-  if (cats === 0) return `${date} — nav ierakstu`;
-  if (cats === 1) return `${date} — fokusēts (1 kat.)`;
-  if (cats <= 3) return `${date} — mērens (${cats} kat.)`;
-  return `${date} — izkaisīts (${cats} kat.)`;
+  if (cats === 0) return `${date} - nav ierakstu`;
+  if (cats === 1) return `${date} - fokusēts (1 kat.)`;
+  if (cats <= 3) return `${date} - mērens (${cats} kat.)`;
+  return `${date} - izkaisīts (${cats} kat.)`;
 }
 
 export function FocusHeatmap({ days }: { days: DayData[] }) {

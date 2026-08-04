@@ -226,7 +226,7 @@ export function InvisibleWorkCostPanel({ extraHours, extraPct, totalHours }: Pro
           )}
 
           <p className="mt-3 border-t border-border pt-2 text-[11px] text-muted-foreground/50">
-            Komandas vidējā likme. Individuālas — drīzumā.
+            Komandas vidējā likme. Individuālas - drīzumā.
           </p>
         </div>
       )}

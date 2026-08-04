@@ -25,7 +25,7 @@ export default async function AdminAnnouncementsPage() {
     <>
       <PageHeader
         title="Paziņojumi"
-        description="Publicējiet paziņojumu, un tas parādīsies kā uznirstošs logs darbiniekiem, kad viņi nākamreiz atvērs Shadowy — līdz brīdim, kad to aizvērs."
+        description="Publicējiet paziņojumu, un tas parādīsies kā uznirstošs logs darbiniekiem, kad viņi nākamreiz atvērs Shadowy - līdz brīdim, kad to aizvērs."
       />
 
       <div className="grid gap-6 lg:grid-cols-3">

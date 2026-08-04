@@ -161,7 +161,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
                 </p>
               </>
             ) : (
-              <div className="text-4xl font-bold tabular-nums text-muted-foreground/20">—</div>
+              <div className="text-4xl font-bold tabular-nums text-muted-foreground/20">-</div>
             )}
           </div>
 
@@ -317,7 +317,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
           )}
 
           <p className="mt-3 border-t border-border pt-2 text-[11px] text-muted-foreground/50">
-            Komandas vidējā likme. Individuālas — drīzumā.
+            Komandas vidējā likme. Individuālas - drīzumā.
           </p>
         </div>
       )}

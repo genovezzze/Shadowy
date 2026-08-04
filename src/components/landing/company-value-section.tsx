@@ -28,8 +28,9 @@ const cards: readonly ValueCard[] = [
 export function CompanyValueSection() {
   return (
     <section
+      id="uznemumam"
       aria-labelledby="company-value-heading"
-      className="relative overflow-hidden bg-[#070809] pt-6 pb-12 sm:pt-8 sm:pb-20 md:pb-24"
+      className="relative scroll-mt-24 overflow-hidden bg-[#070809] pt-6 pb-12 sm:pt-8 sm:pb-20 md:pb-24"
     >
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr] lg:gap-16">
@@ -40,10 +41,9 @@ export function CompanyValueSection() {
           <div className="min-w-0 lg:order-2">
             <h2
               id="company-value-heading"
-              className="text-balance font-accent text-[1.9rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2rem,3.2vw,2.8rem)] lg:whitespace-nowrap"
+              className="text-balance font-accent text-[clamp(1.35rem,4vw,2.5rem)] font-bold uppercase leading-none tracking-[0.015em] text-[#75babc] [font-synthesis:weight] lg:whitespace-nowrap"
             >
-              Ko iegūst{" "}
-              <span className="text-white/45">uzņēmums?</span>
+              Ko iegūst uzņēmums?
             </h2>
             <p className="mt-4 max-w-md font-accent text-base font-light leading-relaxed tracking-[0.01em] text-white/55 sm:mt-5 sm:text-xl">
               Shadowy nerāda, kurš strādā vairāk, bet{" "}

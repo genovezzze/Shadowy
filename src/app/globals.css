@@ -87,11 +87,137 @@
 /* Shadowy AI is a single brand mark, so its internal swirl follows the mark's geometry. */
 .sidebar-nav-icon.is-animating[data-nav-motion="ai"] { animation: nav-ai-swirl 640ms cubic-bezier(.22,1,.36,1) both; }
 
+/* Landing dropdown: each topic icon behaves like its counterpart inside the app. */
+.how-menu-icon,
+.how-menu-icon > * {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes how-problem-pulse {
+  0%, 100% { transform: scale(1); }
+  38% { transform: scale(1.18); }
+  68% { transform: scale(0.96); }
+}
+
+@keyframes how-workflow-shift {
+  0%, 100% { transform: translate(0, 0); }
+  38% { transform: translate(2px, -1px); }
+  72% { transform: translate(-0.5px, 0.5px); }
+}
+
+@keyframes how-user-rise {
+  0%, 100% { transform: translateY(0); }
+  42% { transform: translateY(-2.5px); }
+  74% { transform: translateY(0.5px); }
+}
+
+@keyframes how-building-rise {
+  0%, 100% { transform: scaleY(1); }
+  38% { transform: scaleY(0.82); }
+  72% { transform: scaleY(1.05); }
+}
+
+@keyframes how-checklist-draw {
+  0%, 100% { stroke-dashoffset: 0; opacity: 1; }
+  35% { stroke-dashoffset: 10; opacity: 0.35; }
+  76% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes how-shield-confirm {
+  0%, 100% { transform: scale(1) rotate(0); }
+  38% { transform: scale(0.88) rotate(-5deg); }
+  72% { transform: scale(1.08) rotate(3deg); }
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="problem"] > circle {
+  animation: how-problem-pulse 560ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="problem"] > path {
+  animation: nav-part-rise 520ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="workflow"] > :nth-child(odd) {
+  animation: how-workflow-shift 580ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="workflow"] > :nth-child(even) {
+  animation: how-workflow-shift 580ms 70ms cubic-bezier(.22,1,.36,1) both reverse;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="user"] > :first-child {
+  animation: how-user-rise 540ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="user"] > :last-child {
+  animation: nav-part-rise 540ms 55ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="building"] > path {
+  transform-origin: center bottom;
+  animation: how-building-rise 560ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="building"] > path:nth-child(2) {
+  animation-delay: 65ms;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="checklist"] > path {
+  stroke-dasharray: 10;
+  animation: how-checklist-draw 540ms ease-out both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="checklist"] > path:nth-child(even) {
+  animation-delay: 65ms;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="shield"] {
+  animation: how-shield-confirm 580ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.how-menu-item:hover .how-menu-icon[data-how-motion="shield"] > path:last-child {
+  stroke-dasharray: 9;
+  animation: nav-part-check 560ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sidebar-nav-icon.is-animating,
-  .sidebar-nav-icon.is-animating > * {
+  .sidebar-nav-icon.is-animating > *,
+  .how-menu-item:hover .how-menu-icon,
+  .how-menu-item:hover .how-menu-icon > * {
     animation: none !important;
   }
+}
+
+html.client-case-open,
+body.client-case-open {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+.client-case-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  scrollbar-gutter: stable;
+}
+
+.client-case-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+
+.client-case-scroll::-webkit-scrollbar-track {
+  margin-block: 16px;
+  background: transparent;
+}
+
+.client-case-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.client-case-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.24);
 }
 
 @layer base {
@@ -828,6 +954,21 @@
   to { background-position: 100% 50%; }
 }
 
+.animate-pb-logo-gradient {
+  background-image: linear-gradient(
+    100deg,
+    #1f777a 0%,
+    #4b999b 22%,
+    #7b8788 40%,
+    #a6adae 49%,
+    #768284 58%,
+    #398b8d 78%,
+    #1f777a 100%
+  );
+  background-size: 240% auto;
+  animation: business-heading-gradient 4.8s ease-in-out infinite alternate;
+}
+
 .animate-business-heading-gradient {
   background-image: linear-gradient(
     100deg,
@@ -904,6 +1045,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .animate-pb-logo-gradient {
+    animation: none;
+    background-position: 50% 50%;
+  }
+
   .animate-business-heading-gradient {
     animation: none;
     background-position: 50% 50%;
@@ -1355,7 +1501,8 @@ input[type="checkbox"]:focus-visible {
 }
 
 .animate-pilot-grid {
-  animation: none;
+  animation: pilot-grid-drift 18s linear infinite;
+  will-change: background-position;
 }
 
 @keyframes pilot-path-flow {
@@ -1402,6 +1549,8 @@ input[type="checkbox"]:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-pilot-grid,
+  .animate-cta-glow-1,
+  .animate-cta-glow-2,
   .animate-solution-grid,
   .animate-solution-glow-a,
   .animate-solution-glow-b,

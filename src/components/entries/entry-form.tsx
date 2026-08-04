@@ -68,7 +68,7 @@ export function EntryForm({
         >
           {initialValues ? (
             <div className="rounded-md border border-border bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
-              Lauki aizpildīti no iepriekšējā ieraksta — pārbaudiet un pielāgojiet pirms iesniegšanas.
+              Lauki aizpildīti no iepriekšējā ieraksta - pārbaudiet un pielāgojiet pirms iesniegšanas.
             </div>
           ) : null}
           <div className="grid gap-2">

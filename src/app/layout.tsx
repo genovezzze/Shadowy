@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -7,19 +6,31 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { getSiteUrl } from "@/lib/site-url";
 
-const inter = Inter({
-  subsets: ["latin", "latin-ext"],
+const inter = localFont({
+  src: [
+    {
+      path: "../../public/fonts/Inter-Regular.woff",
+      weight: "400",
+      style: "normal",
+    },
+    {
+      path: "../../public/fonts/Inter-SemiBold.woff",
+      weight: "600",
+      style: "normal",
+    },
+  ],
   variable: "--font-sans",
   display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
-// latin-ext is not optional here: the terminal-styled copy this carries is
-// Latvian, and the base latin subset has none of its diacritics.
-const jetBrainsMono = JetBrains_Mono({
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
+const jetBrainsMono = localFont({
+  src: "../../public/fonts/JetBrainsMono-Regular.woff",
+  weight: "400",
+  style: "normal",
   variable: "--font-mono",
   display: "swap",
+  fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
 
 const neueHaas = localFont({
@@ -53,6 +64,16 @@ const neueHaasLight = localFont({
   display: "swap",
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
+
+// Keep the variables inline as well as in the generated Next.js classes.
+// This prevents a stale development stylesheet from dropping the global font
+// stack and falling all the way back to the browser's serif default.
+const fontVariables = {
+  "--font-sans": inter.style.fontFamily,
+  "--font-display": neueHaas.style.fontFamily,
+  "--font-accent": neueHaasLight.style.fontFamily,
+  "--font-mono": jetBrainsMono.style.fontFamily,
+} as React.CSSProperties;
 
 const siteUrl = getSiteUrl();
 const title = "Shadowy - Padariet neredzamo darbu redzamu";
@@ -122,9 +143,10 @@ export default function RootLayout({
     <html
       lang="lv"
       className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable}`}
+      style={fontVariables}
       suppressHydrationWarning
     >
-      <body className="font-sans">
+      <body className="font-sans" style={{ fontFamily: inter.style.fontFamily }}>
         <ThemeProvider
           attribute="class"
           defaultTheme="slate"

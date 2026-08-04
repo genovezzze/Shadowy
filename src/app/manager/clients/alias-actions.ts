@@ -15,7 +15,7 @@ const aliasSchema = z.object({
  * Registers an alternative spelling ("alias") for a client and re-links any
  * existing unlinked entries whose clientName resolves to the same normalized
  * key. Once linked (clientId set), every report/dashboard that aggregates by
- * clientId counts them under this client — collapsing the duplicate row.
+ * clientId counts them under this client - collapsing the duplicate row.
  */
 export async function addClientAlias(input: { clientId: string; name: string }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
@@ -57,7 +57,7 @@ export async function addClientAlias(input: { clientId: string; name: string }) 
       data: { organizationId: session.organizationId, clientId, name, normalized },
     });
   } catch {
-    // Unique [organizationId, normalized] — alias already registered.
+    // Unique [organizationId, normalized] - alias already registered.
     return { ok: false as const, error: "Šāds nosaukuma variants jau ir reģistrēts." };
   }
 

@@ -39,14 +39,15 @@ function HatchPattern() {
 export function WhatToLogSection() {
   return (
     <section
+      id="ko-fikset"
       aria-labelledby="what-to-log-heading"
-      className="relative overflow-hidden bg-[#070809] py-10 sm:py-12"
+      className="relative scroll-mt-24 overflow-hidden bg-[#070809] py-10 sm:py-12"
     >
       <div className="relative mx-auto max-w-4xl px-5 sm:px-6">
         <div className="mb-5 text-left sm:text-center">
           <h2
             id="what-to-log-heading"
-            className="text-balance font-accent text-[1.4rem] font-bold tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(1.75rem,2.6vw,2.25rem)]"
+            className="text-balance font-accent text-[clamp(1.35rem,4vw,2.5rem)] font-bold uppercase leading-none tracking-[0.015em] text-[#75babc] [font-synthesis:weight]"
           >
             Kas der fiksēšanai un kas ne?
           </h2>

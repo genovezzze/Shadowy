@@ -60,7 +60,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
 
 /**
  * Seed/demo accounts (…@demo.lv) hard-bounce and end up on Resend's
- * suppression list — skip them in automated sends to save quota and keep
+ * suppression list - skip them in automated sends to save quota and keep
  * delivery logs clean.
  */
 export function isDemoEmail(email: string): boolean {
@@ -348,7 +348,7 @@ export async function sendWeeklyManagerReport(opts: {
 
       <p style="color:#3b3b3b;background:#f5f5f5;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
         💶 Pagājušās nedēļas neredzamā darba izmaksas: <strong>€${opts.costEur}</strong>
-        <br/><span style="color:#888;font-size:12px">Aprēķināts ar vidējo likmi €${opts.rateEur}/h — aptuvena vērtība, nevis precīzs budžeta zaudējums.</span>
+        <br/><span style="color:#888;font-size:12px">Aprēķināts ar vidējo likmi €${opts.rateEur}/h - aptuvena vērtība, nevis precīzs budžeta zaudējums.</span>
       </p>
 
       ${opts.inactiveEmployeeNames.length > 0 ? `
@@ -389,7 +389,7 @@ export async function sendMorningReminder(opts: {
       </div>
 
       <p style="color:#333;font-size:14px">
-        Vēl viena darba diena priekšā — neaizmirsti šodien pierakstīt neredzamo darbu, kas paliek ārpus ierastajiem uzdevumiem.
+        Vēl viena darba diena priekšā - neaizmirsti šodien pierakstīt neredzamo darbu, kas paliek ārpus ierastajiem uzdevumiem.
       </p>
 
       <p>
@@ -451,7 +451,7 @@ export async function sendEveningReminder(opts: {
       </div>
 
       <p style="color:#333;font-size:14px">
-        Shadowy sistēmā no tevis šodien vēl nav neviena ieraksta. Pirms beidz darba dienu — neaizmirsti pierakstīt to, kas šodien aizņēma laiku ārpus ierastā.
+        Shadowy sistēmā no tevis šodien vēl nav neviena ieraksta. Pirms beidz darba dienu - neaizmirsti pierakstīt to, kas šodien aizņēma laiku ārpus ierastā.
       </p>
 
       <p>
@@ -486,14 +486,14 @@ export async function sendEmptyWeekNudge(opts: {
       </p>
 
       <p style="color:#333;font-size:14px">
-        Shadowy neko neuzspiež un neseko līdzi ar spiedienu — tas nav paredzēts kā kontrole. Mērķis ir palīdzēt padarīt redzamu darbu, kas citādi paliek nepamanīts, lai tev un komandai būtu vieglāk strādāt efektīvāk.
+        Shadowy neko neuzspiež un neseko līdzi ar spiedienu - tas nav paredzēts kā kontrole. Mērķis ir palīdzēt padarīt redzamu darbu, kas citādi paliek nepamanīts, lai tev un komandai būtu vieglāk strādāt efektīvāk.
       </p>
 
       <p style="color:#333;font-size:14px;margin-bottom:8px">
-        Pirms turpini nedēļu — pajautā sev, kāpēc tā sanācis (atbildi šeit rakstīt nevajag):
+        Pirms turpini nedēļu - pajautā sev, kāpēc tā sanācis (atbildi šeit rakstīt nevajag):
       </p>
       <ul style="color:#333;font-size:14px;padding-left:20px;margin-top:0">
-        <li>Vai biji prombūtnē (atvaļinājumā, slimības lapā u.tml.)? Ja jā — viss kārtībā, tas nav pārmetums.</li>
+        <li>Vai biji prombūtnē (atvaļinājumā, slimības lapā u.tml.)? Ja jā - viss kārtībā, tas nav pārmetums.</li>
         <li>Vai tiešām nebija nekāda papildu vai neredzama darba?</li>
         <li>Vai vienkārši aizmirsi to pierakstīt?</li>
         <li>Vai negribējies to darīt?</li>
@@ -501,7 +501,7 @@ export async function sendEmptyWeekNudge(opts: {
       </ul>
 
       <p style="color:#888;background:#f5f5f5;border-radius:8px;padding:12px 16px;font-size:13px;margin-bottom:20px">
-        Par atbildi parunāsim klātienē — šis e-pasts ir tikai atgādinājums padomāt par to iepriekš.
+        Par atbildi parunāsim klātienē - šis e-pasts ir tikai atgādinājums padomāt par to iepriekš.
       </p>
 
       <p>

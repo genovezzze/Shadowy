@@ -533,7 +533,7 @@ export default async function ManagerDashboard({
           { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts" },
           {
             label: "Izskatīšana",
-            value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "—",
+            value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "-",
             icon: Timer,
             sub: "vid. laiks",
           },
@@ -584,7 +584,7 @@ export default async function ManagerDashboard({
                 : "border-border bg-card"
             }`}>
               <div className="text-sm">
-                <span className="font-medium">Aktivitāte šonedēļ — </span>
+                <span className="font-medium">Aktivitāte šonedēļ - </span>
                 <span className="font-semibold text-foreground">{thisWeekActiveIds.size}</span>
                 <span className="text-muted-foreground"> / {teamMembers.length} darbinieki</span>
               </div>
@@ -712,7 +712,7 @@ export default async function ManagerDashboard({
                 <p className="mt-0.5 text-sm text-muted-foreground">
                   Kategorija{" "}
                   <span className="font-medium text-foreground">&ldquo;{patternCategory}&rdquo;</span>{" "}
-                  ir biežākā pēdējās 4 nedēļās — iespējama strukturāla problēma, ne gadījuma rakstura.
+                  ir biežākā pēdējās 4 nedēļās - iespējama strukturāla problēma, ne gadījuma rakstura.
                 </p>
               </div>
             </div>

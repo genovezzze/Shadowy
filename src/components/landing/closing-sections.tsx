@@ -156,29 +156,14 @@ export function ClosingSections() {
       <section
         id="pilots"
         aria-labelledby="pilot-heading-visible"
-        className="relative mt-6 overflow-hidden bg-[#070809] py-6 scroll-mt-24 sm:mx-4 sm:mt-10 sm:rounded-[28px] sm:border sm:border-white/[0.07] md:py-8 lg:mx-7"
+        className="relative mt-5 overflow-hidden bg-[#070809] py-1 scroll-mt-24 sm:mt-7 sm:py-2"
       >
-        <div
-          aria-hidden
-          className="animate-pilot-grid pointer-events-none absolute inset-0 opacity-40"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(148,163,184,0.105) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,0.105) 1px, transparent 1px)",
-            backgroundSize: "34px 34px",
-            maskImage:
-              "radial-gradient(ellipse 95% 90% at 50% 45%, black 0%, rgba(0,0,0,.72) 55%, transparent 100%)",
-            WebkitMaskImage:
-              "radial-gradient(ellipse 95% 90% at 50% 45%, black 0%, rgba(0,0,0,.72) 55%, transparent 100%)",
-          }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_75%_78%_at_50%_46%,transparent_20%,rgba(7,8,9,0.28)_68%,rgba(7,8,9,0.82)_100%)]"
-        />
-        <div className="relative mx-auto max-w-2xl px-4 sm:px-6">
+        <div className="relative mx-auto max-w-5xl px-4 sm:px-6">
+          <div className="overflow-hidden rounded-[18px] border border-white/[0.1] bg-black shadow-[0_18px_55px_rgba(0,0,0,0.32)] lg:grid lg:grid-cols-2">
+          <div className="flex flex-col justify-center px-4 py-3 sm:px-6 sm:py-4 lg:px-7 lg:py-5">
           <h2
             id="pilot-heading-visible"
-            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_40%,rgba(226,232,240,.78)_70%,rgba(100,116,139,.6)_100%)] bg-clip-text text-center font-accent text-[1.6rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(1.75rem,2.8vw,2.1rem)]"
+            className="text-balance bg-[linear-gradient(90deg,#f8fafc_0%,#f8fafc_48%,rgba(148,163,184,.72)_100%)] bg-clip-text font-accent text-[1.4rem] font-bold leading-[1.05] tracking-[0.02em] text-transparent [font-synthesis:weight] sm:text-[clamp(1.5rem,2.2vw,1.75rem)]"
           >
             Izmēģiniet pilotu bez riska
           </h2>
@@ -218,7 +203,7 @@ export function ClosingSections() {
             </p>
           </div>
 
-          <div className="mt-4 rounded-2xl border border-white/[0.1] bg-[#070809]/90 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.28)]">
+          <div className="mt-3">
             <h3 className="font-accent text-base font-bold tracking-[0.035em] text-white">
               Pieteikt pilotu
             </h3>
@@ -231,7 +216,7 @@ export function ClosingSections() {
             <PilotForm />
           </div>
 
-          <p className="mx-auto mt-5 max-w-xl text-center font-accent text-sm font-light leading-relaxed tracking-[0.018em] text-white/48">
+          <p className="hidden">
             Shadowy ir Ventspils Augstskolas studentu veidots agrīnās stadijas
             projekts. Šobrīd meklējam pirmās komandas{" "}
             <strong className="font-bold text-white/62 [font-synthesis:weight]">
@@ -247,6 +232,27 @@ export function ClosingSections() {
             </strong>{" "}
             palīdzēs veidot labāku produktu
           </p>
+          </div>
+
+          <aside
+            aria-label="Shadowy"
+            className="relative hidden min-h-[500px] overflow-hidden border-l border-white/[0.1] bg-neutral-950 lg:block"
+          >
+            <Image
+              src="/images/shadowy_login-background.png"
+              alt=""
+              fill
+              sizes="50vw"
+              className="object-cover object-center"
+            />
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,rgba(0,0,0,0.18),transparent_38%)]" />
+            <div className="pointer-events-none absolute inset-0 grid place-items-center">
+              <span className="translate-x-2 whitespace-nowrap text-center font-display text-[clamp(3.5rem,5vw,5.5rem)] font-bold leading-none tracking-[-0.045em] text-white [font-synthesis:none] drop-shadow-[0_2px_18px_rgba(0,0,0,0.3)]">
+                Shadowy
+              </span>
+            </div>
+          </aside>
+          </div>
 
           <div className="hidden">
             <div
@@ -425,12 +431,12 @@ export function ClosingSections() {
                 Produkts
               </h3>
               <nav className="mt-3.5 flex flex-col gap-3">
-                <a
-                  href="#risinajums"
+                <Link
+                  href="/ka-tas-darbojas"
                   className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Kā tas darbojas
-                </a>
+                </Link>
                 <a
                   href="#pilots"
                   className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"

@@ -21,7 +21,7 @@ export function ResetForm({ token }: { token: string }) {
       // No router.refresh() here: the token is single-use and was just
       // consumed, so re-running the server component would re-check it,
       // find it spent, and replace this success state with the
-      // "link expired" error — even though the password did change.
+      // "link expired" error - even though the password did change.
       else setDone(true);
     });
   }

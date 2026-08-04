@@ -537,7 +537,7 @@ export default async function AdminDashboard({
                 : "border-border bg-card"
             }`}>
               <div className="text-sm">
-                <span className="font-medium">Aktivitāte šonedēļ — </span>
+                <span className="font-medium">Aktivitāte šonedēļ - </span>
                 <span className="font-semibold text-foreground">{thisWeekActiveIds.size}</span>
                 <span className="text-muted-foreground"> / {allEmployees.length} darbinieki</span>
               </div>

@@ -186,7 +186,7 @@ export function SmartWorkLog({
         return;
       }
     } catch {
-      // permissions API not supported — fall through to getUserMedia
+      // permissions API not supported - fall through to getUserMedia
     }
 
     try {
@@ -352,7 +352,7 @@ export function SmartWorkLog({
     const newConfirmed = !ticket.confirmed;
     if (newConfirmed && ticket.client_name === null) {
       setError(
-        "Ieteicams norādīt klientu/uzņēmumu — tas ļauj analizēt laiku pa klientiem. Vari iekļaut arī bez klienta."
+        "Ieteicams norādīt klientu/uzņēmumu - tas ļauj analizēt laiku pa klientiem. Vari iekļaut arī bez klienta."
       );
     } else {
       setError(null);
@@ -632,7 +632,7 @@ export function SmartWorkLog({
                             </select>
                             {ticket.client_name && !ticket.client_id && (
                               <p className="text-xs text-amber-500">
-                                Atpazīts klients: &ldquo;{ticket.client_name}&rdquo; — nav sarakstā. Izvēlies vai atstāj bez klienta.
+                                Atpazīts klients: &ldquo;{ticket.client_name}&rdquo; - nav sarakstā. Izvēlies vai atstāj bez klienta.
                               </p>
                             )}
                           </>

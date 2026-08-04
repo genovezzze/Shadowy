@@ -43,7 +43,7 @@ export function buildEntryWhere(
   const categoryFilter = sp.category?.trim();
   if (categoryFilter) {
     // Older entries can store the category as its Latvian label instead of the
-    // canonical key (or vice versa) — match either form so the filter doesn't
+    // canonical key (or vice versa) - match either form so the filter doesn't
     // silently miss half the matching rows.
     const key = normalizeCategoryKey(categoryFilter);
     const label = categoryLabel(key);

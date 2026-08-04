@@ -18,12 +18,6 @@ const schema = z.object({
 });
 
 export async function submitPilotApplication(formData: FormData) {
-  const ip = getClientIp();
-  if (await isActionRateLimited(RATE_LIMIT_KEY, ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
-    return { ok: false as const, error: ACTION_RATE_LIMIT_MESSAGE };
-  }
-  await recordActionHit(RATE_LIMIT_KEY, ip, RATE_LIMIT_WINDOW_MINUTES);
-
   const parsed = schema.safeParse({
     name: formData.get("name"),
     company: formData.get("company"),
@@ -36,6 +30,15 @@ export async function submitPilotApplication(formData: FormData) {
     return { ok: false as const, error: parsed.error.issues[0].message };
   }
 
+  const ip = getClientIp();
+  if (await isActionRateLimited(RATE_LIMIT_KEY, ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
+    return { ok: false as const, error: ACTION_RATE_LIMIT_MESSAGE };
+  }
+  await recordActionHit(RATE_LIMIT_KEY, ip, RATE_LIMIT_WINDOW_MINUTES);
+
+  let savedToDatabase = false;
+  let emailSent = false;
+
   try {
     await prisma.pilotLead.create({
       data: {
@@ -46,14 +49,25 @@ export async function submitPilotApplication(formData: FormData) {
         comment: parsed.data.comment || null,
       },
     });
-  } catch {
+    savedToDatabase = true;
+  } catch (error) {
     // DB save failed - still try to send email so the lead isn't lost
+    console.error("[pilot] Database save failed", error);
   }
 
   try {
     await sendPilotInquiry(parsed.data);
-  } catch {
+    emailSent = true;
+  } catch (error) {
     // Email failed but DB save succeeded - not a user-facing error
+    console.error("[pilot] Email notification failed", error);
+  }
+
+  if (!savedToDatabase && !emailSent) {
+    return {
+      ok: false as const,
+      error: "Pieteikumu neizdevās nosūtīt. Lūdzu, mēģiniet vēlreiz.",
+    };
   }
 
   return { ok: true as const };

@@ -65,7 +65,7 @@ export function ImportClient() {
         const id = override ?? emp.employeeId;
         if (id && id !== "__skip__") empIds.push(id);
       });
-      // Include even unmatched clients — they will be created by the action
+      // Include even unmatched clients - they will be created by the action
       assignments.push({
         clientId: match.clientId ?? null,
         clientName: match.clientId ? undefined : match.clientName,
@@ -111,7 +111,7 @@ export function ImportClient() {
         <div className="text-center">
           <p className="text-sm font-medium">Noklikšķini vai ievelc Excel failu</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Kolonna &ldquo;Uzņēmums&rdquo; + kolonna &ldquo;Grāmatvedis&rdquo; — tiek atpazīts automātiski
+            Kolonna &ldquo;Uzņēmums&rdquo; + kolonna &ldquo;Grāmatvedis&rdquo; - tiek atpazīts automātiski
           </p>
         </div>
         <Button variant="outline" size="sm" disabled={uploading}>
@@ -132,7 +132,7 @@ export function ImportClient() {
       {preview && (
         <div className="space-y-4">
           <h2 className="text-sm font-semibold">
-            Priekšskatījums — {preview.matches.length} klienti
+            Priekšskatījums - {preview.matches.length} klienti
           </h2>
 
           <div className="rounded-xl border border-border overflow-hidden">
@@ -175,7 +175,7 @@ export function ImportClient() {
                                   className="appearance-none bg-transparent text-[10px] text-muted-foreground cursor-pointer pr-3 border-0 focus:outline-none"
                                   title="Labot atbilstību"
                                 >
-                                  <option value="__skip__">— izlaist</option>
+                                  <option value="__skip__">- izlaist</option>
                                   {preview.employees.map((e) => (
                                     <option key={e.id} value={e.id}>{e.name}</option>
                                   ))}
@@ -201,8 +201,8 @@ export function ImportClient() {
               {pending ? "Saglabā..." : "Apstiprināt un saglabāt"}
             </Button>
             <p className="text-xs text-muted-foreground">
-              <span className="text-amber-500">Dzeltens</span> — jauns klients, tiks izveidots automātiski.{" "}
-              <span className="text-emerald-500">Zaļš</span> — atrasts sistēmā.
+              <span className="text-amber-500">Dzeltens</span> - jauns klients, tiks izveidots automātiski.{" "}
+              <span className="text-emerald-500">Zaļš</span> - atrasts sistēmā.
             </p>
           </div>
         </div>

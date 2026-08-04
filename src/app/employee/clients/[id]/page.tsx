@@ -137,7 +137,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
             <span className="text-xs">Šomēnes</span>
           </div>
           <div className={`text-2xl font-bold tabular-nums ${thisMonthOverrun > 0 ? "text-amber-500" : ""}`}>
-            {thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "—"}
+            {thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "-"}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
             {limitMin !== null ? `limits: ${formatDurationLV(limitMin)}` : "bez limita"}

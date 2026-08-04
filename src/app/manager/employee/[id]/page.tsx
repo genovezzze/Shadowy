@@ -131,13 +131,13 @@ export default async function ManagerEmployeeDetail({
         <KpiCard
           icon={<TrendingUp className="h-4 w-4" />}
           label="Šomēnes"
-          value={thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "—"}
+          value={thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "-"}
           sub="šis kalendārais mēnesis"
         />
         <KpiCard
           icon={<Tag className="h-4 w-4" />}
           label="Galvenā kategorija"
-          value={topCat ? categoryLabel(topCat.category) : "—"}
+          value={topCat ? categoryLabel(topCat.category) : "-"}
           sub={topCat && totalMinutes > 0 ? `${Math.round((topCat.minutes / totalMinutes) * 100)}% no laika` : "nav datu"}
         />
         <KpiCard
@@ -168,7 +168,7 @@ export default async function ManagerEmployeeDetail({
           <div>
             <div className="text-sm font-medium">Redz visus klientus</div>
             <div className="text-xs text-muted-foreground mt-0.5">
-              Ja ieslēgts — darbinieks var izvēlēties jebkuru klientu iesniedzot ierakstu
+              Ja ieslēgts - darbinieks var izvēlēties jebkuru klientu iesniedzot ierakstu
             </div>
           </div>
           <form action={async () => {

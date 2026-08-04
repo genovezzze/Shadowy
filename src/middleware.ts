@@ -9,10 +9,31 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/accept-invite",
   "/privacy",
+  "/ka-tas-darbojas",
   "/hero-demo",
   "/preview/mobile-demo",
 ];
+
+const PROTECTED_PREFIXES = [
+  "/account",
+  "/admin",
+  "/employee",
+  "/manager",
+  "/notifications",
+  "/superadmin",
+  "/trial-expired",
+  "/api/clients",
+  "/api/export",
+  "/api/smart-log",
+];
+
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME ?? "shadowy_session";
+
+function isProtectedPath(pathname: string) {
+  return PROTECTED_PREFIXES.some(
+    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  );
+}
 
 function roleHome(role: string) {
   switch (role) {
@@ -44,6 +65,7 @@ export async function middleware(req: NextRequest) {
   const session = token ? await verifySessionToken(token) : null;
 
   const isPublic = PUBLIC_PATHS.includes(pathname);
+  const isProtected = isProtectedPath(pathname);
 
   // Authenticated user on public auth pages -> push to their home
   if (session && (pathname === "/login" || pathname === "/register")) {
@@ -51,6 +73,10 @@ export async function middleware(req: NextRequest) {
   }
 
   if (isPublic) return NextResponse.next();
+
+  // Let Next.js render its regular 404 page for unknown routes instead of
+  // treating every unmatched URL as a protected page.
+  if (!isProtected) return NextResponse.next();
 
   // Protected areas
   if (!session) {

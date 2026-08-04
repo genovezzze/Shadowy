@@ -28,8 +28,9 @@ const cards: readonly ValueCard[] = [
 export function EmployeeValueSection() {
   return (
     <section
+      id="darbiniekiem"
       aria-labelledby="employee-value-heading"
-      className="relative overflow-hidden bg-[#070809] pt-12 pb-6 sm:pt-20 sm:pb-8 md:pt-24"
+      className="relative scroll-mt-24 overflow-hidden bg-[#070809] pt-12 pb-6 sm:pt-20 sm:pb-8 md:pt-24"
     >
       <div className="relative mx-auto max-w-6xl px-5 sm:px-6">
         <div className="grid items-center gap-12 lg:grid-cols-[1fr_1.1fr] lg:gap-16">
@@ -37,10 +38,9 @@ export function EmployeeValueSection() {
           <div className="min-w-0">
             <h2
               id="employee-value-heading"
-              className="text-balance font-accent text-[1.9rem] font-bold leading-[1.06] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2rem,3.2vw,2.8rem)] lg:whitespace-nowrap"
+              className="text-balance font-accent text-[clamp(1.35rem,4vw,2.5rem)] font-bold uppercase leading-none tracking-[0.015em] text-[#75babc] [font-synthesis:weight] lg:whitespace-nowrap"
             >
-              Ko iegūst{" "}
-              <span className="text-white/45">darbinieks?</span>
+              Ko iegūst darbinieks?
             </h2>
             <p className="mt-4 max-w-md font-accent text-base font-light leading-relaxed tracking-[0.01em] text-white/55 sm:mt-5 sm:text-xl">
               Shadowy palīdz nevis pierādīt, ka cilvēks strādā, bet{" "}

@@ -17,7 +17,7 @@ interface ChartItem {
 
 function formatTooltip(value: unknown): [string, string] {
   const v = typeof value === "number" ? value : 0;
-  if (v === 0) return ["—", "Laiks"];
+  if (v === 0) return ["-", "Laiks"];
   const h = Math.floor(v / 60);
   const m = v % 60;
   return [h > 0 ? `${h}h ${m}m` : `${m}m`, "Laiks"];

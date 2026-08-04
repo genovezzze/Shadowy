@@ -123,7 +123,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
                         {Math.round((min / 60) * 10) / 10}h
                       </span>
                     ) : (
-                      <span className="text-muted-foreground/25 text-xs select-none">—</span>
+                      <span className="text-muted-foreground/25 text-xs select-none">-</span>
                     )}
                   </td>
                 );
@@ -155,7 +155,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
                 ) : row.freeMinutes !== null ? (
                   <span className="text-xs text-emerald-500 font-medium">OK</span>
                 ) : (
-                  <span className="text-xs text-muted-foreground/30">—</span>
+                  <span className="text-xs text-muted-foreground/30">-</span>
                 )}
               </td>
             </tr>
@@ -176,7 +176,7 @@ function Legend() {
           ))}
         </div>
         <span className="text-[11px] text-muted-foreground">
-          klients ietilpst limitā — maz → daudz stundu
+          klients ietilpst limitā - maz → daudz stundu
         </span>
       </div>
       <div className="flex items-center gap-1.5">
@@ -186,7 +186,7 @@ function Legend() {
           ))}
         </div>
         <span className="text-[11px] text-muted-foreground">
-          klients pārsniedz limitu — jo tumšāks, jo lielāka daļa no darbinieka laika
+          klients pārsniedz limitu - jo tumšāks, jo lielāka daļa no darbinieka laika
         </span>
       </div>
     </div>

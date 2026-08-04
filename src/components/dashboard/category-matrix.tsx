@@ -114,7 +114,7 @@ function MatrixTable({ rows, cols, allCols, minutes, hiddenCount, compact }: Mat
                         {fmtHours(min)}
                       </span>
                     ) : (
-                      <span className="select-none text-xs text-muted-foreground/25">—</span>
+                      <span className="select-none text-xs text-muted-foreground/25">-</span>
                     )}
                   </td>
                 );
@@ -200,7 +200,7 @@ export function CategoryMatrix({
             className="flex w-full items-center justify-center gap-2 border-t border-teal-500/30 bg-teal-500/15 px-4 py-3.5 text-sm font-semibold text-teal-600 transition-colors hover:bg-teal-500/25 dark:text-teal-300"
           >
             <Maximize2 className="h-4 w-4" />
-            {`Skatīt visu — ${rows.length} kategorijas × ${cols.length}${unit ? ` ${unit}` : ""}`}
+            {`Skatīt visu - ${rows.length} kategorijas × ${cols.length}${unit ? ` ${unit}` : ""}`}
           </button>
         )}
       </Card>

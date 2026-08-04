@@ -3,7 +3,7 @@
 import { CSSProperties, useEffect, useRef, useState } from "react"
 
 const FULL_TEXT =
-  'Klients "ARIRI Labs" piezvanija ar jautajumu arpus manas atbildibas — paskaidrošana aiznema 40 minutes.'
+  'Klients "ARIRI Labs" piezvanija ar jautajumu arpus manas atbildibas - paskaidrošana aiznema 40 minutes.'
 
 const ACCENT = "#4ade80"
 const ACCENT_SOFT = "rgba(74,222,128,0.18)"

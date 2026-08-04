@@ -165,7 +165,7 @@ export function AnnaStoryCarousel() {
     <section
       id="problema"
       aria-labelledby="anna-story-heading"
-      className="relative z-[46] overflow-hidden bg-[#070809] py-8 sm:py-12 md:py-14"
+      className="relative z-[46] scroll-mt-24 overflow-hidden bg-[#070809] py-8 sm:py-12 md:py-14"
     >
       <div
         aria-hidden
@@ -184,7 +184,7 @@ export function AnnaStoryCarousel() {
         <header className="mx-auto max-w-none text-center">
           <h2
             id="anna-story-heading"
-            className="text-balance font-accent text-[1.75rem] font-bold leading-[1.08] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(2rem,3vw,2.75rem)]"
+            className="text-balance font-accent text-[clamp(1.35rem,4vw,2.5rem)] font-bold uppercase leading-none tracking-[0.015em] text-[#75babc] [font-synthesis:weight]"
           >
             Kur pazūd laiks, nauda un komandas fokuss
           </h2>

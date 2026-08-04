@@ -430,7 +430,7 @@ export default async function EmployeeDashboard() {
         <KpiCard
           formal
           label="Nedēļu sērija"
-          value={streak === 0 ? "—" : String(streak)}
+          value={streak === 0 ? "-" : String(streak)}
           hint={
             streak === 0 ? "Pievieno ierakstu šonedēļ" :
             streak === bestStreak && streak > 1 ? "Personīgais rekords!" :
@@ -444,7 +444,7 @@ export default async function EmployeeDashboard() {
         <KpiCard
           formal
           label="Dziļā darba bloki"
-          value={deepWork === 0 ? "—" : String(deepWork)}
+          value={deepWork === 0 ? "-" : String(deepWork)}
           hint="Ieraksti ≥ 60 min šomēnesī"
           icon={<Zap className="h-5 w-5" />}
         />
@@ -498,7 +498,7 @@ export default async function EmployeeDashboard() {
           <CardContent className="p-5">
             <div className="text-sm font-semibold mb-1">Kontekstu maiņa</div>
             <p className="text-xs text-muted-foreground mb-4">
-              Krāsa parāda, cik kategorijās tu strādāji vienā dienā. Jo vairāk — jo izkaisītāks fokuss.
+              Krāsa parāda, cik kategorijās tu strādāji vienā dienā. Jo vairāk - jo izkaisītāks fokuss.
             </p>
             <FocusHeatmap days={focusDays} />
           </CardContent>

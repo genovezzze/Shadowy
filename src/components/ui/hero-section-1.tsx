@@ -4,7 +4,18 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { Menu, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  Building2,
+  ChevronDown,
+  CircleAlert,
+  ListChecks,
+  Menu,
+  ShieldCheck,
+  UserRound,
+  Workflow,
+  X,
+} from "lucide-react";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { AnimatedGroup } from "@/components/ui/animated-group";
 import { Button } from "@/components/ui/button";
@@ -17,27 +28,12 @@ import { MobileDashboardPreview } from "@/components/landing/mobile-dashboard-pr
 
 // Below-the-fold sections are code-split into their own chunks so the hero
 // hydrates without parsing all section JS up front. ssr stays enabled (default)
-// so the server-rendered HTML — and therefore the visual output — is unchanged.
-const AnnaStoryCarousel = dynamic(() =>
-  import("@/components/landing/anna-story-carousel").then((m) => m.AnnaStoryCarousel),
-);
-const SolutionSection = dynamic(() =>
-  import("@/components/landing/solution-section").then((m) => m.SolutionSection),
-);
-const EmployeeValueSection = dynamic(() =>
-  import("@/components/landing/employee-value-section").then((m) => m.EmployeeValueSection),
-);
-const CompanyValueSection = dynamic(() =>
-  import("@/components/landing/company-value-section").then((m) => m.CompanyValueSection),
-);
-const WhatToLogSection = dynamic(() =>
-  import("@/components/landing/what-to-log-section").then((m) => m.WhatToLogSection),
+// so the server-rendered HTML - and therefore the visual output - is unchanged.
+const ClientCasesSection = dynamic(() =>
+  import("@/components/landing/client-cases-section").then((m) => m.ClientCasesSection),
 );
 const PilotResultsSection = dynamic(() =>
   import("@/components/landing/pilot-results-section").then((m) => m.PilotResultsSection),
-);
-const PrivacyTrustSection = dynamic(() =>
-  import("@/components/landing/privacy-trust-section").then((m) => m.PrivacyTrustSection),
 );
 const ClosingSections = dynamic(() =>
   import("@/components/landing/closing-sections").then((m) => m.ClosingSections),
@@ -56,11 +52,56 @@ const transitionVariants: { item: Variants } = {
 };
 
 const menuItems = [
-  { name: "Kā tas darbojas", href: "#risinajums" },
-  { name: "Pilots", href: "#pilots" },
-  { name: "FAQ", href: "#faq" },
-  { name: "Privātums", href: "#privatums" },
+  { number: "01", name: "Kā tas darbojas", caption: "Produkts un darba plūsma", href: "/ka-tas-darbojas" },
+  { number: "02", name: "Pilots", caption: "Izmēģiniet Shadowy komandā", href: "#pilots" },
+  { number: "03", name: "FAQ", caption: "Atbildes uz jautājumiem", href: "#faq" },
+  { number: "04", name: "Privātums", caption: "Dati un drošība", href: "/privacy" },
 ];
+
+const howItWorksMenuItems = [
+  {
+    icon: CircleAlert,
+    motion: "problem",
+    title: "Problēma",
+    text: "Kur ikdienā pazūd komandas laiks un fokuss.",
+    href: "/ka-tas-darbojas#problema",
+  },
+  {
+    icon: Workflow,
+    motion: "workflow",
+    title: "Kā Shadowy strādā",
+    text: "No īsa ieraksta līdz strukturētai analītikai.",
+    href: "/ka-tas-darbojas#risinajums",
+  },
+  {
+    icon: UserRound,
+    motion: "user",
+    title: "Darbiniekiem",
+    text: "Vienkārša darba fiksēšana bez papildu kontroles.",
+    href: "/ka-tas-darbojas#darbiniekiem",
+  },
+  {
+    icon: Building2,
+    motion: "building",
+    title: "Uzņēmumam",
+    text: "Slodze, izmaksas un atkārtojošies procesi vienuviet.",
+    href: "/ka-tas-darbojas#uznemumam",
+  },
+  {
+    icon: ListChecks,
+    motion: "checklist",
+    title: "Ko fiksēt",
+    text: "Praktiski piemēri darbam, kas paliek ārpus atskaitēm.",
+    href: "/ka-tas-darbojas#ko-fikset",
+  },
+  {
+    icon: ShieldCheck,
+    motion: "shield",
+    title: "Privātums",
+    text: "Kā Shadowy aizsargā darbinieku un uzņēmuma datus.",
+    href: "/ka-tas-darbojas#privatums",
+  },
+] as const;
 
 export function HeroSection() {
   const [previewMode, setPreviewMode] = React.useState<
@@ -520,24 +561,35 @@ export function HeroSection() {
           </section>
         </div>
 
-        <ScrollReveal effect="rise" disableOnMobile className="relative z-30">
-          <AnnaStoryCarousel />
-        </ScrollReveal>
-        <ScrollReveal effect="focus">
-          <SolutionSection />
-        </ScrollReveal>
-        <ScrollReveal effect="blur">
-          <EmployeeValueSection />
-        </ScrollReveal>
-        <ScrollReveal effect="blur">
-          <CompanyValueSection />
-        </ScrollReveal>
-        <ScrollReveal effect="fade">
-          <WhatToLogSection />
-        </ScrollReveal>
-        <ScrollReveal effect="unfold" disableOnMobile>
-          <PrivacyTrustSection />
-        </ScrollReveal>
+        <div className="relative bg-[#070809]">
+          <ScrollReveal effect="rise" className="relative z-30">
+            <ClientCasesSection />
+          </ScrollReveal>
+          <ScrollReveal effect="fade" className="relative z-30">
+            <section className="bg-[#070809] px-5 pb-8 sm:px-6 sm:pb-10">
+              <Link
+                href="/ka-tas-darbojas"
+                className="group mx-auto flex max-w-5xl flex-col gap-6 border-y border-white/[0.12] py-6 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div>
+                  <p className="font-display text-[10px] font-bold uppercase tracking-[0.16em] text-[#75babc]">
+                    Produkts
+                  </p>
+                  <h2 className="mt-2 font-display text-2xl font-bold text-white sm:text-3xl">
+                    Kā darbojas Shadowy?
+                  </h2>
+                  <p className="mt-2 max-w-2xl font-sans text-sm leading-6 text-white/58 sm:text-base">
+                    Apskatiet visu ceļu no ikdienas darba fiksēšanas līdz komandas slodzes, izmaksu un procesu analīzei.
+                  </p>
+                </div>
+                <span className="inline-flex shrink-0 items-center gap-2 font-display text-sm font-bold text-white/72 transition group-hover:text-[#75babc]">
+                  Kā tas darbojas
+                  <ArrowUpRight className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />
+                </span>
+              </Link>
+            </section>
+          </ScrollReveal>
+        </div>
         <ScrollReveal effect="rise">
           <PilotResultsSection />
         </ScrollReveal>
@@ -552,10 +604,12 @@ function HeroHeader({
   pinned,
   heroRef,
   meetsDashboard,
+  standalone = false,
 }: {
   pinned: boolean;
   heroRef: React.RefObject<HTMLElement | null>;
   meetsDashboard: boolean;
+  standalone?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [isScrolled, setIsScrolled] = React.useState(false);
@@ -579,11 +633,19 @@ function HeroHeader({
       return () => observer.disconnect();
     }
 
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () =>
+      setIsScrolled(window.scrollY > (standalone ? 0 : 50));
+    const handleScrollIntent = (event: WheelEvent) => {
+      if (standalone && event.deltaY > 0) setIsScrolled(true);
+    };
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [pinned, heroRef]);
+    window.addEventListener("wheel", handleScrollIntent, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("wheel", handleScrollIntent);
+    };
+  }, [pinned, heroRef, standalone]);
 
   // Clicking the mark while already on the landing page used to fire a
   // same-route navigation: the scroll jumped to the top, but the header's
@@ -637,6 +699,25 @@ function HeroHeader({
   // own header is the ugly overlap.
   const compact = isScrolled || meetsDashboard;
 
+  const openPilot = React.useCallback(() => {
+    setMenuOpen(false);
+    const pilotSection = document.getElementById("pilots");
+
+    if (!pilotSection) {
+      window.location.assign("/#pilots");
+      return;
+    }
+
+    if (window.location.hash !== "#pilots") {
+      window.history.pushState(null, "", "#pilots");
+    }
+
+    pilotSection.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  }, []);
+
   return (
     <header>
       <nav
@@ -651,6 +732,7 @@ function HeroHeader({
             !compact &&
               "mt-3 rounded-none border-transparent bg-transparent shadow-none",
             compact && "max-w-4xl lg:px-5",
+            standalone && "duration-150",
           )}
         >
           <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
@@ -694,16 +776,69 @@ function HeroHeader({
               </button>
             </div>
 
-            <div className="absolute inset-0 m-auto hidden h-fit w-fit lg:block">
+            <div className="absolute inset-0 m-auto hidden h-fit w-fit -translate-x-10 lg:block xl:-translate-x-14">
               <ul className="flex gap-8 text-sm">
                 {menuItems.map((item) => (
-                  <li key={item.name}>
+                  <li
+                    key={item.name}
+                    className={item.href === "/ka-tas-darbojas" ? "group/how relative" : undefined}
+                  >
                     <Link
-                      href={item.href}
-                      className="block text-muted-foreground duration-150 hover:text-accent-foreground"
+                      href={standalone && item.href.startsWith("#") ? `/${item.href}` : item.href}
+                      className={cn(
+                        "flex items-center gap-1 duration-150",
+                        standalone
+                          ? "text-white/78 [text-shadow:0_1px_8px_rgba(0,0,0,0.95)] hover:text-white"
+                          : "text-muted-foreground hover:text-accent-foreground",
+                      )}
                     >
                       {item.name}
+                      {item.href === "/ka-tas-darbojas" && (
+                        <ChevronDown
+                          className="size-3.5 transition-transform duration-200 group-hover/how:rotate-180 group-focus-within/how:rotate-180"
+                          aria-hidden
+                        />
+                      )}
                     </Link>
+
+                    {item.href === "/ka-tas-darbojas" && (
+                      <div className="invisible absolute left-1/2 top-full w-[305px] -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-100 group-hover/how:visible group-hover/how:opacity-100 group-focus-within/how:visible group-focus-within/how:opacity-100">
+                        <div className="overflow-hidden rounded-b-[16px] rounded-t-[7px] border border-white/[0.13] bg-[rgba(11,14,17,0.93)] shadow-[0_20px_55px_rgba(0,0,0,0.48)]">
+                          <div className="h-px bg-[linear-gradient(90deg,transparent,#75babc_50%,transparent)] opacity-60" />
+                          <div className="flex flex-col px-2 py-2.5">
+                            {howItWorksMenuItems.map((menuItem) => {
+                              const MenuIcon = menuItem.icon;
+
+                              return (
+                              <Link
+                                key={menuItem.href}
+                                href={menuItem.href}
+                                className="how-menu-item group/item flex min-h-12 items-center gap-3.5 rounded-[8px] px-4 py-2.5 font-sans text-[15px] font-medium text-white/52 transition-all hover:bg-white/[0.045] hover:text-white/90"
+                              >
+                                <MenuIcon
+                                  data-how-motion={menuItem.motion}
+                                  className="how-menu-icon size-[19px] shrink-0 text-white/30 transition-colors group-hover/item:text-[#75babc]"
+                                  strokeWidth={1.65}
+                                  aria-hidden
+                                />
+                                <span>{menuItem.title}</span>
+                              </Link>
+                              );
+                            })}
+                          </div>
+
+                          <div className="border-t border-white/[0.08] p-2">
+                            <Link
+                              href="/ka-tas-darbojas"
+                              className="group/all flex min-h-11 items-center gap-3.5 rounded-[8px] px-4 py-2.5 font-sans text-sm font-medium text-white/42 transition-all hover:bg-white/[0.045] hover:text-white/85"
+                            >
+                              <ArrowUpRight className="size-[18px] text-white/28 transition-colors group-hover/all:text-[#75babc]" aria-hidden />
+                              Visas sadaļas
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </li>
                 ))}
               </ul>
@@ -724,19 +859,7 @@ function HeroHeader({
                 <ButtonColorful
                   type="button"
                   label="Pieteikt pilotu"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    const pilotSection = document.getElementById("pilots");
-
-                    if (window.location.hash !== "#pilots") {
-                      window.history.pushState(null, "", "#pilots");
-                    }
-
-                    pilotSection?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                  }}
+                  onClick={openPilot}
                   className="h-8 rounded-lg px-3 text-[13px]"
                 />
               </div>
@@ -751,15 +874,19 @@ function HeroHeader({
           role="dialog"
           aria-modal="true"
           aria-label="Mobilā navigācija"
-          className="fixed inset-0 z-[100] flex min-h-[100dvh] flex-col overflow-hidden bg-[#07090b] p-3 lg:hidden"
+          className="fixed inset-0 z-[100] min-h-[100dvh] overflow-y-auto overscroll-contain bg-[#07090b] p-3 lg:hidden"
         >
           <div
             aria-hidden
             className="landing-grain-overlay pointer-events-none absolute inset-0 z-0"
             style={{ opacity: 0.34 }}
           />
+          <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+            <div className="absolute -right-28 -top-24 size-80 rounded-full bg-[#75babc]/[0.1] blur-[90px]" />
+            <div className="absolute -bottom-36 -left-28 size-80 rounded-full bg-violet-500/[0.08] blur-[100px]" />
+          </div>
 
-          <div className="relative z-10 flex items-center justify-between px-2 py-2">
+          <div className="relative z-10 mx-auto flex w-full max-w-md items-center justify-between px-1 py-1">
             <Link
               href="/"
               aria-label="Shadowy home"
@@ -774,7 +901,7 @@ function HeroHeader({
               onClick={() => setMenuOpen(false)}
               aria-label="Close menu"
               autoFocus
-              className="grid size-12 place-items-center rounded-xl border border-white/10 bg-white/[0.07] text-white transition active:scale-95 [@media(max-height:560px)]:size-10"
+              className="grid size-12 place-items-center rounded-2xl border border-white/[0.12] bg-white/[0.065] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.06)] transition hover:bg-white/[0.1] active:scale-95 [@media(max-height:560px)]:size-10"
             >
               <X className="size-6" />
             </button>
@@ -784,7 +911,15 @@ function HeroHeader({
               a phone held sideways: at full size only two of the four links
               fit above the buttons, and the rest were only reachable by
               scrolling a list that gives no sign it scrolls. */}
-          <div className="relative z-10 mt-4 flex min-h-0 flex-1 animate-in flex-col rounded-[22px] border border-white/10 bg-[#0a0d10] p-4 shadow-[0_24px_80px_rgba(0,0,0,0.48)] duration-300 fade-in slide-in-from-bottom-2 [@media(max-height:560px)]:mt-3 [@media(max-height:560px)]:p-3">
+          <div className="relative z-10 mx-auto mt-5 w-full max-w-md animate-in overflow-hidden rounded-[26px] border border-white/[0.11] bg-[#0a0d10]/95 p-3 shadow-[0_28px_90px_rgba(0,0,0,0.58),inset_0_1px_0_rgba(255,255,255,0.05)] duration-300 fade-in slide-in-from-bottom-3 [@media(max-height:560px)]:mt-3">
+            <div className="px-3 pb-3 pt-2 [@media(max-height:560px)]:hidden">
+              <p className="font-accent text-[10px] font-semibold uppercase tracking-[0.18em] text-[#75babc]">
+                Navigācija
+              </p>
+              <p className="mt-1.5 font-sans text-sm text-white/42">
+                Izvēlieties, kur vēlaties doties
+              </p>
+            </div>
             {/* The link list is the part that gives way when the sheet cannot
                 fit: min-h-0 lets this box shrink, so without a scroller of its
                 own the <ul> spilled straight out of it. On a phone held
@@ -794,61 +929,69 @@ function HeroHeader({
                 bottom on any viewport height. */}
             <nav
               aria-label="Mobilā izvēlne"
-              className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+              className="min-h-0"
             >
-              <ul className="divide-y divide-white/[0.07]">
+              <ul className="grid gap-2">
                 {menuItems.map((item) => (
                   <li key={item.name}>
                     <Link
-                      href={item.href}
+                      href={standalone && item.href.startsWith("#") ? `/${item.href}` : item.href}
                       onClick={() => setMenuOpen(false)}
-                      className="group flex items-center justify-between rounded-xl px-4 py-4 text-lg font-semibold text-white/72 transition hover:bg-white/[0.045] hover:text-white [@media(max-height:560px)]:py-2 [@media(max-height:560px)]:text-base"
+                      className="group flex min-h-[68px] items-center gap-4 rounded-2xl border border-transparent px-3 py-2.5 transition-all hover:border-white/[0.08] hover:bg-white/[0.05] active:scale-[0.99] [@media(max-height:560px)]:min-h-[48px] [@media(max-height:560px)]:py-1.5"
                     >
-                      <span>{item.name}</span>
-                      <span
-                        aria-hidden
-                        className="text-emerald-300/0 transition group-hover:text-emerald-300/80"
-                      >
-                        ↗
+                      <span className="grid size-9 shrink-0 place-items-center rounded-xl border border-white/[0.08] bg-white/[0.035] font-mono text-[10px] text-[#75babc]/70 transition-colors group-hover:border-[#75babc]/25 group-hover:text-[#75babc] [@media(max-height:560px)]:size-8">
+                        {item.number}
                       </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-display text-[17px] font-semibold text-white/84 transition-colors group-hover:text-white [@media(max-height:560px)]:text-[15px]">
+                          {item.name}
+                        </span>
+                        <span className="mt-0.5 block font-sans text-xs text-white/34 [@media(max-height:560px)]:hidden">
+                          {item.caption}
+                        </span>
+                      </span>
+                      <ArrowUpRight className="size-4 text-white/22 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[#75babc]" aria-hidden />
                     </Link>
                   </li>
                 ))}
               </ul>
             </nav>
 
-            <div className="mt-4 grid gap-3 border-t border-white/10 pt-4 [@media(max-height:560px)]:mt-3 [@media(max-height:560px)]:gap-2 [@media(max-height:560px)]:pt-3">
+            <div className="mt-3 grid grid-cols-2 gap-2 border-t border-white/[0.09] pt-3">
               <Link
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className="flex h-12 items-center justify-center rounded-xl border border-white/[0.14] bg-white/[0.045] text-sm font-semibold text-white transition hover:bg-white/[0.08] [@media(max-height:560px)]:h-10"
+                className="flex h-12 items-center justify-center rounded-xl border border-white/[0.13] bg-white/[0.045] font-display text-sm font-semibold text-white transition hover:bg-white/[0.08] [@media(max-height:560px)]:h-10"
               >
                 Pieslēgties
               </Link>
               <button
                 type="button"
-                onClick={() => {
-                  setMenuOpen(false);
-
-                  if (window.location.hash !== "#pilots") {
-                    window.history.pushState(null, "", "#pilots");
-                  }
-
-                  requestAnimationFrame(() => {
-                    document.getElementById("pilots")?.scrollIntoView({
-                      behavior: "smooth",
-                      block: "start",
-                    });
-                  });
-                }}
-                className="flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-[#090b0d] shadow-[0_10px_32px_rgba(255,255,255,0.12)] transition active:scale-[0.985] [@media(max-height:560px)]:h-10"
+                onClick={openPilot}
+                className="flex h-12 items-center justify-center gap-2 rounded-xl bg-white px-3 font-display text-sm font-bold text-[#090b0d] shadow-[0_10px_32px_rgba(255,255,255,0.12)] transition hover:bg-white/90 active:scale-[0.985] [@media(max-height:560px)]:h-10"
               >
-                Pieteikt pilotu <span aria-hidden>↗</span>
+                Pieteikt pilotu <ArrowUpRight className="size-4" aria-hidden />
               </button>
             </div>
           </div>
+          <p className="relative z-10 mx-auto mt-5 max-w-md text-center font-sans text-[11px] tracking-[0.06em] text-white/24 [@media(max-height:560px)]:hidden">
+            Redziet neredzamo darbu. Uzlabojiet procesus.
+          </p>
         </div>
       )}
     </header>
+  );
+}
+
+export function LandingNavbar() {
+  const detachedHeroRef = React.useRef<HTMLElement | null>(null);
+
+  return (
+    <HeroHeader
+      pinned={false}
+      heroRef={detachedHeroRef}
+      meetsDashboard={false}
+      standalone
+    />
   );
 }

@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Fallback: no header detected — assume col 1 = client, col 2 = employee (skip col 0 = row number)
+  // Fallback: no header detected - assume col 1 = client, col 2 = employee (skip col 0 = row number)
   if (headerRowIdx === -1) {
     headerRowIdx = 0;
     clientCol = 1;
