@@ -47,21 +47,29 @@ export function buildClientMatrix(
     let meta: { name: string; id: string; freeMinutes: number | null };
 
     if (e.clientId) {
-      key = e.clientId;
       const c = clientById.get(e.clientId);
+      // Entries can outlive a deleted client. Do not resurrect that stale
+      // client as a standalone matrix row.
+      if (!c) continue;
+
+      key = c.id;
       meta = {
-        id: e.clientId,
-        name: c?.name ?? e.clientName ?? "?",
-        freeMinutes: c?.freeMinutesPerMonth ?? null,
+        id: c.id,
+        name: c.name,
+        freeMinutes: c.freeMinutesPerMonth,
       };
     } else {
       const norm = normalizeClientName(e.clientName!);
       const c = clientByNorm.get(norm);
-      key = c ? c.id : `name:${norm}`;
+      // A free-typed name is included only when it resolves to a registered
+      // client. Values such as "Visi klienti" must not become fake clients.
+      if (!c) continue;
+
+      key = c.id;
       meta = {
-        id: key,
-        name: c?.name ?? e.clientName!,
-        freeMinutes: c?.freeMinutesPerMonth ?? null,
+        id: c.id,
+        name: c.name,
+        freeMinutes: c.freeMinutesPerMonth,
       };
     }
 
