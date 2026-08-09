@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import {
   getClientIp,
   isActionRateLimited,
@@ -73,7 +73,7 @@ function extractOutputText(response: ResponsesApiResult): string | null {
 }
 
 export async function POST(request: Request) {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session || session.role !== "EMPLOYEE") {
     return NextResponse.json({ error: "Nav atļauts." }, { status: 401 });
   }

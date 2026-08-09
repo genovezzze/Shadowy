@@ -40,7 +40,12 @@ export async function resetPassword(token: string, formData: FormData) {
   const passwordHash = await hashPassword(parsed.data.newPassword);
   await prisma.user.update({
     where: { id: consumed.userId },
-    data: { passwordHash },
+    data: {
+      passwordHash,
+      // A reset is the standard response to a suspected compromise, so every
+      // session handed out before this point stops working.
+      sessionsValidFrom: new Date(),
+    },
   });
 
   return { ok: true as const };

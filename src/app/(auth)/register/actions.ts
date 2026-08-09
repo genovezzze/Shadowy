@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { hashPassword, roleHome } from "@/lib/auth";
 import { createSession } from "@/lib/session";
 import { slugify } from "@/lib/utils";
+import { isReservedSuperAdminEmail, RESERVED_EMAIL_MESSAGE } from "@/lib/superadmin";
 import { trialEndsAtDate } from "@/lib/trial";
 import { getClientIp, isActionRateLimited, recordActionHit, ACTION_RATE_LIMIT_MESSAGE } from "@/lib/rate-limit";
 
@@ -64,6 +65,11 @@ export async function registerAction(formData: FormData) {
 
   const { organizationName, name, email, password } = parsed.data;
   const normalizedEmail = email.toLowerCase().trim();
+
+  // Registering the configured super-admin address would hand out that role.
+  if (isReservedSuperAdminEmail(normalizedEmail)) {
+    return { ok: false as const, error: RESERVED_EMAIL_MESSAGE };
+  }
 
   const existing = await prisma.user.findUnique({
     where: { email: normalizedEmail },

@@ -36,8 +36,15 @@ async function sendEmail(to: string, subject: string, html: string): Promise<voi
   const from = process.env.EMAIL_FROM ?? "Shadowy <onboarding@resend.dev>";
 
   if (!apiKey) {
-    console.log(
-      `\n[email:dev] Nav RESEND_API_KEY - vēstule netiek sūtīta.\n  to: ${to}\n  subject: ${subject}\n  html:\n${html}\n`
+    // The body is never logged: it carries password-reset links, client names
+    // and report fragments, and logs are retained far longer than the links are
+    // valid. Locally the full message can be re-enabled on purpose.
+    if (process.env.EMAIL_DEBUG_LOG_BODY === "1" && process.env.NODE_ENV !== "production") {
+      console.log(`\n[email:dev] to: ${to}\n  subject: ${subject}\n  html:\n${html}\n`);
+      return;
+    }
+    console.warn(
+      `[email] RESEND_API_KEY nav iestatīts - vēstule netiek nosūtīta (subject: ${subject}).`,
     );
     return;
   }

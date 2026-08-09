@@ -29,7 +29,14 @@ export default async function EmployeeHistoryPage({
   searchParams: EntrySearchParams & { page?: string };
 }) {
   const session = await requireUser(["EMPLOYEE"]);
-  const where = { employeeId: session.userId, ...buildEntryWhere(searchParams) };
+  // Scope goes LAST. Spread the other way round, a URL filter such as
+  // ?employee=<other id> overwrites employeeId and exposes someone else's
+  // entries — there is no organizationId in this query to fall back on.
+  const where = {
+    ...buildEntryWhere(searchParams),
+    organizationId: session.organizationId,
+    employeeId: session.userId,
+  };
 
   const [total, user, clientSource] = await Promise.all([
     prisma.invisibleWorkEntry.count({ where }),

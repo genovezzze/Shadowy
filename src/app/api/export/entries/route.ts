@@ -1,12 +1,12 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { buildEntryWhere, type EntrySearchParams } from "@/lib/entry-filter";
 import { toCsv } from "@/lib/csv";
 import { statusLabel } from "@/lib/i18n";
 
 export async function GET(req: NextRequest) {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session) {
     return NextResponse.redirect(new URL("/login", req.url));
   }

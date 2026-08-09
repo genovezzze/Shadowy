@@ -1,9 +1,10 @@
 import { PageHeader } from "@/components/layout/page-header";
 import { Card } from "@/components/ui/card";
 import { ChangePasswordForm } from "@/components/account/change-password-form";
+import { SignOutEverywhere } from "@/components/account/sign-out-everywhere";
 import { roleLabel } from "@/lib/i18n";
 import type { Role } from "@prisma/client";
-import { UserCircle, KeyRound } from "lucide-react";
+import { UserCircle, KeyRound, LogOut } from "lucide-react";
 
 interface ProfileViewProps {
   name: string;
@@ -63,6 +64,19 @@ export function ProfileView({ name, email, role, title }: ProfileViewProps) {
           </div>
           <div className="px-6 py-5">
             <ChangePasswordForm />
+          </div>
+        </Card>
+
+        <Card className="relative min-w-0 overflow-hidden p-0 lg:col-span-2">
+          <div className={glassInner} />
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-border dark:border-white/[0.07]">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20">
+              <LogOut className="h-4 w-4" />
+            </div>
+            <div className="text-sm font-semibold">Aktīvās sesijas</div>
+          </div>
+          <div className="px-6 py-5">
+            <SignOutEverywhere />
           </div>
         </Card>
       </div>

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { Mail, Users, Calendar, ClipboardList } from "lucide-react";
 import { isSuperAdmin } from "@/lib/superadmin";
@@ -23,7 +23,7 @@ const TEAM_SIZE_LABELS: Record<string, string> = {
 };
 
 export default async function SuperAdminPilotLeadsPage() {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session || !isSuperAdmin(session.email)) redirect("/login");
 
   const leads = await prisma.pilotLead.findMany({

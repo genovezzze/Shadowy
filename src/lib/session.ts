@@ -4,10 +4,31 @@ import { SignJWT, jwtVerify } from "jose";
 import type { Role } from "@prisma/client";
 
 const COOKIE_NAME = process.env.SESSION_COOKIE_NAME ?? "shadowy_session";
-const SESSION_SECRET =
-  process.env.SESSION_SECRET ?? "dev-only-insecure-secret-change-me-please-min32chars";
 
-const secret = new TextEncoder().encode(SESSION_SECRET);
+const DEV_FALLBACK_SECRET = "dev-only-insecure-secret-change-me-please-min32chars";
+
+let cachedSecret: Uint8Array | null = null;
+
+/**
+ * The signing key, resolved on first use rather than at import time — a missing
+ * variable must fail the request, not the build.
+ *
+ * A checked-in fallback would let anyone who can read this file sign a session
+ * for any user of any organisation, so production fails closed instead.
+ */
+function sessionSecret(): Uint8Array {
+  if (cachedSecret) return cachedSecret;
+
+  const configured = process.env.SESSION_SECRET;
+  if (!configured && process.env.NODE_ENV === "production") {
+    throw new Error(
+      "SESSION_SECRET is not set. Refusing to sign sessions with the development fallback.",
+    );
+  }
+
+  cachedSecret = new TextEncoder().encode(configured ?? DEV_FALLBACK_SECRET);
+  return cachedSecret;
+}
 
 export type SessionPayload = {
   userId: string;
@@ -16,6 +37,9 @@ export type SessionPayload = {
   email: string;
   name: string;
 };
+
+/** The signed payload plus the JWT's issued-at claim, used for revocation checks. */
+export type VerifiedSession = SessionPayload & { iat?: number };
 
 const SESSION_DURATION_SECONDS = 60 * 60 * 24 * 7; // 7 days (Google OAuth / default)
 const REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 30; // 30 days
@@ -38,7 +62,7 @@ export async function signSessionToken(payload: SessionPayload) {
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${SESSION_DURATION_SECONDS}s`)
-    .sign(secret);
+    .sign(sessionSecret());
 }
 
 export async function createSession(payload: SessionPayload, rememberMe = false) {
@@ -47,7 +71,7 @@ export async function createSession(payload: SessionPayload, rememberMe = false)
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
     .setExpirationTime(`${duration}s`)
-    .sign(secret);
+    .sign(sessionSecret());
 
   const cookieOpts = {
     httpOnly: true,
@@ -64,12 +88,17 @@ export async function destroySession() {
   cookies().delete(COOKIE_NAME);
 }
 
-export async function getSession(): Promise<SessionPayload | null> {
+/**
+ * Verify the cookie's signature only. This says nothing about whether the
+ * account still exists, still has that role, or whether the token was revoked —
+ * server code should use `getValidatedSession` from `@/lib/auth` instead.
+ */
+export async function getSession(): Promise<VerifiedSession | null> {
   const token = cookies().get(COOKIE_NAME)?.value;
   if (!token) return null;
   try {
-    const { payload } = await jwtVerify(token, secret);
-    return payload as unknown as SessionPayload;
+    const { payload } = await jwtVerify(token, sessionSecret());
+    return payload as unknown as VerifiedSession;
   } catch {
     return null;
   }
@@ -80,7 +109,7 @@ export async function verifySessionToken(
   token: string
 ): Promise<SessionPayload | null> {
   try {
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtVerify(token, sessionSecret());
     return payload as unknown as SessionPayload;
   } catch {
     return null;

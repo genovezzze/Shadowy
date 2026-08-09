@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import { isSuperAdmin } from "@/lib/superadmin";
 
 async function requireSuperAdmin() {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session || !isSuperAdmin(session.email)) {
     throw new Error("Unauthorized");
   }

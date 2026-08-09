@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import * as XLSX from "xlsx";
 
@@ -40,7 +40,7 @@ function bestMatch(
 }
 
 export async function POST(req: NextRequest) {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session || (session.role !== "ADMIN" && session.role !== "MANAGER")) {
     return NextResponse.json({ error: "Nav atļauts." }, { status: 401 });
   }

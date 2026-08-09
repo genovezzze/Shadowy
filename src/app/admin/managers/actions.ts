@@ -5,6 +5,7 @@ import { randomBytes } from "crypto";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
 import { requireUser, hashPassword } from "@/lib/auth";
+import { isReservedSuperAdminEmail, RESERVED_EMAIL_MESSAGE } from "@/lib/superadmin";
 import { sendInviteEmail } from "@/lib/email";
 import { getSiteUrl } from "@/lib/site-url";
 
@@ -35,6 +36,9 @@ export async function createManager(formData: FormData) {
   }
 
   const email = parsed.data.email.toLowerCase().trim();
+  if (isReservedSuperAdminEmail(email)) {
+    return { ok: false as const, error: RESERVED_EMAIL_MESSAGE };
+  }
   const existing = await prisma.user.findUnique({ where: { email } });
   if (existing) {
     return { ok: false as const, error: "Lietotājs ar šādu e-pastu jau eksistē." };
@@ -89,6 +93,9 @@ export async function updateManager(managerId: string, formData: FormData) {
   if (!manager) return { ok: false as const, error: "Vadītājs nav atrasts." };
 
   const email = parsed.data.email.toLowerCase().trim();
+  if (isReservedSuperAdminEmail(email)) {
+    return { ok: false as const, error: RESERVED_EMAIL_MESSAGE };
+  }
   const conflict = await prisma.user.findFirst({
     where: { email, organizationId: session.organizationId, NOT: { id: managerId } },
   });
@@ -101,6 +108,9 @@ export async function updateManager(managerId: string, formData: FormData) {
   };
   if (parsed.data.password) {
     data.passwordHash = await hashPassword(parsed.data.password);
+    // An administrative password change must also cut off sessions that were
+    // issued with the old password.
+    data.sessionsValidFrom = new Date();
   }
 
   await prisma.user.update({ where: { id: managerId }, data });

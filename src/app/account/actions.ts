@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser, hashPassword, verifyPassword } from "@/lib/auth";
+import { createSession, destroySession } from "@/lib/session";
 
 const schema = z
   .object({
@@ -51,8 +52,35 @@ export async function changeOwnPassword(formData: FormData) {
   const passwordHash = await hashPassword(parsed.data.newPassword);
   await prisma.user.update({
     where: { id: user.id },
-    data: { passwordHash },
+    data: { passwordHash, sessionsValidFrom: new Date() },
   });
 
+  // The caller's own cookie was issued before the cut-off too, so it has to be
+  // replaced — otherwise changing a password would sign you out of your own tab.
+  await createSession({
+    userId: user.id,
+    organizationId: user.organizationId,
+    role: user.role,
+    email: user.email,
+    name: user.name,
+  });
+
+  return { ok: true as const };
+}
+
+/**
+ * Revoke every session of the current account, including this one. Used when a
+ * device is lost or a password may have leaked: the stateless tokens cannot be
+ * deleted, so they are invalidated by moving the account's cut-off to now.
+ */
+export async function signOutEverywhere() {
+  const session = await requireUser();
+
+  await prisma.user.update({
+    where: { id: session.userId },
+    data: { sessionsValidFrom: new Date() },
+  });
+
+  await destroySession();
   return { ok: true as const };
 }

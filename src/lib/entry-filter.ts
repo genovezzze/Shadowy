@@ -21,6 +21,10 @@ export interface EntrySearchParams {
 /**
  * Build the filter portion of a Prisma where clause from URL search params.
  * Tenant/role scoping (organizationId, managerId, employeeId) is added by the caller.
+ *
+ * IMPORTANT: this result is attacker-controlled and can contain `employeeId`,
+ * `clientId` and `status`. Callers must spread it FIRST and apply their scope
+ * after it, so a crafted URL can never widen what the viewer may read.
  */
 export function buildEntryWhere(
   sp: EntrySearchParams

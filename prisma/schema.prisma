@@ -91,6 +91,11 @@ model User {
   inviteToken          String?   @unique
   inviteTokenExpiresAt DateTime?
 
+  /// Sessions are stateless JWTs, so a stolen token stays valid until it expires.
+  /// Any token issued before this moment is rejected, which is how a password
+  /// change or an explicit "sign out everywhere" revokes existing sessions.
+  sessionsValidFrom DateTime?
+
   managerId String?
   manager   User?   @relation("ManagerEmployees", fields: [managerId], references: [id], onDelete: SetNull)
   employees User[]  @relation("ManagerEmployees")

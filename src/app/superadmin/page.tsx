@@ -1,13 +1,13 @@
 import { redirect } from "next/navigation";
 import Image from "next/image";
-import { getSession } from "@/lib/session";
+import { getValidatedSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { getTrialDaysLeft, isTrialExpired } from "@/lib/trial";
 import { OrgRow } from "./org-row";
 import { isSuperAdmin } from "@/lib/superadmin";
 
 export default async function SuperAdminPage() {
-  const session = await getSession();
+  const session = await getValidatedSession();
   if (!session || !isSuperAdmin(session.email)) redirect("/login");
 
   const orgs = await prisma.organization.findMany({

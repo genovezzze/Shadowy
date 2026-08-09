@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { loginAction } from "@/app/(auth)/login/actions";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 import {
   authFieldClassName,
   authLabelClassName,
@@ -27,7 +28,12 @@ const OAUTH_ERRORS: Record<string, string> = {
 export function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const nextPath = params.get("next") ?? undefined;
+  // Only same-origin paths. Anything absolute (or protocol-relative) would turn
+  // the login page into an open redirect: /login?next=https://evil.example
+  // sends the user straight to an attacker's site right after signing in.
+  const rawNext = params.get("next");
+  const nextPath =
+    rawNext && rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : undefined;
   const errorCode = params.get("error");
   const [remember, setRemember] = useState(false);
   const [pending, startTransition] = useTransition();
@@ -42,7 +48,9 @@ export function LoginForm() {
       if (!res.ok) {
         setError(res.error);
       } else if (res.redirectTo) {
-        router.push(nextPath ?? res.redirectTo);
+        const destination = nextPath ?? res.redirectTo;
+        startNavigationLoading(destination);
+        router.push(destination);
         router.refresh();
       }
     });
