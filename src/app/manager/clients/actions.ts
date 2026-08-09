@@ -4,11 +4,52 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
+import { normalizeClientName } from "@/lib/client-name";
 
 const clientSchema = z.object({
   name: z.string().trim().min(1).max(120),
   freeMinutesPerMonth: z.number().int().min(0).nullable(),
 });
+
+async function linkHistoricalEntries(
+  organizationId: string,
+  clientId: string,
+  clientName: string,
+) {
+  const [unlinkedEntries, aliases] = await Promise.all([
+    prisma.invisibleWorkEntry.findMany({
+      where: {
+        organizationId,
+        clientId: null,
+        clientName: { not: null },
+        deletedAt: null,
+      },
+      select: { id: true, clientName: true },
+    }),
+    prisma.clientAlias.findMany({
+      where: { organizationId, clientId },
+      select: { normalized: true },
+    }),
+  ]);
+  const acceptedNames = new Set([
+    normalizeClientName(clientName),
+    ...aliases.map((alias) => alias.normalized),
+  ]);
+  const matchingIds = unlinkedEntries
+    .filter((entry) => acceptedNames.has(normalizeClientName(entry.clientName ?? "")))
+    .map((entry) => entry.id);
+
+  if (matchingIds.length === 0) return;
+
+  await prisma.invisibleWorkEntry.updateMany({
+    where: {
+      id: { in: matchingIds },
+      organizationId,
+      clientId: null,
+    },
+    data: { clientId },
+  });
+}
 
 export async function upsertClient(input: {
   id?: string;
@@ -27,23 +68,41 @@ export async function upsertClient(input: {
     });
     if (!exists) return { ok: false as const, error: "Klients nav atrasts." };
 
-    await prisma.client.update({
+    const client = await prisma.client.update({
       where: { id: input.id },
       data: { name, freeMinutesPerMonth },
     });
+    await linkHistoricalEntries(session.organizationId, client.id, client.name);
   } else {
-    const duplicate = await prisma.client.findFirst({
-      where: { organizationId: session.organizationId, name },
-    });
-    if (duplicate) return { ok: false as const, error: "Klients ar šādu nosaukumu jau pastāv." };
+    const normalizedName = normalizeClientName(name);
+    const [orgClients, duplicateAlias] = await Promise.all([
+      prisma.client.findMany({
+        where: { organizationId: session.organizationId },
+        select: { name: true },
+      }),
+      prisma.clientAlias.findFirst({
+        where: { organizationId: session.organizationId, normalized: normalizedName },
+        select: { id: true },
+      }),
+    ]);
+    const duplicate = orgClients.some(
+      (client) => normalizeClientName(client.name) === normalizedName,
+    );
+    if (duplicate || duplicateAlias) {
+      return { ok: false as const, error: "Klients ar šādu nosaukumu jau pastāv." };
+    }
 
-    await prisma.client.create({
+    const client = await prisma.client.create({
       data: { organizationId: session.organizationId, name, freeMinutesPerMonth },
     });
+    await linkHistoricalEntries(session.organizationId, client.id, client.name);
   }
 
   revalidatePath("/manager/clients");
   revalidatePath("/manager/dashboard");
+  revalidatePath("/manager/report");
+  revalidatePath("/admin/dashboard");
+  revalidatePath("/admin/report");
   return { ok: true as const };
 }
 

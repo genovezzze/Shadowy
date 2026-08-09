@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { statusLabel } from "@/lib/i18n";
 import type { EntryStatus } from "@prisma/client";
 import { categoryLabel } from "@/lib/work-insights";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 
 const STATUSES: EntryStatus[] = ["PENDING", "APPROVED", "REJECTED", "RETURNED"];
 
@@ -44,7 +45,9 @@ export function EntriesFilter({
       if (v && v !== ALL_VALUE) next.set(key, v);
     }
     const qs = next.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname);
+    const destination = qs ? `${pathname}?${qs}` : pathname;
+    startNavigationLoading(destination);
+    router.push(destination);
   }
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -166,7 +169,10 @@ export function EntriesFilter({
           <Button
             type="button"
             variant="outline"
-            onClick={() => router.push(pathname)}
+            onClick={() => {
+              startNavigationLoading(pathname);
+              router.push(pathname);
+            }}
           >
             Notīrīt
           </Button>

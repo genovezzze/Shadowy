@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { acceptInviteAction } from "./actions";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 
 function AcceptInviteForm() {
   const router = useRouter();
@@ -23,7 +24,10 @@ function AcceptInviteForm() {
     startTransition(async () => {
       const res = await acceptInviteAction(formData);
       if (!res.ok) setError(res.error);
-      else router.push(res.redirectTo);
+      else {
+        startNavigationLoading(res.redirectTo);
+        router.push(res.redirectTo);
+      }
     });
   }
 

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { confirmImport } from "./actions";
 import { Upload, Check, AlertTriangle, FileSpreadsheet, ChevronDown } from "lucide-react";
 import type { ImportMatch } from "@/app/api/clients/import/route";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 
 interface OrgEmployee { id: string; name: string }
 interface OrgClient { id: string; name: string }
@@ -82,7 +83,10 @@ export function ImportClient() {
       const result = await confirmImport({ assignments });
       if (result.ok) {
         setDone(true);
-        setTimeout(() => router.push("/manager/clients"), 1500);
+        setTimeout(() => {
+          startNavigationLoading("/manager/clients");
+          router.push("/manager/clients");
+        }, 1500);
       } else {
         setError(result.error);
       }

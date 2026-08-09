@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 
 const PERIODS = [
   { label: "7 d.", value: "7d" },
@@ -20,7 +21,9 @@ export function PeriodTabs({ current, className }: { current: string; className?
     if (value === "all") params.delete("period");
     else params.set("period", value);
     const qs = params.toString();
-    router.push(qs ? `${pathname}?${qs}` : pathname);
+    const destination = qs ? `${pathname}?${qs}` : pathname;
+    startNavigationLoading(destination);
+    router.push(destination);
   }
 
   const active = current || "all";

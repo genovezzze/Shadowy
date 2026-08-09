@@ -23,6 +23,7 @@ import {
   Building2,
   Settings,
   Megaphone,
+  ScanSearch,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -73,6 +74,7 @@ const ADMIN_ONLY_NAV: NavItem[] = [
   { href: "/admin/employees", label: "Darbinieki", icon: Users, motion: "users" },
   { href: "/manager/clients", label: "Klienti", icon: Building2, motion: "building" },
   { href: "/admin/entries", label: "Visi ieraksti", icon: FileText, motion: "document" },
+  { href: "/admin/insights", label: "Procesu analīze", icon: ScanSearch, motion: "chart" },
   { href: "/admin/bonuses", label: "Bonusu pārskats", icon: Gift, motion: "gift" },
   { href: "/admin/report", label: "Pilota atskaite", icon: BarChart2, motion: "chart" },
   { href: "/admin/announcements", label: "Paziņojumi", icon: Megaphone, motion: "megaphone" },
@@ -91,6 +93,7 @@ const MANAGER_NAV: NavItem[] = [
   { href: "/manager/dashboard", label: "Pārskats", icon: LayoutDashboard, motion: "dashboard" },
   { href: "/manager/employees", label: "Mana komanda", icon: Users, motion: "users" },
   { href: "/manager/entries", label: "Komandas ieraksti", icon: FileText, motion: "document" },
+  { href: "/manager/insights", label: "Procesu analīze", icon: ScanSearch, motion: "chart" },
   { href: "/manager/clients", label: "Klienti", icon: Building2, motion: "building" },
   { href: "/manager/roles", label: "Lomas", icon: Briefcase, motion: "briefcase" },
   { href: "/manager/bonus-rules", label: "Atzinības noteikumi", icon: Gift, motion: "gift" },

@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { CalendarDays, Check, ChevronDown } from "lucide-react";
 import type { ClientMonthOption } from "@/lib/client-month";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 import { cn } from "@/lib/utils";
 
 interface DropdownProps {
@@ -21,7 +22,9 @@ export function ClientMonthDropdown({ selectedMonth, options, compact }: Dropdow
   function changeMonth(value: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("clientMonth", value);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    const destination = `${pathname}?${params.toString()}`;
+    startNavigationLoading(destination);
+    router.push(destination, { scroll: false });
   }
 
   return (

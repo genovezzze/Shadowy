@@ -160,11 +160,18 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
             : "Bez bezmaksas laika limita"
         }
         actions={
-          <Button asChild variant="outline" size="sm">
-            <Link href="/manager/clients">
-              <ArrowLeft className="h-4 w-4" /> Visi klienti
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href={`/manager/clients/${client.id}/presentation`}>
+                Klienta pārskats
+              </Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/manager/clients">
+                <ArrowLeft className="h-4 w-4" /> Visi klienti
+              </Link>
+            </Button>
+          </div>
         }
       />
 

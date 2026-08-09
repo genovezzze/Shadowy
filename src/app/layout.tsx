@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { NavigationLoadingOverlay } from "@/components/ui/navigation-loading-overlay";
 import { getSiteUrl } from "@/lib/site-url";
 
 const inter = localFont({
@@ -155,6 +157,9 @@ export default function RootLayout({
           value={{ light: "light", dark: "dark", slate: "slate" }}
         >
           {children}
+          <Suspense fallback={null}>
+            <NavigationLoadingOverlay />
+          </Suspense>
         </ThemeProvider>
         <Analytics />
         <SpeedInsights />

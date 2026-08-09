@@ -8,6 +8,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Button } from "@/components/ui/button";
 import { TermsDialog } from "@/components/auth/terms-dialog";
 import { registerAction } from "@/app/(auth)/register/actions";
+import { startNavigationLoading } from "@/lib/navigation-loading";
 import {
   authFieldClassName,
   authLabelClassName,
@@ -39,6 +40,7 @@ export function RegisterForm() {
       if (!res.ok) {
         setError(res.error);
       } else if (res.redirectTo) {
+        startNavigationLoading(res.redirectTo);
         router.push(res.redirectTo);
         router.refresh();
       }
