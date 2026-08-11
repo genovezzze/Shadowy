@@ -70,6 +70,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
     orderBy: { workDate: "desc" },
     include: {
       employee: { select: { id: true, name: true } },
+      helpedUser: { select: { name: true } },
       timeLogs: { select: { minutes: true } },
     },
   });
@@ -359,6 +360,8 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                   status={e.status}
                   employeeName={e.employee.name}
                   managerComment={e.managerComment}
+                  helpedColleague={e.helpedColleague}
+                  helpedName={e.helpedUser?.name}
                 />
               ))}
               {entries.length > 50 && (

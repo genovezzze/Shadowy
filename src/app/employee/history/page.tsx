@@ -88,6 +88,8 @@ export default async function EmployeeHistoryPage({
       client: { select: { name: true } },
       workDate: true, durationMinutes: true, status: true,
       managerComment: true, isOutsideRole: true,
+      helpedColleague: true,
+      helpedUser: { select: { name: true } },
       timeLogs: { select: { minutes: true } },
     },
   });
@@ -152,6 +154,8 @@ export default async function EmployeeHistoryPage({
                 status={e.status}
                 managerComment={e.managerComment}
                 workType={resolveWorkType(e.isOutsideRole, e.category, e.title, duties)}
+                helpedColleague={e.helpedColleague}
+                helpedName={e.helpedUser?.name}
                 footer={
                   <div className="flex flex-wrap items-center gap-2">
                     {e.status === "PENDING" || e.status === "RETURNED" ? (

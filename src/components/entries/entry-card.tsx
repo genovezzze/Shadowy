@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { HeartHandshake } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { StatusBadge } from "./status-badge";
 import { WorkTypeBadge } from "./work-type-badge";
@@ -20,6 +21,11 @@ interface EntryCardProps {
   employeeName?: string;
   managerComment?: string | null;
   workType?: WorkType;
+  /** Set when the entry was done to cover for someone. */
+  helpedColleague?: boolean | null;
+  /** Who it was done for. Optional even when helpedColleague is set - naming
+   * the colleague is not required when ticking the box. */
+  helpedName?: string | null;
   footer?: React.ReactNode;
 }
 
@@ -35,6 +41,8 @@ export function EntryCard({
   employeeName,
   managerComment,
   workType,
+  helpedColleague,
+  helpedName,
   footer,
 }: EntryCardProps) {
   return (
@@ -60,6 +68,14 @@ export function EntryCard({
               <span>{formatDateLV(workDate)}</span>
               <span>·</span>
               <span>{formatDurationLV(durationMinutes)}</span>
+              {helpedColleague ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-500">
+                  <HeartHandshake className="h-3 w-3 shrink-0" />
+                  {helpedName
+                    ? `Palīdzēja: ${helpedName}`
+                    : "Palīdzība kolēģim"}
+                </span>
+              ) : null}
             </div>
             <h3 className="mt-1 text-base font-semibold leading-snug">
               {title}

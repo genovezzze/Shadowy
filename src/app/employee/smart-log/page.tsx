@@ -23,6 +23,16 @@ export default async function SmartLogPage() {
     select: { id: true, name: true },
   });
 
+  // Colleagues to name as the recipient of help - same org, excluding self.
+  const colleagues = await prisma.user.findMany({
+    where: {
+      organizationId: session.organizationId,
+      NOT: { id: session.userId },
+    },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
+
   if (!employee?.managerId) {
     return (
       <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center">
@@ -36,5 +46,12 @@ export default async function SmartLogPage() {
     );
   }
 
-  return <SmartWorkLog clients={clients} />;
+  return (
+    <SmartWorkLog
+      clients={clients}
+      colleagues={colleagues.flatMap((c) =>
+        c.name ? [{ id: c.id, name: c.name }] : []
+      )}
+    />
+  );
 }

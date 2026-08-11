@@ -109,7 +109,7 @@ export async function POST(request: Request) {
   upstreamForm.append("response_format", "json");
   upstreamForm.append(
     "prompt",
-    "Audio is in Latvian. It is an employee describing extra work, focus interruptions, waiting for information, helping colleagues, urgent tasks, repeated questions or work outside their role for Shadowy. Transcribe clearly in Latvian. Do not translate."
+    "Audio is in Latvian. It is an employee describing their work for Shadowy: bookkeeping and posting entries, scanning and archiving documents, invoicing, payments, payroll, checks and reconciliation, client communication, and also extra work such as helping colleagues, urgent tasks or work outside their role. Transcribe clearly in Latvian. Do not translate."
   );
 
   try {

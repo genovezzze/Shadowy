@@ -31,6 +31,15 @@ export default async function NewEntryPage({
     orderBy: { name: "asc" },
     select: { id: true, name: true },
   });
+  // Colleagues to name as the recipient of help - same org, excluding self.
+  const colleagues = await prisma.user.findMany({
+    where: {
+      organizationId: session.organizationId,
+      NOT: { id: session.userId },
+    },
+    orderBy: { name: "asc" },
+    select: { id: true, name: true },
+  });
   const duties = employee?.workRole?.duties ?? [];
 
   let initialValues;
@@ -74,7 +83,13 @@ export default async function NewEntryPage({
         </Card>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
-          <EntryForm clients={clients} initialValues={initialValues} />
+          <EntryForm
+            clients={clients}
+            colleagues={colleagues.flatMap((c) =>
+              c.name ? [{ id: c.id, name: c.name }] : []
+            )}
+            initialValues={initialValues}
+          />
 
           {/* Duties sidebar */}
           <div className="rounded-xl border border-border bg-card p-5 h-fit">

@@ -9,9 +9,11 @@ import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-wid
 import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
+import { WorkNatureCard } from "@/components/dashboard/work-nature-card";
+import { groupByWorkNature, groupHelpPairs } from "@/lib/work-nature";
 import { resolveWorkType } from "@/lib/work-type";
 import { formatDurationLV } from "@/lib/utils";
-import { normalizeClientName } from "@/lib/client-name";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
 import { ClientOverrunWidget } from "@/components/dashboard/client-overrun-widget";
@@ -225,6 +227,7 @@ export default async function ManagerDashboard({
     prisma.client.findMany({
       where: { organizationId: orgId },
       orderBy: { name: "asc" },
+      include: { aliases: { select: { normalized: true } } },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: {
@@ -244,6 +247,8 @@ export default async function ManagerDashboard({
         createdAt: true,
         updatedAt: true,
         isOutsideRole: true,
+        helpedColleague: true,
+        helpedUser: { select: { name: true } },
         employee: {
           select: {
             id: true,
@@ -445,15 +450,14 @@ export default async function ManagerDashboard({
   );
 
   // --- Client budget forecast ---
+  const clientByNorm = buildClientLookup(clients);
   const monthClientById = new Map<string, number>();
-  const monthClientByName = new Map<string, number>();
   for (const e of currentMonthEntries) {
-    if (e.clientId) {
-      monthClientById.set(e.clientId, (monthClientById.get(e.clientId) ?? 0) + e.durationMinutes);
-    } else if (e.clientName) {
-      const key = normalizeClientName(e.clientName);
-      monthClientByName.set(key, (monthClientByName.get(key) ?? 0) + e.durationMinutes);
-    }
+    // Free-typed shorthands resolve through the client's aliases, otherwise
+    // the hours never reach the forecast for that client.
+    const id = e.clientId ?? (e.clientName ? clientByNorm.get(normalizeClientName(e.clientName))?.id : undefined);
+    if (!id) continue;
+    monthClientById.set(id, (monthClientById.get(id) ?? 0) + e.durationMinutes);
   }
   const daysSoFar = nowDate.getUTCDate();
   const daysInMonth = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth() + 1, 0)).getUTCDate();
@@ -462,9 +466,7 @@ export default async function ManagerDashboard({
   const clientForecasts: ClientForecast[] = [];
   for (const c of clients) {
     if (c.freeMinutesPerMonth === null) continue;
-    const usedMin =
-      (monthClientById.get(c.id) ?? 0) +
-      (monthClientByName.get(normalizeClientName(c.name)) ?? 0);
+    const usedMin = monthClientById.get(c.id) ?? 0;
     if (usedMin >= c.freeMinutesPerMonth || usedMin === 0 || daysSoFar === 0) continue;
     const dailyRate = usedMin / daysSoFar;
     const projectedTotal = usedMin + dailyRate * daysRemaining;
@@ -476,6 +478,16 @@ export default async function ManagerDashboard({
     }
   }
   clientForecasts.sort((a, b) => a.daysLeft - b.daysLeft);
+
+  const workNatureRows = groupByWorkNature(approved);
+  const helpPairs = groupHelpPairs(
+    approved.map((e) => ({
+      employeeName: e.employee.name ?? "-",
+      helpedName: e.helpedUser?.name ?? null,
+      durationMinutes: e.durationMinutes,
+      helpedColleague: e.helpedColleague,
+    }))
+  );
 
   const topCategories = Array.from(categoryCount.entries())
     .sort((a, b) => b[1] - a[1]);
@@ -792,6 +804,15 @@ export default async function ManagerDashboard({
       {categoryItems.length > 0 && (
         <>
           <SectionDivider label="Kategorijas" />
+          {workNatureRows.length > 0 && (
+            <div className="mb-4">
+              <WorkNatureCard
+                rows={workNatureRows}
+                totalEntries={approved.length}
+                helpPairs={helpPairs}
+              />
+            </div>
+          )}
           <Card className="mb-8 p-4">
             <CategoryList items={categoryItems} patternCategory={patternCategory} />
           </Card>

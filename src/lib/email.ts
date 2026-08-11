@@ -381,6 +381,154 @@ export async function sendWeeklyManagerReport(opts: {
   await sendEmail(opts.to, subject, html);
 }
 
+/**
+ * The administrator's counterpart to the manager report: the same week, but
+ * across the whole organisation, with the per-manager split an administrator
+ * cannot get from a single team's report.
+ */
+export async function sendWeeklyAdminReport(opts: {
+  to: string;
+  adminName: string;
+  orgName: string;
+  pendingCount: number;
+  weekEntries: number;
+  weekMinutes: number;
+  employeeCount: number;
+  activeEmployeeCount: number;
+  entriesTrend: string | null;
+  hoursTrend: string | null;
+  costEur: number;
+  rateEur: number;
+  managerBreakdown: { name: string; count: number; minutes: number; pending: number }[];
+  employeeBreakdown: { name: string; count: number; minutes: number }[];
+  categoryBreakdown: { label: string; count: number; minutes: number }[];
+  clientBreakdown: { name: string; minutes: number }[];
+  inactiveEmployeeNames: string[];
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const subject = `Shadowy - organizācijas pārskats par pagājušo nedēļu`;
+
+  const listSection = (title: string, rows: string) =>
+    rows
+      ? `
+      <div style="margin-bottom:20px">
+        <div style="font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.03em;margin-bottom:8px">${title}</div>
+        <table style="width:100%;border-collapse:collapse;font-size:14px">${rows}</table>
+      </div>`
+      : "";
+
+  const row = (left: string, right: string, note?: string) => `
+        <tr>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${left}</td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${right}</td>
+        </tr>
+        ${note ? `
+        <tr>
+          <td colspan="2" style="padding:0 0 8px;color:#aaa;font-size:12px">↳ ${note}</td>
+        </tr>` : ""}`;
+
+  const managerRows = opts.managerBreakdown
+    .map((m) =>
+      row(
+        escapeHtml(m.name),
+        `${pluralEntriesLV(m.count)} · ${formatDurationLV(m.minutes)}`,
+        m.pending > 0 ? `${m.pending} gaida izskatīšanu` : undefined,
+      ),
+    )
+    .join("");
+
+  const employeeRows = opts.employeeBreakdown
+    .map((e) => row(escapeHtml(e.name), `${pluralEntriesLV(e.count)} · ${formatDurationLV(e.minutes)}`))
+    .join("");
+
+  const categoryRows = opts.categoryBreakdown
+    .map((c) => row(escapeHtml(c.label), `${pluralEntriesLV(c.count)} · ${formatDurationLV(c.minutes)}`))
+    .join("");
+
+  const clientRows = opts.clientBreakdown
+    .map((c) => row(escapeHtml(c.name), formatDurationLV(c.minutes)))
+    .join("");
+
+  const trendLine =
+    opts.entriesTrend || opts.hoursTrend
+      ? `
+      <p style="color:#888;font-size:13px;margin-bottom:16px">
+        ${[opts.entriesTrend, opts.hoursTrend].filter(Boolean).join(" · ")}
+      </p>`
+      : "";
+
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
+      <div style="margin-bottom:24px">
+        <h2 style="margin:0 0 4px">Organizācijas pārskats</h2>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · par pagājušo nedēļu · Sveiks, ${escapeHtml(opts.adminName)}!</p>
+      </div>
+
+      <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
+        <tr>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:25%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${opts.pendingCount}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Gaida izskatīšanu</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:25%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${opts.weekEntries}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Ieraksti nedēļā</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:25%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${formatDurationLV(opts.weekMinutes)}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Apst. stundas</div>
+          </td>
+          <td style="width:12px"></td>
+          <td style="background:#f5f5f5;border-radius:8px;padding:14px 18px;width:25%;text-align:center">
+            <div style="font-size:28px;font-weight:700;line-height:1">${opts.activeEmployeeCount}/${opts.employeeCount}</div>
+            <div style="font-size:12px;color:#888;margin-top:4px">Aktīvie darbinieki</div>
+          </td>
+        </tr>
+      </table>
+
+      ${trendLine}
+
+      ${opts.pendingCount > 0 ? `
+        <p style="color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
+          ⏳ Organizācijā <strong>${opts.pendingCount}</strong> ieraksti gaida vadītāju izskatīšanu.
+        </p>
+      ` : `
+        <p style="color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
+          ✓ Visi ieraksti ir izskatīti.
+        </p>
+      `}
+
+      <p style="color:#3b3b3b;background:#f5f5f5;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
+        💶 Pagājušās nedēļas neredzamā darba izmaksas: <strong>€${opts.costEur}</strong>
+        <br/><span style="color:#888;font-size:12px">Aprēķināts ar vidējo likmi €${opts.rateEur}/h - aptuvena vērtība, nevis precīzs budžeta zaudējums.</span>
+      </p>
+
+      ${opts.inactiveEmployeeNames.length > 0 ? `
+        <p style="color:#555;background:#f5f5f5;border-radius:8px;padding:12px 16px;font-size:14px;margin-bottom:20px">
+          👤 Pagājušajā nedēļā nav iesnieguši nevienu ierakstu: <strong>${escapeHtml(opts.inactiveEmployeeNames.join(", "))}</strong>
+        </p>
+      ` : ""}
+
+      ${listSection("Sadalījums pa vadītājiem", managerRows)}
+      ${listSection("Sadalījums pa darbiniekiem", employeeRows)}
+      ${listSection("Sadalījums pa kategorijām", categoryRows)}
+      ${listSection("Sadalījums pa klientiem", clientRows)}
+
+      <p>
+        <a href="${appUrl}/admin/insights" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Atvērt procesu analīzi →
+        </a>
+      </p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">
+        Shadowy · Šis e-pasts tiek sūtīts katru pirmdienu automātiski. To var izslēgt sadaļā Iestatījumi → E-pasta paziņojumi.
+      </p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}
+
 export async function sendMorningReminder(opts: {
   to: string;
   employeeName: string;

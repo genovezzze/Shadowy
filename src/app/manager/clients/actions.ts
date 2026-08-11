@@ -51,6 +51,49 @@ async function linkHistoricalEntries(
   });
 }
 
+type NameConflict =
+  | { kind: "client"; clientName: string }
+  | { kind: "alias"; aliasName: string; clientName: string };
+
+/**
+ * A name is unavailable both when another client already uses it and when it is
+ * registered as some client's alternative spelling — entries matching it would
+ * otherwise have two possible owners.
+ */
+async function findNameConflict(
+  organizationId: string,
+  normalized: string,
+  excludeClientId?: string,
+): Promise<NameConflict | null> {
+  const [clients, alias] = await Promise.all([
+    prisma.client.findMany({
+      where: { organizationId, ...(excludeClientId ? { id: { not: excludeClientId } } : {}) },
+      select: { name: true },
+    }),
+    prisma.clientAlias.findFirst({
+      where: {
+        organizationId,
+        normalized,
+        ...(excludeClientId ? { clientId: { not: excludeClientId } } : {}),
+      },
+      select: { name: true, client: { select: { name: true } } },
+    }),
+  ]);
+
+  const clash = clients.find((client) => normalizeClientName(client.name) === normalized);
+  if (clash) return { kind: "client", clientName: clash.name };
+  if (alias) return { kind: "alias", aliasName: alias.name, clientName: alias.client.name };
+  return null;
+}
+
+/** Say which record holds the name and what to do about it, not just "taken". */
+function conflictMessage(conflict: NameConflict) {
+  if (conflict.kind === "client") {
+    return `Šo nosaukumu jau lieto klients “${conflict.clientName}”.`;
+  }
+  return `Šis nosaukums ir reģistrēts kā klienta “${conflict.clientName}” nosaukuma variants (“${conflict.aliasName}”). Noņemiet šo variantu klienta kartē, lai izveidotu atsevišķu klientu.`;
+}
+
 export async function upsertClient(input: {
   id?: string;
   name: string;
@@ -62,11 +105,19 @@ export async function upsertClient(input: {
 
   const { name, freeMinutesPerMonth } = parsed.data;
 
+  const normalizedName = normalizeClientName(name);
+  if (!normalizedName) return { ok: false as const, error: "Nosaukums nav derīgs." };
+
   if (input.id) {
     const exists = await prisma.client.findFirst({
       where: { id: input.id, organizationId: session.organizationId },
     });
     if (!exists) return { ok: false as const, error: "Klients nav atrasts." };
+
+    // Renaming was not checked at all, so a client could be renamed onto
+    // another client's name or alias and silently make matching ambiguous.
+    const conflict = await findNameConflict(session.organizationId, normalizedName, input.id);
+    if (conflict) return { ok: false as const, error: conflictMessage(conflict) };
 
     const client = await prisma.client.update({
       where: { id: input.id },
@@ -74,23 +125,8 @@ export async function upsertClient(input: {
     });
     await linkHistoricalEntries(session.organizationId, client.id, client.name);
   } else {
-    const normalizedName = normalizeClientName(name);
-    const [orgClients, duplicateAlias] = await Promise.all([
-      prisma.client.findMany({
-        where: { organizationId: session.organizationId },
-        select: { name: true },
-      }),
-      prisma.clientAlias.findFirst({
-        where: { organizationId: session.organizationId, normalized: normalizedName },
-        select: { id: true },
-      }),
-    ]);
-    const duplicate = orgClients.some(
-      (client) => normalizeClientName(client.name) === normalizedName,
-    );
-    if (duplicate || duplicateAlias) {
-      return { ok: false as const, error: "Klients ar šādu nosaukumu jau pastāv." };
-    }
+    const conflict = await findNameConflict(session.organizationId, normalizedName);
+    if (conflict) return { ok: false as const, error: conflictMessage(conflict) };
 
     const client = await prisma.client.create({
       data: { organizationId: session.organizationId, name, freeMinutesPerMonth },

@@ -24,6 +24,8 @@ export interface PendingEntry {
   status: string;
   employeeName: string;
   workType: "in_role" | "extra" | "no_role";
+  helpedColleague?: boolean;
+  helpedName?: string | null;
 }
 
 type EmployeeGroup = {
@@ -206,6 +208,8 @@ function GroupCard({ group }: { group: EmployeeGroup }) {
                   durationMinutes={e.durationMinutes}
                   status={e.status as "PENDING"}
                   workType={e.workType}
+                  helpedColleague={e.helpedColleague}
+                  helpedName={e.helpedName}
                   footer={
                     <div className="space-y-3">
                       <div className="flex flex-wrap gap-2">

@@ -22,6 +22,8 @@ const schema = z.object({
     .int()
     .min(1, "Ilgumam jābūt vismaz 1 minūte.")
     .max(1440, "Ilgums nedrīkst pārsniegt 24 stundas."),
+  helpedColleague: z.coerce.boolean(),
+  helpedUserId: z.string().optional(),
 });
 
 export async function createEntry(formData: FormData) {
@@ -35,6 +37,8 @@ export async function createEntry(formData: FormData) {
     clientId: formData.get("clientId") ?? undefined,
     workDate: formData.get("workDate"),
     durationMinutes: formData.get("durationMinutes"),
+    helpedColleague: formData.get("helpedColleague"),
+    helpedUserId: formData.get("helpedUserId") ?? undefined,
   });
 
   if (!parsed.success) {
@@ -58,6 +62,21 @@ export async function createEntry(formData: FormData) {
     resolvedClientId = client?.id ?? null;
   }
 
+  // A colleague can only be named when the help flag is set, and only if they
+  // are a real user of the same organization.
+  let resolvedHelpedUserId: string | null = null;
+  if (parsed.data.helpedColleague && parsed.data.helpedUserId) {
+    const colleague = await prisma.user.findFirst({
+      where: {
+        id: parsed.data.helpedUserId,
+        organizationId: session.organizationId,
+        NOT: { id: session.userId },
+      },
+      select: { id: true },
+    });
+    resolvedHelpedUserId = colleague?.id ?? null;
+  }
+
   const entryTitle = parsed.data.title.trim();
 
   await prisma.invisibleWorkEntry.create({
@@ -73,6 +92,8 @@ export async function createEntry(formData: FormData) {
       workDate: parsed.data.workDate,
       durationMinutes: parsed.data.durationMinutes,
       status: "APPROVED",
+      helpedColleague: parsed.data.helpedColleague,
+      helpedUserId: resolvedHelpedUserId,
     },
   });
 

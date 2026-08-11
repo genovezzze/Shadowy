@@ -33,9 +33,37 @@ Noteikumi:
 - is_outside_role ir null, ja saistību ar lomu nevar droši noteikt.
 - confidence_score atspoguļo pārliecību par konkrētā ieraksta interpretāciju.
 - Nosaukumam un aprakstam jābūt īsam, skaidram un latviešu valodā.
-- Kategorijai izmanto tikai JSON shēmā atļautās enum vērtības.
 - Atpazīsti datumus no teksta, tostarp "šodien", "vakar" un "aizvakar".
 - Ja aktivitātei datums nav minēts, work_date ir šodienas datums.
+
+Kategorija (KAS tika darīts):
+- Kategorija apraksta tikai darba saturu, nevis iemeslu vai apstākļus.
+- Izmanto tikai JSON shēmā atļautās enum vērtības.
+- Grāmatošanai izvēlies kategoriju pēc TĀ, KO grāmato, nevis vispārīgu:
+  - bookkeeping_invoices: rēķinu, pavadzīmju, kreditoru un debitoru grāmatošana,
+    ievade programmā.
+  - bookkeeping_receipts: čeku grāmatošana, apstrāde, līmēšana.
+  - bookkeeping_cash: kase, kases žurnāls, Z atskaites, kases orderi.
+  - bookkeeping_advances: avansa norēķinu grāmatošana.
+  - bookkeeping_bank: bankas izraksti, bankas datu ievade, karšu maksājumi.
+  - payroll_calculation: darba algas aprēķini un algu grāmatošana.
+- Dokumentu darbs:
+  - document_scanning: skenēšana, ieskenēšana, digitalizēšana.
+  - document_archiving: arhivēšana, sakārtošana, saglabāšana, mapēs likšana.
+  - Ja nosaukumā ir gan skenēšana, gan sakārtošana, izvēlies document_scanning.
+- reconciliation: pārbaudes, salīdzināšana, saskaņošana, PVN vai partneru pārbaude.
+- invoicing: rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana).
+- other izmanto tikai tad, ja neviena cita kategorija tiešām neder.
+- NEIZVĒLIES kategoriju pēc tā, kam darbs tika darīts. "Iegrāmatoju čekus, jo
+  kolēģe bija slima" ir bookkeeping_receipts - palīdzībai ir atsevišķs karodziņš.
+
+Palīdzība kolēģim (atsevišķs karodziņš, nevis kategorija):
+- is_helping_colleague ir true tikai tad, ja darbs tika darīts kolēģa vietā vai
+  viņa uzdevuma atbalstam. Palīdzība klientam NAV palīdzība kolēģim.
+- helped_colleague_name ir kolēģa vārds, ja tas ir minēts, citādi null.
+- Ja tekstā nav pierādījuma, is_helping_colleague ir false. Nemini to.
+- Karodziņš neietekmē kategoriju: ierakstam vienlaikus ir gan kategorija par to,
+  KAS tika darīts, gan karodziņš par to, ka tas darīts kolēģa vietā.
 
 Klienti:
 - Ja tekstā ir minēts klients vai uzņēmums (piemēram, "klientam Ventspils Balss", "SIA Piemērs"), ieraksti precīzi to client_name.

@@ -64,7 +64,10 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
       ],
     },
     orderBy: { workDate: "desc" },
-    include: { timeLogs: { select: { minutes: true } } },
+    include: {
+      timeLogs: { select: { minutes: true } },
+      helpedUser: { select: { name: true } },
+    },
   });
 
   const entryMin = (e: (typeof entries)[0]) =>
@@ -259,6 +262,8 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
                   durationMinutes={entryMin(e)}
                   status={e.status}
                   managerComment={e.managerComment}
+                  helpedColleague={e.helpedColleague}
+                  helpedName={e.helpedUser?.name}
                 />
               ))}
               {entries.length > 50 && (

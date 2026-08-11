@@ -84,6 +84,7 @@ export default async function EmployeeDashboard() {
       where: baseWhere,
       orderBy: { updatedAt: "desc" },
       take: 4,
+      include: { helpedUser: { select: { name: true } } },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: baseWhere,
@@ -665,6 +666,8 @@ export default async function EmployeeDashboard() {
               durationMinutes={e.durationMinutes}
               status={e.status}
               managerComment={e.managerComment}
+              helpedColleague={e.helpedColleague}
+              helpedName={e.helpedUser?.name}
               footer={
                 <div className="flex flex-wrap items-center gap-2">
                   {e.status === "PENDING" || e.status === "RETURNED" ? (

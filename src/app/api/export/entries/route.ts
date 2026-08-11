@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { buildEntryWhere, type EntrySearchParams } from "@/lib/entry-filter";
 import { toCsv } from "@/lib/csv";
 import { statusLabel } from "@/lib/i18n";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 export async function GET(req: NextRequest) {
   const session = await getValidatedSession();
@@ -27,13 +28,19 @@ export async function GET(req: NextRequest) {
   const entries = await prisma.invisibleWorkEntry.findMany({
     where,
     orderBy: { workDate: "desc" },
-    include: { employee: true, manager: true },
+    include: {
+      employee: true,
+      manager: true,
+      helpedUser: { select: { name: true } },
+    },
   });
 
   const header = [
     "Datums",
     "Nosaukums",
     "Kategorija",
+    "Palīdzība kolēģim",
+    "Kam palīdzēts",
     "Klients / uzņēmums",
     "Apraksts",
     "Ilgums (min)",
@@ -47,7 +54,11 @@ export async function GET(req: NextRequest) {
   const rows = entries.map((e) => [
     e.workDate.toISOString().slice(0, 10),
     e.title,
-    e.category,
+    // Entries store the canonical key now - export the Latvian label so the
+    // CSV stays readable, and stays consistent with older label-stored rows.
+    categoryLabel(normalizeCategoryKey(e.category)),
+    e.helpedColleague ? "Jā" : "",
+    e.helpedUser?.name ?? "",
     e.clientName ?? "",
     e.description,
     e.durationMinutes,

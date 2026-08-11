@@ -51,16 +51,24 @@ export default async function ManagerEmployeeDetail({
   });
   if (!employee) notFound();
 
-  const entries = await prisma.invisibleWorkEntry.findMany({
-    where: { employeeId: employee.id, organizationId: session.organizationId, deletedAt: null },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true, title: true, category: true, description: true,
-      clientName: true, clientId: true,
-      client: { select: { name: true } },
-      workDate: true, durationMinutes: true, status: true, managerComment: true,
-    },
-  });
+  const [entries, clients] = await Promise.all([
+    prisma.invisibleWorkEntry.findMany({
+      where: { employeeId: employee.id, organizationId: session.organizationId, deletedAt: null },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true, title: true, category: true, description: true,
+        clientName: true, clientId: true,
+        client: { select: { name: true } },
+        workDate: true, durationMinutes: true, status: true, managerComment: true,
+        helpedColleague: true,
+        helpedUser: { select: { name: true } },
+      },
+    }),
+    prisma.client.findMany({
+      where: { organizationId: session.organizationId },
+      select: { id: true, name: true, aliases: { select: { normalized: true } } },
+    }),
+  ]);
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -97,7 +105,7 @@ export default async function ManagerEmployeeDetail({
   const topCat = catRows[0] ?? null;
 
   // By client
-  const clientRows = groupByClient(entries);
+  const clientRows = groupByClient(entries, clients);
   const maxClientMin = clientRows[0]?.minutes ?? 1;
 
   const backHref = session.role === "ADMIN" ? "/admin/employees" : "/manager/employees";
@@ -267,6 +275,8 @@ export default async function ManagerEmployeeDetail({
                   durationMinutes={e.durationMinutes}
                   status={e.status}
                   managerComment={e.managerComment}
+                  helpedColleague={e.helpedColleague}
+                  helpedName={e.helpedUser?.name}
                 />
               ))}
               {entries.length > 50 && (

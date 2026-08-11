@@ -4,17 +4,16 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import {
-  SMART_LOG_CATEGORY_LABELS,
-  smartLogDraftSchema,
-} from "@/lib/smart-log";
+import { smartLogDraftSchema } from "@/lib/smart-log";
 import { normalizeClientName } from "@/lib/client-name";
+import { normalizePersonName } from "@/lib/work-nature";
 
 const confirmedTicketSchema = smartLogDraftSchema.extend({
   estimated_time_minutes: z.number().int().min(1).max(1440),
   workDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   confirmed: z.literal(true),
   client_id: z.string().nullable().optional(),
+  helped_user_id: z.string().nullable().optional(),
 });
 
 const saveSchema = z.object({
@@ -40,7 +39,7 @@ export async function saveConfirmedSmartLogTickets(input: {
     };
   }
 
-  const [employee, orgClients, orgAliases] = await Promise.all([
+  const [employee, orgClients, orgAliases, colleagues] = await Promise.all([
     prisma.user.findFirst({
       where: { id: session.userId, organizationId: session.organizationId },
       select: { managerId: true, name: true },
@@ -55,6 +54,13 @@ export async function saveConfirmedSmartLogTickets(input: {
     prisma.clientAlias.findMany({
       where: { organizationId: session.organizationId },
       select: { normalized: true, clientId: true },
+    }),
+    prisma.user.findMany({
+      where: {
+        organizationId: session.organizationId,
+        NOT: { id: session.userId },
+      },
+      select: { id: true, name: true },
     }),
   ]);
 
@@ -80,6 +86,16 @@ export async function saveConfirmedSmartLogTickets(input: {
 
   try {
     await prisma.$transaction(async (tx) => {
+      const colleagueIds = new Set(colleagues.map((c) => c.id));
+      // Name -> id, but only for names that are unambiguous in the org, so a
+      // second "Anna" never silently attributes help to the wrong person.
+      const colleagueNameMap = new Map<string, string | null>();
+      for (const colleague of colleagues) {
+        if (!colleague.name) continue;
+        const key = normalizePersonName(colleague.name);
+        colleagueNameMap.set(key, colleagueNameMap.has(key) ? null : colleague.id);
+      }
+
       const clientNameMap = new Map(orgClients.map((c) => [normalizeClientName(c.name), c.id]));
       // Alias spellings resolve to their target client (aliases win only where
       // no registered client name already occupies the key).
@@ -96,12 +112,25 @@ export async function saveConfirmedSmartLogTickets(input: {
               ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
               : null);
 
+          // The recipient is only recorded when the help flag is set: an
+          // explicit pick from the review UI wins, otherwise the name the AI
+          // heard is matched against the org's people.
+          const helpedUserId = !ticket.is_helping_colleague
+            ? null
+            : ticket.helped_user_id && colleagueIds.has(ticket.helped_user_id)
+              ? ticket.helped_user_id
+              : ticket.helped_colleague_name
+                ? (colleagueNameMap.get(
+                    normalizePersonName(ticket.helped_colleague_name)
+                  ) ?? null)
+                : null;
+
           return {
             organizationId: session.organizationId,
             employeeId: session.userId,
             managerId,
             title: ticket.title,
-            category: SMART_LOG_CATEGORY_LABELS[ticket.category],
+            category: ticket.category,
             description: ticket.description,
             clientName: ticket.client_name || null,
             clientId: resolvedClientId,
@@ -111,6 +140,8 @@ export async function saveConfirmedSmartLogTickets(input: {
             source: parsed.data.source === "voice" ? "ai_voice" : "ai_text",
             originalInput: parsed.data.originalInput,
             isOutsideRole: ticket.is_outside_role,
+            helpedColleague: ticket.is_helping_colleague,
+            helpedUserId,
             roleRelation: ticket.role_relation || null,
             businessImpact: ticket.business_impact || null,
             confidenceScore: ticket.confidence_score,

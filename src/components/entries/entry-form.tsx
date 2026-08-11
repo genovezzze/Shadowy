@@ -5,13 +5,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ClientCombobox } from "@/components/ui/client-combobox";
 import { createEntry } from "@/app/employee/new-entry/actions";
-import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
+import { CATEGORY_GROUPS, SMART_LOG_CATEGORIES } from "@/lib/smart-log";
+import { WORK_NATURE_FLAGS } from "@/lib/work-nature";
+
+const HELP_FLAG = WORK_NATURE_FLAGS[0];
 
 interface ClientOption {
+  id: string;
+  name: string;
+}
+
+interface ColleagueOption {
   id: string;
   name: string;
 }
@@ -27,9 +35,11 @@ interface EntryFormInitialValues {
 
 export function EntryForm({
   clients = [],
+  colleagues = [],
   initialValues,
 }: {
   clients?: ClientOption[];
+  colleagues?: ColleagueOption[];
   initialValues?: EntryFormInitialValues;
 }) {
   const [pending, startTransition] = useTransition();
@@ -37,12 +47,20 @@ export function EntryForm({
   const [success, setSuccess] = useState(false);
   const [category, setCategory] = useState(initialValues?.category ?? "");
   const [clientId, setClientId] = useState(initialValues?.clientId ?? "");
+  const [helpedColleague, setHelpedColleague] = useState(false);
+  const [helpedUserId, setHelpedUserId] = useState("");
 
   async function onSubmit(formData: FormData) {
     setError(null);
     setSuccess(false);
     formData.set("category", category);
     if (clientId && clientId !== "__none__") formData.set("clientId", clientId);
+    formData.set("helpedColleague", helpedColleague ? "on" : "");
+    // Only meaningful while the flag is set - unticking it must not leave a
+    // stale recipient behind on the entry.
+    if (helpedColleague && helpedUserId) {
+      formData.set("helpedUserId", helpedUserId);
+    }
     startTransition(async () => {
       const result = await createEntry(formData);
       if (!result.ok) {
@@ -51,6 +69,8 @@ export function EntryForm({
         setSuccess(true);
         setCategory("");
         setClientId("");
+        setHelpedColleague(false);
+        setHelpedUserId("");
         (document.getElementById("entry-form") as HTMLFormElement)?.reset();
       }
     });
@@ -91,10 +111,17 @@ export function EntryForm({
                   <SelectValue placeholder="Izvēlieties kategoriju" />
                 </SelectTrigger>
                 <SelectContent>
-                  {SMART_LOG_CATEGORIES.map(({ value, label }) => (
-                    <SelectItem key={value} value={label}>
-                      {label}
-                    </SelectItem>
+                  {CATEGORY_GROUPS.map((group) => (
+                    <SelectGroup key={group}>
+                      <SelectLabel>{group}</SelectLabel>
+                      {SMART_LOG_CATEGORIES.filter((c) => c.group === group).map(
+                        ({ value, label }) => (
+                          <SelectItem key={value} value={value}>
+                            {label}
+                          </SelectItem>
+                        )
+                      )}
+                    </SelectGroup>
                   ))}
                 </SelectContent>
               </Select>
@@ -146,6 +173,45 @@ export function EntryForm({
             <p className="text-xs text-muted-foreground">
               Norādiet aptuveno laiku, kas tika veltīts šim neredzamajam darbam.
             </p>
+          </div>
+
+          <div className="grid gap-3 rounded-lg border border-border bg-muted/20 p-4">
+            <label className="flex cursor-pointer items-start gap-2.5">
+              <input
+                type="checkbox"
+                checked={helpedColleague}
+                onChange={(event) => setHelpedColleague(event.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-emerald-500"
+              />
+              <span className="min-w-0">
+                <span className="block text-sm leading-tight">
+                  {HELP_FLAG.label}
+                </span>
+                <span className="block text-xs text-muted-foreground">
+                  {HELP_FLAG.hint}
+                </span>
+              </span>
+            </label>
+            {helpedColleague && colleagues.length > 0 ? (
+              <div className="grid gap-2 border-t border-border/60 pt-3">
+                <Label htmlFor="helpedUserId" className="text-xs">
+                  Kam palīdzējāt?{" "}
+                  <span className="text-muted-foreground">(neobligāti)</span>
+                </Label>
+                <Select value={helpedUserId} onValueChange={setHelpedUserId}>
+                  <SelectTrigger id="helpedUserId">
+                    <SelectValue placeholder="Izvēlieties kolēģi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {colleagues.map((colleague) => (
+                      <SelectItem key={colleague.id} value={colleague.id}>
+                        {colleague.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            ) : null}
           </div>
 
           <div className="grid gap-2">

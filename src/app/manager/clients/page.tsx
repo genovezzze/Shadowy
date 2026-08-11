@@ -6,7 +6,6 @@ import { LinkEntriesButton } from "@/components/clients/link-entries-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FileSpreadsheet } from "lucide-react";
-import { normalizeClientName } from "@/lib/client-name";
 import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { buildClientMatrix } from "@/lib/client-matrix";
@@ -23,7 +22,10 @@ export default async function ManagerClientsPage({
     prisma.client.findMany({
       where: { organizationId: session.organizationId },
       orderBy: { name: "asc" },
-      include: { assignments: { select: { employeeId: true } } },
+      include: {
+        assignments: { select: { employeeId: true } },
+        aliases: { select: { normalized: true } },
+      },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: {
@@ -62,27 +64,8 @@ export default async function ManagerClientsPage({
     clientMonth.key,
   );
 
-  const minutesById = new Map<string, number>();
-  const minutesByNameLower = new Map<string, number>();
-  for (const e of entryStats) {
-    if (e.clientId) {
-      minutesById.set(e.clientId, (minutesById.get(e.clientId) ?? 0) + e.durationMinutes);
-    } else if (e.clientName) {
-      const key = normalizeClientName(e.clientName);
-      minutesByNameLower.set(key, (minutesByNameLower.get(key) ?? 0) + e.durationMinutes);
-    }
-  }
-
-  const clientsWithStats = clients.map((c) => ({
-    id: c.id,
-    name: c.name,
-    freeMinutesPerMonth: c.freeMinutesPerMonth,
-    status: c.status,
-    totalMinutes: (minutesById.get(c.id) ?? 0) + (minutesByNameLower.get(normalizeClientName(c.name)) ?? 0),
-    overrunMinutes: 0,
-    assignedEmployeeIds: c.assignments.map((a) => a.employeeId),
-  }));
-
+  // Totals come from the matrix so the list and the matrix agree on what
+  // belongs to a client - including hours logged under one of its aliases.
   const { rows: clientRows } = buildClientMatrix(
     entryStats.map((entry) => ({
       ...entry,
@@ -93,9 +76,16 @@ export default async function ManagerClientsPage({
     { resetLimitMonthly: clientMonth.isAll },
   );
   const clientRowsById = new Map(clientRows.map((row) => [row.clientId, row]));
-  for (const client of clientsWithStats) {
-    client.overrunMinutes = clientRowsById.get(client.id)?.overrunMinutes ?? 0;
-  }
+
+  const clientsWithStats = clients.map((c) => ({
+    id: c.id,
+    name: c.name,
+    freeMinutesPerMonth: c.freeMinutesPerMonth,
+    status: c.status,
+    totalMinutes: clientRowsById.get(c.id)?.totalMinutes ?? 0,
+    overrunMinutes: clientRowsById.get(c.id)?.overrunMinutes ?? 0,
+    assignedEmployeeIds: c.assignments.map((a) => a.employeeId),
+  }));
 
   return (
     <>

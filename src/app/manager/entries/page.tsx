@@ -31,7 +31,11 @@ export default async function ManagerEntriesPage({
       where: { organizationId: session.organizationId, managerId: session.userId, status: { in: ["APPROVED", "PENDING"] }, ...filter },
       orderBy: { createdAt: "desc" },
       take: 100,
-      include: { employee: { include: { workRole: { include: { duties: true } } } }, client: { select: { name: true } } },
+      include: {
+        employee: { include: { workRole: { include: { duties: true } } } },
+        client: { select: { name: true } },
+        helpedUser: { select: { name: true } },
+      },
     }),
     prisma.invisibleWorkEntry.findMany({
       where: {
@@ -45,6 +49,7 @@ export default async function ManagerEntriesPage({
       include: {
         employee: { include: { workRole: { include: { duties: true } } } },
         client: { select: { name: true } },
+        helpedUser: { select: { name: true } },
         timeLogs: { select: { minutes: true } },
       },
     }),
@@ -114,6 +119,8 @@ export default async function ManagerEntriesPage({
             status: e.status,
             employeeName: e.employee.name,
             workType: getWorkType(e),
+            helpedColleague: e.helpedColleague,
+            helpedName: e.helpedUser?.name ?? null,
           }))}
         />
       </section>
@@ -143,6 +150,8 @@ export default async function ManagerEntriesPage({
                   employeeName={e.employee.name}
                   managerComment={e.managerComment}
                   workType={getWorkType(e)}
+                  helpedColleague={e.helpedColleague}
+                  helpedName={e.helpedUser?.name}
                 />
               );
             })}

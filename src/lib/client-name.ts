@@ -27,3 +27,27 @@ export function normalizeClientName(name: string): string {
     .replace(/\s+/g, "")
     .toLowerCase();
 }
+
+export type ClientLookupEntry = {
+  name: string;
+  aliases?: { normalized: string }[];
+};
+
+/**
+ * Builds the normalized-key → client map used to attach free-typed entries to
+ * a registered client. Employees shorthand clients ("VKK" for "Ventspils
+ * Kērlinga Klubs"), and those shorthands only exist as aliases, so a lookup
+ * built from names alone silently drops the hours.
+ *
+ * Aliases fill gaps only: a real client name always wins over another client's
+ * alias that normalizes to the same key.
+ */
+export function buildClientLookup<T extends ClientLookupEntry>(clients: T[]): Map<string, T> {
+  const byNorm = new Map(clients.map((c) => [normalizeClientName(c.name), c]));
+  for (const c of clients) {
+    for (const alias of c.aliases ?? []) {
+      if (!byNorm.has(alias.normalized)) byNorm.set(alias.normalized, c);
+    }
+  }
+  return byNorm;
+}

@@ -61,7 +61,11 @@ export default async function AdminEntriesPage({
   const entries = await prisma.invisibleWorkEntry.findMany({
     where,
     orderBy: { createdAt: "desc" },
-    include: { employee: true, manager: true },
+    include: {
+      employee: true,
+      manager: true,
+      helpedUser: { select: { name: true } },
+    },
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
   });
@@ -116,6 +120,8 @@ export default async function AdminEntriesPage({
               status={e.status}
               employeeName={e.employee.name}
               managerComment={e.managerComment}
+              helpedColleague={e.helpedColleague}
+              helpedName={e.helpedUser?.name}
               footer={
                 e.status !== "REJECTED" ? (
                   <AdminReviewActions entryId={e.id} />

@@ -11,7 +11,7 @@ import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { Card } from "@/components/ui/card";
 import { StatusBadge } from "@/components/entries/status-badge";
 import { formatDateTimeLV, formatDurationLV } from "@/lib/utils";
-import { normalizeClientName } from "@/lib/client-name";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { EmptyState } from "@/components/ui/empty-state";
 import { AlertTriangle, FileText, UserCog, Users, Clock, Timer, TrendingUp } from "lucide-react";
 import { GettingStarted } from "@/components/dashboard/getting-started";
@@ -20,6 +20,8 @@ import { SectionDivider } from "@/components/dashboard/section-divider";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
+import { WorkNatureCard } from "@/components/dashboard/work-nature-card";
+import { groupByWorkNature, groupHelpPairs } from "@/lib/work-nature";
 import { resolveWorkType } from "@/lib/work-type";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
@@ -105,6 +107,8 @@ export default async function AdminDashboard({
         select: {
           durationMinutes: true,
           isOutsideRole: true,
+          helpedColleague: true,
+          helpedUser: { select: { name: true } },
           category: true,
           title: true,
           employeeId: true,
@@ -132,7 +136,12 @@ export default async function AdminDashboard({
       }),
       prisma.client.findMany({
         where: { organizationId: orgId },
-        select: { id: true, name: true, freeMinutesPerMonth: true },
+        select: {
+          id: true,
+          name: true,
+          freeMinutesPerMonth: true,
+          aliases: { select: { normalized: true } },
+        },
       }),
       prisma.invisibleWorkEntry.findMany({
         where: { organizationId: orgId, status: "APPROVED", deletedAt: null, workDate: { gte: currentMonthStartA } },
@@ -203,6 +212,17 @@ export default async function AdminDashboard({
     0
   );
 
+  // --- Work nature breakdown (cross-cuts categories) ---
+  const workNatureRowsA = groupByWorkNature(approvedEntries);
+  const helpPairsA = groupHelpPairs(
+    approvedEntries.map((e) => ({
+      employeeName: e.employee.name ?? "-",
+      helpedName: e.helpedUser?.name ?? null,
+      durationMinutes: e.durationMinutes,
+      helpedColleague: e.helpedColleague,
+    }))
+  );
+
   // --- Category breakdown ---
   const categoryCountA = new Map<string, number>();
   for (const e of approvedEntries) {
@@ -234,15 +254,14 @@ export default async function AdminDashboard({
     });
 
   // --- Client budget forecast ---
+  const clientByNormA = buildClientLookup(orgClients);
   const monthClientByIdA = new Map<string, number>();
-  const monthClientByNameA = new Map<string, number>();
   for (const e of currentMonthClientEntries) {
-    if (e.clientId) {
-      monthClientByIdA.set(e.clientId, (monthClientByIdA.get(e.clientId) ?? 0) + e.durationMinutes);
-    } else if (e.clientName) {
-      const key = normalizeClientName(e.clientName);
-      monthClientByNameA.set(key, (monthClientByNameA.get(key) ?? 0) + e.durationMinutes);
-    }
+    // Free-typed shorthands resolve through the client's aliases, otherwise
+    // the hours never reach the forecast for that client.
+    const id = e.clientId ?? (e.clientName ? clientByNormA.get(normalizeClientName(e.clientName))?.id : undefined);
+    if (!id) continue;
+    monthClientByIdA.set(id, (monthClientByIdA.get(id) ?? 0) + e.durationMinutes);
   }
   const daysSoFarA = nowDateA.getUTCDate();
   const daysInMonthA = new Date(Date.UTC(nowDateA.getUTCFullYear(), nowDateA.getUTCMonth() + 1, 0)).getUTCDate();
@@ -251,9 +270,7 @@ export default async function AdminDashboard({
   const clientForecastsA: ClientForecastA[] = [];
   for (const c of orgClients) {
     if (c.freeMinutesPerMonth === null) continue;
-    const usedMin =
-      (monthClientByIdA.get(c.id) ?? 0) +
-      (monthClientByNameA.get(normalizeClientName(c.name)) ?? 0);
+    const usedMin = monthClientByIdA.get(c.id) ?? 0;
     if (usedMin >= c.freeMinutesPerMonth || usedMin === 0 || daysSoFarA === 0) continue;
     const dailyRate = usedMin / daysSoFarA;
     const projectedTotal = usedMin + dailyRate * daysRemainingA;
@@ -618,6 +635,15 @@ export default async function AdminDashboard({
       {categoryItemsA.length > 0 && (
         <>
           <SectionDivider label="Kategorijas" />
+          {workNatureRowsA.length > 0 && (
+            <div className="mb-4">
+              <WorkNatureCard
+                rows={workNatureRowsA}
+                totalEntries={approvedEntries.length}
+                helpPairs={helpPairsA}
+              />
+            </div>
+          )}
           <Card className="mb-8 p-4">
             <CategoryList items={categoryItemsA} />
           </Card>

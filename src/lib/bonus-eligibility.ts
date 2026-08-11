@@ -1,4 +1,5 @@
 import type { PeriodType } from "./reward-types";
+import { normalizeCategoryKey } from "./work-insights";
 
 export interface EligibilityEntry {
   durationMinutes: number;
@@ -51,7 +52,11 @@ export function calculateEligibility(
   );
 
   if (rule.categories.length > 0) {
-    filtered = filtered.filter((e) => rule.categories.includes(e.category));
+    // Rules are stored with the Latvian label, entries with the canonical key
+    // (older entries carry the label too). Compare on the key so a rule keeps
+    // matching regardless of which form either side happens to hold.
+    const wanted = new Set(rule.categories.map(normalizeCategoryKey));
+    filtered = filtered.filter((e) => wanted.has(normalizeCategoryKey(e.category)));
   }
 
   const totalMinutes = filtered.reduce((s, e) => s + e.durationMinutes, 0);

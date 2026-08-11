@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import {
+  CATEGORY_GROUPS,
   SMART_LOG_CATEGORIES,
   SMART_LOG_CATEGORY_LABELS,
   type SmartLogCategory,
@@ -32,6 +33,7 @@ import {
   type ConfirmedSmartLogTicket,
 } from "@/app/employee/smart-log/actions";
 import { normalizeClientName } from "@/lib/client-name";
+import { normalizePersonName } from "@/lib/work-nature";
 
 interface ClientOption {
   id: string;
@@ -44,6 +46,8 @@ type ReviewTicket = SmartLogDraft & {
   confirmed: boolean;
   editing: boolean;
   client_id: string | null;
+  /** Set once the employee picks the colleague the AI only heard by name. */
+  helped_user_id: string | null;
 };
 
 const today = new Date().toISOString().slice(0, 10);
@@ -56,9 +60,11 @@ function roleLabel(value: boolean | null) {
 
 export function SmartWorkLog({
   clients = [],
+  colleagues = [],
   preview = false,
 }: {
   clients?: ClientOption[];
+  colleagues?: ClientOption[];
   preview?: boolean;
 }) {
   const [description, setDescription] = useState("");
@@ -320,6 +326,9 @@ export function SmartWorkLog({
       const clientNameMap = new Map(
         clients.map((c) => [normalizeClientName(c.name), c.id])
       );
+      const colleagueNameMap = new Map(
+        colleagues.map((c) => [normalizePersonName(c.name), c.id])
+      );
       setTickets(
         parsed.data.tickets.map((ticket, index) => ({
           ...ticket,
@@ -329,6 +338,11 @@ export function SmartWorkLog({
           editing: false,
           client_id: ticket.client_name
             ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
+            : null,
+          helped_user_id: ticket.is_helping_colleague
+            ? (colleagueNameMap.get(
+                normalizePersonName(ticket.helped_colleague_name ?? "")
+              ) ?? null)
             : null,
         }))
       );
@@ -375,8 +389,14 @@ export function SmartWorkLog({
         description: ticket.description,
         work_date: ticket.work_date,
         client_name: ticket.client_name,
+        // Without this an explicit pick in the review UI never reaches the
+        // server, which then silently falls back to matching on client_name.
+        client_id: ticket.client_id ?? null,
         estimated_time_minutes: ticket.estimated_time_minutes!,
         is_outside_role: ticket.is_outside_role,
+        is_helping_colleague: ticket.is_helping_colleague,
+        helped_colleague_name: ticket.helped_colleague_name,
+        helped_user_id: ticket.helped_user_id ?? null,
         role_relation: ticket.role_relation,
         business_impact: ticket.business_impact,
         confidence_score: ticket.confidence_score,
@@ -562,10 +582,16 @@ export function SmartWorkLog({
                             }
                             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                           >
-                            {SMART_LOG_CATEGORIES.map((category) => (
-                              <option key={category.value} value={category.value}>
-                                {category.label}
-                              </option>
+                            {CATEGORY_GROUPS.map((group) => (
+                              <optgroup key={group} label={group}>
+                                {SMART_LOG_CATEGORIES.filter(
+                                  (category) => category.group === group
+                                ).map((category) => (
+                                  <option key={category.value} value={category.value}>
+                                    {category.label}
+                                  </option>
+                                ))}
+                              </optgroup>
                             ))}
                           </select>
                         </div>
@@ -652,6 +678,66 @@ export function SmartWorkLog({
                         )}
                       </div>
 
+                      <div className="grid gap-3 rounded-lg border border-border bg-muted/20 p-3">
+                        <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={ticket.is_helping_colleague === true}
+                            onChange={(event) =>
+                              updateTicket(ticket.id, {
+                                is_helping_colleague: event.target.checked,
+                                ...(event.target.checked
+                                  ? {}
+                                  : { helped_user_id: null }),
+                              })
+                            }
+                            className="h-4 w-4 shrink-0 accent-emerald-500"
+                          />
+                          <span>Palīdzība kolēģim</span>
+                        </label>
+                        {ticket.is_helping_colleague && colleagues.length > 0 ? (
+                          <div className="grid gap-1.5 border-t border-border/60 pt-2.5">
+                            <Label
+                              htmlFor={`helped-${ticket.id}`}
+                              className="text-xs"
+                            >
+                              Kam palīdzēji?{" "}
+                              <span className="text-muted-foreground">
+                                (neobligāti)
+                              </span>
+                            </Label>
+                            <select
+                              id={`helped-${ticket.id}`}
+                              value={ticket.helped_user_id ?? "__none__"}
+                              onChange={(event) =>
+                                updateTicket(ticket.id, {
+                                  helped_user_id:
+                                    event.target.value === "__none__"
+                                      ? null
+                                      : event.target.value,
+                                })
+                              }
+                              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+                            >
+                              <option value="__none__">Nav norādīts</option>
+                              {colleagues.map((colleague) => (
+                                <option key={colleague.id} value={colleague.id}>
+                                  {colleague.name}
+                                </option>
+                              ))}
+                            </select>
+                            {ticket.helped_colleague_name &&
+                            !ticket.helped_user_id ? (
+                              <p className="text-xs text-amber-500">
+                                Atpazīts kolēģis: &ldquo;
+                                {ticket.helped_colleague_name}&rdquo; - nav
+                                sarakstā. Izvēlies vai atstāj bez norādes.
+                              </p>
+                            ) : null}
+                          </div>
+                        ) : null}
+                      </div>
+
                       <div className="grid gap-2">
                         <Label htmlFor={`description-${ticket.id}`}>
                           Apraksts
@@ -716,6 +802,18 @@ export function SmartWorkLog({
                         <span>{roleLabel(ticket.is_outside_role)}</span>
                         {ticket.client_name ? (
                           <span>Klients: {ticket.client_name}</span>
+                        ) : null}
+                        {ticket.is_helping_colleague ? (
+                          <span className="text-emerald-500">
+                            Palīdzība kolēģim
+                            {ticket.helped_user_id
+                              ? `: ${
+                                  colleagues.find(
+                                    (c) => c.id === ticket.helped_user_id
+                                  )?.name ?? ""
+                                }`
+                              : ""}
+                          </span>
                         ) : null}
                         <span>
                           Pārliecības līmenis{" "}

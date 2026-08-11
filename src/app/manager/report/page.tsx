@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
-import { normalizeClientName } from "@/lib/client-name";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { addMonthlyMinutes, clientMonthOptions, resolveClientMonth, sumMonthlyOverrun } from "@/lib/client-month";
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { ReportPrintButton } from "@/components/report/report-print-button";
@@ -144,7 +144,12 @@ export default async function ManagerReportPage({
     prisma.organization.findUnique({ where: { id: orgId }, select: { name: true } }),
     prisma.client.findMany({
       where: { organizationId: orgId, status: "active" },
-      select: { id: true, name: true, freeMinutesPerMonth: true },
+      select: {
+        id: true,
+        name: true,
+        freeMinutesPerMonth: true,
+        aliases: { select: { normalized: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.invisibleWorkEntry.findMany({
@@ -248,14 +253,28 @@ export default async function ManagerReportPage({
   const totalHours = Math.round((approved.reduce((s, e) => s + e.durationMinutes, 0) / 60) * 10) / 10;
 
   // Client analytics
+  const clientById = new Map(clients.map((c) => [c.id, c]));
+  const clientByNorm = buildClientLookup(clients);
   const clientMinMap = new Map<string, number>(); // clientId → minutes
   const clientNameMinMap = new Map<string, { minutes: number; displayName: string }>(); // clientName.lower → data
   const clientMonthlyMap = new Map<string, Map<string, number>>();
   let noClientCount = 0;
   for (const e of clientMonthEntries) {
-    if (e.clientId) {
-      clientMinMap.set(e.clientId, (clientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
-      addMonthlyMinutes(clientMonthlyMap, e.clientId, e.workDate, e.durationMinutes);
+    // A free-typed name that resolves to a registered client - directly or
+    // through one of its aliases - counts towards that client, not towards a
+    // lookalike unregistered row sitting next to it.
+    const registered = e.clientId
+      ? clientById.get(e.clientId)
+      : e.clientName
+        ? clientByNorm.get(normalizeClientName(e.clientName))
+        : undefined;
+
+    if (registered) {
+      clientMinMap.set(registered.id, (clientMinMap.get(registered.id) ?? 0) + e.durationMinutes);
+      addMonthlyMinutes(clientMonthlyMap, registered.id, e.workDate, e.durationMinutes);
+    } else if (e.clientId) {
+      // Linked to an archived or deleted client: this report covers active
+      // clients only, so it stays out of both buckets.
     } else if (e.clientName) {
       const key = normalizeClientName(e.clientName);
       const existing = clientNameMinMap.get(key);
@@ -265,23 +284,19 @@ export default async function ManagerReportPage({
       noClientCount++;
     }
   }
-  const registeredClientLower = new Set(clients.map((c) => normalizeClientName(c.name)));
   const clientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
   for (const c of clients) {
-    const nameMinutes = clientNameMinMap.get(normalizeClientName(c.name))?.minutes ?? 0;
-    const minutes = (clientMinMap.get(c.id) ?? 0) + nameMinutes;
+    const minutes = clientMinMap.get(c.id) ?? 0;
     if (minutes === 0) continue;
     const overrun = c.freeMinutesPerMonth !== null
       ? clientMonth.isAll
-        ? sumMonthlyOverrun(clientMonthlyMap, [c.id, `name:${normalizeClientName(c.name)}`], c.freeMinutesPerMonth)
+        ? sumMonthlyOverrun(clientMonthlyMap, [c.id], c.freeMinutesPerMonth)
         : Math.max(0, minutes - c.freeMinutesPerMonth)
       : 0;
     clientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
   }
   for (const [nameLower, { minutes, displayName }] of clientNameMinMap.entries()) {
-    if (!registeredClientLower.has(nameLower)) {
-      clientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: null, overrun: 0, eur: 0, registered: false });
-    }
+    clientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: null, overrun: 0, eur: 0, registered: false });
   }
   clientData.sort((a, b) => b.minutes - a.minutes);
 

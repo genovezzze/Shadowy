@@ -1,7 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { resolveWorkType } from "@/lib/work-type";
-import { normalizeClientName } from "@/lib/client-name";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText, UserCog } from "lucide-react";
@@ -75,7 +75,12 @@ export default async function AdminReportPage({
     }),
     prisma.client.findMany({
       where: { organizationId: orgId, status: "active" },
-      select: { id: true, name: true, freeMinutesPerMonth: true },
+      select: {
+        id: true,
+        name: true,
+        freeMinutesPerMonth: true,
+        aliases: { select: { normalized: true } },
+      },
       orderBy: { name: "asc" },
     }),
     prisma.invisibleWorkEntry.findMany({
@@ -149,14 +154,28 @@ export default async function AdminReportPage({
   const maxWeekCount = Math.max(...weeklyData.map((w) => w.count), 1);
 
   // Client analytics
+  const adminClientById = new Map(clients.map((c) => [c.id, c]));
+  const adminClientByNorm = buildClientLookup(clients);
   const adminClientMinMap = new Map<string, number>();
   const adminClientNameMinMap = new Map<string, { minutes: number; displayName: string }>();
   const adminClientMonthlyMap = new Map<string, Map<string, number>>();
   let adminNoClientCount = 0;
   for (const e of clientMonthEntries) {
-    if (e.clientId) {
-      adminClientMinMap.set(e.clientId, (adminClientMinMap.get(e.clientId) ?? 0) + e.durationMinutes);
-      addMonthlyMinutes(adminClientMonthlyMap, e.clientId, e.workDate, e.durationMinutes);
+    // A free-typed name that resolves to a registered client - directly or
+    // through one of its aliases - counts towards that client, not towards a
+    // lookalike unregistered row sitting next to it.
+    const registered = e.clientId
+      ? adminClientById.get(e.clientId)
+      : e.clientName
+        ? adminClientByNorm.get(normalizeClientName(e.clientName))
+        : undefined;
+
+    if (registered) {
+      adminClientMinMap.set(registered.id, (adminClientMinMap.get(registered.id) ?? 0) + e.durationMinutes);
+      addMonthlyMinutes(adminClientMonthlyMap, registered.id, e.workDate, e.durationMinutes);
+    } else if (e.clientId) {
+      // Linked to an archived or deleted client: this report covers active
+      // clients only, so it stays out of both buckets.
     } else if (e.clientName) {
       const key = normalizeClientName(e.clientName);
       const existing = adminClientNameMinMap.get(key);
@@ -166,27 +185,23 @@ export default async function AdminReportPage({
       adminNoClientCount++;
     }
   }
-  const registeredClientLower = new Set(clients.map((c) => normalizeClientName(c.name)));
   const adminClientData: { id: string; name: string; minutes: number; freeMinutes: number | null; overrun: number; eur: number; registered: boolean }[] = [];
   for (const c of clients) {
-    const nameEntry = adminClientNameMinMap.get(normalizeClientName(c.name));
-    const minutes = (adminClientMinMap.get(c.id) ?? 0) + (nameEntry?.minutes ?? 0);
+    const minutes = adminClientMinMap.get(c.id) ?? 0;
     if (minutes === 0) continue;
     const overrun = c.freeMinutesPerMonth !== null
       ? clientMonth.isAll
-        ? sumMonthlyOverrun(adminClientMonthlyMap, [c.id, `name:${normalizeClientName(c.name)}`], c.freeMinutesPerMonth)
+        ? sumMonthlyOverrun(adminClientMonthlyMap, [c.id], c.freeMinutesPerMonth)
         : Math.max(0, minutes - c.freeMinutesPerMonth)
       : 0;
     adminClientData.push({ id: c.id, name: c.name, minutes, freeMinutes: c.freeMinutesPerMonth, overrun, eur: Math.round((overrun / 60) * 20), registered: true });
   }
   const DEFAULT_FREE_MINUTES = 60;
   for (const [nameLower, { minutes, displayName }] of adminClientNameMinMap.entries()) {
-    if (!registeredClientLower.has(nameLower)) {
-      const overrun = clientMonth.isAll
-        ? sumMonthlyOverrun(adminClientMonthlyMap, [`name:${nameLower}`], DEFAULT_FREE_MINUTES)
-        : Math.max(0, minutes - DEFAULT_FREE_MINUTES);
-      adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: DEFAULT_FREE_MINUTES, overrun, eur: Math.round((overrun / 60) * 20), registered: false });
-    }
+    const overrun = clientMonth.isAll
+      ? sumMonthlyOverrun(adminClientMonthlyMap, [`name:${nameLower}`], DEFAULT_FREE_MINUTES)
+      : Math.max(0, minutes - DEFAULT_FREE_MINUTES);
+    adminClientData.push({ id: nameLower, name: displayName, minutes, freeMinutes: DEFAULT_FREE_MINUTES, overrun, eur: Math.round((overrun / 60) * 20), registered: false });
   }
   adminClientData.sort((a, b) => b.minutes - a.minutes);
 

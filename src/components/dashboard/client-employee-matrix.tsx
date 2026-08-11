@@ -7,11 +7,30 @@ import { AlertTriangle, Maximize2, Search, X } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import type { MatrixClientRow, MatrixEmployee } from "@/lib/client-matrix";
+import { normalizeClientName } from "@/lib/client-name";
 import type { ClientMonthOption } from "@/lib/client-month";
 import { ClientMonthDropdown } from "@/components/dashboard/client-month-selector";
 
 function overrunEur(minutes: number, rateEur: number): number {
   return Math.round((minutes / 60) * rateEur);
+}
+
+function hours(minutes: number): number {
+  return Math.round((minutes / 60) * 10) / 10;
+}
+
+const monthFormatter = new Intl.DateTimeFormat("lv-LV", { month: "short", year: "numeric" });
+
+function monthLabelOf(monthKey: string): string {
+  const [year, month] = monthKey.split("-").map(Number);
+  return monthFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
+}
+
+/** "Jūl. 2026: 0.8h · Aug. 2026: 1h" — the detail behind a multi-month total. */
+function monthBreakdown(row: MatrixClientRow): string {
+  return row.monthlyMinutes
+    .map((m) => `${monthLabelOf(m.month)}: ${hours(m.minutes)}h`)
+    .join(" · ");
 }
 
 const MAX_EMP_COLS = 8;
@@ -83,6 +102,10 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
       <tbody className="divide-y divide-border">
         {rows.map((row) => {
           const overLimit = row.overrunMinutes > 0;
+          const months = Math.max(1, row.monthlyMinutes.length);
+          // The free allowance renews every month, so across N months the row
+          // really has N × the monthly limit available.
+          const allowanceMinutes = row.freeMinutes === null ? null : row.freeMinutes * months;
           const rowMax = Math.max(
             ...employees.map((e) => row.byEmployee[e.id] ?? 0),
             1,
@@ -131,14 +154,27 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               {hiddenCount > 0 && (
                 <td className={`${cellPad} text-center text-muted-foreground/25 text-xs`}>…</td>
               )}
-              <td className={`${numPad} text-right text-xs tabular-nums font-medium`}>
+              <td
+                className={`${numPad} text-right text-xs tabular-nums font-medium`}
+                title={months > 1 ? monthBreakdown(row) : undefined}
+              >
                 {Math.round((row.totalMinutes / 60) * 10) / 10}h
               </td>
               {!compact && (
-                <td className={`${numPad} text-right text-xs tabular-nums text-muted-foreground`}>
-                  {row.freeMinutes !== null
-                    ? `${Math.round((row.freeMinutes / 60) * 10) / 10}h/mēn.`
-                    : "∞"}
+                <td
+                  className={`${numPad} text-right text-xs tabular-nums text-muted-foreground`}
+                  title={allowanceMinutes !== null && months > 1
+                    ? `${hours(row.freeMinutes!)}h mēnesī × ${months} mēneši`
+                    : undefined}
+                >
+                  {allowanceMinutes === null
+                    ? "∞"
+                    : months > 1
+                      // Comparing a multi-month total against a single month's
+                      // limit is what made the row look wrong, so the column
+                      // shows what is actually free across those months.
+                      ? `${hours(allowanceMinutes)}h`
+                      : `${hours(allowanceMinutes)}h/mēn.`}
                 </td>
               )}
               <td className={`${numPad} text-right`}>
@@ -153,7 +189,14 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
                     )}
                   </span>
                 ) : row.freeMinutes !== null ? (
-                  <span className="text-xs text-emerald-500 font-medium">OK</span>
+                  <span
+                    className="text-xs font-medium text-emerald-500"
+                    title={months > 1
+                      ? `Neviens mēnesis nepārsniedz bezmaksas limitu. ${monthBreakdown(row)}`
+                      : undefined}
+                  >
+                    OK
+                  </span>
                 ) : (
                   <span className="text-xs text-muted-foreground/30">-</span>
                 )}
@@ -223,9 +266,12 @@ export function ClientEmployeeMatrix({
   }, [detailEventName]);
 
   const filteredRows = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    // Normalizing the query the same way the row's searchKey was built makes
+    // the search diacritic- and alias-aware: "vkk" and "kerlinga" both find
+    // "Ventspils Kērlinga Klubs".
+    const q = normalizeClientName(query);
     if (!q) return rows;
-    return rows.filter((r) => r.clientName.toLowerCase().includes(q));
+    return rows.filter((r) => r.searchKey.includes(q));
   }, [rows, query]);
 
   if (!rows.length || !employees.length) return null;
@@ -233,6 +279,7 @@ export function ClientEmployeeMatrix({
   const visibleEmps = employees.slice(0, MAX_EMP_COLS);
   const hiddenCount = employees.length - visibleEmps.length;
   const overrunCount = rows.filter((r) => r.overrunMinutes > 0).length;
+  const spansMonths = rows.some((r) => r.monthlyMinutes.length > 1);
   const totalOverrunEur = rows.reduce((s, r) => s + overrunEur(r.overrunMinutes, hourlyRateEur), 0);
   const previewRows = rows.slice(0, PREVIEW_ROWS);
   const remainingCount = rows.length - previewRows.length;
@@ -252,6 +299,11 @@ export function ClientEmployeeMatrix({
             </div>
           ) : (
             <span className="text-xs text-muted-foreground">{rows.length} klienti</span>
+          )}
+          {spansMonths && (
+            <span className="shrink-0 text-[11px] text-muted-foreground/70">
+              Bezmaksas limits atjaunojas katru mēnesi — kolonna “Limits” rāda to par visu periodu
+            </span>
           )}
         </div>
         <div className="overflow-x-auto">

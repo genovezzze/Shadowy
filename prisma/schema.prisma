@@ -108,6 +108,7 @@ model User {
 
   submittedEntries  InvisibleWorkEntry[] @relation("EntryEmployee")
   reviewedEntries   InvisibleWorkEntry[] @relation("EntryManager")
+  receivedHelp      InvisibleWorkEntry[] @relation("EntryHelpedUser")
   timeLogsCreated   WorkEntryTimeLog[]
   clientAssignments ClientEmployee[]
 
@@ -185,10 +186,17 @@ model InvisibleWorkEntry {
 
   source          String   @default("manual") @db.VarChar(30)
   originalInput   String?  @db.Text
-  isOutsideRole   Boolean?
   roleRelation    String?  @db.VarChar(300)
   businessImpact  String?  @db.VarChar(500)
   confidenceScore Float?
+
+  isOutsideRole Boolean?
+
+  // Work nature: independent of `category`, which records what was done. An
+  // entry can be both bookkeeping and done to cover for a colleague.
+  helpedColleague Boolean @default(false)
+  helpedUserId    String?
+  helpedUser      User?   @relation("EntryHelpedUser", fields: [helpedUserId], references: [id], onDelete: SetNull)
 
   // Soft delete
   deletedAt DateTime?
@@ -204,6 +212,7 @@ model InvisibleWorkEntry {
   @@index([managerId])
   @@index([status])
   @@index([clientId])
+  @@index([helpedUserId])
 }
 
 // Tracks failed login attempts for brute-force / password-spray rate limiting.

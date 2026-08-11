@@ -42,6 +42,24 @@ export async function GET(req: NextRequest) {
   });
   const orgById = new Map(orgs.map((o) => [o.id, o]));
 
+  // Lets a free-typed shorthand fold into the client it aliases instead of
+  // becoming a second line in the digest. Fetched once for all recipients.
+  const allClients = await prisma.client.findMany({
+    where: { organizationId: { in: orgs.map((o) => o.id) } },
+    select: {
+      id: true,
+      name: true,
+      organizationId: true,
+      aliases: { select: { normalized: true } },
+    },
+  });
+  const clientsByOrg = new Map<string, typeof allClients>();
+  for (const client of allClients) {
+    const list = clientsByOrg.get(client.organizationId) ?? [];
+    list.push(client);
+    clientsByOrg.set(client.organizationId, list);
+  }
+
   const employees = await prisma.user.findMany({
     where: { role: "EMPLOYEE", organizationId: { in: orgs.map((o) => o.id) } },
     select: { id: true, name: true, email: true, organizationId: true },
@@ -72,6 +90,7 @@ export async function GET(req: NextRequest) {
             clientId: true,
             clientName: true,
             client: { select: { name: true } },
+            helpedColleague: true,
           },
         }),
         prisma.invisibleWorkEntry.findMany({
@@ -96,7 +115,9 @@ export async function GET(req: NextRequest) {
         const grouped = groupByCategory(weekEntries);
         const top = topCategory(grouped);
         const weekMinutes = weekEntries.reduce((s, e) => s + e.durationMinutes, 0);
-        const helpedCount = grouped.find((g) => g.category === "helping_colleague")?.count ?? 0;
+        // Help is a flag now, not a category - counting the retired category
+        // here would report zero for every entry logged since the split.
+        const helpedCount = weekEntries.filter((e) => e.helpedColleague).length;
 
         const prevWeekMinutes = prevWeekEntries.reduce((s, e) => s + e.durationMinutes, 0);
 
@@ -129,7 +150,10 @@ export async function GET(req: NextRequest) {
             count: g.count,
             minutes: g.minutes,
           })),
-          clientBreakdown: groupByClient(clientEntries).map((c) => ({
+          clientBreakdown: groupByClient(
+            clientEntries,
+            clientsByOrg.get(employee.organizationId) ?? [],
+          ).map((c) => ({
             name: c.name,
             minutes: c.minutes,
           })),

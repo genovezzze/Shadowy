@@ -1,9 +1,25 @@
-import { SMART_LOG_CATEGORIES, SMART_LOG_CATEGORY_LABELS, type SmartLogCategory } from "@/lib/smart-log";
-import { normalizeClientName } from "@/lib/client-name";
+import {
+  CATEGORY_LABEL_ALIASES,
+  LEGACY_SMART_LOG_CATEGORIES,
+  SMART_LOG_CATEGORIES,
+  SMART_LOG_CATEGORY_LABELS,
+  type SmartLogCategory,
+} from "@/lib/smart-log";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 
-const LABEL_TO_KEY: Record<string, SmartLogCategory> = Object.fromEntries(
-  SMART_LOG_CATEGORIES.map((c) => [c.label.toLowerCase(), c.value])
-) as Record<string, SmartLogCategory>;
+/**
+ * Legacy labels belong here too. Retiring a category moves it out of
+ * SMART_LOG_CATEGORIES, and if this map were built from the live list alone,
+ * every row still storing that label would stop folding into its key - the 123
+ * rows reading "palīdzība kolēģim" would split off from the 6 reading
+ * "helping_colleague" and render as two identical-looking chart lines.
+ */
+const LABEL_TO_KEY: Record<string, string> = Object.fromEntries(
+  [...SMART_LOG_CATEGORIES, ...LEGACY_SMART_LOG_CATEGORIES].map((c) => [
+    c.label.toLowerCase(),
+    c.value,
+  ])
+);
 
 /**
  * Older entries (manual or pre-migration AI parses) can store the category as
@@ -13,7 +29,8 @@ const LABEL_TO_KEY: Record<string, SmartLogCategory> = Object.fromEntries(
  */
 export function normalizeCategoryKey(category: string): string {
   if (category in SMART_LOG_CATEGORY_LABELS) return category;
-  return LABEL_TO_KEY[category.trim().toLowerCase()] ?? category;
+  const lowered = category.trim().toLowerCase();
+  return LABEL_TO_KEY[lowered] ?? CATEGORY_LABEL_ALIASES[lowered] ?? category;
 }
 
 type MinimalEntry = { category: string; durationMinutes: number };
@@ -66,14 +83,40 @@ export function groupByCategoryWithTitles(
 }
 
 type MinimalClientEntry = { clientId: string | null; clientName: string | null; durationMinutes: number };
+type ClientRef = { id: string; name: string; aliases?: { normalized: string }[] };
 export type ClientBreakdown = { name: string; minutes: number };
 
-/** Groups entries by client, deduping "SIA X" / "X" style name variants like the dashboards do. */
-export function groupByClient(entries: MinimalClientEntry[]): ClientBreakdown[] {
+/**
+ * Groups entries by client, deduping "SIA X" / "X" style name variants like
+ * the dashboards do. Pass the org's registered clients so a free-typed name
+ * that is really an alias ("VKK") folds into its client instead of forming a
+ * second row next to it.
+ */
+export function groupByClient(
+  entries: MinimalClientEntry[],
+  clients: ClientRef[] = [],
+): ClientBreakdown[] {
+  const clientById = new Map(clients.map((c) => [c.id, c]));
+  const clientByNorm = buildClientLookup(clients);
   const byId = new Map<string, ClientBreakdown>();
   const byName = new Map<string, ClientBreakdown>();
+
   for (const e of entries) {
-    if (e.clientId) {
+    // A free-typed name that resolves to a registered client is counted under
+    // that client, so its hours land in a single row under the official name.
+    const registered = e.clientId
+      ? clientById.get(e.clientId)
+      : e.clientName
+        ? clientByNorm.get(normalizeClientName(e.clientName))
+        : undefined;
+
+    if (registered) {
+      const cur = byId.get(registered.id) ?? { name: registered.name, minutes: 0 };
+      cur.minutes += e.durationMinutes;
+      byId.set(registered.id, cur);
+    } else if (e.clientId) {
+      // Caller passed no client list (or the client is gone) - keep the old
+      // behaviour of grouping on the id alone.
       const cur = byId.get(e.clientId) ?? { name: e.clientName ?? e.clientId, minutes: 0 };
       cur.minutes += e.durationMinutes;
       byId.set(e.clientId, cur);
@@ -118,7 +161,32 @@ export function weekCountTrend(current: number, previous: number): string | null
   return `${diff > 0 ? "+" : ""}${diff} vs iepriekšējā nedēļa`;
 }
 
-const RECOMMENDATIONS: Record<SmartLogCategory, string> = {
+/**
+ * Keyed by category, including the retired nature-categories: entries written
+ * before those became flags still carry them, so a weekly digest over older
+ * data must still find a recommendation.
+ */
+const RECOMMENDATIONS: Record<string, string> = {
+  bookkeeping_invoices:
+    "Liela daļa laika aizgāja rēķinu un pavadzīmju grāmatošanai - ja piegādātāji atkārtojas, vērts pārrunāt automātisku ievadi vai e-rēķinus.",
+  bookkeeping_receipts:
+    "Daudz laika aizgāja čeku grāmatošanai - apsver, vai čekus var savākt digitāli jau to rašanās brīdī.",
+  bookkeeping_cash:
+    "Liela daļa laika aizgāja kases operācijām - ja Z atskaites un orderi atkārtojas katru nedēļu, vērts paskatīties uz to sagatavošanas procesu.",
+  bookkeeping_advances:
+    "Daudz laika aizgāja avansa norēķinu grāmatošanai - bieži tas nozīmē, ka atskaites pienāk nepilnīgas.",
+  bookkeeping_bank:
+    "Liela daļa laika aizgāja bankas operāciju grāmatošanai - vērts pārbaudīt, vai bankas izrakstu var importēt automātiski.",
+  document_scanning:
+    "Daudz laika pavadīts dokumentu skenēšanā un digitalizēšanā - apsver, vai dokumentus var saņemt jau digitāli.",
+  document_archiving:
+    "Daudz laika pavadīts dokumentu arhivēšanā un sakārtošanā - ja tas atkārtojas katru mēnesi, vērts pārskatīt glabāšanas kārtību.",
+  bookkeeping:
+    "Liela daļa laika aizgāja grāmatošanai - ja tie ir līdzīgi dokumenti nedēļu pēc nedēļas, vērts pārrunāt, vai daļu var ievadīt automātiski.",
+  document_processing:
+    "Daudz laika pavadīts dokumentu skenēšanā un sakārtošanā - apsver, vai dokumentus var saņemt jau digitāli.",
+  reconciliation:
+    "Liela daļa laika aizgāja pārbaudēm un saskaņošanai - ja kļūdas atkārtojas, vērts paskatīties uz procesu, kurā tās rodas.",
   helping_colleague:
     "Šonedēļ daudz palīdzēji kolēģiem - pārliecinies, ka vadītājs to redz, jo šis darbs bieži paliek nepamanīts.",
   urgent_extra_task:
