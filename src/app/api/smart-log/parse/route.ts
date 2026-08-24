@@ -53,6 +53,8 @@ Kategorija (KAS tika darīts):
   - Ja nosaukumā ir gan skenēšana, gan sakārtošana, izvēlies document_scanning.
 - reconciliation: pārbaudes, salīdzināšana, saskaņošana, PVN vai partneru pārbaude.
 - invoicing: rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana).
+- vid_communication: saziņa ar Valsts ieņēmumu dienestu (VID) - zvani, vēstules, iesniegumi,
+  jautājumu noskaidrošana. NEVIS pati grāmatošana vai deklarācijas sagatavošana - tikai saziņa.
 - other izmanto tikai tad, ja neviena cita kategorija tiešām neder.
 - NEIZVĒLIES kategoriju pēc tā, kam darbs tika darīts. "Iegrāmatoju čekus, jo
   kolēģe bija slima" ir bookkeeping_receipts - palīdzībai ir atsevišķs karodziņš.
