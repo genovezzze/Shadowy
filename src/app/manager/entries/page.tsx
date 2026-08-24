@@ -26,9 +26,17 @@ export default async function ManagerEntriesPage({
   const filterParams: EntrySearchParams = { ...searchParams, status: undefined };
   const filter = buildEntryWhere(filterParams);
 
+  // An administrator is nobody's manager of record, so scoping this page to
+  // their own id would always show an empty list - they see the whole
+  // organisation instead. Spread LAST so a crafted URL cannot widen it.
+  const scope =
+    session.role === "ADMIN"
+      ? { organizationId: session.organizationId }
+      : { organizationId: session.organizationId, managerId: session.userId };
+
   const [pending, reviewed, team, clientSource] = await Promise.all([
     prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: session.organizationId, managerId: session.userId, status: { in: ["APPROVED", "PENDING"] }, ...filter },
+      where: { ...filter, ...scope, status: { in: ["APPROVED", "PENDING"] } },
       orderBy: { createdAt: "desc" },
       take: 100,
       include: {
@@ -38,12 +46,7 @@ export default async function ManagerEntriesPage({
       },
     }),
     prisma.invisibleWorkEntry.findMany({
-      where: {
-        organizationId: session.organizationId,
-        managerId: session.userId,
-        status: { in: ["REJECTED", "RETURNED"] },
-        ...filter,
-      },
+      where: { ...filter, ...scope, status: { in: ["REJECTED", "RETURNED"] } },
       orderBy: { updatedAt: "desc" },
       take: 50,
       include: {
@@ -54,12 +57,16 @@ export default async function ManagerEntriesPage({
       },
     }),
     prisma.user.findMany({
-      where: { organizationId: session.organizationId, managerId: session.userId, role: "EMPLOYEE" },
+      where: {
+        organizationId: session.organizationId,
+        role: "EMPLOYEE",
+        ...(session.role === "ADMIN" ? {} : { managerId: session.userId }),
+      },
       orderBy: { name: "asc" },
       select: { id: true, name: true },
     }),
     prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: session.organizationId, managerId: session.userId, deletedAt: null },
+      where: { ...scope, deletedAt: null },
       select: { clientId: true, clientName: true, client: { select: { name: true } } },
     }),
   ]);

@@ -1,13 +1,16 @@
 "use client";
 
+import { useRef, useState } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { statusLabel } from "@/lib/i18n";
 import type { EntryStatus } from "@prisma/client";
 import { categoryLabel } from "@/lib/work-insights";
+import { parseEmployeeIds } from "@/lib/entry-filter";
 import { startNavigationLoading } from "@/lib/navigation-loading";
 
 const STATUSES: EntryStatus[] = ["PENDING", "APPROVED", "REJECTED", "RETURNED"];
@@ -32,6 +35,18 @@ export function EntriesFilter({
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // The employee filter holds several ids, comma separated in the URL. Keep it
+  // in state so ticking boxes doesn't navigate on every click, and re-sync it
+  // whenever the URL changes underneath us (back button, "Notīrīt").
+  const employeeParam = params.get("employee") ?? "";
+  const [employeeIds, setEmployeeIds] = useState(() => parseEmployeeIds(employeeParam));
+  const [syncedParam, setSyncedParam] = useState(employeeParam);
+  if (syncedParam !== employeeParam) {
+    setSyncedParam(employeeParam);
+    setEmployeeIds(parseEmployeeIds(employeeParam));
+  }
 
   const hasFilters = ["q", "status", "category", "employee", "client", "from", "to"].some(
     (k) => params.get(k)
@@ -57,6 +72,7 @@ export function EntriesFilter({
 
   return (
     <form
+      ref={formRef}
       onSubmit={onSubmit}
       onChange={(e) => {
         // Auto-apply when a dropdown or date changes; free-text waits for submit.
@@ -134,20 +150,23 @@ export function EntriesFilter({
 
       {employees ? (
         <div className="grid gap-1.5">
-          <Label htmlFor="employee">Darbinieks</Label>
-          <Select name="employee" defaultValue={params.get("employee") || ALL_VALUE}>
-            <SelectTrigger id="employee">
-              <SelectValue placeholder="Visi darbinieki" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL_VALUE}>Visi darbinieki</SelectItem>
-              {employees.map((e) => (
-                <SelectItem key={e.id} value={e.id}>
-                  {e.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <Label htmlFor="employee">Darbinieki</Label>
+          <input type="hidden" name="employee" value={employeeIds.join(",")} />
+          <MultiSelect
+            id="employee"
+            options={employees.map((e) => ({ value: e.id, label: e.name }))}
+            value={employeeIds}
+            onChange={setEmployeeIds}
+            onClose={() => {
+              // Apply once the dropdown closes, not on every tick.
+              if (employeeIds.join(",") !== employeeParam && formRef.current) {
+                apply(formRef.current);
+              }
+            }}
+            placeholder="Visi darbinieki"
+            allLabel="Visi darbinieki"
+            searchPlaceholder="Meklēt darbinieku..."
+          />
         </div>
       ) : null}
 

@@ -236,6 +236,69 @@ export async function sendBonusRequestEmail(opts: {
   await sendEmail(opts.to, subject, html);
 }
 
+/**
+ * A breakdown row in the weekly reports. `href` is an app-relative link
+ * (`/admin/entries?...`) to the entries the row was computed from, so the
+ * recipient can open what the numbers actually were.
+ */
+type ReportRowLink = { href?: string };
+
+type EmployeeReportGroup = ReportRowLink & {
+  /** null renders as a flat list - used when no work roles are set up. */
+  roleName: string | null;
+  count: number;
+  minutes: number;
+  members: (ReportRowLink & { name: string; count: number; minutes: number })[];
+};
+
+/** Roles only make it into the heading once someone actually has one. */
+function employeeSectionTitle(groups: EmployeeReportGroup[]): string {
+  return groups.some((g) => g.roleName)
+    ? "Sadalījums pa lomām un darbiniekiem"
+    : "Sadalījums pa darbiniekiem";
+}
+
+/** Renders a breakdown label as a link into the app when the row has one. */
+function reportLabel(appUrl: string, label: string, href?: string): string {
+  const text = escapeHtml(label);
+  return href
+    ? `<a href="${appUrl}${escapeHtml(href)}" style="color:#18181b;text-decoration:underline">${text}</a>`
+    : text;
+}
+
+/**
+ * Per-employee rows, split into work-role sections when roles are in use.
+ * A section header links to all of its employees at once.
+ */
+function employeeGroupRows(appUrl: string, groups: EmployeeReportGroup[]): string {
+  const flat = groups.length === 1 && groups[0].roleName === null;
+
+  return groups
+    .map((group) => {
+      const header = flat
+        ? ""
+        : `
+        <tr>
+          <td style="padding:12px 0 4px;border-top:1px solid #eee;color:#111;font-weight:600">${reportLabel(appUrl, group.roleName ?? "Bez lomas", group.href)}</td>
+          <td style="padding:12px 0 4px;border-top:1px solid #eee;color:#555;text-align:right;white-space:nowrap;font-weight:600">${pluralEntriesLV(group.count)} · ${formatDurationLV(group.minutes)}</td>
+        </tr>`;
+
+      const border = flat ? "#eee" : "#f5f5f5";
+      const members = group.members
+        .map(
+          (m) => `
+        <tr>
+          <td style="padding:6px 0 6px ${flat ? "0" : "12px"};border-top:1px solid ${border};color:#333">${reportLabel(appUrl, m.name, m.href)}</td>
+          <td style="padding:6px 0;border-top:1px solid ${border};color:#888;text-align:right;white-space:nowrap">${pluralEntriesLV(m.count)} · ${formatDurationLV(m.minutes)}</td>
+        </tr>`,
+        )
+        .join("");
+
+      return header + members;
+    })
+    .join("");
+}
+
 export async function sendWeeklyManagerReport(opts: {
   to: string;
   managerName: string;
@@ -248,10 +311,12 @@ export async function sendWeeklyManagerReport(opts: {
   hoursTrend: string | null;
   costEur: number;
   rateEur: number;
-  employeeBreakdown: { name: string; count: number; minutes: number }[];
-  categoryBreakdown: { label: string; count: number; minutes: number; topTitles: { title: string; count: number }[] }[];
-  clientBreakdown: { name: string; minutes: number }[];
+  employeeBreakdown: EmployeeReportGroup[];
+  categoryBreakdown: (ReportRowLink & { label: string; count: number; minutes: number; topTitles: { title: string; count: number }[] })[];
+  clientBreakdown: (ReportRowLink & { name: string; minutes: number })[];
   inactiveEmployeeNames: string[];
+  /** Link to the full list of entries behind this report. */
+  entriesHref: string;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
   const subject = `Shadowy - iknedēļas pārskats`;
@@ -265,15 +330,7 @@ export async function sendWeeklyManagerReport(opts: {
       </div>`
       : "";
 
-  const employeeRows = opts.employeeBreakdown
-    .map(
-      (e) => `
-        <tr>
-          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(e.name)}</td>
-          <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${pluralEntriesLV(e.count)} · ${formatDurationLV(e.minutes)}</td>
-        </tr>`
-    )
-    .join("");
+  const employeeRows = employeeGroupRows(appUrl, opts.employeeBreakdown);
 
   const categoryRows = opts.categoryBreakdown
     .map((c) => {
@@ -282,7 +339,7 @@ export async function sendWeeklyManagerReport(opts: {
         .join(", ");
       return `
         <tr>
-          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(c.label)}</td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${reportLabel(appUrl, c.label, c.href)}</td>
           <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${pluralEntriesLV(c.count)} · ${formatDurationLV(c.minutes)}</td>
         </tr>
         ${titlesLine ? `
@@ -296,7 +353,7 @@ export async function sendWeeklyManagerReport(opts: {
     .map(
       (c) => `
         <tr>
-          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${escapeHtml(c.name)}</td>
+          <td style="padding:6px 0;border-top:1px solid #eee;color:#333">${reportLabel(appUrl, c.name, c.href)}</td>
           <td style="padding:6px 0;border-top:1px solid #eee;color:#888;text-align:right;white-space:nowrap">${formatDurationLV(c.minutes)}</td>
         </tr>`
     )
@@ -364,12 +421,16 @@ export async function sendWeeklyManagerReport(opts: {
         </p>
       ` : ""}
 
-      ${listSection("Sadalījums pa darbiniekiem", employeeRows)}
+      ${listSection(employeeSectionTitle(opts.employeeBreakdown), employeeRows)}
       ${listSection("Sadalījums pa kategorijām", categoryRows)}
       ${listSection("Sadalījums pa klientiem", clientRows)}
 
+      <p style="color:#888;font-size:12px;margin:-8px 0 20px">
+        Uzspiediet uz nosaukuma sarakstos, lai atvērtu tieši tos ierakstus, no kuriem skaitlis ir aprēķināts.
+      </p>
+
       <p>
-        <a href="${appUrl}/manager/entries" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+        <a href="${appUrl}${escapeHtml(opts.entriesHref)}" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
           Apskatīt komandas ierakstus →
         </a>
       </p>
@@ -399,11 +460,13 @@ export async function sendWeeklyAdminReport(opts: {
   hoursTrend: string | null;
   costEur: number;
   rateEur: number;
-  managerBreakdown: { name: string; count: number; minutes: number; pending: number }[];
-  employeeBreakdown: { name: string; count: number; minutes: number }[];
-  categoryBreakdown: { label: string; count: number; minutes: number }[];
-  clientBreakdown: { name: string; minutes: number }[];
+  managerBreakdown: (ReportRowLink & { name: string; count: number; minutes: number; pending: number })[];
+  employeeBreakdown: EmployeeReportGroup[];
+  categoryBreakdown: (ReportRowLink & { label: string; count: number; minutes: number })[];
+  clientBreakdown: (ReportRowLink & { name: string; minutes: number })[];
   inactiveEmployeeNames: string[];
+  /** Link to the full list of entries behind this report. */
+  entriesHref: string;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
   const subject = `Shadowy - organizācijas pārskats par pagājušo nedēļu`;
@@ -430,23 +493,21 @@ export async function sendWeeklyAdminReport(opts: {
   const managerRows = opts.managerBreakdown
     .map((m) =>
       row(
-        escapeHtml(m.name),
+        reportLabel(appUrl, m.name, m.href),
         `${pluralEntriesLV(m.count)} · ${formatDurationLV(m.minutes)}`,
         m.pending > 0 ? `${m.pending} gaida izskatīšanu` : undefined,
       ),
     )
     .join("");
 
-  const employeeRows = opts.employeeBreakdown
-    .map((e) => row(escapeHtml(e.name), `${pluralEntriesLV(e.count)} · ${formatDurationLV(e.minutes)}`))
-    .join("");
+  const employeeRows = employeeGroupRows(appUrl, opts.employeeBreakdown);
 
   const categoryRows = opts.categoryBreakdown
-    .map((c) => row(escapeHtml(c.label), `${pluralEntriesLV(c.count)} · ${formatDurationLV(c.minutes)}`))
+    .map((c) => row(reportLabel(appUrl, c.label, c.href), `${pluralEntriesLV(c.count)} · ${formatDurationLV(c.minutes)}`))
     .join("");
 
   const clientRows = opts.clientBreakdown
-    .map((c) => row(escapeHtml(c.name), formatDurationLV(c.minutes)))
+    .map((c) => row(reportLabel(appUrl, c.name, c.href), formatDurationLV(c.minutes)))
     .join("");
 
   const trendLine =
@@ -512,13 +573,21 @@ export async function sendWeeklyAdminReport(opts: {
       ` : ""}
 
       ${listSection("Sadalījums pa vadītājiem", managerRows)}
-      ${listSection("Sadalījums pa darbiniekiem", employeeRows)}
+      ${listSection(employeeSectionTitle(opts.employeeBreakdown), employeeRows)}
       ${listSection("Sadalījums pa kategorijām", categoryRows)}
       ${listSection("Sadalījums pa klientiem", clientRows)}
 
+      <p style="color:#888;font-size:12px;margin:-8px 0 20px">
+        Uzspiediet uz nosaukuma sarakstos, lai atvērtu tieši tos ierakstus, no kuriem skaitlis ir aprēķināts.
+      </p>
+
       <p>
-        <a href="${appUrl}/admin/insights" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
-          Atvērt procesu analīzi →
+        <a href="${appUrl}${escapeHtml(opts.entriesHref)}" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Apskatīt visus nedēļas ierakstus →
+        </a>
+        &nbsp;
+        <a href="${appUrl}/admin/insights" style="display:inline-block;padding:10px 20px;background:#f5f5f5;color:#18181b;border-radius:8px;text-decoration:none;font-weight:500">
+          Procesu analīze →
         </a>
       </p>
       <p style="color:#aaa;font-size:12px;margin-top:24px">

@@ -84,7 +84,12 @@ export function groupByCategoryWithTitles(
 
 type MinimalClientEntry = { clientId: string | null; clientName: string | null; durationMinutes: number };
 type ClientRef = { id: string; name: string; aliases?: { normalized: string }[] };
-export type ClientBreakdown = { name: string; minutes: number };
+/**
+ * `filterValue` is the value the entries-page client filter expects
+ * (`id:<clientId>` or `name:<free-typed name>`), so a breakdown row can be
+ * turned into a link straight to the entries behind it.
+ */
+export type ClientBreakdown = { name: string; minutes: number; filterValue: string };
 
 /**
  * Groups entries by client, deduping "SIA X" / "X" style name variants like
@@ -111,18 +116,21 @@ export function groupByClient(
         : undefined;
 
     if (registered) {
-      const cur = byId.get(registered.id) ?? { name: registered.name, minutes: 0 };
+      const cur = byId.get(registered.id)
+        ?? { name: registered.name, minutes: 0, filterValue: `id:${registered.id}` };
       cur.minutes += e.durationMinutes;
       byId.set(registered.id, cur);
     } else if (e.clientId) {
       // Caller passed no client list (or the client is gone) - keep the old
       // behaviour of grouping on the id alone.
-      const cur = byId.get(e.clientId) ?? { name: e.clientName ?? e.clientId, minutes: 0 };
+      const cur = byId.get(e.clientId)
+        ?? { name: e.clientName ?? e.clientId, minutes: 0, filterValue: `id:${e.clientId}` };
       cur.minutes += e.durationMinutes;
       byId.set(e.clientId, cur);
     } else if (e.clientName) {
       const key = normalizeClientName(e.clientName);
-      const cur = byName.get(key) ?? { name: e.clientName, minutes: 0 };
+      const cur = byName.get(key)
+        ?? { name: e.clientName, minutes: 0, filterValue: `name:${e.clientName}` };
       cur.minutes += e.durationMinutes;
       byName.set(key, cur);
     }
@@ -143,6 +151,46 @@ export function groupByEmployee(entries: MinimalEmployeeEntry[]): EmployeeBreakd
     map.set(e.employeeId, cur);
   }
   return Array.from(map.values()).sort((a, b) => b.minutes - a.minutes);
+}
+
+type MinimalRoleEntry = MinimalEmployeeEntry & { roleName: string | null };
+export type EmployeeRoleGroup = {
+  /** null for employees without a work role - always sorted last. */
+  roleName: string | null;
+  employeeIds: string[];
+  count: number;
+  minutes: number;
+  members: EmployeeBreakdown[];
+};
+
+/**
+ * Groups entries by work role and then by employee. Roles carry different
+ * rates and duties, so a mixed per-employee list cannot be evaluated: the
+ * grouping is what separates e.g. accountants from accounting assistants.
+ */
+export function groupByRoleAndEmployee(entries: MinimalRoleEntry[]): EmployeeRoleGroup[] {
+  const roleByEmployee = new Map<string, string | null>();
+  for (const e of entries) {
+    if (!roleByEmployee.has(e.employeeId)) roleByEmployee.set(e.employeeId, e.roleName);
+  }
+
+  const groups = new Map<string, EmployeeRoleGroup>();
+  for (const employee of groupByEmployee(entries)) {
+    const roleName = roleByEmployee.get(employee.employeeId) ?? null;
+    const key = roleName ?? "";
+    const group = groups.get(key)
+      ?? { roleName, employeeIds: [], count: 0, minutes: 0, members: [] };
+    group.employeeIds.push(employee.employeeId);
+    group.count += employee.count;
+    group.minutes += employee.minutes;
+    group.members.push(employee);
+    groups.set(key, group);
+  }
+
+  return Array.from(groups.values()).sort((a, b) => {
+    if ((a.roleName === null) !== (b.roleName === null)) return a.roleName === null ? 1 : -1;
+    return b.minutes - a.minutes;
+  });
 }
 
 /** Percentage week-over-week change (for continuous values like minutes), or null with no prior week. */

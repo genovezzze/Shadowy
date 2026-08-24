@@ -19,6 +19,22 @@ export interface EntrySearchParams {
 }
 
 /**
+ * The employee filter accepts several ids at once, comma separated
+ * (`?employee=a,b`). A single id keeps working as before.
+ */
+export function parseEmployeeIds(value?: string): string[] {
+  if (!value) return [];
+  return Array.from(
+    new Set(
+      value
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean)
+    )
+  );
+}
+
+/**
  * Build the filter portion of a Prisma where clause from URL search params.
  * Tenant/role scoping (organizationId, managerId, employeeId) is added by the caller.
  *
@@ -55,8 +71,11 @@ export function buildEntryWhere(
     where.category = variants.length > 1 ? { in: variants } : variants[0];
   }
 
-  if (sp.employee?.trim()) {
-    where.employeeId = sp.employee;
+  const employeeIds = parseEmployeeIds(sp.employee);
+  if (employeeIds.length === 1) {
+    where.employeeId = employeeIds[0];
+  } else if (employeeIds.length > 1) {
+    where.employeeId = { in: employeeIds };
   }
 
   const client = sp.client?.trim();

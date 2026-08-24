@@ -8,6 +8,18 @@ import { sendEntryReviewedEmail } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
 import { statusLabel } from "@/lib/i18n";
 
+/**
+ * An administrator is nobody's manager of record, so scoping these actions to
+ * their own id would make every entry unreviewable from this page. They can
+ * already review any entry of their organisation from /admin/entries, so the
+ * same organisation-wide scope applies here.
+ */
+function entryScope(session: { role: string; userId: string; organizationId: string }) {
+  return session.role === "ADMIN"
+    ? { organizationId: session.organizationId }
+    : { organizationId: session.organizationId, managerId: session.userId };
+}
+
 const schema = z.object({
   entryId: z.string().min(1),
   action: z.enum(["APPROVE", "REJECT", "RETURN"]),
@@ -30,8 +42,7 @@ export async function reviewEntry(input: {
     prisma.invisibleWorkEntry.findFirst({
       where: {
         id: entryId,
-        organizationId: session.organizationId,
-        managerId: session.userId,
+        ...entryScope(session),
       },
       include: { employee: { select: { id: true, name: true, email: true } } },
     }),
@@ -119,8 +130,7 @@ export async function editEntry(input: {
   const exists = await prisma.invisibleWorkEntry.findFirst({
     where: {
       id: entryId,
-      organizationId: session.organizationId,
-      managerId: session.userId,
+      ...entryScope(session),
       status: { in: ["APPROVED", "PENDING"] },
     },
   });
@@ -164,8 +174,7 @@ export async function bulkReviewEntries(input: {
     prisma.invisibleWorkEntry.findMany({
       where: {
         id: { in: entryIds },
-        organizationId: session.organizationId,
-        managerId: session.userId,
+        ...entryScope(session),
         status: "PENDING",
       },
       include: { employee: { select: { id: true, name: true, email: true } } },
@@ -179,8 +188,7 @@ export async function bulkReviewEntries(input: {
   await prisma.invisibleWorkEntry.updateMany({
     where: {
       id: { in: entries.map((e) => e.id) },
-      organizationId: session.organizationId,
-      managerId: session.userId,
+      ...entryScope(session),
       status: "PENDING",
     },
     data: {
