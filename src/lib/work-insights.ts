@@ -249,6 +249,8 @@ const RECOMMENDATIONS: Record<string, string> = {
     "Daudz laika veltīts jaunu cilvēku ievadīšanai darbā - vērtīgs ieguldījums komandā, kas reti tiek pamanīts.",
   statistics_reports:
     "Liela daļa laika aizgāja statistikas pārskatu sagatavošanai - apsver, vai daļu no šī darba var automatizēt vai veidot pēc gatavas veidnes.",
+  annual_report:
+    "Daudz laika veltīts gada pārskatu sastādīšanai - sezonāls darbs, ko vērts plānot laikus, lai tas nekrājas kopā ar ikdienas uzdevumiem.",
   payroll_calculation:
     "Daudz laika veltīts algu aprēķiniem - ja tas atkārtojas katru nedēļu ar līdzīgu apjomu, vērts pārrunāt ar vadītāju par slodzes sadalījumu.",
   payment_preparation:
