@@ -152,9 +152,13 @@ export function LandingInterestModal() {
                   className="pointer-events-none absolute -bottom-10 -right-16 aspect-square w-[75%] select-none overflow-visible md:w-[60%]"
                 >
                   <Image
-                    src="/images/pic10-cutout.png"
+                    // A 900px webp rather than the 1.9 MB source PNG: the popup
+                    // opens mid-scroll on a phone, where waiting on the
+                    // original meant the card appeared empty for seconds.
+                    src="/images/pic10-cutout.webp"
                     alt=""
                     fill
+                    priority
                     sizes="(min-width: 768px) 460px, 75vw"
                     className="object-contain"
                   />

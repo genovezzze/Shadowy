@@ -72,7 +72,7 @@ export function LandingHero() {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate flex h-[100dvh] min-h-[640px] flex-col items-center justify-start overflow-hidden bg-[#070809] px-2 pt-[180px] text-center md:px-8 md:pt-56"
+      className="relative isolate flex h-[100dvh] min-h-[640px] flex-col items-center justify-start overflow-hidden bg-[#070809] px-2 pt-[128px] text-center md:px-8 md:pt-56"
     >
       <motion.div
         aria-hidden
@@ -125,7 +125,7 @@ export function LandingHero() {
 
         {/* The mark, pixel by pixel, filling the empty half of the hero under
             the button. Decorative only - the wordmark is already in the bar. */}
-        <PixelLogoDissolve className="pointer-events-none mx-auto mt-10 h-[26vh] w-full opacity-90 md:mt-14" />
+        <PixelLogoDissolve className="pointer-events-none mx-auto mt-6 h-[24vh] max-h-[240px] w-full opacity-90 md:mt-12" />
       </div>
     </section>
   );

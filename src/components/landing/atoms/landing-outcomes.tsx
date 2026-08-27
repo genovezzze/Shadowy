@@ -86,7 +86,7 @@ export function LandingOutcomes() {
             WebkitMaskImage:
               "linear-gradient(to bottom, transparent 0%, #000 32%, #000 100%)",
           }}
-          className="absolute bottom-0 left-1/2 h-auto w-[220%] max-w-none -translate-x-1/2 object-contain object-left-bottom sm:bottom-auto sm:top-[10%] sm:w-[120%] lg:left-[-5%] lg:top-auto lg:bottom-0 lg:w-[120%] lg:translate-x-0"
+          className="absolute bottom-0 left-0 h-auto w-[170%] max-w-none translate-x-0 object-contain object-left-bottom sm:left-1/2 sm:-translate-x-1/2 sm:bottom-auto sm:top-[10%] sm:w-[120%] lg:left-[-5%] lg:top-auto lg:bottom-0 lg:w-[120%] lg:translate-x-0"
         />
       </div>
 
