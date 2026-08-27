@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroVideoBackground } from "@/components/landing/hero-video-background";
+import { LandingHeroLockup } from "@/components/landing/atoms/landing-hero-lockup";
 import { PixelLogoDissolve } from "@/components/landing/pixel-logo-dissolve";
 
 // How far the backdrop lags the page over one screen of scrolling, as a share
@@ -42,7 +43,27 @@ const WAVE_WIDTH = 4;
 const WAVE_GAP = 3;
 
 /**
- * The hero: the headline over the looping video, the page's one sentence under
+ * The hero, switched on width: the lockup on desktop, the pixel headline on
+ * phones.
+ *
+ * Both are laid out with CSS rather than picked after mount, so the server
+ * renders the same markup the browser keeps and neither version flashes.
+ */
+export function LandingHero() {
+  return (
+    <>
+      <div className="md:hidden">
+        <LandingHeroMobile />
+      </div>
+      <div className="hidden md:block">
+        <LandingHeroLockup />
+      </div>
+    </>
+  );
+}
+
+/**
+ * The phone hero: the headline over the looping video, the page's one sentence under
  * it, and the single call to action.
  *
  * Typography, colours and spacing follow the atoms.technology hero as built:
@@ -51,7 +72,7 @@ const WAVE_GAP = 3;
  * and a white pill. The pixel wave is their effect - each character swaps to a
  * pixel face and back as the wave passes over it.
  */
-export function LandingHero() {
+function LandingHeroMobile() {
   const sectionRef = React.useRef<HTMLElement | null>(null);
 
   // Runs from the moment the hero's top meets the viewport top until its bottom

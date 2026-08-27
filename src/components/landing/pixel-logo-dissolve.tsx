@@ -127,6 +127,13 @@ export function PixelLogoDissolve({ className }: { className?: string }) {
     };
 
     const draw = (time: number) => {
+      // The phone hero is display:none on desktop, which leaves this canvas at
+      // zero size - there is nothing to paint and no reason to keep measuring.
+      if (!width || !height) {
+        if (!reducedMotion && !disposed) frame = requestAnimationFrame(draw);
+        return;
+      }
+
       context.clearRect(0, 0, width, height);
 
       // The mark is drawn square and centred, so it does not stretch with the
