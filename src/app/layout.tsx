@@ -154,15 +154,17 @@ const description =
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  // One icon for both themes: the mark sits black inside a white rounded tile,
+  // so it stays legible on a dark browser chrome as well as a light one - the
+  // bare mark used to disappear into whichever background matched it.
   icons: {
     icon: [
-      { url: "/images/story/Black.svg" },
-      {
-        url: "/shadowy.svg",
-        media: "(prefers-color-scheme: dark)",
-      },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icon-192.png", type: "image/png", sizes: "192x192" },
     ],
-    shortcut: "/images/story/Black.svg",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+    shortcut: "/favicon-32.png",
   },
   title: {
     default: title,
