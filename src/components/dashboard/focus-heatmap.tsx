@@ -44,7 +44,7 @@ export function FocusHeatmap({ days }: { days: DayData[] }) {
       <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-muted-foreground">
         {[
           { cls: "bg-emerald-500/75", label: "Fokusēts (1 kat.)" },
-          { cls: "bg-amber-400/80", label: "Mērens (2–3)" },
+          { cls: "bg-amber-400/80", label: "Mērens (2-3)" },
           { cls: "bg-red-500/65", label: "Izkaisīts (4+)" },
         ].map(({ cls, label }) => (
           <span key={label} className="flex items-center gap-1.5">

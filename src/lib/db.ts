@@ -38,6 +38,17 @@ function errorCode(error: unknown): string | undefined {
   return undefined;
 }
 
+/** Connection failures that callers may safely turn into a temporary-service
+ * response. Authentication must fail closed when this returns true. */
+export function isDatabaseUnavailableError(error: unknown): boolean {
+  const code = errorCode(error);
+  return (
+    error instanceof Prisma.PrismaClientInitializationError ||
+    (code !== undefined &&
+      (RETRYABLE_BEFORE_EXECUTION.has(code) || code === CONNECTION_CLOSED))
+  );
+}
+
 function isRetryable(error: unknown, operation: string): boolean {
   const code = errorCode(error);
   if (!code) {

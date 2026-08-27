@@ -8,7 +8,7 @@ type ScrollRevealProps = {
   delay?: number;
   duration?: number;
   className?: string;
-  effect?: "rise" | "focus" | "unfold" | "zoom" | "blur" | "tilt" | "fade";
+  effect?: "rise" | "focus" | "unfold" | "zoom" | "blur" | "tilt" | "fade" | "atomsHero" | "atomsRow";
   disableOnMobile?: boolean;
 };
 
@@ -45,6 +45,8 @@ export function ScrollReveal({
     blur: { opacity: 0, y: 16, filter: "blur(6px)" },
     tilt: { opacity: 0, y: 22, scale: 0.988, filter: "blur(2px)" },
     fade: { opacity: 0, filter: "blur(2px)" },
+    atomsHero: { opacity: 0, y: 30 },
+    atomsRow: { opacity: 0, x: 20 },
   } as const;
 
   const skipAnimation = reduceMotion || isMobile;

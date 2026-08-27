@@ -56,7 +56,7 @@ const shortDate = new Intl.DateTimeFormat("lv-LV", { day: "2-digit", month: "2-d
 
 function periodLabel(period: string, start: Date | null, end: Date) {
   if (!start) return "Visa sadarbības vēsture";
-  return `${shortDate.format(start)}–${shortDate.format(end)}`;
+  return `${shortDate.format(start)}-${shortDate.format(end)}`;
 }
 
 /**

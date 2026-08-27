@@ -105,7 +105,7 @@ function DraftFace() {
           ))}
         </div>
         <div style={{ marginTop: 8, fontSize: 12, color: "#c7c7ca", lineHeight: 1.5 }}>
-          Sniedzu skaidrojumu klienta jautājumā, kas bija ārpus manas atbildības.
+          Sniedzu skaidrojumu klienta jautājumā, kas bija ārpus manas atbildības
         </div>
         <div style={{ marginTop: 10, background: "#141414", borderRadius: 9, padding: "9px 12px" }}>
           <div style={{ fontSize: 9.5, letterSpacing: "0.08em", color: "#6a6a6e", fontWeight: 600 }}>IETEKME UZ DARBU</div>

@@ -18,6 +18,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@calcom/embed-react": "^1.5.3",
     "@prisma/client": "^5.22.0",
     "@radix-ui/react-dialog": "^1.1.2",
     "@radix-ui/react-dropdown-menu": "^2.1.2",

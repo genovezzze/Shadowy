@@ -44,14 +44,20 @@ export function LoginForm() {
   async function onSubmit(formData: FormData) {
     setError(null);
     startTransition(async () => {
-      const res = await loginAction(formData);
-      if (!res.ok) {
-        setError(res.error);
-      } else if (res.redirectTo) {
-        const destination = nextPath ?? res.redirectTo;
-        startNavigationLoading(destination);
-        router.push(destination);
-        router.refresh();
+      try {
+        const res = await loginAction(formData);
+        if (!res.ok) {
+          setError(res.error);
+        } else if (res.redirectTo) {
+          const destination = nextPath ?? res.redirectTo;
+          startNavigationLoading(destination);
+          router.push(destination);
+          router.refresh();
+        }
+      } catch {
+        setError(
+          "Pieslēgšanās īslaicīgi nav pieejama. Lūdzu, mēģiniet vēlreiz pēc brīža.",
+        );
       }
     });
   }

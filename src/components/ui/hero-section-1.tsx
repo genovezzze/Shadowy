@@ -52,7 +52,7 @@ const transitionVariants: { item: Variants } = {
 };
 
 const menuItems = [
-  { number: "01", name: "Kā tas darbojas", caption: "Produkts un darba plūsma", href: "/ka-tas-darbojas" },
+  { number: "01", name: "Kā tas darbojas", caption: "Produkts un darba plūsma", href: "#process" },
   { number: "02", name: "Pilots", caption: "Izmēģiniet Shadowy komandā", href: "#pilots" },
   { number: "03", name: "FAQ", caption: "Atbildes uz jautājumiem", href: "#faq" },
   { number: "04", name: "Privātums", caption: "Dati un drošība", href: "/privacy" },
@@ -64,42 +64,42 @@ const howItWorksMenuItems = [
     motion: "problem",
     title: "Problēma",
     text: "Kur ikdienā pazūd komandas laiks un fokuss.",
-    href: "/ka-tas-darbojas#problema",
+    href: "#process",
   },
   {
     icon: Workflow,
     motion: "workflow",
     title: "Kā Shadowy strādā",
     text: "No īsa ieraksta līdz strukturētai analītikai.",
-    href: "/ka-tas-darbojas#risinajums",
+    href: "#process",
   },
   {
     icon: UserRound,
     motion: "user",
     title: "Darbiniekiem",
     text: "Vienkārša darba fiksēšana bez papildu kontroles.",
-    href: "/ka-tas-darbojas#darbiniekiem",
+    href: "#kam-noder",
   },
   {
     icon: Building2,
     motion: "building",
     title: "Uzņēmumam",
     text: "Slodze, izmaksas un atkārtojošies procesi vienuviet.",
-    href: "/ka-tas-darbojas#uznemumam",
+    href: "#ieguvumi",
   },
   {
     icon: ListChecks,
     motion: "checklist",
     title: "Ko fiksēt",
     text: "Praktiski piemēri darbam, kas paliek ārpus atskaitēm.",
-    href: "/ka-tas-darbojas#ko-fikset",
+    href: "#ko-fikset",
   },
   {
     icon: ShieldCheck,
     motion: "shield",
     title: "Privātums",
     text: "Kā Shadowy aizsargā darbinieku un uzņēmuma datus.",
-    href: "/ka-tas-darbojas#privatums",
+    href: "/privacy",
   },
 ] as const;
 
@@ -568,7 +568,7 @@ export function HeroSection() {
           <ScrollReveal effect="fade" className="relative z-30">
             <section className="bg-[#070809] px-5 pb-8 sm:px-6 sm:pb-10">
               <Link
-                href="/ka-tas-darbojas"
+                href="#process"
                 className="group mx-auto flex max-w-5xl flex-col gap-6 border-y border-white/[0.12] py-6 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div>
@@ -781,7 +781,7 @@ function HeroHeader({
                 {menuItems.map((item) => (
                   <li
                     key={item.name}
-                    className={item.href === "/ka-tas-darbojas" ? "group/how relative" : undefined}
+                    className={item.number === "01" ? "group/how relative" : undefined}
                   >
                     <Link
                       href={standalone && item.href.startsWith("#") ? `/${item.href}` : item.href}
@@ -793,7 +793,7 @@ function HeroHeader({
                       )}
                     >
                       {item.name}
-                      {item.href === "/ka-tas-darbojas" && (
+                      {item.number === "01" && (
                         <ChevronDown
                           className="size-3.5 transition-transform duration-200 group-hover/how:rotate-180 group-focus-within/how:rotate-180"
                           aria-hidden
@@ -801,7 +801,7 @@ function HeroHeader({
                       )}
                     </Link>
 
-                    {item.href === "/ka-tas-darbojas" && (
+                    {item.number === "01" && (
                       <div className="invisible absolute left-1/2 top-full w-[305px] -translate-x-1/2 pt-3 opacity-0 transition-opacity duration-100 group-hover/how:visible group-hover/how:opacity-100 group-focus-within/how:visible group-focus-within/how:opacity-100">
                         <div className="overflow-hidden rounded-b-[16px] rounded-t-[7px] border border-white/[0.13] bg-[rgba(11,14,17,0.93)] shadow-[0_20px_55px_rgba(0,0,0,0.48)]">
                           <div className="h-px bg-[linear-gradient(90deg,transparent,#75babc_50%,transparent)] opacity-60" />
@@ -829,7 +829,7 @@ function HeroHeader({
 
                           <div className="border-t border-white/[0.08] p-2">
                             <Link
-                              href="/ka-tas-darbojas"
+                              href="#process"
                               className="group/all flex min-h-11 items-center gap-3.5 rounded-[8px] px-4 py-2.5 font-sans text-sm font-medium text-white/42 transition-all hover:bg-white/[0.045] hover:text-white/85"
                             >
                               <ArrowUpRight className="size-[18px] text-white/28 transition-colors group-hover/all:text-[#75babc]" aria-hidden />

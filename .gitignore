@@ -34,3 +34,5 @@ dev.log
 *.tsbuildinfo
 .vercel
 .env*
+output/
+tmp/

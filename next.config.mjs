@@ -53,6 +53,15 @@ const nextConfig = {
         source: "/preview/:path*",
         headers: [{ key: "X-Frame-Options", value: "SAMEORIGIN" }],
       },
+      {
+        // Public case-study reports are embedded on pages from this same site.
+        // Other origins still cannot frame them.
+        source: "/documents/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "Cache-Control", value: "public, max-age=3600" },
+        ],
+      },
     ];
   },
 };

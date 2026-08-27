@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx vercel *)"
+      "Bash(npx vercel *)",
+      "Bash(cp \"C:/Users/artem/AppData/Local/Temp/claude/c--Projects-shadowy/34f5e7d1-ad7d-4b56-9585-056c9d88e404/scratchpad/roles.js\" ./scratch-roles.js)",
+      "Bash(node -r dotenv/config ./scratch-roles.js dotenv_config_path=.env)",
+      "Bash(node -e ' *)",
+      "Bash(npx tsx *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Projects\\shadowy"
     ]
   }
 }

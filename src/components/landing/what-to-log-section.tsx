@@ -54,7 +54,7 @@ export function WhatToLogSection() {
           <p className="mx-auto mt-3 max-w-xl font-accent text-[0.9rem] font-light leading-6 text-white/50 sm:text-[0.95rem]">
             Shadowy nefiksē visu darbu. Shadowy fiksē situācijas,{" "}
             <strong className="font-medium text-white/68">
-              kur pamatdarbs tiek traucēts vai rodas papildu slodze.
+              kur pamatdarbs tiek traucēts vai rodas papildu slodze
             </strong>
           </p>
         </div>

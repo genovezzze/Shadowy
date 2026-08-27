@@ -37,7 +37,7 @@ export function PrivacyTrustSection() {
           <p className="mx-auto mt-3 max-w-3xl text-balance font-accent text-[0.9rem] font-light leading-6 tracking-[0.012em] text-white/60 sm:text-[0.95rem] sm:leading-[1.55]">
             Shadowy neskatās, cik ilgi cilvēks sēž pie datora.{" "}
             <strong className="font-semibold text-white/80 [font-synthesis:weight]">
-              Mēs nesekojam katrai darbībai un neveidojam darbinieku reitingu.
+              Mēs nesekojam katrai darbībai un neveidojam darbinieku reitingu
             </strong>
           </p>
         </header>

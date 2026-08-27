@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HeroSection } from "@/components/ui/hero-section-1";
+import { LandingPage } from "@/components/landing/atoms/landing-page";
 
 export const metadata: Metadata = {
   title: {
@@ -18,8 +18,6 @@ export const metadata: Metadata = {
 
 export default function HomePage() {
   return (
-    <div className="dark">
-      <HeroSection />
-    </div>
+    <LandingPage />
   );
 }

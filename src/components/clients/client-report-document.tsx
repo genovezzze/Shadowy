@@ -209,7 +209,7 @@ export function ClientReportDocument({
                   <ShareRule value={month.minutes} max={maxMonthMinutes} />
                 </td>
                 <td className="w-28 py-2 text-right tabular-nums">
-                  {month.minutes > 0 ? formatDurationLV(month.minutes) : "—"}
+                  {month.minutes > 0 ? formatDurationLV(month.minutes) : "-"}
                 </td>
               </tr>
             ))}

@@ -26,7 +26,7 @@ function weekdayShort(dateStr: string): string {
 function weekRangeLabel(mondayStr: string): string {
   const start = new Date(`${mondayStr}T12:00:00Z`);
   const end = new Date(start.getTime() + 6 * 86400000);
-  return `${dateLabel(start.toISOString().slice(0, 10))}–${dateLabel(end.toISOString().slice(0, 10))}`;
+  return `${dateLabel(start.toISOString().slice(0, 10))}-${dateLabel(end.toISOString().slice(0, 10))}`;
 }
 
 interface DailyBreakdownEntry {

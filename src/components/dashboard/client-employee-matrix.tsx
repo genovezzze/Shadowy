@@ -59,22 +59,22 @@ interface MatrixTableProps {
 }
 
 function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixTableProps) {
-  const cellPad = compact ? "px-2 py-1.5" : "px-2 py-3";
-  const namePad = compact ? "px-3 py-1.5" : "px-5 py-3";
-  const numPad = compact ? "px-3 py-1.5" : "px-4 py-3";
-  const textSize = compact ? "text-xs" : "text-sm";
+  const cellPad = compact ? "px-1 py-1.5 sm:px-2" : "px-2 py-3";
+  const namePad = compact ? "px-2 py-1.5 sm:px-3" : "px-5 py-3";
+  const numPad = compact ? "px-2 py-1.5 sm:px-3" : "px-4 py-3";
+  const textSize = compact ? "text-[11px] sm:text-xs" : "text-sm";
 
   return (
-    <table className={`w-full border-separate border-spacing-0 ${textSize}`}>
+    <table className={`w-full border-separate border-spacing-0 ${compact ? "table-fixed" : ""} ${textSize}`}>
       <thead>
         <tr className="border-b border-border bg-muted">
-          <th className={`${namePad} sticky left-0 top-0 z-40 border-b border-border bg-muted text-left text-xs font-medium text-muted-foreground ${compact ? "w-28" : "w-36"}`}>
+          <th className={`${namePad} sticky left-0 top-0 z-40 border-b border-border bg-muted text-left text-xs font-medium text-muted-foreground ${compact ? "w-[98px] sm:w-28" : "w-36"}`}>
             Klients
           </th>
           {employees.map((emp) => (
             <th
               key={emp.id}
-              className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[52px]" : "min-w-[68px]"}`}
+              className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[42px] sm:min-w-[52px]" : "min-w-[68px]"}`}
             >
               <span className="block truncate max-w-[80px] mx-auto" title={emp.name}>
                 {emp.name.split(" ")[0]}
@@ -86,7 +86,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               +{hiddenCount}
             </th>
           )}
-          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-[10px] font-medium text-muted-foreground sm:text-xs`}>
             Kopā
           </th>
           {!compact && (
@@ -94,7 +94,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               Limits
             </th>
           )}
-          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground ${compact ? "hidden sm:table-cell" : ""}`}>
             Statuss
           </th>
         </tr>
@@ -177,7 +177,7 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
                       : `${hours(allowanceMinutes)}h/mēn.`}
                 </td>
               )}
-              <td className={`${numPad} text-right`}>
+              <td className={`${numPad} text-right ${compact ? "hidden sm:table-cell" : ""}`}>
                 {overLimit ? (
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 tabular-nums whitespace-nowrap">
                     <AlertTriangle className="h-3 w-3" />
@@ -287,11 +287,11 @@ export function ClientEmployeeMatrix({
   return (
     <>
       <Card className="overflow-hidden p-0">
-        <div className="flex items-center justify-between gap-2 border-b border-border/60 px-4 py-2">
+        <div className="flex min-w-0 items-center justify-between gap-2 overflow-hidden border-b border-border/60 px-3 py-2 sm:px-4">
           {overrunCount > 0 ? (
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 items-center gap-2">
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-xs text-muted-foreground">
+              <span className="truncate text-xs text-muted-foreground">
                 {overrunCount} {overrunCount === 1 ? "klients pārsniedz" : "klienti pārsniedz"} mēneša limitu
                 {totalOverrunEur > 0 && ` · kopā −€${totalOverrunEur}`}
                 {` · ${monthLabel}`}
@@ -302,7 +302,7 @@ export function ClientEmployeeMatrix({
           )}
           {spansMonths && (
             <span className="shrink-0 text-[11px] text-muted-foreground/70">
-              Bezmaksas limits atjaunojas katru mēnesi — kolonna “Limits” rāda to par visu periodu
+              Bezmaksas limits atjaunojas katru mēnesi - kolonna “Limits” rāda to par visu periodu
             </span>
           )}
         </div>
@@ -322,8 +322,8 @@ export function ClientEmployeeMatrix({
       <Dialog.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex h-[92vh] w-[96vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl focus:outline-none">
-            <div className="relative z-40 flex shrink-0 items-center justify-between gap-3 border-b border-border bg-card px-5 py-3">
+          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex h-[calc(100dvh-1rem)] w-[calc(100vw-1rem)] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-lg border border-border bg-card shadow-2xl focus:outline-none sm:h-[92vh] sm:w-[96vw] sm:rounded-xl">
+            <div className="relative z-40 flex shrink-0 flex-col items-start justify-between gap-3 border-b border-border bg-card px-3 py-3 sm:flex-row sm:items-center sm:px-5">
               <div className="min-w-0">
                 <Dialog.Title className="text-sm font-semibold">
                   Noslodze pa darbiniekiem
@@ -333,15 +333,15 @@ export function ClientEmployeeMatrix({
                   {totalOverrunEur > 0 && ` · kopā pārsniegums −€${totalOverrunEur}`}
                 </Dialog.Description>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:shrink-0">
                 <ClientMonthDropdown selectedMonth={selectedMonth} options={monthOptions} compact />
-                <div className="relative">
+                <div className="relative min-w-0 flex-1 sm:flex-none">
                   <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
                   <Input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Meklēt klientu..."
-                    className="h-8 w-48 pl-8 text-xs sm:w-64"
+                    className="h-8 w-full min-w-0 pl-8 text-xs sm:w-64"
                   />
                 </div>
                 <Dialog.Close asChild>

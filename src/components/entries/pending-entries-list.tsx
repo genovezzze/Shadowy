@@ -53,7 +53,7 @@ function shortDateRange(entries: PendingEntry[]): string {
       new Date(iso + "T12:00:00Z")
     );
   if (dates.length === 1) return fmt(dates[0]);
-  return `${fmt(dates[0])} – ${fmt(dates[dates.length - 1])}`;
+  return `${fmt(dates[0])} - ${fmt(dates[dates.length - 1])}`;
 }
 
 function groupByEmployee(entries: PendingEntry[]): EmployeeGroup[] {

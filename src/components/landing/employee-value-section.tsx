@@ -6,7 +6,7 @@ const cards: readonly ValueCard[] = [
   {
     icon: "/images/icons-3d/bell_with_slash.png",
     title: "Mazāk lieku pārtraukumu",
-    text: "Shadowy palīdz parādīt, kas traucē paveikt pamatdarbu ātrāk.",
+    text: "Shadowy palīdz parādīt, kas traucē paveikt pamatdarbu ātrāk",
   },
   {
     icon: "/images/icons-3d/eye.png",
@@ -45,7 +45,7 @@ export function EmployeeValueSection() {
             <p className="mt-4 max-w-md font-accent text-base font-light leading-relaxed tracking-[0.01em] text-white/55 sm:mt-5 sm:text-xl">
               Shadowy palīdz nevis pierādīt, ka cilvēks strādā, bet{" "}
               <strong className="font-semibold text-white/75 [font-synthesis:weight]">
-                parādīt, kas viņam traucē strādāt efektīvāk.
+                parādīt, kas viņam traucē strādāt efektīvāk
               </strong>
             </p>
           </div>

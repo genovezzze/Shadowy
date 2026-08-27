@@ -175,7 +175,7 @@ export function ProcessInsightsView({
             />
             <KpiCard
               label="Lielākā slodze"
-              value={insights.processes[0] ? formatDurationLV(insights.processes[0].minutes) : "—"}
+              value={insights.processes[0] ? formatDurationLV(insights.processes[0].minutes) : "-"}
               hint={insights.processes[0]?.label ?? "Šajā periodā nav ierakstu"}
               icon={<Clock />}
               tone="default"

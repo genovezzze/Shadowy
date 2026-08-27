@@ -189,7 +189,7 @@ export function AnnaStoryCarousel() {
             Kur pazūd laiks, nauda un komandas fokuss
           </h2>
           <p className="mx-auto mt-3 max-w-4xl text-balance font-accent text-[0.95rem] font-light leading-6 tracking-[0.01em] text-white/72 sm:text-[clamp(1rem,1.15vw,1.15rem)] sm:leading-[1.6] sm:text-white/80">
-            Daļa darba notiek ārpus sistēmām - ārpus kalendāra, uzdevumiem un atskaitēm.
+            Daļa darba notiek ārpus sistēmām - ārpus kalendāra, uzdevumiem un atskaitēm
             <br className="hidden xl:block" />
             {" "}Katrs gadījums šķiet mazs, bet kopā tie kļūst par reālām izmaksām
           </p>

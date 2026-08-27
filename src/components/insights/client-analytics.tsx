@@ -198,7 +198,7 @@ export function ClientAnalytics({
         />
         <KpiCard
           label="Slodze aug"
-          value={comparable.length ? rising.length : "—"}
+          value={comparable.length ? rising.length : "-"}
           hint={comparable.length
             ? `Klienti ar +${SIGNIFICANT_TREND}% vai vairāk pret iepriekšējo periodu`
             : "Šim periodam nav salīdzinājuma"}

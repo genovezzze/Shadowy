@@ -9,7 +9,6 @@ const PUBLIC_PATHS = [
   "/reset-password",
   "/accept-invite",
   "/privacy",
-  "/ka-tas-darbojas",
   "/hero-demo",
   "/preview/mobile-demo",
 ];

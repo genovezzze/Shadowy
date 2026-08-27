@@ -20,6 +20,23 @@ const inter = localFont({
       weight: "600",
       style: "normal",
     },
+    {
+      // Without this, every font-bold (700) request in the app had no exact
+      // face to match against - only 400 and 600 were registered - so the CSS
+      // font-matching algorithm silently substituted the nearest available
+      // weight (600) instead of synthesising bold, and every "bold" heading
+      // rendered as semibold site-wide.
+      path: "../../public/fonts/Inter-Bold.woff2",
+      weight: "700",
+      style: "normal",
+    },
+    {
+      // A step past bold for the handful of spots - nav links at 14px - where
+      // true 700 still reads as merely semibold at that size.
+      path: "../../public/fonts/Inter-ExtraBold.woff2",
+      weight: "800",
+      style: "normal",
+    },
   ],
   variable: "--font-sans",
   display: "swap",
@@ -67,6 +84,54 @@ const neueHaasLight = localFont({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
+// The pixel faces the hero headline dissolves through. Each is the same
+// grid-based glyph set drawn with a different cell shape, so cycling them per
+// character is what makes a word look like it is resolving out of pixels.
+const geistPixelSquare = localFont({
+  src: "../../public/fonts/GeistPixel-Square.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-pixel-square",
+  display: "block",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
+const geistPixelCircle = localFont({
+  src: "../../public/fonts/GeistPixel-Circle.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-pixel-circle",
+  display: "block",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
+const geistPixelGrid = localFont({
+  src: "../../public/fonts/GeistPixel-Grid.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-pixel-grid",
+  display: "block",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
+const geistPixelTriangle = localFont({
+  src: "../../public/fonts/GeistPixel-Triangle.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-pixel-triangle",
+  display: "block",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
+const geistPixelLine = localFont({
+  src: "../../public/fonts/GeistPixel-Line.woff2",
+  weight: "400",
+  style: "normal",
+  variable: "--font-pixel-line",
+  display: "block",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
 // Keep the variables inline as well as in the generated Next.js classes.
 // This prevents a stale development stylesheet from dropping the global font
 // stack and falling all the way back to the browser's serif default.
@@ -75,6 +140,11 @@ const fontVariables = {
   "--font-display": neueHaas.style.fontFamily,
   "--font-accent": neueHaasLight.style.fontFamily,
   "--font-mono": jetBrainsMono.style.fontFamily,
+  "--font-pixel-square": geistPixelSquare.style.fontFamily,
+  "--font-pixel-circle": geistPixelCircle.style.fontFamily,
+  "--font-pixel-grid": geistPixelGrid.style.fontFamily,
+  "--font-pixel-triangle": geistPixelTriangle.style.fontFamily,
+  "--font-pixel-line": geistPixelLine.style.fontFamily,
 } as React.CSSProperties;
 
 const siteUrl = getSiteUrl();
@@ -144,7 +214,7 @@ export default function RootLayout({
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable}`}
+      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable} ${geistPixelSquare.variable} ${geistPixelCircle.variable} ${geistPixelGrid.variable} ${geistPixelTriangle.variable} ${geistPixelLine.variable}`}
       style={fontVariables}
       suppressHydrationWarning
     >

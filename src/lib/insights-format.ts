@@ -8,8 +8,8 @@ function hoursValue(minutes: number) {
 
 /** Saving ranges sit inside narrow tiles, so they stay short: "21–40 h". */
 export function formatSavingRangeLV(lowMinutes: number, highMinutes: number) {
-  if (highMinutes < 60) return `${lowMinutes}–${highMinutes} min`;
-  return `${hoursValue(lowMinutes)}–${hoursValue(highMinutes)} h`;
+  if (highMinutes < 60) return `${lowMinutes}-${highMinutes} min`;
+  return `${hoursValue(lowMinutes)}-${hoursValue(highMinutes)} h`;
 }
 
 /**

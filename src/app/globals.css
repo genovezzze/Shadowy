@@ -21,16 +21,17 @@
   z-index: 1;
   display: flex;
   align-items: center;
-  gap: 0.9rem;
+  gap: 0.85rem;
 }
 
 .app-loading-logo {
   display: grid;
-  width: 3.6rem;
-  height: 3.6rem;
+  width: 2.75rem;
+  height: 2.75rem;
   place-items: center;
   will-change: transform;
-  animation: app-loading-logo-spin 1.65s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  animation: app-loading-logo-spin 1.65s cubic-bezier(0.65, 0, 0.35, 1)
+    infinite;
 }
 
 .app-loading-logo img {
@@ -41,8 +42,9 @@
 .app-loading-wordmark {
   color: #ececec;
   font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(1.65rem, 4vw, 2.2rem);
+  font-size: clamp(2rem, 4vw, 2.75rem);
   font-weight: 700;
+  line-height: 1;
   letter-spacing: -0.035em;
   animation: app-loading-wordmark-pulse 1.65s ease-in-out infinite;
 }
@@ -1886,4 +1888,78 @@ input[type="checkbox"]:focus-visible {
   .report-document h3 {
     break-after: avoid;
   }
+}
+
+/* ==========================================================================
+   Landing type scale and surface tokens.
+
+   The landing runs its own scale rather than the app's: headings are set in a
+   single fluid step so a section title reads the same on a phone and a 27"
+   monitor, and the tight tracking is what keeps the large sizes from looking
+   airy. Scoped to .atoms-landing so none of it reaches the product UI.
+   ========================================================================== */
+
+.atoms-landing {
+  --landing-ink: #0a0a0a;
+  /* The light half of the page. Just off pure white, so the white cards and
+     panels sitting on it read as raised rather than merging into the ground. */
+  --landing-paper: #fafafa;
+  /* The dark half of the page. One value for the whole run - pilot banner,
+     FAQ, application form and footer sit directly on top of each other, so
+     any difference between them shows as a seam. */
+  --landing-night: #000000;
+}
+
+.atoms-landing .text-landing-h1 {
+  font-size: clamp(2rem, 4vw, 2.5rem);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.atoms-landing .text-landing-h2 {
+  font-size: clamp(1.5rem, 4vw, 2.25rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+@keyframes atomsGradientTextReveal {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+.atoms-gradient-text-reveal {
+  --reveal-color: currentColor;
+  display: inline-block;
+  margin-bottom: -0.15em;
+  padding-bottom: 0.15em;
+  vertical-align: top;
+  background-image: linear-gradient(
+    90deg,
+    var(--reveal-color) 0%,
+    var(--reveal-color) 46%,
+    #4caf50 47.5%,
+    #ff4081 49%,
+    #288cff 50.5%,
+    #ffc107 52%,
+    transparent 54%,
+    transparent 100%
+  );
+  background-position: 100% 0;
+  background-size: 300% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.atoms-gradient-text-reveal.is-visible {
+  animation: atomsGradientTextReveal 2.5s cubic-bezier(0.2, 0, 0, 1) forwards;
+}
+
+.atoms-gradient-text-reveal.is-static {
+  background-position: 0 0;
 }

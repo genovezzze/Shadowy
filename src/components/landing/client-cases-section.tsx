@@ -90,7 +90,7 @@ export function ClientCasesSection() {
               className="hidden h-24 w-px bg-gradient-to-b from-transparent via-white/25 to-transparent lg:block"
             />
             <p className="text-center font-accent text-sm font-light leading-6 text-white/52 sm:text-base sm:leading-relaxed lg:text-left">
-              Shadowy aug kopā ar uzņēmumiem, kuri vēlas redzēt darbu, kas līdz šim palicis ārpus atskaitēm.
+              Shadowy aug kopā ar uzņēmumiem, kuri vēlas redzēt darbu, kas līdz šim palicis ārpus atskaitēm
             </p>
           </div>
         </header>
@@ -126,7 +126,7 @@ export function ClientCasesSection() {
                     PB Finanses
                   </h3>
                   <p className="mt-1.5 font-accent text-[13px] font-light leading-5 text-white/55">
-                    Vienota platforma neredzamā darba, komandas slodzes un klientu izmaksu pārskatīšanai.
+                    Vienota platforma neredzamā darba, komandas slodzes un klientu izmaksu pārskatīšanai
                   </p>
 
                   <div className="mt-auto flex items-center justify-between border-t border-white/[0.09] pt-3">
@@ -173,7 +173,7 @@ export function ClientCasesSection() {
                         Par uzņēmumu
                       </p>
                       <p className="mt-2 font-sans text-sm font-normal leading-6 text-white/72 sm:text-[15px] sm:leading-7">
-                        PB Finanses ir pilna servisa finanšu kompānija, kas sniedz grāmatvedības, finanšu plānošanas un biznesa konsultāciju pakalpojumus Latvijas un ārvalstu uzņēmumiem.
+                        PB Finanses ir pilna servisa finanšu kompānija, kas sniedz grāmatvedības, finanšu plānošanas un biznesa konsultāciju pakalpojumus Latvijas un ārvalstu uzņēmumiem
                       </p>
                     </section>
                     <section className="border-t border-white/[0.12] py-5 sm:border-l sm:border-t-0 sm:pl-8">
@@ -181,7 +181,7 @@ export function ClientCasesSection() {
                         Ko izstrādājām
                       </p>
                       <p className="mt-2 font-sans text-sm font-normal leading-6 text-white/72 sm:text-[15px] sm:leading-7">
-                        Shadowy pilotplatformu papildu darba fiksēšanai un analīzei - lai komanda reģistrētu darbu, bet vadība redzētu slodzi, atkārtojošos procesus un klientiem veltīto laiku.
+                        Shadowy pilotplatformu papildu darba fiksēšanai un analīzei - lai komanda reģistrētu darbu, bet vadība redzētu slodzi, atkārtojošos procesus un klientiem veltīto laiku
                       </p>
                     </section>
                   </div>
@@ -274,7 +274,7 @@ export function ClientCasesSection() {
                           Laiks
                         </p>
                         <p className="mt-1.5 font-sans text-xs font-normal leading-5 text-white/55">
-                          Stundas rāda papildu darbu, ko katrs darbinieks mēneša laikā veltījis konkrētajam klientam.
+                          Stundas rāda papildu darbu, ko katrs darbinieks mēneša laikā veltījis konkrētajam klientam
                         </p>
                       </div>
                       <div>
@@ -290,7 +290,7 @@ export function ClientCasesSection() {
                           </span>
                         </div>
                         <p className="mt-1.5 font-sans text-xs font-normal leading-5 text-white/55">
-                          Tirkīza tonis apzīmē darba laiku; jo tas ir gaišāks un piesātinātāks, jo vairāk stundu ieguldīts.
+                          Tirkīza tonis apzīmē darba laiku; jo tas ir gaišāks un piesātinātāks, jo vairāk stundu ieguldīts
                         </p>
                       </div>
                       <div>
@@ -304,7 +304,7 @@ export function ClientCasesSection() {
                     </div>
 
                     <p className="mt-4 font-sans text-[11px] font-normal leading-5 text-white/35">
-                      Visi klientu nosaukumi, stundas, limiti un izmaksas šajā piemērā ir izdomāti un neatspoguļo PB Finanses datus.
+                      Visi klientu nosaukumi, stundas, limiti un izmaksas šajā piemērā ir izdomāti un neatspoguļo PB Finanses datus
                     </p>
                   </section>
 
@@ -318,13 +318,13 @@ export function ClientCasesSection() {
                       </h3>
                       <div className="mt-4 space-y-4 font-sans text-sm font-normal leading-7 text-white/70 sm:text-[15px] sm:leading-7">
                         <p>
-                          PB Finanses komanda jau iepriekš saviem spēkiem pētīja “slēpto darbu” - uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri palīdz nodrošināt labāku servisu.
+                          PB Finanses komanda jau iepriekš saviem spēkiem pētīja “slēpto darbu” - uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri palīdz nodrošināt labāku servisu
                         </p>
                         <p>
-                          Shadowy šo procesu pārnes vienotā vidē: papildu darbs tiek fiksēts, strukturēts un pārvērsts vadībai izmantojamā analītikā par komandas laiku, uzmanību un iesaisti.
+                          Shadowy šo procesu pārnes vienotā vidē: papildu darbs tiek fiksēts, strukturēts un pārvērsts vadībai izmantojamā analītikā par komandas laiku, uzmanību un iesaisti
                         </p>
                         <p>
-                          Sadarbība sākās pēc iepazīšanās CoLab 2026 biznesa forumā un turpinājās kā pilotprojekts reālā uzņēmuma ikdienas darbā.
+                          Sadarbība sākās pēc iepazīšanās CoLab 2026 biznesa forumā un turpinājās kā pilotprojekts reālā uzņēmuma ikdienas darbā
                         </p>
                       </div>
                     </section>
@@ -353,7 +353,7 @@ export function ClientCasesSection() {
 
                   <div className="mt-9 flex flex-col gap-4 border-t border-white/[0.12] pt-6 sm:flex-row sm:items-center sm:justify-between">
                     <p className="max-w-xl font-sans text-sm font-normal leading-6 text-white/62">
-                      PB Finanses redz Shadowy kā vērtīgu rīku uzņēmumiem, kuri vēlas labāk saprast komandas slodzi, iekšējos procesus un darbu, kas paliek ārpus ierastajām atskaitēm.
+                      PB Finanses redz Shadowy kā vērtīgu rīku uzņēmumiem, kuri vēlas labāk saprast komandas slodzi, iekšējos procesus un darbu, kas paliek ārpus ierastajām atskaitēm
                     </p>
                     <Dialog.Close asChild>
                       <a

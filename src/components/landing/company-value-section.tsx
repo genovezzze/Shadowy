@@ -16,7 +16,7 @@ const cards: readonly ValueCard[] = [
   {
     icon: "/images/icons-3d/bullseye.png",
     title: "Lēmumi, balstīti datos",
-    text: "Skaidrs, kurus procesus sakārtot vispirms, lai ieguvums būtu lielākais.",
+    text: "Skaidrs, kurus procesus sakārtot vispirms, lai ieguvums būtu lielākais",
   },
   {
     icon: "/images/icons-3d/shield.png",
@@ -48,7 +48,7 @@ export function CompanyValueSection() {
             <p className="mt-4 max-w-md font-accent text-base font-light leading-relaxed tracking-[0.01em] text-white/55 sm:mt-5 sm:text-xl">
               Shadowy nerāda, kurš strādā vairāk, bet{" "}
               <strong className="font-semibold text-white/75 [font-synthesis:weight]">
-                parāda, kur uzņēmums zaudē laiku un naudu.
+                parāda, kur uzņēmums zaudē laiku un naudu
               </strong>
             </p>
           </div>

@@ -33,7 +33,7 @@ export function ShadowyExplainerSection() {
               <span className="text-[#75babc]">Shadowy</span> padara neredzamo darbu redzamu
             </h2>
             <p className="mt-5 max-w-3xl font-sans text-base font-normal leading-7 text-white/62 sm:text-lg sm:leading-8">
-              Viena vieta, kur komandas ikdienas situācijas kļūst par saprotamu informāciju procesu uzlabošanai.
+              Viena vieta, kur komandas ikdienas situācijas kļūst par saprotamu informāciju procesu uzlabošanai
             </p>
           </div>
         </div>

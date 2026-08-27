@@ -64,7 +64,7 @@ const processTones = [
 ] as const;
 
 const pilotBenefits = [
-  "2 nedēļas, 5–8 darbinieki, 30 sekundes dienā",
+  "2 nedēļas, 5-8 darbinieki, 30 sekundes dienā",
   "Bez kredītkartes un bez saistībām",
   "Iepazīšanās zvans 20 minūtes - bez spiediena",
   "Pilota beigās: stundas, kategorijas, šķēršļi, izmaksas",
@@ -222,7 +222,7 @@ export function ClosingSections() {
             <strong className="font-bold text-white/62 [font-synthesis:weight]">
               2 nedēļu pilotam
             </strong>
-            {" "}ar 5–20 darbiniekiem, lai pārbaudītu risinājumu{" "}
+            {" "}ar 5-20 darbiniekiem, lai pārbaudītu risinājumu{" "}
             <strong className="font-bold text-white/62 [font-synthesis:weight]">
               reālā darba vidē
             </strong>
@@ -432,7 +432,7 @@ export function ClosingSections() {
               </h3>
               <nav className="mt-3.5 flex flex-col gap-3">
                 <Link
-                  href="/ka-tas-darbojas"
+                  href="#process"
                   className="font-accent w-fit text-[15px] font-medium text-white/70 transition hover:text-white"
                 >
                   Kā tas darbojas
