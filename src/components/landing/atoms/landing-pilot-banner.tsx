@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 
@@ -15,20 +15,6 @@ const PILOT_BENEFITS = [
 export function LandingPilotBanner() {
   return (
     <section className="relative overflow-hidden bg-[var(--landing-night)] py-24 md:py-32">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-40"
-        style={{
-          backgroundImage:
-            "radial-gradient(rgba(255,255,255,0.08) 0.7px, transparent 0.8px)",
-          backgroundSize: "30px 30px",
-          maskImage:
-            "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to bottom, transparent, black 20%, black 80%, transparent)",
-        }}
-      />
-
       <div className="relative z-10 w-full px-4 md:px-8">
         <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <Reveal className="lg:w-1/2">
@@ -47,7 +33,6 @@ export function LandingPilotBanner() {
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-base font-bold text-black transition-all hover:bg-white/90 active:scale-95"
             >
               Pieteikties pilotam
-              <ArrowUpRight className="size-4" aria-hidden />
             </Link>
           </Reveal>
 

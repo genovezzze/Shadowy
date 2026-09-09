@@ -16,7 +16,7 @@ const OPEN_DELAY_MS = 1200;
 
 export function LandingInterestModal() {
   const [open, setOpen] = React.useState(false);
-  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+  const dialogRef = React.useRef<HTMLElement>(null);
   // Once shown, it stays shown for the rest of the session - scrolling back up
   // and down again must not bring it back.
   const shown = React.useRef(false);
@@ -63,7 +63,12 @@ export function LandingInterestModal() {
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    closeButtonRef.current?.focus();
+    // Focus the dialog, not the close button. Moving focus onto a control is
+    // what drew the browser's focus ring around the cross the moment the modal
+    // opened - a heavy outline the design never asked for. The panel takes the
+    // focus instead, so Escape and the tab order still start inside the modal
+    // while nothing is highlighted.
+    dialogRef.current?.focus();
 
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
@@ -98,24 +103,25 @@ export function LandingInterestModal() {
           />
 
           <motion.section
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby="interest-modal-title"
+            tabIndex={-1}
             initial={{ scale: 0.9, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ duration: 0.5, ease: [0.23, 1, 0.32, 1] }}
-            className="relative w-full max-w-3xl overflow-hidden rounded-3xl border-none bg-white/[0.08] text-white shadow-[0_20px_100px_rgba(0,0,0,0.5)] backdrop-blur-[40px]"
+            className="relative w-full max-w-3xl overflow-hidden rounded-3xl border-none bg-white/[0.08] text-white shadow-[0_20px_100px_rgba(0,0,0,0.5)] outline-none backdrop-blur-[40px]"
           >
             <div className="relative min-h-[500px]">
               <div className="absolute left-6 right-6 top-6 z-50 flex items-center justify-between">
                 <div className="size-10" aria-hidden="true" />
                 <button
-                  ref={closeButtonRef}
                   type="button"
                   aria-label="Aizvērt"
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer rounded-full bg-white/5 p-2.5 text-white/40 transition-all hover:bg-white/10 hover:text-white active:scale-95"
+                  className="cursor-pointer rounded-full bg-white/5 p-2.5 text-white/40 outline-none transition-all hover:bg-white/10 hover:text-white focus-visible:ring-1 focus-visible:ring-white/40 active:scale-95"
                 >
                   <X className="size-5" strokeWidth={1.5} />
                 </button>
@@ -149,17 +155,22 @@ export function LandingInterestModal() {
                   initial={{ opacity: 0, y: 24 }}
                   animate={{ opacity: 0.9, y: 0 }}
                   transition={{ delay: 0.1, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-                  className="pointer-events-none absolute -bottom-10 -right-16 aspect-square w-[75%] select-none overflow-visible md:w-[60%]"
+                  // Sat on negative offsets before, which pushed it past the card's
+                  // edges - and the card clips (`overflow-hidden` carries the
+                  // rounded corners), so the island lost its right side and
+                  // bottom. Pulled back inside the bounds so the whole cut-out
+                  // shows; `object-contain` was never the thing cropping it.
+                  className="pointer-events-none absolute bottom-4 right-4 aspect-square w-[70%] select-none md:w-[56%]"
                 >
                   <Image
-                    // A 900px webp rather than the 1.9 MB source PNG: the popup
-                    // opens mid-scroll on a phone, where waiting on the
-                    // original meant the card appeared empty for seconds.
-                    src="/images/pic10-cutout.webp"
+                    src="/images/Blue-Tree-Flowers-Transparent.svg"
                     alt=""
                     fill
                     priority
                     sizes="(min-width: 768px) 460px, 75vw"
+                    // SVG never goes through the image optimiser: Next refuses
+                    // it unless `dangerouslyAllowSVG` is on site-wide.
+                    unoptimized
                     className="object-contain"
                   />
                 </motion.div>

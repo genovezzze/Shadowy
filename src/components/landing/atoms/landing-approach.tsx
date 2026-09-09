@@ -203,7 +203,7 @@ const STAGES: Stage[] = [
     icon: ClipboardList,
     title: "Darbinieks fiksē",
     desc: "30 sekundes dienā. Tikai tas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto",
-    bg: "/images/pic1.webp",
+    bg: "/images/01-Golden-Valley.svg",
     panel: <EntryPanel />,
   },
   {
@@ -211,7 +211,7 @@ const STAGES: Stage[] = [
     icon: BrainCircuit,
     title: "AI sagatavo melnrakstu",
     desc: "No brīvi uzrakstīta teikuma top strukturēts ieraksts ar kategoriju un laiku. Darbinieks to pārskata un apstiprina",
-    bg: "/images/pic2.webp",
+    bg: "/images/02-Mountain-Lake.svg",
     panel: <DraftPanel />,
   },
   {
@@ -219,7 +219,7 @@ const STAGES: Stage[] = [
     icon: Check,
     title: "Vadītājs izvērtē",
     desc: "Vadītājs redz savas komandas iesniegtos ierakstus, apstiprina tos vai atgriež precizēšanai",
-    bg: "/images/pic3.webp",
+    bg: "/images/03-Autumn-Bridge.svg",
     panel: <ReviewPanel />,
   },
   {
@@ -227,7 +227,7 @@ const STAGES: Stage[] = [
     icon: Layers,
     title: "Dati sakārtojas",
     desc: "Apstiprinātie ieraksti veido kategorijas, tendences un atkārtojošos šķēršļus - nevis atsevišķus stāstus",
-    bg: "/images/pic4.webp",
+    bg: "/images/04-Hillside-Windmill.svg",
     panel: <CategoriesPanel />,
   },
   {
@@ -235,7 +235,7 @@ const STAGES: Stage[] = [
     icon: Coins,
     title: "Uzņēmums redz izmaksas",
     desc: "Slodze, aptuvenās izmaksas un dārgākie klienti vienā pārskatā. Ar konkrētiem procesu ieteikumiem",
-    bg: "/images/pic5.webp",
+    bg: "/images/05-Forest-Waterfall.svg",
     panel: <CostPanel />,
   },
 ];
@@ -265,7 +265,10 @@ export function LandingApproach() {
   return (
     <section
       id="process"
-      className="relative scroll-mt-20 bg-[var(--landing-paper)] py-24 md:py-32"
+      // No top padding: "Pilotprojekti un klienti" above is the same paper
+      // colour and already ends on its own py-24/py-32, so a second one stacked
+      // a band of empty white with no colour change to justify it.
+      className="relative scroll-mt-20 bg-[var(--landing-paper)] pb-24 pt-0 md:pb-32"
     >
       <div className="w-full px-4 md:px-8">
         <Reveal className="mb-12 max-w-3xl md:mb-16">
@@ -343,7 +346,12 @@ export function LandingApproach() {
               16:10 rather than the taller 4:3 - the fixed 210px card doesn't
               need the extra headroom, and on tablet widths 4:3 was turning the
               whole panel into a slab far taller than the list beside it. */}
-          <div className="w-full overflow-hidden rounded-2xl lg:w-[55%] lg:self-stretch">
+          {/* Capped at the row's own minimum height. `self-stretch` alone let the
+              photo grow with the stage list, and since the list gets taller
+              whenever a stage expands, the photo ended up overshooting it. The
+              cap holds it to the height the row is built around, so it reads as
+              the same block as the list beside it. */}
+          <div className="w-full overflow-hidden rounded-2xl lg:max-h-[560px] lg:w-[55%] lg:self-stretch">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active.id}
@@ -359,6 +367,9 @@ export function LandingApproach() {
                   fill
                   priority={activeIndex === 0}
                   sizes="(min-width: 1024px) 55vw, 100vw"
+                  // SVG never goes through the image optimiser: Next refuses it
+                  // unless `dangerouslyAllowSVG` is on site-wide.
+                  unoptimized
                   className="object-cover"
                 />
                 <div className="relative z-10">{active.panel}</div>

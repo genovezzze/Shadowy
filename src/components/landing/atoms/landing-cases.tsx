@@ -118,14 +118,12 @@ export function LandingCases() {
                       className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black px-5 py-2 text-[13px] font-bold text-white transition-all hover:bg-black/85"
                     >
                       Pieteikties pilotam
-                      <ArrowUpRight className="size-3.5" aria-hidden />
                     </Link>
                     <Link
                       href="/pilotprojekts"
                       className="inline-flex w-fit items-center gap-1.5 rounded-full bg-black/5 px-5 py-2 text-[13px] font-bold text-black transition-all hover:bg-black/10"
                     >
                       Uzzināt vairāk
-                      <ArrowUpRight className="size-3.5" aria-hidden />
                     </Link>
                   </div>
                 </div>

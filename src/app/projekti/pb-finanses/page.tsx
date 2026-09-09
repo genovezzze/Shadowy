@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, breadcrumbNode, organizationNode } from "@/lib/structured-data";
 import { Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,10 +13,23 @@ import { FitToWidth } from "@/components/landing/fit-to-width";
 import { AnimatedReportMetrics } from "@/components/projects/animated-report-metrics";
 import type { MatrixClientRow, MatrixEmployee } from "@/lib/client-matrix";
 
+const caseTitle = "Grāmatvedības uzņēmuma gadījums: PB Finanses";
+const caseDescription =
+  "Kā grāmatvedības uzņēmums ar Shadowy ieraudzīja neredzamo darbu, komandas slodzi un klientu patieso pašizmaksu - reāla projekta rezultāti";
+
 export const metadata: Metadata = {
-  title: "PB Finanses klienta projekts",
-  description:
-    "Shadowy risinājums grāmatvedības uzņēmumiem - neredzamā darba, komandas slodzes un klientu izmaksu pārskatīšanai vienuviet.",
+  title: caseTitle,
+  description: caseDescription,
+  alternates: { canonical: "/projekti/pb-finanses" },
+  openGraph: {
+    type: "article",
+    locale: "lv_LV",
+    url: "/projekti/pb-finanses",
+    siteName: "Shadowy",
+    title: caseTitle,
+    description: caseDescription,
+    images: [{ url: "/images/shadowyxpb.png", alt: "Shadowy un PB Finanses" }],
+  },
 };
 
 const audiences = [
@@ -41,19 +55,19 @@ const keyFeatures = [
 const projectDetails = [
   {
     title: "Par PB Finanses",
-    text: "PB Finanses ir pilna servisa finanšu uzņēmums, kas sniedz grāmatvedības, finanšu plānošanas un biznesa konsultāciju pakalpojumus Latvijas un ārvalstu uzņēmumiem.",
+    text: "PB Finanses ir pilna servisa finanšu uzņēmums, kas sniedz grāmatvedības, finanšu plānošanas un biznesa konsultāciju pakalpojumus Latvijas un ārvalstu uzņēmumiem",
   },
   {
     title: "Uzņēmuma vajadzība",
-    text: "Komanda jau iepriekš pētīja “slēpto darbu” - uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri ir nepieciešami kvalitatīvam servisam.",
+    text: "Komanda jau iepriekš pētīja “slēpto darbu” - uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri ir nepieciešami kvalitatīvam servisam",
   },
   {
     title: "Ko izstrādājām",
-    text: "Shadowy pilotplatformu papildu darba fiksēšanai un analīzei, lai komanda reģistrētu darbu, bet vadība redzētu slodzi, atkārtojošos procesus un klientiem veltīto laiku.",
+    text: "Shadowy pilotplatformu papildu darba fiksēšanai un analīzei, lai komanda reģistrētu darbu, bet vadība redzētu slodzi, atkārtojošos procesus un klientiem veltīto laiku",
   },
   {
     title: "Sadarbības sākums",
-    text: "Sadarbība sākās pēc iepazīšanās CoLab 2026 biznesa forumā un turpinājās kā pilotprojekts reāla uzņēmuma ikdienas darbā.",
+    text: "Sadarbība sākās pēc iepazīšanās CoLab 2026 biznesa forumā un turpinājās kā pilotprojekts reāla uzņēmuma ikdienas darbā",
   },
   {
     title: "Projekta formāts",
@@ -65,36 +79,36 @@ const solutionSteps = [
   {
     number: "01",
     title: "Fiksēt darbu",
-    text: "Komanda vienuviet reģistrē papildu darbu, pārtraukumus un uzdevumus, kas iepriekš palika ārpus ierastajām atskaitēm.",
+    text: "Komanda vienuviet reģistrē papildu darbu, pārtraukumus un uzdevumus, kas iepriekš palika ārpus ierastajām atskaitēm",
   },
   {
     number: "02",
     title: "Strukturēt datus",
-    text: "Ieraksti tiek sasaistīti ar klientiem, kategorijām un komandas lomām, lai atsevišķi notikumi kļūtu salīdzināmi.",
+    text: "Ieraksti tiek sasaistīti ar klientiem, kategorijām un komandas lomām, lai atsevišķi notikumi kļūtu salīdzināmi",
   },
   {
     number: "03",
     title: "Ieraudzīt kopsakarības",
-    text: "Vadība redz slodzi, atkārtojošos procesus, klientiem veltīto laiku un vietas, kurās rodas neplānotas izmaksas.",
+    text: "Vadība redz slodzi, atkārtojošos procesus, klientiem veltīto laiku un vietas, kurās rodas neplānotas izmaksas",
   },
 ] as const;
 
 const accountingFit = [
   {
     title: "Gatavs pamats grāmatvedības uzņēmumam",
-    text: "PB Finanses projektā pārbaudītais process jau aptver klientus, darbiniekus, darba kategorijas, laiku, limitus un izmaksu pārskatus.",
+    text: "PB Finanses projektā pārbaudītais process jau aptver klientus, darbiniekus, darba kategorijas, laiku, limitus un izmaksu pārskatus",
   },
   {
     title: "Pielāgošana jūsu pakalpojumu modelim",
-    text: "Varam mainīt darba kategorijas, lomas, limitu loģiku, pārskatus un aprēķinus atbilstoši tam, kā jūsu uzņēmums apkalpo klientus.",
+    text: "Varam mainīt darba kategorijas, lomas, limitu loģiku, pārskatus un aprēķinus atbilstoši tam, kā jūsu uzņēmums apkalpo klientus",
   },
   {
     title: "Integrācijas ar esošajiem procesiem",
-    text: "Pēc vajadzības varam pievienot datu importu, automatizētus paziņojumus, vadības atskaites vai savienojumus ar jau izmantotajām sistēmām.",
+    text: "Pēc vajadzības varam pievienot datu importu, automatizētus paziņojumus, vadības atskaites vai savienojumus ar jau izmantotajām sistēmām",
   },
   {
     title: "Pilotprojekts pirms pilnas ieviešanas",
-    text: "Sākam ar konkrētu komandu un izmērāmu problēmu, pārbaudām risinājumu ikdienas darbā un tikai tad vienojamies par nākamajām funkcijām.",
+    text: "Sākam ar konkrētu komandu un izmērāmu problēmu, pārbaudām risinājumu ikdienas darbā un tikai tad vienojamies par nākamajām funkcijām",
   },
 ] as const;
 
@@ -194,6 +208,7 @@ function ReferenceListSection({
 export default function PbFinansesCasePage() {
   return (
     <div className="min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
+      <JsonLd nodes={[organizationNode, breadcrumbNode([{ name: "PB Finanses", path: "/projekti/pb-finanses" }])]} />
       <LandingNav alwaysLight />
 
       <main className="overflow-x-hidden pt-28 md:pt-48">

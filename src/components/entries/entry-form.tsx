@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ClientCombobox } from "@/components/ui/client-combobox";
+import { NoClientsNotice } from "@/components/entries/no-clients-notice";
 import { createEntry } from "@/app/employee/new-entry/actions";
 import { CATEGORY_GROUPS, SMART_LOG_CATEGORIES } from "@/lib/smart-log";
 import { WORK_NATURE_FLAGS } from "@/lib/work-nature";
@@ -148,13 +149,16 @@ export function EntryForm({
                 onChange={setClientId}
               />
             ) : (
-              <Input
-                id="clientName"
-                name="clientName"
-                maxLength={120}
-                defaultValue={initialValues?.clientName ?? undefined}
-                placeholder="Neobligāti"
-              />
+              <>
+                <NoClientsNotice />
+                <Input
+                  id="clientName"
+                  name="clientName"
+                  maxLength={120}
+                  defaultValue={initialValues?.clientName ?? undefined}
+                  placeholder="Ierakstiet klienta nosaukumu"
+                />
+              </>
             )}
           </div>
 

@@ -36,3 +36,6 @@ dev.log
 .env*
 output/
 tmp/
+
+# Grant application paperwork - business documents, not code, and this repo is public
+COLOURS-pieteikums/

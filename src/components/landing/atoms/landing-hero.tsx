@@ -6,6 +6,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { HeroVideoBackground } from "@/components/landing/hero-video-background";
 import { LandingHeroLockup } from "@/components/landing/atoms/landing-hero-lockup";
 import { PixelLogoDissolve } from "@/components/landing/pixel-logo-dissolve";
+import { LandingHeroTrust } from "@/components/landing/atoms/landing-hero-trust";
 
 // How far the backdrop lags the page over one screen of scrolling, as a share
 // of the hero's height. The lockup rises with the page as normal; the shot
@@ -144,9 +145,17 @@ function LandingHeroMobile() {
           </Link>
         </div>
 
+        <LandingHeroTrust className="mt-4 px-4" />
+
         {/* The mark, pixel by pixel, filling the empty half of the hero under
             the button. Decorative only - the wordmark is already in the bar. */}
-        <PixelLogoDissolve className="pointer-events-none mx-auto mt-6 h-[24vh] max-h-[240px] w-full opacity-90 md:mt-12" />
+        <PixelLogoDissolve // `svh` on phones, not `vh`: the mobile browser's address bar collapses as
+          // you scroll, which grows the viewport and grew this mark with it - the
+          // logo visibly swelled mid-scroll and pushed the section taller. The
+          // small-viewport unit is the toolbar-shown height and never changes, so
+          // the mark holds one size for the whole scroll. Desktop keeps `vh`;
+          // there is no collapsing toolbar there.
+          className="pointer-events-none mx-auto mt-4 h-[16svh] max-h-[240px] w-full opacity-90 md:mt-12 md:h-[24vh]" />
       </div>
     </section>
   );

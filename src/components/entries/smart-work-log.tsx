@@ -34,6 +34,7 @@ import {
 } from "@/app/employee/smart-log/actions";
 import { normalizeClientName } from "@/lib/client-name";
 import { normalizePersonName } from "@/lib/work-nature";
+import { NoClientsNotice } from "@/components/entries/no-clients-notice";
 
 interface ClientOption {
   id: string;
@@ -663,18 +664,21 @@ export function SmartWorkLog({
                             )}
                           </>
                         ) : (
-                          <Input
-                            id={`client-${ticket.id}`}
-                            value={ticket.client_name ?? ""}
-                            maxLength={120}
-                            placeholder="Nav norādīts"
-                            onChange={(e) =>
-                              updateTicket(ticket.id, {
-                                client_name: e.target.value || null,
-                                client_id: null,
-                              })
-                            }
-                          />
+                          <>
+                            <NoClientsNotice />
+                            <Input
+                              id={`client-${ticket.id}`}
+                              value={ticket.client_name ?? ""}
+                              maxLength={120}
+                              placeholder="Ierakstiet klienta nosaukumu"
+                              onChange={(e) =>
+                                updateTicket(ticket.id, {
+                                  client_name: e.target.value || null,
+                                  client_id: null,
+                                })
+                              }
+                            />
+                          </>
                         )}
                       </div>
 

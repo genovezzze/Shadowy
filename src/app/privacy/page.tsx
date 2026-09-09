@@ -1,9 +1,13 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-export const metadata = {
-  title: "Privātuma politika - Shadowy",
+export const metadata: Metadata = {
+  title: "Privātuma politika",
+  description:
+    "Kā Shadowy apstrādā un glabā jūsu organizācijas datus, kam tie ir pieejami un kā tos eksportēt vai dzēst.",
+  alternates: { canonical: "/privacy" },
 };
 
 const CONTACT_EMAIL = "contact@shadowy.lv";

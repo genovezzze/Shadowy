@@ -3,6 +3,7 @@ import { LandingHero } from "@/components/landing/atoms/landing-hero";
 import { LandingCases } from "@/components/landing/atoms/landing-cases";
 import { LandingApproach } from "@/components/landing/atoms/landing-approach";
 import { LandingOutcomes } from "@/components/landing/atoms/landing-outcomes";
+import { LandingProduct } from "@/components/landing/atoms/landing-product";
 import { LandingWhatToLog } from "@/components/landing/atoms/landing-what-to-log";
 import { LandingAudience } from "@/components/landing/atoms/landing-audience";
 import { LandingPilotBanner } from "@/components/landing/atoms/landing-pilot-banner";
@@ -31,6 +32,7 @@ export function LandingPage() {
         <LandingHero />
         <LandingCases />
         <LandingApproach />
+        <LandingProduct />
         <LandingOutcomes />
         <LandingWhatToLog />
         <LandingAudience />

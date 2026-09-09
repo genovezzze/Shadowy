@@ -148,9 +148,10 @@ const fontVariables = {
 } as React.CSSProperties;
 
 const siteUrl = getSiteUrl();
-const title = "Shadowy - Padariet neredzamo darbu redzamu";
+const title =
+  "Shadowy - darba slodzes un neredzamā darba pārskats komandām";
 const description =
-  "Shadowy palīdz padarīt neredzamo darbu redzamu: strukturēta darba iesniegšana, vadītāja izskatīšana un godīgāka slodzes pārvaldība.";
+  "Shadowy rāda komandas neredzamo darbu, slodzi un darba pašizmaksu pa klientiem: strukturēta fiksēšana, vadītāja izskatīšana un pārskats lēmumiem. 30 dienu bezmaksas pilots.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -171,9 +172,11 @@ export const metadata: Metadata = {
     template: "%s | Shadowy",
   },
   description,
-  alternates: {
-    canonical: "/",
-  },
+  // No canonical here on purpose. Next.js merges metadata per key: a child
+  // page that does not declare `alternates` inherits this object verbatim, so a
+  // root-level canonical of "/" silently told Google that /pilotprojekts,
+  // /privacy and every case study were all duplicates of the homepage. Each
+  // page now declares its own canonical instead.
   verification: {
     google: "_N_n1qi-G4kQ72xDD6_7WDP8zvXqNu8LII_bJt8BSa4",
     other: {
@@ -201,7 +204,7 @@ export const metadata: Metadata = {
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title,
     description,
     images: ["/images/shadowy-dashboard-wide.png"],

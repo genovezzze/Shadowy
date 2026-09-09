@@ -32,6 +32,7 @@ const FOOTER_COLUMNS = [
       { label: "Kā tas darbojas", href: "#process" },
       { label: "Process", href: "#process" },
       { label: "Ko fiksēt", href: "#ko-fikset" },
+      { label: "Pārskats", href: "#produkts" },
       { label: "Kam noder", href: "#kam-noder" },
     ],
   },
@@ -71,9 +72,14 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
     <footer
       className={cn(
         "relative overflow-hidden border-t",
+        // Bottom padding matched to the hills band below (360px, 520px from md),
+        // not the 16rem/20rem it used to be. Those were shorter than the
+        // illustration, so the closing rule and the copyright line came to rest
+        // on the grass instead of clearing it - the content now stops where the
+        // hills begin.
         isDark
-          ? "border-white/10 bg-black pb-0 pt-14 sm:pb-64 sm:pt-16 md:pb-80 md:pt-20"
-          : "border-black/10 bg-white pb-0 pt-14 sm:pb-64 sm:pt-16 md:pb-80 md:pt-20",
+          ? "border-white/10 bg-black pb-0 pt-14 sm:pb-[380px] sm:pt-16 md:pb-[540px] md:pt-20"
+          : "border-black/10 bg-white pb-0 pt-14 sm:pb-[380px] sm:pt-16 md:pb-[540px] md:pt-20",
       )}
     >
       {/* Hills along the footer's bottom edge, black sky above - the shot's own

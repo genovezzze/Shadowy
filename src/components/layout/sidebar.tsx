@@ -233,10 +233,24 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
       <div className="relative z-10 flex items-center justify-between border-b border-sidebar-border px-5 py-5 dark:border-white/[0.07]">
         <Link
           href="/"
-          className="flex items-center gap-2.5 transition-opacity hover:opacity-75"
+          className="flex items-center gap-1 transition-opacity hover:opacity-75"
         >
-          <Image src="/shadowy.svg" alt="Shadowy" width={30} height={30} className="shrink-0 invert dark:invert-0" />
-          <div className="text-lg font-semibold leading-none tracking-tight">Shadowy</div>
+          <Image src="/shadowy.svg" alt="Shadowy" width={26} height={26} className="shrink-0 invert dark:invert-0" />
+          {/* Deliberately not matched to the mark's height. Standing the
+              capitals at the full 26px of the logo is geometrically equal but
+              reads oversized: the mark is a compact disc, while the word is
+              seven characters wide and carries ascenders and a descender on top
+              of its capitals, so equal cap height makes the text dominate the
+              lockup. At 22px the capitals sit around 16px - subordinate to the
+              mark, which is the usual proportion for a sidebar lockup.
+
+              `font-display` is named because the sidebar sits in a `font-accent`
+              group, and that variable registers a 300 face alone - any weight
+              asked for against it is synthesised rather than drawn. `font-normal`
+              resolves to that real 300 face here. */}
+          <div className="font-display text-[22px] font-normal leading-none tracking-tight">
+            Shadowy
+          </div>
         </Link>
         <NotificationBell initialUnreadCount={unreadNotificationCount ?? 0} alignLeft />
       </div>

@@ -23,6 +23,7 @@ const MEGA_MENUS = {
           { label: "Kā Shadowy darbojas", href: "#process" },
           { label: "Darba fiksēšanas process", href: "#process" },
           { label: "Ko fiksēt", href: "#ko-fikset" },
+          { label: "Pārskats", href: "#produkts" },
         ],
       },
       {

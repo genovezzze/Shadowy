@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "@/components/landing/atoms/landing-primitives";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 
@@ -71,10 +70,13 @@ export function LandingOutcomes() {
           edges is simply hidden, not clipped. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <Image
-          src="/images/back3.webp"
+          src="/images/Blue-Tree-Enhanced.svg"
           alt=""
-          width={1832}
-          height={910}
+          width={1732}
+          height={908}
+          // SVG never goes through the image optimiser: Next refuses it unless
+          // `dangerouslyAllowSVG` is on site-wide.
+          unoptimized
           // The illustration carries its own sky, which never matches the
           // section gradient exactly at whatever height its top edge lands -
           // so that edge read as a hard horizontal line across the band.
@@ -86,7 +88,12 @@ export function LandingOutcomes() {
             WebkitMaskImage:
               "linear-gradient(to bottom, transparent 0%, #000 32%, #000 100%)",
           }}
-          className="absolute bottom-0 left-0 h-auto w-[170%] max-w-none translate-x-0 object-contain object-left-bottom sm:left-1/2 sm:-translate-x-1/2 sm:bottom-auto sm:top-[10%] sm:w-[120%] lg:left-[-5%] lg:top-auto lg:bottom-0 lg:w-[120%] lg:translate-x-0"
+          // Pulled further left on wide screens than the old scenery needed:
+          // this illustration carries its subject - the tree - in the left third
+          // rather than spread across the frame, so at -5% the crown reached
+          // under the outcome cards. -12% is the window between that and -20%,
+          // where the crown started being clipped by the left edge instead.
+          className="absolute bottom-0 left-0 h-auto w-[170%] max-w-none translate-x-0 object-contain object-left-bottom sm:left-1/2 sm:-translate-x-1/2 sm:bottom-auto sm:top-[10%] sm:w-[120%] lg:left-[-12%] lg:top-auto lg:bottom-0 lg:w-[120%] lg:translate-x-0"
         />
       </div>
 
@@ -106,7 +113,6 @@ export function LandingOutcomes() {
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-all hover:bg-white/90 active:scale-[0.98]"
             >
               Sākt pilotu
-              <ArrowUpRight className="size-4" aria-hidden />
             </Link>
           </Reveal>
 
@@ -145,7 +151,6 @@ export function LandingOutcomes() {
                       className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-black/85"
                     >
                       Uzzināt vairāk
-                      <ArrowUpRight className="size-4" aria-hidden />
                     </Link>
                   </div>
                 </article>

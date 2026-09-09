@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { PixelBrand } from "@/components/brand/pixel-brand";
 
 export function AppLoadingScreen() {
   return (
@@ -8,12 +8,7 @@ export function AppLoadingScreen() {
       aria-live="polite"
       aria-label="Lapa tiek ielādēta"
     >
-      <div className="app-loading-brand" aria-hidden="true">
-        <span className="app-loading-logo">
-          <Image src="/shadowy.svg" alt="" width={64} height={64} priority />
-        </span>
-        <span className="app-loading-wordmark">Shadowy</span>
-      </div>
+      <PixelBrand variant="intro" />
       <span className="sr-only">Lapa tiek ielādēta...</span>
     </div>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { JsonLd, breadcrumbNode, organizationNode, softwareApplicationNode } from "@/lib/structured-data";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
@@ -7,10 +8,23 @@ import { ScrollReveal } from "@/components/ui/scroll-reveal";
 import { LandingNav } from "@/components/landing/atoms/landing-nav";
 import { LandingFooter } from "@/components/landing/atoms/landing-footer";
 
+const pilotTitle = "30 dienu bezmaksas pilotprojekts";
+const pilotDescription =
+  "Kādiem uzņēmumiem paredzēts Shadowy pilotprojekts, ko saņemsiet 30 dienu laikā un ko sagaidām no dalībniekiem. Bez maksas un bez kredītkartes";
+
 export const metadata: Metadata = {
-  title: "Shadowy pilotprojekts",
-  description:
-    "Uzziniet, kādiem uzņēmumiem paredzēts Shadowy pilotprojekts, ko saņemsiet un ko sagaidām no pilotprojekta dalībniekiem.",
+  title: pilotTitle,
+  description: pilotDescription,
+  alternates: { canonical: "/pilotprojekts" },
+  openGraph: {
+    type: "website",
+    locale: "lv_LV",
+    url: "/pilotprojekts",
+    siteName: "Shadowy",
+    title: `${pilotTitle} | Shadowy`,
+    description: pilotDescription,
+    images: [{ url: "/images/shadowy-dashboard-wide.png", width: 1916, height: 821, alt: "Shadowy darba slodzes pārskats" }],
+  },
 };
 
 type InfoItem = { title: string; text: string };
@@ -18,73 +32,73 @@ type InfoItem = { title: string; text: string };
 const companies: InfoItem[] = [
   {
     title: "Pakalpojumu uzņēmumi ar 5-50 cilvēku komandu",
-    text: "Īpaši noderīgi grāmatvedības, finanšu, konsultāciju, aģentūru un citu profesionālo pakalpojumu komandām.",
+    text: "Īpaši noderīgi grāmatvedības, finanšu, konsultāciju, aģentūru un citu profesionālo pakalpojumu komandām",
   },
   {
     title: "Komandas, kurās daļa darba paliek neredzama",
-    text: "Meklējam uzņēmumus, kuros papildu uzdevumi, pārtraukumi, klientu pieprasījumi vai iekšējie darbi neparādās ierastajās atskaitēs.",
+    text: "Meklējam uzņēmumus, kuros papildu uzdevumi, pārtraukumi, klientu pieprasījumi vai iekšējie darbi neparādās ierastajās atskaitēs",
   },
   {
     title: "Uzņēmumi ar klientiem, projektiem vai fiksētu pakalpojumu maksu",
-    text: "Shadowy palīdz salīdzināt ieguldīto laiku, komandas slodzi un faktisko darba pašizmaksu pa klientiem vai projektiem.",
+    text: "Shadowy palīdz salīdzināt ieguldīto laiku, komandas slodzi un faktisko darba pašizmaksu pa klientiem vai projektiem",
   },
   {
     title: "Vadītāji, kuri vēlas lēmumus balstīt datos",
-    text: "Pilotprojekts ir piemērots komandām, kuras grib saprast cēloņus, nevis uzraudzīt cilvēkus, un ir gatavas kopīgi pārbaudīt risinājumu praksē.",
+    text: "Pilotprojekts ir piemērots komandām, kuras grib saprast cēloņus, nevis uzraudzīt cilvēkus, un ir gatavas kopīgi pārbaudīt risinājumu praksē",
   },
 ] as const;
 
 const benefits: InfoItem[] = [
   {
     title: "Jūsu procesiem pielāgota Shadowy vide",
-    text: "Sagatavosim kategorijas, lomas, klientus vai projektus atbilstoši tam, kā jūsu komanda strādā ikdienā.",
+    text: "Sagatavosim kategorijas, lomas, klientus vai projektus atbilstoši tam, kā jūsu komanda strādā ikdienā",
   },
   {
     title: "Komandas ievadapmācība un atbalsts",
-    text: "Palīdzēsim uzsākt darbu, izskaidrosim vienkāršu fiksēšanas principu un atbildēsim uz jautājumiem pilotprojekta laikā.",
+    text: "Palīdzēsim uzsākt darbu, izskaidrosim vienkāršu fiksēšanas principu un atbildēsim uz jautājumiem pilotprojekta laikā",
   },
   {
     title: "Skaidrs slodzes un neredzamā darba pārskats",
-    text: "Redzēsiet, kur rodas papildu darbs, kuri procesi atkārtojas un kam komanda patiesībā velta savu laiku.",
+    text: "Redzēsiet, kur rodas papildu darbs, kuri procesi atkārtojas un kam komanda patiesībā velta savu laiku",
   },
   {
     title: "Noslēguma analīze un praktiski ieteikumi",
-    text: "Apkoposim rezultātus, parādīsim būtiskākās tendences un ieteiksim, ko automatizēt, pārplānot vai mērīt turpmāk.",
+    text: "Apkoposim rezultātus, parādīsim būtiskākās tendences un ieteiksim, ko automatizēt, pārplānot vai mērīt turpmāk",
   },
   {
     title: "Iespēja ietekmēt produkta attīstību",
-    text: "Jūsu pieredze un atgriezeniskā saite palīdzēs noteikt, kuras funkcijas Shadowy jāpilnveido nākamās.",
+    text: "Jūsu pieredze un atgriezeniskā saite palīdzēs noteikt, kuras funkcijas Shadowy jāpilnveido nākamās",
   },
   {
     title: "Pamats lēmumam par turpmāku ieviešanu",
-    text: "Pirms plašākas ieviešanas varēsiet novērtēt risinājuma praktisko vērtību ar savas komandas reāliem procesiem.",
+    text: "Pirms plašākas ieviešanas varēsiet novērtēt risinājuma praktisko vērtību ar savas komandas reāliem procesiem",
   },
 ] as const;
 
 const expectations: InfoItem[] = [
   {
     title: "Viena atbildīgā kontaktpersona",
-    text: "Cilvēks, kurš palīdz saskaņot pilotprojekta mērķi, dalībniekus un īsas regulārās sarunas ar Shadowy komandu.",
+    text: "Cilvēks, kurš palīdz saskaņot pilotprojekta mērķi, dalībniekus un īsas regulārās sarunas ar Shadowy komandu",
   },
   {
     title: "Konkrēta komanda un izmērāma problēma",
-    text: "Kopīgi izvēlēsimies vienu komandu, procesu vai klientu grupu, kurā pilotprojekta rezultātu var skaidri novērtēt.",
+    text: "Kopīgi izvēlēsimies vienu komandu, procesu vai klientu grupu, kurā pilotprojekta rezultātu var skaidri novērtēt",
   },
   {
     title: "Regulāra lietošana pilotprojekta laikā",
-    text: "Dalībniekiem jābūt gataviem īsi fiksēt būtisko darbu un izmantot platformu saskaņotajā testa periodā.",
+    text: "Dalībniekiem jābūt gataviem īsi fiksēt būtisko darbu un izmantot platformu saskaņotajā testa periodā",
   },
   {
     title: "Godīga un konkrēta atgriezeniskā saite",
-    text: "Sagaidām īsas atsauksmes par to, kas strādā, kas traucē un kas būtu jāpielāgo, lai risinājums dotu lielāku vērtību.",
+    text: "Sagaidām īsas atsauksmes par to, kas strādā, kas traucē un kas būtu jāpielāgo, lai risinājums dotu lielāku vērtību",
   },
 ] as const;
 
 const steps: InfoItem[] = [
-  { title: "01 - Iepazīšanās", text: "20 minūšu sarunā izrunājam komandas situāciju un saprotam, vai pilotprojekts jums ir piemērots." },
-  { title: "02 - Sagatavošana", text: "Vienojamies par mērķi, dalībniekiem, periodu un pielāgojam Shadowy vidi jūsu procesam." },
-  { title: "03 - Pilotprojekts", text: "Komanda izmanto platformu ikdienā, bet mēs sekojam līdzi pieredzei un palīdzam novērst neskaidrības." },
-  { title: "04 - Rezultāti", text: "Kopīgi apskatām datus, secinājumus un vienojamies, vai un kā risinājumu attīstīt tālāk." },
+  { title: "01 - Iepazīšanās", text: "20 minūšu sarunā izrunājam komandas situāciju un saprotam, vai pilotprojekts jums ir piemērots" },
+  { title: "02 - Sagatavošana", text: "Vienojamies par mērķi, dalībniekiem, periodu un pielāgojam Shadowy vidi jūsu procesam" },
+  { title: "03 - Pilotprojekts", text: "Komanda izmanto platformu ikdienā, bet mēs sekojam līdzi pieredzei un palīdzam novērst neskaidrības" },
+  { title: "04 - Rezultāti", text: "Kopīgi apskatām datus, secinājumus un vienojamies, vai un kā risinājumu attīstīt tālāk" },
 ] as const;
 
 function InfoSection({ title, items, id }: { title: string; items: readonly InfoItem[]; id?: string }) {
@@ -120,6 +134,7 @@ function InfoSection({ title, items, id }: { title: string; items: readonly Info
 export default function PilotProjectPage() {
   return (
     <div className="min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
+      <JsonLd nodes={[organizationNode, softwareApplicationNode, breadcrumbNode([{ name: "Pilotprojekts", path: "/pilotprojekts" }])]} />
       <LandingNav alwaysLight />
 
       <main className="overflow-x-hidden pt-28 md:pt-48">

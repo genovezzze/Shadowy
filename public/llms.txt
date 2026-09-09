@@ -1,0 +1,25 @@
+# Shadowy
+
+> Shadowy ir darba slodzes pārskatāmības rīks Latvijas uzņēmumiem. Tas palīdz
+> ieraudzīt neredzamo darbu - palīdzību kolēģiem, pārtraukumus, koordināciju,
+> steidzamus uzdevumus ārpus lomas - un aprēķināt darba patieso pašizmaksu pa
+> klientiem un projektiem, nenovērojot darbiniekus.
+
+Shadowy nav laika uzskaites vai novērošanas rīks. Darbinieks pats fiksē tikai
+tās situācijas, kas bija ārpus pamatdarba; vadītājs tās izvērtē un apstiprina;
+administrators redz organizācijas līmeņa pārskatu. AI veido tikai melnrakstus -
+nekas netiek saglabāts bez darbinieka apstiprinājuma.
+
+Kam paredzēts: pakalpojumu uzņēmumiem ar 5-50 cilvēku komandu - grāmatvedības,
+finanšu, konsultāciju un aģentūru komandām, īpaši tām, kas strādā ar fiksētu
+pakalpojumu maksu.
+
+Cena: 30 dienu pilotprojekts ir bez maksas un bez kredītkartes.
+Valoda: latviešu. Kontakts: contact@shadowy.lv
+
+## Lapas
+
+- [Sākumlapa](https://shadowy.lv/): produkts, ieguvumi, ko fiksēt, biežāk uzdotie jautājumi
+- [Pilotprojekts](https://shadowy.lv/pilotprojekts): kam paredzēts 30 dienu pilots, ko saņemsiet un ko sagaidām
+- [PB Finanses gadījums](https://shadowy.lv/projekti/pb-finanses): kā grāmatvedības uzņēmums ieraudzīja klientu patieso pašizmaksu
+- [Privātuma politika](https://shadowy.lv/privacy): datu apstrāde, pieejamība, eksports un dzēšana

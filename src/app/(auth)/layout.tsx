@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import { PixelBrand } from "@/components/brand/pixel-brand";
 
 export default function AuthLayout({
   children,
@@ -13,19 +14,9 @@ export default function AuthLayout({
           <Link
             href="/"
             aria-label="Shadowy sākumlapa"
-            className="mx-auto mb-6 flex w-fit items-center gap-2.5 sm:mb-7"
+            className="mx-auto mb-6 block w-fit sm:mb-7"
           >
-            <span className="grid size-9 place-items-center">
-              <Image
-                src="/shadowy.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            </span>
-            <span className="font-display text-xl font-medium tracking-tight text-white [font-synthesis:none]">
-              Shadowy
-            </span>
+            <PixelBrand iridescent />
           </Link>
           {children}
         </div>
