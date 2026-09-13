@@ -122,6 +122,7 @@ export default async function ManagerEntriesPage({
             description: e.description,
             clientName: e.clientName ?? e.client?.name ?? null,
             workDate: e.workDate.toISOString(),
+            createdAt: e.createdAt.toISOString(),
             durationMinutes: e.durationMinutes,
             status: e.status,
             employeeName: e.employee.name,
@@ -152,6 +153,7 @@ export default async function ManagerEntriesPage({
                   description={e.description}
                   clientName={e.clientName ?? e.client?.name ?? undefined}
                   workDate={e.workDate}
+                  createdAt={e.createdAt}
                   durationMinutes={totalMinutes}
                   status={e.status}
                   employeeName={e.employee.name}

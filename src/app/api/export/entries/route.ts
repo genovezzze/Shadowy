@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getValidatedSession } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { buildEntryWhere, type EntrySearchParams } from "@/lib/entry-filter";
+import { buildEntryWhere, entryScopeForSession, type EntrySearchParams } from "@/lib/entry-filter";
 import { toCsv } from "@/lib/csv";
 import { statusLabel } from "@/lib/i18n";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
@@ -16,14 +16,7 @@ export async function GET(req: NextRequest) {
   const sp = Object.fromEntries(url.searchParams.entries()) as EntrySearchParams;
 
   // Role scope is applied LAST so it cannot be overridden by query filters.
-  const scope =
-    session.role === "ADMIN"
-      ? { organizationId: session.organizationId }
-      : session.role === "MANAGER"
-        ? { organizationId: session.organizationId, managerId: session.userId }
-        : { organizationId: session.organizationId, employeeId: session.userId };
-
-  const where = { ...buildEntryWhere(sp), ...scope };
+  const where = { ...buildEntryWhere(sp), ...entryScopeForSession(session) };
 
   const entries = await prisma.invisibleWorkEntry.findMany({
     where,

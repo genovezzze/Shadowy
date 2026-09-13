@@ -21,6 +21,9 @@ import { EntriesBreakdownCard } from "@/components/dashboard/entries-breakdown-c
 import { buildClientMatrix } from "@/lib/client-matrix";
 import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
+import { EntryLeaderboard } from "@/components/dashboard/entry-leaderboard";
+import { EmployeeClientMatrix } from "@/components/dashboard/employee-client-matrix";
+import { DeltaBadge } from "@/components/dashboard/delta-badge";
 import {
   AlertTriangle,
   Clock,
@@ -222,7 +225,7 @@ export default async function ManagerDashboard({
   const nowDate = new Date();
   const currentMonthStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), 1));
 
-  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear, clientMatrixEntries, clientMonthHistory] = await Promise.all([
+  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear, clientMatrixEntries, clientMonthHistory, entryCountsByEmployee, clientAssignmentRows] = await Promise.all([
     prisma.user.count({ where: { organizationId: orgId, managerId } }),
     prisma.client.findMany({
       where: { organizationId: orgId },
@@ -317,7 +320,21 @@ export default async function ManagerDashboard({
       },
       select: { workDate: true },
     }),
+    prisma.invisibleWorkEntry.groupBy({
+      by: ["employeeId"],
+      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+      _count: { _all: true },
+    }),
+    prisma.clientEmployee.findMany({
+      where: { client: { organizationId: orgId }, employee: { managerId } },
+      select: { clientId: true, employeeId: true, client: { select: { name: true } } },
+    }),
   ]);
+  const clientAssignments = clientAssignmentRows.map((a) => ({
+    clientId: a.clientId,
+    clientName: a.client.name,
+    employeeId: a.employeeId,
+  }));
 
   const availableClientMonths = clientMonthOptions(
     clientMonthHistory.map((entry) => entry.workDate),
@@ -351,6 +368,26 @@ export default async function ManagerDashboard({
   const extraDailyBreakdown = Array.from(extraByDay.entries()).map(([date, minutes]) => ({ date, minutes }));
 
   const totalHours = Math.round((totalMinutes / 60) * 10) / 10;
+
+  // Trend vs the previous, equally long window. For a fixed period we reuse its
+  // length; for "all time" (no baseline) we fall back to the last 30 days vs the
+  // 30 before that, so the arrow always has a clear meaning.
+  const deltaDays = period === "7d" ? 7 : period === "90d" ? 90 : 30;
+  const deltaLabel = `pret iepr. ${deltaDays} d.`;
+  const curWindowStart = new Date(Date.now() - deltaDays * 86400000);
+  const prevWindowStart = new Date(Date.now() - 2 * deltaDays * 86400000);
+  const [curHoursAgg, prevHoursAgg] = await Promise.all([
+    prisma.invisibleWorkEntry.aggregate({
+      _sum: { durationMinutes: true },
+      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: curWindowStart } },
+    }),
+    prisma.invisibleWorkEntry.aggregate({
+      _sum: { durationMinutes: true },
+      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: prevWindowStart, lt: curWindowStart } },
+    }),
+  ]);
+  const curWindowHours = Math.round(((curHoursAgg._sum.durationMinutes ?? 0) / 60) * 10) / 10;
+  const prevWindowHours = Math.round(((prevHoursAgg._sum.durationMinutes ?? 0) / 60) * 10) / 10;
   const extraHours = Math.round((extraMinutes / 60) * 10) / 10;
 
   // --- Entries breakdown (today / yesterday / week / month / etc.) ---
@@ -479,6 +516,17 @@ export default async function ManagerDashboard({
   }
   clientForecasts.sort((a, b) => a.daysLeft - b.daysLeft);
 
+  // --- Entry leaderboard (who submitted the most entries) ---
+  const teamNameMap = new Map(teamMembers.map((m) => [m.id, m.name]));
+  const leaderboardRows = entryCountsByEmployee
+    .map((g) => ({
+      id: g.employeeId,
+      name: teamNameMap.get(g.employeeId) ?? "Nezināms",
+      count: g._count._all,
+    }))
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count);
+
   const workNatureRows = groupByWorkNature(approved);
   const helpPairs = groupHelpPairs(
     approved.map((e) => ({
@@ -540,14 +588,21 @@ export default async function ManagerDashboard({
       {/* KPI strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 mb-8">
         {[
-          { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā" },
-          { label: "Kopā stundas", value: `${totalHours}h`, icon: Clock, sub: "ierakstītas" },
-          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts" },
+          { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā", delta: null as React.ReactNode },
+          {
+            label: "Kopā stundas",
+            value: `${totalHours}h`,
+            icon: Clock,
+            sub: "ierakstītas",
+            delta: <DeltaBadge current={curWindowHours} previous={prevWindowHours} label={deltaLabel} />,
+          },
+          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts", delta: null as React.ReactNode },
           {
             label: "Izskatīšana",
             value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "-",
             icon: Timer,
             sub: "vid. laiks",
+            delta: null as React.ReactNode,
           },
         ].map((k, i) => (
           <Card key={i} className="p-4">
@@ -555,7 +610,10 @@ export default async function ManagerDashboard({
               <k.icon className="h-4 w-4" />
               <span className="text-xs">{k.label}</span>
             </div>
-            <div className="text-2xl font-bold tabular-nums">{k.value}</div>
+            <div className="flex items-baseline gap-2">
+              <div className="text-2xl font-bold tabular-nums">{k.value}</div>
+              {k.delta}
+            </div>
             <div className="text-xs text-muted-foreground">{k.sub}</div>
           </Card>
         ))}
@@ -729,6 +787,30 @@ export default async function ManagerDashboard({
               </div>
             </div>
           )}
+        </>
+      )}
+
+      {/* Entry activity */}
+      {leaderboardRows.length > 0 && (
+        <>
+          <SectionDivider label="Ierakstu aktivitāte" />
+          <EntryLeaderboard
+            rows={leaderboardRows}
+            subtitle={periodLabel(period)}
+          />
+        </>
+      )}
+
+      {/* Employee → clients matrix */}
+      {matrixRows.length > 0 && (
+        <>
+          <SectionDivider label="Darbinieku klienti" />
+          <EmployeeClientMatrix
+            rows={matrixRows}
+            employees={matrixEmployees}
+            monthLabel={clientMonth.label}
+            assignments={clientAssignments}
+          />
         </>
       )}
 

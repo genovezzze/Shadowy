@@ -16,6 +16,9 @@ interface EntryCardProps {
   clientName?: string | null;
   clientHref?: string;
   workDate: Date | string;
+  /** When the employee logged the entry. Often later than workDate - people
+   * enter last week's work days after the fact - so it is shown separately. */
+  createdAt?: Date | string;
   durationMinutes: number;
   status: EntryStatus;
   employeeName?: string;
@@ -36,6 +39,7 @@ export function EntryCard({
   clientName,
   clientHref,
   workDate,
+  createdAt,
   durationMinutes,
   status,
   employeeName,
@@ -52,20 +56,18 @@ export function EntryCard({
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>{categoryLabel(category)}</span>
-              {clientName ? (
-                <>
-                  <span>·</span>
-                  {clientHref ? (
-                    <Link href={clientHref} className="hover:underline hover:text-foreground transition-colors">
-                      {clientName}
-                    </Link>
-                  ) : (
-                    <span>{clientName}</span>
-                  )}
-                </>
-              ) : null}
               <span>·</span>
-              <span>{formatDateLV(workDate)}</span>
+              {clientName ? (
+                clientHref ? (
+                  <Link href={clientHref} className="hover:underline hover:text-foreground transition-colors">
+                    {clientName}
+                  </Link>
+                ) : (
+                  <span>{clientName}</span>
+                )
+              ) : (
+                <span className="italic">Bez klienta</span>
+              )}
               <span>·</span>
               <span>{formatDurationLV(durationMinutes)}</span>
               {helpedColleague ? (
@@ -85,6 +87,15 @@ export function EntryCard({
                 Iesniedzējs: {employeeName}
               </div>
             ) : null}
+            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+              <span>Darbs veikts: <span className="text-foreground/80">{formatDateLV(workDate)}</span></span>
+              {createdAt ? (
+                <>
+                  <span>·</span>
+                  <span>Ievadīts: <span className="text-foreground/80">{formatDateLV(createdAt)}</span></span>
+                </>
+              ) : null}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-1.5 shrink-0">
             <StatusBadge status={status} />

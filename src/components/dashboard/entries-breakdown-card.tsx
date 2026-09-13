@@ -14,9 +14,11 @@ interface Props {
   icon?: ReactNode;
   breakdown: BreakdownItem[];
   className?: string;
+  /** Optional period-over-period change indicator shown next to the value. */
+  delta?: ReactNode;
 }
 
-export function EntriesBreakdownCard({ label, value, icon, breakdown, className }: Props) {
+export function EntriesBreakdownCard({ label, value, icon, breakdown, className, delta }: Props) {
   const [open, setOpen] = useState(false);
   const [popupStyle, setPopupStyle] = useState<React.CSSProperties>({});
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -71,7 +73,10 @@ export function EntriesBreakdownCard({ label, value, icon, breakdown, className 
           </div>
         ) : null}
         <div className="text-sm text-muted-foreground">{label}</div>
-        <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{value}</div>
+        <div className="mt-1.5 flex items-baseline gap-2">
+          <div className="text-3xl font-bold tracking-tight tabular-nums">{value}</div>
+          {delta}
+        </div>
         <div className="mt-1.5 text-xs text-muted-foreground/50">Detalizēti →</div>
       </button>
 

@@ -106,6 +106,29 @@ export function buildEntryWhere(
   return where;
 }
 
+/**
+ * The mandatory tenant/role scope for reading entries, derived from the session
+ * alone (never from user input). Callers MUST spread this AFTER
+ * {@link buildEntryWhere} so a crafted URL can never widen what the viewer sees:
+ *   `{ ...buildEntryWhere(sp), ...entryScopeForSession(session) }`
+ *
+ * - ADMIN sees the whole organization.
+ * - MANAGER is pinned to entries they manage.
+ * - EMPLOYEE is pinned to their own entries.
+ *
+ * `organizationId` is always present, so no query can cross tenants.
+ */
+export function entryScopeForSession(session: {
+  role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+  organizationId: string;
+  userId: string;
+}): { organizationId: string; managerId?: string; employeeId?: string } {
+  if (session.role === "ADMIN") return { organizationId: session.organizationId };
+  if (session.role === "MANAGER")
+    return { organizationId: session.organizationId, managerId: session.userId };
+  return { organizationId: session.organizationId, employeeId: session.userId };
+}
+
 export function hasActiveFilters(sp: EntrySearchParams): boolean {
   return Boolean(
     sp.q || sp.status || sp.category || sp.employee || sp.client || sp.from || sp.to

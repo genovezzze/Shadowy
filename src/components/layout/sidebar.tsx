@@ -24,6 +24,7 @@ import {
   Settings,
   Megaphone,
   ScanSearch,
+  ShieldCheck,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -115,6 +116,7 @@ const EMPLOYEE_NAV: NavItem[] = [
   { href: "/employee/my-role", label: "Mana loma", icon: BadgeCheck, motion: "badge" },
   { href: "/employee/bonuses", label: "Atzinība", icon: Gift, motion: "gift" },
   { href: "/employee/profile", label: "Mans profils", icon: UserCircle, motion: "profile" },
+  { href: "/employee/privatums", label: "Mani dati", icon: ShieldCheck, motion: "badge" },
 ];
 
 function NavLink({ item, pathname, pendingCount, onClose }: { item: NavItem; pathname: string; pendingCount?: number; onClose?: () => void }) {
@@ -233,22 +235,20 @@ export function Sidebar({ role, userName, organizationName, pendingCount, unread
       <div className="relative z-10 flex items-center justify-between border-b border-sidebar-border px-5 py-5 dark:border-white/[0.07]">
         <Link
           href="/"
-          className="flex items-center gap-1 transition-opacity hover:opacity-75"
+          className="flex items-center gap-1.5 transition-opacity hover:opacity-75"
         >
-          <Image src="/shadowy.svg" alt="Shadowy" width={26} height={26} className="shrink-0 invert dark:invert-0" />
-          {/* Deliberately not matched to the mark's height. Standing the
-              capitals at the full 26px of the logo is geometrically equal but
-              reads oversized: the mark is a compact disc, while the word is
-              seven characters wide and carries ascenders and a descender on top
-              of its capitals, so equal cap height makes the text dominate the
-              lockup. At 22px the capitals sit around 16px - subordinate to the
-              mark, which is the usual proportion for a sidebar lockup.
+          <Image src="/shadowy.svg" alt="Shadowy" width={24} height={24} className="shrink-0 invert dark:invert-0" />
+          {/* Matched to the landing nav lockup: mark and word share the same
+              24px measure so the word stands as tall as the mark, not taller.
+              The size is an arbitrary value on purpose - Tailwind's named steps
+              ship their own line-height, which lands after leading-none and
+              would put the word's box back out of step with the mark.
 
               `font-display` is named because the sidebar sits in a `font-accent`
               group, and that variable registers a 300 face alone - any weight
               asked for against it is synthesised rather than drawn. `font-normal`
               resolves to that real 300 face here. */}
-          <div className="font-display text-[22px] font-normal leading-none tracking-tight">
+          <div className="font-display text-[24px] font-normal leading-none tracking-tight">
             Shadowy
           </div>
         </Link>

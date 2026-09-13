@@ -116,6 +116,7 @@ export default async function AdminEntriesPage({
               description={e.description}
               clientName={e.clientName}
               workDate={e.workDate}
+              createdAt={e.createdAt}
               durationMinutes={e.durationMinutes}
               status={e.status}
               employeeName={e.employee.name}

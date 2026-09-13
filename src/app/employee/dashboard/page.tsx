@@ -663,6 +663,7 @@ export default async function EmployeeDashboard() {
               description={e.description}
               clientName={e.clientName}
               workDate={e.workDate}
+              createdAt={e.createdAt}
               durationMinutes={e.durationMinutes}
               status={e.status}
               managerComment={e.managerComment}

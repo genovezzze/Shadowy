@@ -86,7 +86,7 @@ export default async function EmployeeHistoryPage({
       id: true, title: true, category: true, description: true,
       clientName: true, clientId: true,
       client: { select: { name: true } },
-      workDate: true, durationMinutes: true, status: true,
+      workDate: true, createdAt: true, durationMinutes: true, status: true,
       managerComment: true, isOutsideRole: true,
       helpedColleague: true,
       helpedUser: { select: { name: true } },
@@ -150,6 +150,7 @@ export default async function EmployeeHistoryPage({
                 clientName={e.clientName ?? e.client?.name ?? undefined}
                 clientHref={e.clientId ? `/employee/clients/${e.clientId}` : undefined}
                 workDate={e.workDate}
+                createdAt={e.createdAt}
                 durationMinutes={totalMinutes}
                 status={e.status}
                 managerComment={e.managerComment}

@@ -20,6 +20,7 @@ export interface PendingEntry {
   description: string;
   clientName?: string | null;
   workDate: string;
+  createdAt?: string;
   durationMinutes: number;
   status: string;
   employeeName: string;
@@ -205,6 +206,7 @@ function GroupCard({ group }: { group: EmployeeGroup }) {
                   description={e.description}
                   clientName={e.clientName}
                   workDate={new Date(e.workDate)}
+                  createdAt={e.createdAt ? new Date(e.createdAt) : undefined}
                   durationMinutes={e.durationMinutes}
                   status={e.status as "PENDING"}
                   workType={e.workType}

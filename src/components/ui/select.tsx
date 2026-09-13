@@ -74,9 +74,9 @@ const SelectContent = React.forwardRef<
       position={position}
       sideOffset={6}
       className={cn(
-        "glass relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+        "relative z-50 min-w-[8rem] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
         "max-h-[var(--radix-select-content-available-height)]",
-        "dark:border-white/[0.08] dark:bg-white/[0.05] dark:text-foreground dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06),0_16px_40px_-16px_rgba(0,0,0,0.8)]",
+        "dark:border-white/[0.08] dark:bg-[#141416] dark:text-foreground dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)]",
         position === "popper" &&
           "w-full min-w-[var(--radix-select-trigger-width)] translate-y-1",
         className
@@ -103,9 +103,8 @@ const SelectItem = React.forwardRef<
   <SelectPrimitive.Item
     ref={ref}
     className={cn(
-      "relative flex w-full cursor-pointer select-none items-center rounded-md py-1.5 pl-8 pr-2 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
-      "focus:bg-accent focus:text-accent-foreground",
-      "dark:focus:bg-emerald-500/15 dark:focus:text-emerald-300 dark:data-[state=checked]:text-emerald-400",
+      "relative flex w-full cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-2 text-sm text-foreground outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "focus:bg-accent focus:text-accent-foreground dark:focus:bg-white/[0.06] dark:focus:text-foreground",
       className
     )}
     {...props}

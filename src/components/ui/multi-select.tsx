@@ -20,6 +20,8 @@ interface MultiSelectProps {
   searchPlaceholder?: string;
   /** Shown as the "clear the filter" row inside the dropdown. */
   allLabel?: string;
+  /** Single choice: picking a row replaces the selection and closes. */
+  single?: boolean;
 }
 
 export function MultiSelect({
@@ -31,6 +33,7 @@ export function MultiSelect({
   placeholder = "Visi",
   searchPlaceholder = "Meklēt...",
   allLabel,
+  single = false,
 }: MultiSelectProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -92,11 +95,21 @@ export function MultiSelect({
   }, [open]);
 
   function toggle(optionValue: string) {
+    if (single) {
+      onChange(selected.has(optionValue) ? [] : [optionValue]);
+      close();
+      return;
+    }
     onChange(
       selected.has(optionValue)
         ? value.filter((v) => v !== optionValue)
         : [...value, optionValue]
     );
+  }
+
+  function clearAll() {
+    onChange([]);
+    if (single) close();
   }
 
   return (
@@ -118,8 +131,11 @@ export function MultiSelect({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-card shadow-md">
-          <div className="flex items-center border-b border-border px-3">
+        <div className={cn(
+          "absolute z-50 mt-1.5 w-full overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+          "dark:border-white/[0.08] dark:bg-[#141416] dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)]"
+        )}>
+          <div className="flex items-center border-b border-border px-3 dark:border-white/[0.06]">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               ref={inputRef}
@@ -129,13 +145,13 @@ export function MultiSelect({
               className="flex h-9 w-full bg-transparent py-2 pl-2 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <div className="max-h-60 overflow-y-auto py-1" role="listbox" aria-multiselectable>
+          <div className="max-h-60 overflow-y-auto p-1 pr-2" role="listbox" aria-multiselectable>
             {allLabel ? (
               <button
                 type="button"
-                onClick={() => onChange([])}
+                onClick={clearAll}
                 className={cn(
-                  "flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent",
+                  "flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-sm outline-none transition-colors hover:bg-accent focus:bg-accent dark:hover:bg-white/[0.06] dark:focus:bg-white/[0.06]",
                   value.length === 0 ? "text-foreground" : "text-muted-foreground"
                 )}
               >
@@ -146,21 +162,24 @@ export function MultiSelect({
             {filtered.length === 0 ? (
               <p className="px-3 py-2 text-sm text-muted-foreground">Nav rezultātu</p>
             ) : (
-              filtered.map((o) => (
-                <button
-                  key={o.value}
-                  type="button"
-                  role="option"
-                  aria-selected={selected.has(o.value)}
-                  onClick={() => toggle(o.value)}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm hover:bg-accent"
-                >
-                  <Check
-                    className={cn("h-4 w-4 shrink-0", selected.has(o.value) ? "opacity-100" : "opacity-0")}
-                  />
-                  <span className="truncate">{o.label}</span>
-                </button>
-              ))
+              filtered.map((o) => {
+                const isSelected = selected.has(o.value);
+                return (
+                  <button
+                    key={o.value}
+                    type="button"
+                    role="option"
+                    aria-selected={isSelected}
+                    onClick={() => toggle(o.value)}
+                    className="flex w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm text-foreground outline-none transition-colors hover:bg-accent focus:bg-accent dark:hover:bg-white/[0.06] dark:focus:bg-white/[0.06]"
+                  >
+                    <Check
+                      className={cn("h-4 w-4 shrink-0", isSelected ? "opacity-100" : "opacity-0")}
+                    />
+                    <span className="truncate">{o.label}</span>
+                  </button>
+                );
+              })
             )}
           </div>
         </div>

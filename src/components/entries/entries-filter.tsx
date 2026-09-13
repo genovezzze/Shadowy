@@ -48,6 +48,16 @@ export function EntriesFilter({
     setEmployeeIds(parseEmployeeIds(employeeParam));
   }
 
+  // The client filter is a single value but reuses the searchable dropdown, so
+  // hold it as a one-element array and keep it in sync with the URL.
+  const clientParam = params.get("client") ?? "";
+  const [clientValue, setClientValue] = useState<string[]>(() => (clientParam ? [clientParam] : []));
+  const [syncedClient, setSyncedClient] = useState(clientParam);
+  if (syncedClient !== clientParam) {
+    setSyncedClient(clientParam);
+    setClientValue(clientParam ? [clientParam] : []);
+  }
+
   const hasFilters = ["q", "status", "category", "employee", "client", "from", "to"].some(
     (k) => params.get(k)
   );
@@ -132,19 +142,22 @@ export function EntriesFilter({
       {clients && clients.length > 0 ? (
         <div className="grid gap-1.5">
           <Label htmlFor="client">Klients</Label>
-          <Select name="client" defaultValue={params.get("client") || ALL_VALUE}>
-            <SelectTrigger id="client">
-              <SelectValue placeholder="Visi klienti" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={ALL_VALUE}>Visi klienti</SelectItem>
-              {clients.map((c) => (
-                <SelectItem key={c.value} value={c.value}>
-                  {c.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <input type="hidden" name="client" value={clientValue[0] ?? ""} />
+          <MultiSelect
+            id="client"
+            single
+            options={clients}
+            value={clientValue}
+            onChange={setClientValue}
+            onClose={() => {
+              if ((clientValue[0] ?? "") !== clientParam && formRef.current) {
+                apply(formRef.current);
+              }
+            }}
+            placeholder="Visi klienti"
+            allLabel="Visi klienti"
+            searchPlaceholder="Meklēt klientu..."
+          />
         </div>
       ) : null}
 

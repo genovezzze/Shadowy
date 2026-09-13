@@ -21,6 +21,9 @@ import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-wid
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
 import { CategoryList } from "@/components/dashboard/category-list";
 import { WorkNatureCard } from "@/components/dashboard/work-nature-card";
+import { EntryLeaderboard } from "@/components/dashboard/entry-leaderboard";
+import { EmployeeClientMatrix } from "@/components/dashboard/employee-client-matrix";
+import { DeltaBadge } from "@/components/dashboard/delta-badge";
 import { groupByWorkNature, groupHelpPairs } from "@/lib/work-nature";
 import { resolveWorkType } from "@/lib/work-type";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
@@ -66,7 +69,7 @@ export default async function AdminDashboard({
   const nowDateA = new Date();
   const currentMonthStartA = new Date(Date.UTC(nowDateA.getUTCFullYear(), nowDateA.getUTCMonth(), 1));
 
-  const [managers, employees, totalEntries, allTimeEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries, clientMatrixEntries, clientMonthHistory] =
+  const [managers, employees, totalEntries, allTimeEntries, pending, recent, allEntries, managerList, approvedEntries, allEmployees, recentHeatmapEntries, orgClients, currentMonthClientEntries, clientMatrixEntries, clientMonthHistory, entryCountsByEmployee, employeeNames, clientAssignmentRows] =
     await Promise.all([
       prisma.user.count({ where: { organizationId: orgId, role: "MANAGER" } }),
       prisma.user.count({ where: { organizationId: orgId, role: "EMPLOYEE" } }),
@@ -173,7 +176,41 @@ export default async function AdminDashboard({
         },
         select: { workDate: true },
       }),
+      prisma.invisibleWorkEntry.groupBy({
+        by: ["employeeId"],
+        where: { organizationId: orgId, deletedAt: null, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+        _count: { _all: true },
+      }),
+      prisma.user.findMany({
+        where: { organizationId: orgId, role: "EMPLOYEE" },
+        select: { id: true, name: true },
+      }),
+      prisma.clientEmployee.findMany({
+        where: { client: { organizationId: orgId } },
+        select: { clientId: true, employeeId: true, client: { select: { name: true } } },
+      }),
     ]);
+  const clientAssignments = clientAssignmentRows.map((a) => ({
+    clientId: a.clientId,
+    clientName: a.client.name,
+    employeeId: a.employeeId,
+  }));
+
+  // Trend vs the previous, equally long window. For a fixed period we reuse its
+  // length; for "all time" (no baseline) we fall back to the last 30 days vs the
+  // 30 before that, so the arrow always has a clear meaning.
+  const deltaDays = period === "7d" ? 7 : period === "90d" ? 90 : 30;
+  const deltaLabel = `pret iepr. ${deltaDays} d.`;
+  const curWindowStart = new Date(Date.now() - deltaDays * 86400000);
+  const prevWindowStart = new Date(Date.now() - 2 * deltaDays * 86400000);
+  const [curWindowEntries, prevWindowEntries] = await Promise.all([
+    prisma.invisibleWorkEntry.count({
+      where: { organizationId: orgId, createdAt: { gte: curWindowStart } },
+    }),
+    prisma.invisibleWorkEntry.count({
+      where: { organizationId: orgId, createdAt: { gte: prevWindowStart, lt: curWindowStart } },
+    }),
+  ]);
 
   const availableClientMonths = clientMonthOptions(
     clientMonthHistory.map((entry) => entry.workDate),
@@ -364,6 +401,17 @@ export default async function AdminDashboard({
     })
   );
 
+  // --- Entry leaderboard (who submitted the most entries) ---
+  const employeeNameMap = new Map(employeeNames.map((e) => [e.id, e.name]));
+  const leaderboardRows = entryCountsByEmployee
+    .map((g) => ({
+      id: g.employeeId,
+      name: employeeNameMap.get(g.employeeId) ?? "Nezināms",
+      count: g._count._all,
+    }))
+    .filter((r) => r.count > 0)
+    .sort((a, b) => b.count - a.count);
+
   const monthlyData = buildMonthlyData(allEntries);
 
   // --- Entries breakdown (today / yesterday / week / month / etc.) ---
@@ -416,6 +464,7 @@ export default async function AdminDashboard({
           value={totalEntries}
           icon={<FileText className="h-5 w-5" />}
           breakdown={entriesBreakdown}
+          delta={<DeltaBadge current={curWindowEntries} previous={prevWindowEntries} label={deltaLabel} />}
         />
         <KpiCard
           formal
@@ -450,6 +499,19 @@ export default async function AdminDashboard({
           data={monthlyData}
         />
       </div>
+
+      {/* Employee → clients matrix */}
+      {matrixRows.length > 0 && (
+        <>
+          <SectionDivider label="Darbinieku klienti" />
+          <EmployeeClientMatrix
+            rows={matrixRows}
+            employees={matrixEmployees}
+            monthLabel={clientMonth.label}
+            assignments={clientAssignments}
+          />
+        </>
+      )}
 
       {/* Client x Employee matrix */}
       {matrixRows.length > 0 && (
@@ -628,6 +690,17 @@ export default async function AdminDashboard({
               )}
             </div>
           </div>
+        </>
+      )}
+
+      {/* ── Entry activity ── */}
+      {leaderboardRows.length > 0 && (
+        <>
+          <SectionDivider label="Ierakstu aktivitāte" />
+          <EntryLeaderboard
+            rows={leaderboardRows}
+            subtitle={period === "all" ? "viss laiks" : period === "7d" ? "pēdējās 7 dienas" : period === "30d" ? "pēdējās 30 dienas" : "pēdējās 90 dienas"}
+          />
         </>
       )}
 
