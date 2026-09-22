@@ -5,18 +5,21 @@ import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
-const SHOULD_LOG = [
-  "Darbs ārpus pamatlomas",
-  "Palīdzība kolēģiem",
-  "Informācijas gaidīšana",
-  "Atkārtoti jautājumi",
-  "Kļūdu labošana",
-  "Fokusa pārtraukumi",
-  "Steidzami neplānoti uzdevumi",
-  "Jauno darbinieku ievadīšana",
-  "Koordinācija starp cilvēkiem",
-] as const;
+type L = Record<Locale, string>;
+
+const SHOULD_LOG: readonly L[] = [
+  { lv: "Darbs ārpus pamatlomas", en: "Work outside your core role" },
+  { lv: "Palīdzība kolēģiem", en: "Helping colleagues" },
+  { lv: "Informācijas gaidīšana", en: "Waiting for information" },
+  { lv: "Atkārtoti jautājumi", en: "Repeated questions" },
+  { lv: "Kļūdu labošana", en: "Fixing errors" },
+  { lv: "Fokusa pārtraukumi", en: "Focus interruptions" },
+  { lv: "Steidzami neplānoti uzdevumi", en: "Urgent unplanned tasks" },
+  { lv: "Jauno darbinieku ievadīšana", en: "Onboarding new hires" },
+  { lv: "Koordinācija starp cilvēkiem", en: "Coordination between people" },
+];
 
 /**
  * The same idea in one industry's own words.
@@ -27,41 +30,42 @@ const SHOULD_LOG = [
  * categories look like once they are written for a real company, and says
  * plainly that they are built per company rather than shipped as a fixed list.
  */
-const ACCOUNTING_EXAMPLE = [
-  "Klienta dokumentu gaidīšana",
-  "Trūkstošu attaisnojuma dokumentu pieprasīšana",
-  "Labojumi klienta iesniegtajos datos",
-  "Klienta atkārtoti jautājumi",
-  "Konsultācijas ārpus līguma apjoma",
-  "Steidzami pieprasījumi pirms termiņa",
-  "Saziņa ar VID",
-  "Bankas izrakstu sakārtošana",
-  "Gada pārskata papildu darbi",
-] as const;
+const ACCOUNTING_EXAMPLE: readonly L[] = [
+  { lv: "Klienta dokumentu gaidīšana", en: "Waiting for client documents" },
+  { lv: "Trūkstošu attaisnojuma dokumentu pieprasīšana", en: "Chasing missing supporting documents" },
+  { lv: "Labojumi klienta iesniegtajos datos", en: "Corrections to data the client submitted" },
+  { lv: "Klienta atkārtoti jautājumi", en: "The client's repeated questions" },
+  { lv: "Konsultācijas ārpus līguma apjoma", en: "Advice beyond the contract scope" },
+  { lv: "Steidzami pieprasījumi pirms termiņa", en: "Urgent requests before a deadline" },
+  { lv: "Saziņa ar VID", en: "Dealing with the tax authority" },
+  { lv: "Bankas izrakstu sakārtošana", en: "Sorting out bank statements" },
+  { lv: "Gada pārskata papildu darbi", en: "Extra work on the annual report" },
+];
 
-const SHOULD_NOT_LOG = [
-  "Katra ikdienas darbība",
-  "Katra minūte",
-  "Parastais plānotais darbs",
-  "Privātas sarunas",
-  "Ekrāna aktivitāte",
-] as const;
+const SHOULD_NOT_LOG: readonly L[] = [
+  { lv: "Katra ikdienas darbība", en: "Every routine action" },
+  { lv: "Katra minūte", en: "Every minute" },
+  { lv: "Parastais plānotais darbs", en: "Ordinary planned work" },
+  { lv: "Privātas sarunas", en: "Private conversations" },
+  { lv: "Ekrāna aktivitāte", en: "Screen activity" },
+];
 
 export function LandingWhatToLog() {
+  const { locale, t } = useLocale();
   const [isExampleOpen, setExampleOpen] = React.useState(false);
 
   return (
     <section
       id="ko-fikset"
-      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] py-24 md:py-32"
+      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] py-16 md:py-32"
     >
       <div className="w-full px-4 md:px-8">
-        <Reveal className="mb-12 max-w-3xl">
+        <Reveal className="mb-8 max-w-3xl md:mb-12">
           <div className="mb-3 inline-block">
-            <SectionBadge>Saturs</SectionBadge>
+            <SectionBadge>{t("whatToLog.badge")}</SectionBadge>
           </div>
           <h2 className="text-landing-h2 text-black">
-            <WaveHeading tone="dark">Ko fiksē Shadowy</WaveHeading>
+            <WaveHeading tone="dark">{t("whatToLog.heading")}</WaveHeading>
           </h2>
         </Reveal>
 
@@ -77,19 +81,19 @@ export function LandingWhatToLog() {
         >
           {SHOULD_LOG.map((item) => (
             <motion.li
-              key={item}
+              key={item.lv}
               variants={{
                 hidden: { opacity: 0 },
                 visible: { opacity: 1, transition: { duration: 0.3 } },
               }}
               className="cursor-default text-lg font-bold tracking-tight text-black/60 transition-colors hover:text-black md:text-xl lg:text-2xl"
             >
-              {item}
+              {item[locale]}
             </motion.li>
           ))}
         </motion.ul>
 
-        <Reveal className="mt-16">
+        <Reveal className="mt-10 md:mt-16">
           {/* Folded away behind its own label: the example is here to be opened
               by someone who wants it, and left alone it would read as a second
               list competing with the one above rather than an illustration of
@@ -102,7 +106,7 @@ export function LandingWhatToLog() {
             aria-controls="accounting-example"
             className="group inline-flex items-center gap-2 rounded-full border border-black/5 bg-black/5 py-1 pl-4 pr-3 text-sm font-semibold text-black transition-colors hover:bg-black/10"
           >
-            Piemērs: grāmatvedības uzņēmums
+            {t("whatToLog.example")}
             <motion.span
               animate={{ rotate: isExampleOpen ? 180 : 0 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
@@ -129,36 +133,33 @@ export function LandingWhatToLog() {
             <ul className="flex flex-wrap gap-x-6 gap-y-3 pt-6 md:gap-x-8">
               {ACCOUNTING_EXAMPLE.map((item) => (
                 <li
-                  key={item}
+                  key={item.lv}
                   className="cursor-default text-base font-bold tracking-tight text-black/45 transition-colors hover:text-black/80 md:text-lg"
                 >
-                  {item}
+                  {item[locale]}
                 </li>
               ))}
             </ul>
             <p className="mt-5 max-w-2xl text-sm font-semibold leading-relaxed text-black/60 md:text-base">
-              Kategorijas veidojam individuāli jūsu uzņēmumam - šis ir tikai
-              piemērs tam, kā tās izskatās grāmatvedības komandā. Pilota sākumā
-              tās sagatavojam kopā ar jums, atbilstoši tam, kā strādā jūsu
-              komanda.
+              {t("whatToLog.exampleNote")}
             </p>
           </motion.div>
         </Reveal>
 
-        <Reveal className="mt-16">
+        <Reveal className="mt-10 md:mt-16">
           {/* The same pill the section itself is labelled with, rather than a
               bare uppercase caption - both are section-level labels, so they
               should not be two different shapes. */}
           <div className="mb-4 inline-block">
-            <SectionBadge>Nav jāfiksē</SectionBadge>
+            <SectionBadge>{t("whatToLog.notNeeded")}</SectionBadge>
           </div>
           <ul className="flex flex-wrap gap-x-6 gap-y-3">
             {SHOULD_NOT_LOG.map((item) => (
               <li
-                key={item}
+                key={item.lv}
                 className="text-base font-medium text-black/30 line-through decoration-black/20 md:text-lg"
               >
-                {item}
+                {item[locale]}
               </li>
             ))}
           </ul>

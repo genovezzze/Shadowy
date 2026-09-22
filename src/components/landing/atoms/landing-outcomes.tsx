@@ -4,47 +4,67 @@ import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/landing/atoms/landing-primitives";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
 type Outcome = {
-  tag: string;
-  title: string;
-  text: string;
+  tag: Record<Locale, string>;
+  title: Record<Locale, string>;
+  text: Record<Locale, string>;
 };
 
 const OUTCOMES: Outcome[] = [
   {
-    tag: "Stundas",
-    title: "Slēptās darba stundas",
-    text: "Cik daudz laika aizgāja papildu darbā, gaidīšanā un pārtraukumos",
+    tag: { lv: "Stundas", en: "Hours" },
+    title: { lv: "Slēptās darba stundas", en: "Hidden work hours" },
+    text: {
+      lv: "Cik daudz laika aizgāja papildu darbā, gaidīšanā un pārtraukumos",
+      en: "How much time went into extra work, waiting and interruptions",
+    },
   },
   {
-    tag: "Izmaksas",
-    title: "Aptuvenās izmaksas",
-    text: "Cik šis darbs varētu izmaksāt komandai mēnesī vai gadā",
+    tag: { lv: "Izmaksas", en: "Cost" },
+    title: { lv: "Aptuvenās izmaksas", en: "Approximate cost" },
+    text: {
+      lv: "Cik šis darbs varētu izmaksāt komandai mēnesī vai gadā",
+      en: "What this work could cost the team per month or per year",
+    },
   },
   {
-    tag: "Tendences",
-    title: "Atkārtotās problēmas",
-    text: "Kas visbiežāk traucē pamatdarbam un atkārtojas komandā",
+    tag: { lv: "Tendences", en: "Trends" },
+    title: { lv: "Atkārtotās problēmas", en: "Recurring problems" },
+    text: {
+      lv: "Kas visbiežāk traucē pamatdarbam un atkārtojas komandā",
+      en: "What most often gets in the way of core work and repeats across the team",
+    },
   },
   {
-    tag: "Klienti",
-    title: "Klientu patiesā cena",
-    text: "Kuri klienti prasa visvairāk neplānota un neapmaksāta laika",
+    tag: { lv: "Klienti", en: "Clients" },
+    title: { lv: "Klientu patiesā cena", en: "The true cost of clients" },
+    text: {
+      lv: "Kuri klienti prasa visvairāk neplānota un neapmaksāta laika",
+      en: "Which clients take the most unplanned and unbilled time",
+    },
   },
   {
-    tag: "Slodze",
-    title: "Nevienmērīga slodze",
-    text: "Kur darbs sadalās nevienlīdzīgi starp cilvēkiem un lomām",
+    tag: { lv: "Slodze", en: "Load" },
+    title: { lv: "Nevienmērīga slodze", en: "Uneven workload" },
+    text: {
+      lv: "Kur darbs sadalās nevienlīdzīgi starp cilvēkiem un lomām",
+      en: "Where work is distributed unevenly across people and roles",
+    },
   },
   {
-    tag: "Rīcība",
-    title: "Procesu ieteikumi",
-    text: "2-3 konkrēti uzlabojumi, ko var ieviest komandā uzreiz pēc pilota",
+    tag: { lv: "Rīcība", en: "Action" },
+    title: { lv: "Procesu ieteikumi", en: "Process suggestions" },
+    text: {
+      lv: "2-3 konkrēti uzlabojumi, ko var ieviest komandā uzreiz pēc pilota",
+      en: "2-3 concrete improvements you can roll out in the team right after the pilot",
+    },
   },
 ];
 
 export function LandingOutcomes() {
+  const { locale, t } = useLocale();
   return (
     <section
       id="ieguvumi"
@@ -102,23 +122,23 @@ export function LandingOutcomes() {
           <Reveal className="lg:w-1/3">
             <div className="mb-4 inline-block">
               <span className="inline-flex items-center rounded-full bg-white/20 px-4 py-1 text-sm font-medium text-white">
-                Ieguvumi
+                {t("outcomes.badge")}
               </span>
             </div>
             <h2 className="text-landing-h2 text-white">
-              <WaveHeading tone="light">Ko jūs redzēsiet pēc pilota</WaveHeading>
+              <WaveHeading tone="light">{t("outcomes.heading")}</WaveHeading>
             </h2>
             <Link
               href="#pilots"
               className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-all hover:bg-white/90 active:scale-[0.98]"
             >
-              Sākt pilotu
+              {t("outcomes.cta")}
             </Link>
           </Reveal>
 
           <div className="grid w-full gap-6 sm:grid-cols-2 lg:w-2/3">
             {OUTCOMES.map((outcome, index) => (
-              <Reveal key={outcome.title} delay={0.05 * index}>
+              <Reveal key={outcome.title.lv} delay={0.05 * index}>
                 {/* Title leads, tag sits at the foot behind a hairline rule -
                     the icon that used to head the card is gone, so nothing
                     competes with the heading for the top of the card
@@ -131,10 +151,10 @@ export function LandingOutcomes() {
                 <article className="flex h-full min-h-[290px] flex-col justify-between rounded-2xl bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_8px_28px_rgba(0,0,0,0.10)]">
                   <div>
                     <h3 className="text-xl font-bold leading-tight tracking-tight text-black md:text-2xl">
-                      {outcome.title}
+                      {outcome.title[locale]}
                     </h3>
                     <p className="mt-3 text-sm font-semibold leading-relaxed text-black/60 md:text-base">
-                      {outcome.text}
+                      {outcome.text[locale]}
                     </p>
                   </div>
 
@@ -142,7 +162,7 @@ export function LandingOutcomes() {
                     <div className="flex items-center gap-2">
                       <span className="h-4 w-px shrink-0 bg-black/15" aria-hidden />
                       <span className="rounded-[4px] bg-black/5 px-3 py-1 text-[13px] font-bold leading-tight tracking-tight text-black/70 md:text-sm">
-                        {outcome.tag}
+                        {outcome.tag[locale]}
                       </span>
                     </div>
 
@@ -150,7 +170,7 @@ export function LandingOutcomes() {
                       href="#pilots"
                       className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-black/85"
                     >
-                      Uzzināt vairāk
+                      {t("outcomes.learnMore")}
                     </Link>
                   </div>
                 </article>

@@ -9,13 +9,15 @@ import { submitPilotApplication } from "@/app/pilot-actions";
 import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
 import { cn } from "@/lib/utils";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
-const TEAM_SIZES = [
-  "2-5 cilvēki",
-  "6-15 cilvēki",
-  "16-50 cilvēki",
-  "51+ cilvēki",
-] as const;
+// Value stays in Latvian so submitted data is consistent regardless of UI language.
+const TEAM_SIZES: readonly { value: string; label: Record<Locale, string> }[] = [
+  { value: "2-5 cilvēki", label: { lv: "2-5 cilvēki", en: "2-5 people" } },
+  { value: "6-15 cilvēki", label: { lv: "6-15 cilvēki", en: "6-15 people" } },
+  { value: "16-50 cilvēki", label: { lv: "16-50 cilvēki", en: "16-50 people" } },
+  { value: "51+ cilvēki", label: { lv: "51+ cilvēki", en: "51+ people" } },
+];
 
 // The card sits on white, so the fields are tinted rather than outlined - a
 // border on every input would fight the card's own edge.
@@ -25,6 +27,7 @@ const FIELD_CLASS =
 const LABEL_CLASS = "mb-2 block text-xs text-black/60";
 
 export function LandingContact() {
+  const { locale, t } = useLocale();
   const [pending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
   const [done, setDone] = React.useState(false);
@@ -45,7 +48,7 @@ export function LandingContact() {
       // complete frame remain visible on wide screens; if the form makes the
       // section taller, `object-contain` still prevents any edge from being
       // cropped.
-      className="relative min-h-[56.25vw] scroll-mt-20 overflow-hidden bg-[var(--landing-night)] pb-0 pt-20 sm:pb-32"
+      className="relative min-h-[56.25vw] scroll-mt-20 overflow-hidden bg-[var(--landing-night)] pb-16 pt-20 sm:pb-32"
     >
       {/* Full-bleed backdrop, anchored to its bottom edge like the reference:
           the shot's own sky is black, so it meets the section's black ground
@@ -53,13 +56,21 @@ export function LandingContact() {
           the top where there is nothing but sky to lose. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block">
         <Image
-          src="/images/pic9.webp"
+          src="/images/back15.png"
           alt=""
           fill
           sizes="100vw"
           className="object-contain object-bottom"
         />
       </div>
+
+      {/* Softens the hard top edge of the shot: a blurred band that fades out
+          downward, over a gradient into the section's night colour, so the photo
+          dissolves into the page instead of cutting off on a straight line. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 z-[1] hidden h-[42%] bg-gradient-to-b from-[var(--landing-night)] via-[var(--landing-night)]/55 to-transparent backdrop-blur-[6px] [mask-image:linear-gradient(to_bottom,black_0%,black_50%,transparent_100%)] [-webkit-mask-image:linear-gradient(to_bottom,black_0%,black_50%,transparent_100%)] sm:block"
+      />
 
       <div className="relative z-10 w-full px-4 md:px-8">
         <div className="flex w-full flex-col items-start gap-10 lg:flex-row lg:justify-between">
@@ -69,15 +80,15 @@ export function LandingContact() {
               them in that order too. */}
           <Reveal className="w-full lg:relative lg:-top-8 lg:order-2 lg:w-[40%] xl:w-[35%]">
             <div className="mb-6 inline-block">
-              <SectionBadge tone="dark">Pieteikums</SectionBadge>
+              <SectionBadge tone="dark">{t("contact.badge")}</SectionBadge>
             </div>
             <h2 className="text-landing-h2 leading-tight text-white">
-              <WaveHeading tone="light">Sāksim ar sarunu</WaveHeading>
+              <WaveHeading tone="light">{t("contact.heading")}</WaveHeading>
             </h2>
-            <p className="mt-4 max-w-md text-sm font-medium leading-relaxed text-white/65 md:text-base">
-              Pastāstiet par komandu - sazināsimies 1-2 darba dienu laikā
-              Iepazīšanās zvans ilgst 20 minūtes, un ja Shadowy jūsu situācijai
-              neder, mēs to pateiksim godīgi
+            <p className="mt-4 max-w-md text-sm font-medium leading-relaxed md:text-base">
+              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.65)">
+                {t("contact.subtitle")}
+              </WaveHeading>
             </p>
           </Reveal>
 
@@ -93,10 +104,10 @@ export function LandingContact() {
                     <CheckCircle2 className="size-6" aria-hidden />
                   </span>
                   <p className="text-xl font-bold tracking-tight text-black">
-                    Pieteikums nosūtīts!
+                    {t("contact.sentTitle")}
                   </p>
                   <p className="text-sm font-medium text-black/70">
-                    Sazināsimies ar jums tuvāko dienu laikā
+                    {t("contact.sentBody")}
                   </p>
                 </div>
               ) : (
@@ -104,7 +115,7 @@ export function LandingContact() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className={LABEL_CLASS} htmlFor="pilot-name">
-                        Vārds un uzvārds*
+                        {t("contact.name")}
                       </label>
                       <input
                         id="pilot-name"
@@ -118,7 +129,7 @@ export function LandingContact() {
                     </div>
                     <div>
                       <label className={LABEL_CLASS} htmlFor="pilot-company">
-                        Uzņēmums*
+                        {t("contact.company")}
                       </label>
                       <input
                         id="pilot-company"
@@ -135,7 +146,7 @@ export function LandingContact() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <label className={LABEL_CLASS} htmlFor="pilot-email">
-                        E-pasts*
+                        {t("contact.email")}
                       </label>
                       <input
                         id="pilot-email"
@@ -148,7 +159,7 @@ export function LandingContact() {
                     </div>
                     <div>
                       <label className={LABEL_CLASS} htmlFor="pilot-size">
-                        Komandas lielums*
+                        {t("contact.teamSize")}
                       </label>
                       <SelectPrimitive.Root
                         name="teamSize"
@@ -162,7 +173,7 @@ export function LandingContact() {
                             "group flex min-h-11 items-center justify-between gap-3 text-left data-[placeholder]:text-black/40 focus-visible:ring-2 focus-visible:ring-black/15"
                           )}
                         >
-                          <SelectPrimitive.Value placeholder="Izvēlieties..." />
+                          <SelectPrimitive.Value placeholder={t("contact.selectPlaceholder")} />
                           <SelectPrimitive.Icon asChild>
                             <ChevronDown
                               aria-hidden
@@ -180,12 +191,12 @@ export function LandingContact() {
                             <SelectPrimitive.Viewport>
                               {TEAM_SIZES.map((size) => (
                                 <SelectPrimitive.Item
-                                  key={size}
-                                  value={size}
+                                  key={size.value}
+                                  value={size.value}
                                   className="relative flex cursor-pointer select-none items-center rounded-2xl py-2.5 pl-4 pr-10 text-sm outline-none transition-colors focus:bg-black/[0.06] data-[state=checked]:bg-black/[0.08]"
                                 >
                                   <SelectPrimitive.ItemText>
-                                    {size}
+                                    {size.label[locale]}
                                   </SelectPrimitive.ItemText>
                                   <SelectPrimitive.ItemIndicator className="absolute right-4 inline-flex items-center">
                                     <Check aria-hidden className="size-4" />
@@ -201,14 +212,14 @@ export function LandingContact() {
 
                   <div>
                     <label className={LABEL_CLASS} htmlFor="pilot-comment">
-                      Īss komentārs
+                      {t("contact.comment")}
                     </label>
                     <textarea
                       id="pilot-comment"
                       name="comment"
                       rows={3}
                       maxLength={1000}
-                      placeholder="Ko jūs vēlaties uzlabot komandā?"
+                      placeholder={t("contact.commentPlaceholder")}
                       className={cn(FIELD_CLASS, "resize-y rounded-[20px]")}
                     />
                   </div>
@@ -224,7 +235,7 @@ export function LandingContact() {
                     disabled={pending}
                     className="group inline-flex w-full items-center justify-center gap-2 rounded-full bg-black px-6 py-3.5 text-sm font-bold text-white transition-all hover:bg-black/85 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50"
                   >
-                    {pending ? "Sūta..." : "Nosūtīt pieteikumu"}
+                    {pending ? t("contact.sending") : t("contact.submit")}
                     {!pending && (
                       <ArrowUpRight
                         className="size-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -234,26 +245,17 @@ export function LandingContact() {
                   </button>
 
                   <p className="text-xs font-medium leading-relaxed text-black/40">
-                    Nospiežot pogu, jūs piekrītat{" "}
+                    {t("contact.consentPre")}{" "}
                     <Link href="/privacy" className="underline hover:text-black/70">
-                      privātuma politikai
+                      {t("contact.consentLink")}
                     </Link>
-                    .
+                    {locale === "lv" ? "." : ""}
                   </p>
                 </form>
               )}
             </div>
           </div>
         </div>
-      </div>
-      <div aria-hidden className="relative z-[5] mt-8 aspect-[16/9] w-full bg-black sm:hidden">
-        <Image
-          src="/images/pic9.webp"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-contain object-bottom"
-        />
       </div>
     </section>
   );

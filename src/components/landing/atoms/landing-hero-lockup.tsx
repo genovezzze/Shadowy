@@ -7,6 +7,8 @@ import { AnimatedGroup } from "@/components/ui/animated-group";
 import { HeroVideoBackground } from "@/components/landing/hero-video-background";
 import { cn } from "@/lib/utils";
 import { LandingHeroTrust } from "@/components/landing/atoms/landing-hero-trust";
+import { PixelWaveText } from "@/components/landing/atoms/pixel-wave-text";
+import { useLocale } from "@/components/landing/atoms/i18n";
 import type { Variants } from "framer-motion";
 
 // How far the backdrop lags the page over one screen of scrolling, as a share
@@ -21,7 +23,13 @@ import type { Variants } from "framer-motion";
 // would keep painting behind every section below it.
 const PARALLAX_LAG = 0.3;
 const HERO_WORDMARK = "Shadowy";
-const HERO_SHINE_STAGGER_MS = 420;
+// The wordmark never sits fully lit or fully still: the letters rest grey and a
+// bright band travels across them without pause. HERO_SHINE_BAND is how many
+// neighbouring letters are lit at once, HERO_SHINE_STEP_MS how long the band
+// dwells on each step before advancing. The band wraps continuously, so there
+// is no gap where every letter is grey at the same time.
+const HERO_SHINE_BAND = 3;
+const HERO_SHINE_STEP_MS = 340;
 const HERO_PIXEL_FRAME_MS = 50;
 const HERO_PIXEL_CYCLE_MS = 600;
 const HERO_PIXEL_STAGGER_MS = 250;
@@ -32,9 +40,6 @@ const HERO_PIXEL_FONTS = [
   "var(--font-pixel-triangle)",
   "var(--font-pixel-line)",
 ] as const;
-// How long the mark stays lit after a click - long enough for the staggered
-// per-letter shine to run the length of the wordmark before it eases back.
-const LOGO_LIT_MS = 1800;
 
 const transitionVariants: { item: Variants } = {
   item: {
@@ -56,6 +61,7 @@ const transitionVariants: { item: Variants } = {
  * mostly empty; from md up the lockup is still what the page opens with.
  */
 export function LandingHeroLockup() {
+  const { locale, t } = useLocale();
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const [pixelElapsed, setPixelElapsed] = React.useState(0);
 
@@ -82,38 +88,33 @@ export function LandingHeroLockup() {
     `${(PARALLAX_LAG / layerHeight) * 100}%`,
   ]);
 
-  // Clicking the mark plays its lit state once - the colour shimmer on the mark
-  // and the pixel pass over the wordmark. The mark itself no longer rotates.
-  const [isLogoSpinning, setIsLogoSpinning] = React.useState(false);
-  const settleTimer = React.useRef<number | null>(null);
+  // The copy rises and fades as the page scrolls: while the backdrop lags and
+  // sinks, the lockup lifts away faster than the scroll, so scrolling down reads
+  // as everything lifting up and out of the hero.
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0px", "-96px"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.65], [1, 0]);
 
-  // The played state used to be ended by the rotation reaching a completed 360,
-  // which is what kept the mark from stopping mid-turn. With no rotation left to
-  // wait on, a timer ends it instead: long enough for the 500ms transition in
-  // and the 900ms settle out to read as one gesture.
-  const playLogoSpin = React.useCallback(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (settleTimer.current !== null) window.clearTimeout(settleTimer.current);
-    setIsLogoSpinning(true);
-    settleTimer.current = window.setTimeout(() => {
-      setIsLogoSpinning(false);
-      settleTimer.current = null;
-    }, LOGO_LIT_MS);
-  }, []);
+  // The mark no longer reacts to clicks - the tap-to-play lit state was removed,
+  // so it always renders in its resting look. Kept as a constant so the resting
+  // branches below read the same as before.
+  const isLogoSpinning = false;
 
-  React.useEffect(
-    () => () => {
-      if (settleTimer.current !== null) window.clearTimeout(settleTimer.current);
-    },
-    [],
-  );
+  // The resting transition curve for the mark and the wordmark.
+  const lockupEasing =
+    "[transition-duration:900ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]";
 
-  // Settling is given a longer, softer curve than starting - a symmetric ease
-  // reads abrupt on the way out. Shared by the mark and the wordmark so the two
-  // still finish together.
-  const lockupEasing = isLogoSpinning
-    ? "duration-500 ease-out"
-    : "[transition-duration:900ms] [transition-timing-function:cubic-bezier(0.22,1,0.36,1)]";
+  // The head of the travelling shine band, advanced from the same frame timer as
+  // the pixel-face cycling. The band wraps over the whole lockup - the mark is
+  // unit 0 and the wordmark letters are units 1..n - so the mark shimmers in
+  // turn with the letters rather than pulsing on its own.
+  const shineHead = Math.floor(pixelElapsed / HERO_SHINE_STEP_MS);
+  const lockupUnits = HERO_WORDMARK.length + 1;
+  const isUnitLit = (unitIndex: number) => {
+    const distance =
+      ((unitIndex - shineHead) % lockupUnits + lockupUnits) % lockupUnits;
+    return distance < HERO_SHINE_BAND;
+  };
+  const logoLit = isUnitLit(0);
 
   // Overrides only the duration of the shared shimmer class, so the lockup can
   // run fast without speeding up section headings that use the same class.
@@ -140,7 +141,7 @@ export function LandingHeroLockup() {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate flex h-[100dvh] min-h-[640px] items-center justify-center overflow-hidden bg-[#070809] px-5 pb-16 pt-28 sm:min-h-0 sm:px-6 sm:py-24"
+      className="relative isolate flex h-auto min-h-0 items-start justify-center overflow-hidden bg-[#070809] px-5 pb-20 pt-[16vh] sm:h-[100dvh] sm:items-center sm:px-6 sm:py-24"
     >
       <motion.div
         aria-hidden
@@ -163,11 +164,15 @@ export function LandingHeroLockup() {
       />
 
       {/* Sized to its content rather than to the column, so the lockup keeps
-          its own width instead of stretching across the section. */}
-      <div className="relative z-10 mx-auto w-fit max-w-full">
+          its own width instead of stretching across the section. Rises and
+          fades on scroll via the parallax transforms above. */}
+      <motion.div
+        style={{ y: contentY, opacity: contentOpacity }}
+        className="relative z-10 mx-auto w-full min-w-0 max-w-3xl motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
+      >
         <AnimatedGroup
           variants={transitionVariants}
-          className="mx-auto flex w-full max-w-4xl flex-col items-stretch text-center font-accent font-light"
+          className="mx-auto flex w-full min-w-0 max-w-4xl flex-col items-center text-center font-accent font-light"
         >
           {/* The whole lockup is the target - mark and wordmark alike - and it
               is sized to its content rather than to the column, so a click far
@@ -178,8 +183,7 @@ export function LandingHeroLockup() {
               readers or spending a tab stop on it would be noise. It stays a
               pointer-only flourish. */}
           <div
-            onClick={playLogoSpin}
-            className="mx-auto flex w-fit cursor-pointer items-center justify-center gap-[calc(var(--lockup-cap)*0.3)] [--lockup-cap:2.1rem] sm:[--lockup-cap:2.888rem] lg:[--lockup-cap:3.321rem]"
+            className="mx-auto flex w-fit max-w-full items-center justify-center gap-[calc(var(--lockup-cap)*0.3)] [--lockup-cap:2rem] min-[400px]:[--lockup-cap:2.2rem] sm:[--lockup-cap:3.4rem] lg:[--lockup-cap:4rem]"
           >
             <span
               aria-hidden
@@ -191,10 +195,15 @@ export function LandingHeroLockup() {
                   cross-faded while it plays - you cannot transition a flat
                   colour into an animated gradient. */}
               <span
-                style={logoMaskStyle}
+                style={{
+                  ...logoMaskStyle,
+                  filter: logoLit
+                    ? "brightness(1.5) drop-shadow(0 0 8px rgba(255, 255, 255, 0.75))"
+                    : "brightness(0.72)",
+                  transition: "filter 300ms ease-out",
+                }}
                 className={cn(
-                  "hero-lockup-logo-shine absolute inset-0 bg-white transition-opacity",
-                  lockupEasing,
+                  "absolute inset-0 bg-white",
                   isLogoSpinning ? "opacity-0" : "opacity-100",
                 )}
               />
@@ -259,28 +268,39 @@ export function LandingHeroLockup() {
                   isLogoSpinning ? "opacity-0" : "opacity-100",
                 )}
               >
-                {[...HERO_WORDMARK].map((letter, index) => (
-                  <span
-                    key={`${letter}-${index}`}
-                    className="hero-lockup-letter-shine inline-block"
-                    style={{
-                      animationDelay: `${(index + 1) * HERO_SHINE_STAGGER_MS}ms`,
-                      fontFamily:
-                        HERO_PIXEL_FONTS[
-                          (index +
-                            Math.floor(
-                              Math.max(
-                                0,
-                                pixelElapsed - index * HERO_PIXEL_STAGGER_MS,
-                              ) / HERO_PIXEL_CYCLE_MS,
-                            )) %
-                            HERO_PIXEL_FONTS.length
-                        ],
-                    }}
-                  >
-                    {letter}
-                  </span>
-                ))}
+                {[...HERO_WORDMARK].map((letter, index) => {
+                  // The mark is unit 0, so this letter is unit index + 1 - lit
+                  // while the travelling band passes over it.
+                  const lit = isUnitLit(index + 1);
+
+                  return (
+                    <span
+                      key={`${letter}-${index}`}
+                      className={cn(
+                        "inline-block transition-[color,text-shadow,transform] duration-300 ease-out motion-reduce:transform-none",
+                        lit ? "-translate-y-px text-white" : "text-white/45",
+                      )}
+                      style={{
+                        textShadow: lit
+                          ? "0 0 10px rgba(255, 255, 255, 0.5)"
+                          : "none",
+                        fontFamily:
+                          HERO_PIXEL_FONTS[
+                            (index +
+                              Math.floor(
+                                Math.max(
+                                  0,
+                                  pixelElapsed - index * HERO_PIXEL_STAGGER_MS,
+                                ) / HERO_PIXEL_CYCLE_MS,
+                              )) %
+                              HERO_PIXEL_FONTS.length
+                          ],
+                      }}
+                    >
+                      {letter}
+                    </span>
+                  );
+                })}
               </span>
               <span
                 aria-hidden
@@ -316,72 +336,33 @@ export function LandingHeroLockup() {
             </span>
           </div>
 
-          <p className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-3xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
-            {/* Inline on phones so the sentence wraps to fit the screen, and
-                broken at the comma from sm up, where the intended two lines
-                fit. */}
-            <span className="sm:block">Redziet neredzamo darbu, fokusa zudumu un to,</span>{" "}
-            <span className="sm:block">kuri klienti jūsu uzņēmumam izmaksā visdārgāk</span>
+          {/* `text-balance` evens out the two lines. The key phrases carry the
+              intro's pixel wave so they read as the emphasis of the sentence. */}
+          <p className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-2xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
+            {locale === "lv" ? (
+              <>
+                Komandu slodzes pārskatāmības platforma: redziet{" "}
+                <PixelWaveText text="neredzamo darbu" className="text-white/90" />, patieso{" "}
+                <PixelWaveText text="noslodzi" className="text-white/90" /> un{" "}
+                <PixelWaveText text="dārgākos klientus" className="text-white/90" />
+              </>
+            ) : (
+              t("hero.subtitle")
+            )}
           </p>
-
-          {/* Outside the lockup's click target, so pressing the CTA never also
-              fires the logo spin. */}
-          <Link
-            href="#pilots"
-            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-colors hover:bg-white/90 sm:mt-10 sm:px-7 sm:py-3 sm:text-base"
-          >
-            Sākt projektu
-          </Link>
 
           <LandingHeroTrust className="mt-5 sm:mt-6" />
 
+          <Link
+            href="#pilots"
+            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-colors hover:bg-white/90 sm:mt-8 sm:px-7 sm:py-3 sm:text-base"
+          >
+            {t("hero.cta")}
+          </Link>
+
         </AnimatedGroup>
-      </div>
+      </motion.div>
 
-      <style jsx>{`
-        .hero-lockup-logo-shine {
-          animation: heroLockupLogoShine 7.2s ease-in-out infinite;
-          will-change: filter;
-        }
-
-        .hero-lockup-letter-shine {
-          animation: heroLockupLetterShine 7.2s ease-in-out infinite;
-          will-change: opacity, filter, transform;
-        }
-
-        @keyframes heroLockupLogoShine {
-          0%,
-          7%,
-          48%,
-          100% {
-            filter: brightness(0.72);
-          }
-          18%,
-          32% {
-            filter: brightness(1.45)
-              drop-shadow(0 0 7px rgba(255, 255, 255, 0.7));
-          }
-        }
-
-        @keyframes heroLockupLetterShine {
-          0%,
-          7%,
-          48%,
-          100% {
-            opacity: 0.62;
-            filter: brightness(0.82);
-            text-shadow: none;
-            transform: translateY(0);
-          }
-          18%,
-          32% {
-            opacity: 1;
-            filter: brightness(1.35);
-            text-shadow: 0 0 9px rgba(255, 255, 255, 0.42);
-            transform: translateY(-1px);
-          }
-        }
-      `}</style>
     </section>
   );
 }

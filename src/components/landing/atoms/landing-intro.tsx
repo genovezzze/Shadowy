@@ -12,11 +12,16 @@ const FONT_FAMILIES = [
   "Geist Pixel Line",
 ] as const;
 
+// Marks that the intro has already played in this tab. sessionStorage is cleared
+// when the tab is closed, so returning in a fresh tab shows it again, while
+// reloads and in-site navigation within the same tab skip it.
+const INTRO_SEEN_KEY = "shadowy:intro-seen";
+
 const FRAME_MS = 50;
-const FONT_CYCLE_MS = 600;
-const LETTER_STAGGER_MS = 250;
-const ENTER_DURATION_MS = 3300;
-const EXIT_DURATION_MS = 3300;
+const FONT_CYCLE_MS = 360;
+const LETTER_STAGGER_MS = 130;
+const ENTER_DURATION_MS = 1500;
+const EXIT_DURATION_MS = 1300;
 
 function fontIndexForCharacter(characterIndex: number, elapsed: number) {
   const waveStep = Math.floor(
@@ -34,6 +39,19 @@ export function LandingIntro() {
   const [elapsed, setElapsed] = React.useState(0);
 
   React.useEffect(() => {
+    // Already played in this tab - skip straight to the page, no scroll lock and
+    // no font/animation work.
+    let alreadySeen = false;
+    try {
+      alreadySeen = sessionStorage.getItem(INTRO_SEEN_KEY) === "1";
+    } catch {
+      alreadySeen = false;
+    }
+    if (alreadySeen) {
+      setVisible(false);
+      return;
+    }
+
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     delete document.documentElement.dataset.landingIntroComplete;
@@ -86,6 +104,11 @@ export function LandingIntro() {
 
   React.useEffect(() => {
     if (!visible) {
+      try {
+        sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+      } catch {
+        // Private mode or blocked storage - the intro simply plays each load.
+      }
       document.body.style.overflow = "";
       document.documentElement.dataset.landingIntroComplete = "true";
       window.dispatchEvent(new Event("shadowy:intro-complete"));
@@ -103,7 +126,7 @@ export function LandingIntro() {
       animate={{ opacity: isExiting ? 0 : 1 }}
       transition={
         isExiting
-          ? { duration: 0.8, delay: 2.5, ease: "easeInOut" }
+          ? { duration: 0.7, delay: 0.4, ease: "easeInOut" }
           : { duration: 0 }
       }
       className={`fixed inset-0 z-[10000] h-[100dvh] overflow-hidden bg-white ${

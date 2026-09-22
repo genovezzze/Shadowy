@@ -65,6 +65,7 @@ export default async function AdminEntriesPage({
       employee: true,
       manager: true,
       helpedUser: { select: { name: true } },
+      client: { select: { name: true } },
     },
     skip: (page - 1) * PAGE_SIZE,
     take: PAGE_SIZE,
@@ -114,7 +115,7 @@ export default async function AdminEntriesPage({
               title={e.title}
               category={e.category}
               description={e.description}
-              clientName={e.clientName}
+              clientName={e.clientName ?? e.client?.name ?? undefined}
               workDate={e.workDate}
               createdAt={e.createdAt}
               durationMinutes={e.durationMinutes}

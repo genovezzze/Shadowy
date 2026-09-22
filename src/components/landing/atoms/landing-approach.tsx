@@ -14,14 +14,15 @@ import {
 import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
 import { cn } from "@/lib/utils";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
-const STAGE_DURATION_MS = 6000;
+type L = Record<Locale, string>;
 
 type Stage = {
   id: string;
   icon: LucideIcon;
-  title: string;
-  desc: string;
+  title: L;
+  desc: L;
   /** Backdrop behind the floating panel - a different shot per stage. */
   bg: string;
   panel: React.ReactNode;
@@ -58,19 +59,20 @@ function Panel({
 // than the compact glance-and-move-on cards this section is built around.
 
 function EntryPanel() {
+  const { locale } = useLocale();
   return (
-    <Panel title="Jauns ieraksts">
+    <Panel title={locale === "lv" ? "Jauns ieraksts" : "New entry"}>
       <div className="space-y-2">
         <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/40">Kategorija</p>
+          <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Kategorija" : "Category"}</p>
           <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
-            Palīdzēju kolēģim
+            {locale === "lv" ? "Palīdzēju kolēģim" : "Helped a colleague"}
           </p>
         </div>
         <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/40">Patērētais laiks</p>
+          <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Patērētais laiks" : "Time spent"}</p>
           <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
-            45 minūtes
+            {locale === "lv" ? "45 minūtes" : "45 minutes"}
           </p>
         </div>
       </div>
@@ -79,15 +81,21 @@ function EntryPanel() {
 }
 
 function DraftPanel() {
+  const { locale } = useLocale();
   return (
-    <Panel title="AI melnraksts">
+    <Panel title={locale === "lv" ? "AI melnraksts" : "AI draft"}>
       <div className="rounded-[4px] border border-black/10 bg-black/[0.02] p-3.5">
         <p className="text-sm font-medium leading-relaxed text-black/70">
-          &bdquo;Skaidroju kolēģim VID atskaites sagatavošanu.&ldquo;
+          {locale === "lv"
+            ? "„Skaidroju kolēģim VID atskaites sagatavošanu.“"
+            : "“Explained to a colleague how to prepare the tax report.”"}
         </p>
       </div>
       <div className="mt-3 flex flex-wrap gap-2">
-        {["Saziņa ar VID", "Palīdzība kolēģim"].map((tag) => (
+        {(locale === "lv"
+          ? ["Saziņa ar VID", "Palīdzība kolēģim"]
+          : ["Tax authority", "Helping a colleague"]
+        ).map((tag) => (
           <span
             key={tag}
             className="rounded-full bg-black/[0.05] px-3 py-1 text-xs font-medium text-black/60"
@@ -101,13 +109,20 @@ function DraftPanel() {
 }
 
 function ReviewPanel() {
-  const rows = [
-    { name: "Anna", detail: "Palīdzība kolēģim · 45 min", approved: true },
-    { name: "Jānis", detail: "Informācijas gaidīšana · 1 h 20 min", approved: true },
-  ];
+  const { locale } = useLocale();
+  const rows =
+    locale === "lv"
+      ? [
+          { name: "Anna", detail: "Palīdzība kolēģim · 45 min", approved: true },
+          { name: "Jānis", detail: "Informācijas gaidīšana · 1 h 20 min", approved: true },
+        ]
+      : [
+          { name: "Anna", detail: "Helping a colleague · 45 min", approved: true },
+          { name: "Jānis", detail: "Waiting for information · 1 h 20 min", approved: true },
+        ];
 
   return (
-    <Panel title="Vadītāja skats">
+    <Panel title={locale === "lv" ? "Vadītāja skats" : "Manager view"}>
       <ul className="space-y-2">
         {rows.map((row) => (
           <li
@@ -140,14 +155,22 @@ function ReviewPanel() {
 }
 
 function CategoriesPanel() {
-  const bars = [
-    { label: "Palīdzība kolēģiem", value: 34 },
-    { label: "Informācijas gaidīšana", value: 26 },
-    { label: "Atkārtoti jautājumi", value: 19 },
-  ];
+  const { locale } = useLocale();
+  const bars =
+    locale === "lv"
+      ? [
+          { label: "Palīdzība kolēģiem", value: 34 },
+          { label: "Informācijas gaidīšana", value: 26 },
+          { label: "Atkārtoti jautājumi", value: 19 },
+        ]
+      : [
+          { label: "Helping colleagues", value: 34 },
+          { label: "Waiting for information", value: 26 },
+          { label: "Repeated questions", value: 19 },
+        ];
 
   return (
-    <Panel title="Kategoriju sadalījums">
+    <Panel title={locale === "lv" ? "Kategoriju sadalījums" : "Category breakdown"}>
       <ul className="space-y-3">
         {bars.map((bar) => (
           <li key={bar.label}>
@@ -175,20 +198,21 @@ function CategoriesPanel() {
 }
 
 function CostPanel() {
+  const { locale } = useLocale();
   return (
-    <Panel title="Organizācijas pārskats">
+    <Panel title={locale === "lv" ? "Organizācijas pārskats" : "Organisation overview"}>
       <div className="flex items-baseline gap-2">
         <span className="text-[32px] font-bold leading-none tracking-tight text-black">
           186
         </span>
-        <span className="text-sm font-medium text-black/45">h / mēnesī</span>
+        <span className="text-sm font-medium text-black/45">{locale === "lv" ? "h / mēnesī" : "h / month"}</span>
       </div>
 
       {/* One tile rather than two - the number row already fills the slot the
           other cards give their second data block, so a second tile here
           would push this card past the shared height instead of matching it. */}
       <div className="mt-3 rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-        <p className="text-[11px] font-medium text-black/40">Aptuvenās izmaksas</p>
+        <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Aptuvenās izmaksas" : "Approximate cost"}</p>
         <p className="mt-0.5 text-lg font-bold tracking-tight text-black">
           &euro; 4 650
         </p>
@@ -201,40 +225,55 @@ const STAGES: Stage[] = [
   {
     id: "fiksesana",
     icon: ClipboardList,
-    title: "Darbinieks fiksē",
-    desc: "30 sekundes dienā. Tikai tas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto",
+    title: { lv: "Darbinieks fiksē", en: "The employee logs it" },
+    desc: {
+      lv: "30 sekundes dienā. Tikai tas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto",
+      en: "30 seconds a day. Only what fell outside the core work, added extra load or got in the way of the plan",
+    },
     bg: "/images/01-Golden-Valley.svg",
     panel: <EntryPanel />,
   },
   {
     id: "melnraksts",
     icon: BrainCircuit,
-    title: "AI sagatavo melnrakstu",
-    desc: "No brīvi uzrakstīta teikuma top strukturēts ieraksts ar kategoriju un laiku. Darbinieks to pārskata un apstiprina",
+    title: { lv: "AI sagatavo melnrakstu", en: "AI prepares a draft" },
+    desc: {
+      lv: "No brīvi uzrakstīta teikuma top strukturēts ieraksts ar kategoriju un laiku. Darbinieks to pārskata un apstiprina",
+      en: "A free-written sentence becomes a structured entry with a category and time. The employee reviews and approves it",
+    },
     bg: "/images/02-Mountain-Lake.svg",
     panel: <DraftPanel />,
   },
   {
     id: "izvertesana",
     icon: Check,
-    title: "Vadītājs izvērtē",
-    desc: "Vadītājs redz savas komandas iesniegtos ierakstus, apstiprina tos vai atgriež precizēšanai",
+    title: { lv: "Vadītājs izvērtē", en: "The manager reviews" },
+    desc: {
+      lv: "Vadītājs redz savas komandas iesniegtos ierakstus, apstiprina tos vai atgriež precizēšanai",
+      en: "The manager sees their team's submitted entries and approves them or returns them for clarification",
+    },
     bg: "/images/03-Autumn-Bridge.svg",
     panel: <ReviewPanel />,
   },
   {
     id: "strukturesana",
     icon: Layers,
-    title: "Dati sakārtojas",
-    desc: "Apstiprinātie ieraksti veido kategorijas, tendences un atkārtojošos šķēršļus - nevis atsevišķus stāstus",
+    title: { lv: "Dati sakārtojas", en: "The data organises itself" },
+    desc: {
+      lv: "Apstiprinātie ieraksti veido kategorijas, tendences un atkārtojošos šķēršļus - nevis atsevišķus stāstus",
+      en: "Approved entries form categories, trends and recurring obstacles - not isolated stories",
+    },
     bg: "/images/04-Hillside-Windmill.svg",
     panel: <CategoriesPanel />,
   },
   {
     id: "parskats",
     icon: Coins,
-    title: "Uzņēmums redz izmaksas",
-    desc: "Slodze, aptuvenās izmaksas un dārgākie klienti vienā pārskatā. Ar konkrētiem procesu ieteikumiem",
+    title: { lv: "Uzņēmums redz izmaksas", en: "The company sees the cost" },
+    desc: {
+      lv: "Slodze, aptuvenās izmaksas un dārgākie klienti vienā pārskatā. Ar konkrētiem procesu ieteikumiem",
+      en: "Workload, approximate cost and the costliest clients in one overview. With concrete process suggestions",
+    },
     bg: "/images/05-Forest-Waterfall.svg",
     panel: <CostPanel />,
   },
@@ -246,19 +285,10 @@ const STAGES: Stage[] = [
  * the timer - reading a stage should not be interrupted by it moving on.
  */
 export function LandingApproach() {
+  // Defaults to the first stage ("Darbinieks fiksē") and stays there until the
+  // visitor opens another — no auto-advance, so the first is always open.
   const [activeIndex, setActiveIndex] = React.useState(0);
-  const [paused, setPaused] = React.useState(false);
-
-  React.useEffect(() => {
-    if (paused) return;
-
-    const timer = window.setInterval(
-      () => setActiveIndex((index) => (index + 1) % STAGES.length),
-      STAGE_DURATION_MS,
-    );
-
-    return () => window.clearInterval(timer);
-  }, [paused]);
+  const { locale, t } = useLocale();
 
   const active = STAGES[activeIndex];
 
@@ -268,24 +298,20 @@ export function LandingApproach() {
       // No top padding: "Pilotprojekti un klienti" above is the same paper
       // colour and already ends on its own py-24/py-32, so a second one stacked
       // a band of empty white with no colour change to justify it.
-      className="relative scroll-mt-20 bg-[var(--landing-paper)] pb-24 pt-0 md:pb-32"
+      className="relative scroll-mt-20 bg-[var(--landing-paper)] pb-16 pt-0 md:pb-32"
     >
       <div className="w-full px-4 md:px-8">
-        <Reveal className="mb-12 max-w-3xl md:mb-16">
+        <Reveal className="mb-8 max-w-3xl md:mb-16">
           <div className="mb-3 inline-block">
-            <SectionBadge>Process</SectionBadge>
+            <SectionBadge>{t("approach.badge")}</SectionBadge>
           </div>
           <h2 className="text-landing-h2 text-black">
-            <WaveHeading tone="dark">Kā Shadowy strādā</WaveHeading>
+            <WaveHeading tone="dark">{t("approach.heading")}</WaveHeading>
           </h2>
         </Reveal>
 
         <div className="flex flex-col-reverse items-start gap-6 lg:min-h-[560px] lg:flex-row lg:gap-8">
-          <div
-            className="flex w-full flex-col items-start gap-3 lg:w-[45%]"
-            onMouseEnter={() => setPaused(true)}
-            onMouseLeave={() => setPaused(false)}
-          >
+          <div className="flex w-full flex-col items-start gap-3 lg:w-[45%]">
             {STAGES.map((stage, index) => {
               const isActive = index === activeIndex;
               const Icon = stage.icon;
@@ -315,7 +341,7 @@ export function LandingApproach() {
                       <Icon className="size-[18px]" strokeWidth={2} aria-hidden />
                     </span>
                     <h3 className="text-[17px] font-bold tracking-tight text-black">
-                      {stage.title}
+                      {stage.title[locale]}
                     </h3>
                   </div>
 
@@ -329,7 +355,7 @@ export function LandingApproach() {
                         className="overflow-hidden"
                       >
                         <p className="px-5 pb-5 text-sm font-semibold leading-relaxed text-black/70 md:text-base">
-                          {stage.desc}
+                          {stage.desc[locale]}
                         </p>
                       </motion.div>
                     )}

@@ -6,6 +6,7 @@ import { ArrowUpRight, Linkedin, Mail } from "lucide-react";
 import { HoverWaveText } from "@/components/landing/atoms/hover-wave-text";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
 type Tone = "dark" | "light";
 
@@ -25,34 +26,39 @@ function ColumnHeading({ children, tone }: { children: string; tone: Tone }) {
   );
 }
 
-const FOOTER_COLUMNS = [
+type L = Record<Locale, string>;
+
+const FOOTER_COLUMNS: readonly {
+  heading: L;
+  links: readonly { label: L; href: string }[];
+}[] = [
   {
-    heading: "Produkts",
+    heading: { lv: "Produkts", en: "Product" },
     links: [
-      { label: "Kā tas darbojas", href: "#process" },
-      { label: "Process", href: "#process" },
-      { label: "Ko fiksēt", href: "#ko-fikset" },
-      { label: "Pārskats", href: "#produkts" },
-      { label: "Kam noder", href: "#kam-noder" },
+      { label: { lv: "Kā tas darbojas", en: "How it works" }, href: "#process" },
+      { label: { lv: "Process", en: "Process" }, href: "#process" },
+      { label: { lv: "Ko fiksēt", en: "What to log" }, href: "#ko-fikset" },
+      { label: { lv: "Pārskats", en: "Overview" }, href: "#produkts" },
+      { label: { lv: "Kam noder", en: "Who it's for" }, href: "#kam-noder" },
     ],
   },
   {
-    heading: "Uzņēmumam",
+    heading: { lv: "Uzņēmumam", en: "For companies" },
     links: [
-      { label: "Ieguvumi", href: "#ieguvumi" },
-      { label: "Klienti", href: "#klienti" },
-      { label: "FAQ", href: "#faq" },
-      { label: "Pieteikties pilotam", href: "#pilots" },
+      { label: { lv: "Ieguvumi", en: "Benefits" }, href: "#ieguvumi" },
+      { label: { lv: "Klienti", en: "Clients" }, href: "#klienti" },
+      { label: { lv: "FAQ", en: "FAQ" }, href: "#faq" },
+      { label: { lv: "Pieteikties pilotam", en: "Apply for a pilot" }, href: "#pilots" },
     ],
   },
   {
-    heading: "Konts",
+    heading: { lv: "Konts", en: "Account" },
     links: [
-      { label: "Ieiet", href: "/login" },
-      { label: "Privātuma politika", href: "/privacy" },
+      { label: { lv: "Ieiet", en: "Log in" }, href: "/login" },
+      { label: { lv: "Privātuma politika", en: "Privacy policy" }, href: "/privacy" },
     ],
   },
-] as const;
+];
 
 /**
  * `tone` flips the whole footer between the landing's black and the white used
@@ -61,6 +67,7 @@ const FOOTER_COLUMNS = [
  */
 export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
   const isDark = tone === "dark";
+  const { locale, t } = useLocale();
 
   // The columns point at landing sections; off that route those ids do not
   // exist, so the links have to travel back to the landing page first.
@@ -78,28 +85,10 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
         // on the grass instead of clearing it - the content now stops where the
         // hills begin.
         isDark
-          ? "border-white/10 bg-black pb-0 pt-14 sm:pb-[380px] sm:pt-16 md:pb-[540px] md:pt-20"
-          : "border-black/10 bg-white pb-0 pt-14 sm:pb-[380px] sm:pt-16 md:pb-[540px] md:pt-20",
+          ? "border-white/10 bg-black pb-14 pt-14 sm:pt-16 md:pb-20 md:pt-20"
+          : "border-black/10 bg-white pb-14 pt-14 sm:pt-16 md:pb-20 md:pt-20",
       )}
     >
-      {/* Hills along the footer's bottom edge, black sky above - the shot's own
-          sky is the same black as the footer, so the two meet with no seam and
-          the illustration simply grows out of the ground. Deep bottom padding
-          is what reserves the band for it: the content stops well above, so
-          nothing lands on the grass. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 bottom-0 z-0 hidden h-[360px] sm:block md:h-[520px]"
-      >
-        <Image
-          src={isDark ? "/images/pic8.webp" : "/images/pic8-cutout.png"}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-bottom"
-        />
-      </div>
-
       <div className="relative z-10 w-full px-4 md:px-8">
         {/* Brand on one side, the two calls to action on the other - the same
             top row the reference opens its footer with. */}
@@ -132,18 +121,18 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
                   : "bg-black text-white hover:bg-black/85",
               )}
             >
-              Pieteikt pilotu
+              {t("nav.cta")}
             </Link>
           </div>
         </div>
 
         <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {FOOTER_COLUMNS.map((column) => (
-            <div key={column.heading}>
-              <ColumnHeading tone={tone}>{column.heading}</ColumnHeading>
+            <div key={column.heading.lv}>
+              <ColumnHeading tone={tone}>{column.heading[locale]}</ColumnHeading>
               <ul className="mt-6 space-y-3">
                 {column.links.map((link) => (
-                  <li key={link.href}>
+                  <li key={link.label.lv}>
                     <Link
                       href={resolveHref(link.href)}
                       className={cn(
@@ -151,7 +140,7 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
                         isDark ? "text-white" : "text-black",
                       )}
                     >
-                      <HoverWaveText text={link.label} />
+                      <HoverWaveText text={link.label[locale]} />
                     </Link>
                   </li>
                 ))}
@@ -160,7 +149,7 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
           ))}
 
           <div>
-            <ColumnHeading tone={tone}>Kontakti</ColumnHeading>
+            <ColumnHeading tone={tone}>{t("footer.contacts")}</ColumnHeading>
             <ul className="mt-6 space-y-3">
               <li>
                 <a
@@ -205,7 +194,7 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
                 : "text-black/40 hover:text-black/70",
             )}
           >
-            Privātuma politika
+            {t("cta.privacy")}
           </Link>
         </div>
       </div>

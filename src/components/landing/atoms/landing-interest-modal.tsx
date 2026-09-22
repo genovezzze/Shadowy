@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { createPortal } from "react-dom";
-import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 
@@ -150,30 +149,6 @@ export function LandingInterestModal() {
                     Atstāt pieteikumu
                   </a>
                 </div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 0.9, y: 0 }}
-                  transition={{ delay: 0.1, duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-                  // Sat on negative offsets before, which pushed it past the card's
-                  // edges - and the card clips (`overflow-hidden` carries the
-                  // rounded corners), so the island lost its right side and
-                  // bottom. Pulled back inside the bounds so the whole cut-out
-                  // shows; `object-contain` was never the thing cropping it.
-                  className="pointer-events-none absolute bottom-4 right-4 aspect-square w-[70%] select-none md:w-[56%]"
-                >
-                  <Image
-                    src="/images/Blue-Tree-Flowers-Transparent.svg"
-                    alt=""
-                    fill
-                    priority
-                    sizes="(min-width: 768px) 460px, 75vw"
-                    // SVG never goes through the image optimiser: Next refuses
-                    // it unless `dangerouslyAllowSVG` is on site-wide.
-                    unoptimized
-                    className="object-contain"
-                  />
-                </motion.div>
               </div>
             </div>
           </motion.section>

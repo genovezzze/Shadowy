@@ -354,7 +354,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                   title={e.title}
                   category={e.category}
                   description={e.description}
-                  clientName={e.clientName}
+                  clientName={e.clientName ?? client.name}
                   workDate={e.workDate}
                   durationMinutes={entryMin(e)}
                   status={e.status}

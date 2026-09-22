@@ -97,8 +97,8 @@ export const faqPageNode = {
   inLanguage: "lv",
   mainEntity: FAQ_ITEMS.map((item) => ({
     "@type": "Question",
-    name: item.question,
-    acceptedAnswer: { "@type": "Answer", text: item.answer },
+    name: item.question.lv,
+    acceptedAnswer: { "@type": "Answer", text: item.answer.lv },
   })),
 } as const;
 

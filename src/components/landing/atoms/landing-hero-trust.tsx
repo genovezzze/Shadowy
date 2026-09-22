@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import { ArrowUpRight, Check } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLocale } from "@/components/landing/atoms/i18n";
 
 /**
  * The three things a visitor was previously made to hunt for, moved up beside
@@ -16,14 +19,11 @@ import { cn } from "@/lib/utils";
  * it would compete with the CTA it is meant to support.
  */
 export function LandingHeroTrust({ className }: { className?: string }) {
+  const { t } = useLocale();
   return (
     <div className={cn("flex flex-col items-center gap-2.5", className)}>
       <ul className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[12px] font-medium leading-tight text-white/55 sm:gap-x-2.5 sm:text-[13px]">
-        {[
-          "30 dienas bez maksas",
-          "Bez kredītkartes",
-          "Darbinieks pats izvēlas, ko iesniedz",
-        ].map((item, index) => (
+        {[t("hero.trust1"), t("hero.trust2"), t("hero.trust3")].map((item, index) => (
           <li key={item} className="flex items-center gap-2 sm:gap-2.5">
             {/* The separator belongs to the item that follows it, so it never
                 dangles at the end of a wrapped line. */}
@@ -49,7 +49,7 @@ export function LandingHeroTrust({ className }: { className?: string }) {
         href="/projekti/pb-finanses"
         className="group inline-flex items-center gap-1.5 text-[12px] font-semibold leading-tight text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline sm:text-[13px]"
       >
-        PB Finanses jau strādā ar Shadowy
+        {t("hero.partner")}
         <ArrowUpRight
           className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           aria-hidden

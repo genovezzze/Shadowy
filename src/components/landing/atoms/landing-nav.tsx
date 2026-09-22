@@ -4,9 +4,37 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Mail } from "lucide-react";
+import {
+  Mail,
+  Workflow,
+  ClipboardList,
+  BarChart3,
+  Users,
+  Rocket,
+  Building2,
+  LayoutGrid,
+  Gauge,
+  HelpCircle,
+  Eye,
+  LogIn,
+  AlignLeft,
+  ChevronDown,
+  type LucideIcon,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useLocale, LocaleToggle, type StringKey } from "@/components/landing/atoms/i18n";
+
+// Cycled per letter so the wordmark mixes pixel faces, like the Atoms wordmark.
+// Sparse faces (line, triangle) map to the outer letters and the dense ones
+// (square, grid, circle) to the middle, so the centre of the word isn't hollow.
+const NAV_PIXEL_FONTS = [
+  "var(--font-pixel-line)",
+  "var(--font-pixel-triangle)",
+  "var(--font-pixel-square)",
+  "var(--font-pixel-grid)",
+  "var(--font-pixel-circle)",
+] as const;
 
 const NAV_LINKS = [
   { key: "product", label: "Kā tas darbojas", href: "#process" },
@@ -119,6 +147,42 @@ const MEGA_MENUS = {
 } as const;
 
 type MegaMenuKey = keyof typeof MEGA_MENUS;
+
+// One combined card set for the single "Izpēti" menu (like the reference's one
+// "Services" trigger), 3×2 like the reference.
+const MENU_CARDS: { tkey: StringKey; href: string; icon: LucideIcon }[] = [
+  { tkey: "menu.howItWorks", href: "#process", icon: Workflow },
+  { tkey: "menu.whatToLog", href: "#ko-fikset", icon: ClipboardList },
+  { tkey: "menu.overview", href: "#produkts", icon: BarChart3 },
+  { tkey: "menu.forWhom", href: "#kam-noder", icon: Users },
+  { tkey: "menu.clients", href: "#klienti", icon: Building2 },
+  { tkey: "menu.faq", href: "#faq", icon: HelpCircle },
+];
+
+// Compact card menu, like the atoms.technology dropdown: a small grid of
+// icon + label cards instead of the wide columns panel.
+const CARD_MENUS: Record<MegaMenuKey, { label: string; href: string; icon: LucideIcon }[]> = {
+  product: [
+    { label: "Kā tas darbojas", href: "#process", icon: Workflow },
+    { label: "Ko fiksēt", href: "#ko-fikset", icon: ClipboardList },
+    { label: "Pārskats", href: "#produkts", icon: BarChart3 },
+    { label: "Kam noder", href: "#kam-noder", icon: Users },
+    { label: "Pieteikt pilotu", href: "#pilots", icon: Rocket },
+  ],
+  clients: [
+    { label: "PB Finanses", href: "/projekti/pb-finanses", icon: Building2 },
+    { label: "Pilotprojekti", href: "#klienti", icon: LayoutGrid },
+    { label: "Komandas slodze", href: "#ieguvumi", icon: Gauge },
+    { label: "Pieteikt pilotu", href: "#pilots", icon: Rocket },
+  ],
+  help: [
+    { label: "FAQ", href: "#faq", icon: HelpCircle },
+    { label: "Neredzamais darbs", href: "#ko-fikset", icon: Eye },
+    { label: "Pieteikt pilotu", href: "#pilots", icon: Rocket },
+    { label: "Pieslēgties", href: "/login", icon: LogIn },
+    { label: "Raksti mums", href: "mailto:contact@shadowy.lv", icon: Mail },
+  ],
+};
 
 const WAVE_COLORS = [
   [91, 157, 83],
@@ -291,8 +355,9 @@ export function LandingNav({
     [],
   );
 
-  const megaMenu = activeMegaMenu ? MEGA_MENUS[activeMegaMenu] : null;
-  const navIsLight = alwaysLight || onLight || activeMegaMenu !== null || menuOpen;
+  const navIsLight = alwaysLight || onLight;
+  const { t } = useLocale();
+  const [ctaOpen, setCtaOpen] = React.useState(false);
 
   // Every in-page anchor in this nav points at a landing section. Used on any
   // other route those ids do not exist, so the link would silently do nothing -
@@ -312,12 +377,12 @@ export function LandingNav({
           <motion.button
             type="button"
             aria-label="Aizvērt izvēlni"
-            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
-            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
             onClick={() => setActiveMegaMenu(null)}
-            className="fixed inset-0 z-40 cursor-default bg-black/15"
+            className="fixed inset-0 z-40 cursor-default bg-transparent"
           />
         )}
       </AnimatePresence>
@@ -342,18 +407,14 @@ export function LandingNav({
           // The drop shadow is what lifts the bar off the page now that it has
           // no outline. Deeper over the dark hero, where a soft grey halo would
           // otherwise be invisible against near-black.
-          menuOpen
-            // Matches the radius of the menu card that drops out from under it,
-            // so the bar and the card read as one panel.
-            ? "rounded-b-none rounded-t-[22px] bg-white shadow-none"
-            : activeMegaMenu
-            ? "rounded-b-none rounded-t-[4px] bg-white shadow-none"
-            : navIsLight
-              ? "bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.10)]"
+          navIsLight
+            ? "bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.10)]"
             : "bg-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.30)]",
         )}
       >
-      <div className="flex w-full items-center justify-between gap-6 px-4 py-2 md:px-6">
+      <div className="relative flex w-full items-center justify-between gap-6 px-4 py-2 md:px-6">
+        {/* Left: logo + a single menu trigger, like the reference */}
+        <div className="flex items-center gap-3 lg:gap-6">
         <Link
           href="/"
           aria-label="Shadowy sākumlapa"
@@ -380,60 +441,143 @@ export function LandingNav({
               are arbitrary values on purpose: Tailwind's named steps ship their
               own line-height, which lands after leading-none and would put the
               word's box back out of step with the mark. */}
+          {/* Each letter in a different pixel face, like the Atoms wordmark. */}
           <span
+            aria-label="Shadowy"
             className={cn(
-              "font-display text-[22px] font-semibold leading-none tracking-tight transition-colors duration-500 ease-out sm:text-[24px]",
+              "text-[20px] leading-none tracking-tight transition-colors duration-500 ease-out sm:text-[22px]",
               navIsLight ? "text-black" : "text-white",
             )}
           >
-            Shadowy
+            {[..."Shadowy"].map((letter, index) => (
+              <span key={index} aria-hidden style={{ fontFamily: NAV_PIXEL_FONTS[index % NAV_PIXEL_FONTS.length] }}>
+                {letter}
+              </span>
+            ))}
           </span>
         </Link>
 
-        <nav
-          className="hidden items-center gap-8 lg:flex"
-          aria-label="Galvenā navigācija"
-        >
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={resolveHref(link.href)}
-              aria-expanded={activeMegaMenu === link.key}
-              aria-haspopup="true"
-              aria-controls="landing-mega-menu"
-              onMouseEnter={() => openMegaMenu(link.key)}
-              onFocus={() => openMegaMenu(link.key)}
-              onClick={() => setActiveMegaMenu(null)}
+        {/* Single menu trigger */}
+        <div className="relative hidden lg:block">
+          <button
+            type="button"
+            aria-expanded={activeMegaMenu !== null}
+            aria-haspopup="true"
+            onMouseEnter={() => openMegaMenu("product")}
+            onFocus={() => openMegaMenu("product")}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out",
+              activeMegaMenu !== null
+                ? navIsLight
+                  ? "bg-black/[0.06] text-black"
+                  : "bg-white/[0.12] text-white"
+                : navIsLight
+                  ? "bg-transparent text-black/80 hover:bg-black/[0.035] hover:text-black"
+                  : "bg-transparent text-white/85 hover:bg-white/[0.08] hover:text-white",
+            )}
+          >
+            {t("nav.explore")}
+            <ChevronDown
               className={cn(
-                "rounded-full px-5 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-[400ms] ease-out",
-                activeMegaMenu === link.key
-                  ? "bg-[#f1f1f1] text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]"
-                  : navIsLight
-                    ? "bg-transparent text-black/80 hover:bg-black/[0.035] hover:text-black"
-                    : "bg-transparent text-white/85 hover:bg-white/[0.08] hover:text-white",
+                "size-4 transition-transform duration-300",
+                activeMegaMenu !== null && "rotate-180",
               )}
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+              aria-hidden
+            />
+          </button>
+
+          <AnimatePresence initial={false}>
+            {activeMegaMenu !== null && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                className="absolute left-0 top-[calc(100%+14px)] z-50 origin-top"
+                onMouseEnter={cancelScheduledClose}
+              >
+                <div className="rounded-2xl border border-black/[0.06] bg-white p-2.5 shadow-[0_28px_70px_rgba(20,25,30,0.22)]">
+                  <div className="grid grid-cols-[repeat(3,124px)] gap-2.5">
+                    {MENU_CARDS.map((card) => {
+                      const external = card.href.startsWith("http") || card.href.startsWith("mailto:");
+                      const Icon = card.icon;
+                      return (
+                        <Link
+                          key={card.tkey}
+                          href={resolveHref(card.href)}
+                          target={external ? "_blank" : undefined}
+                          rel={external ? "noopener noreferrer" : undefined}
+                          onClick={() => setActiveMegaMenu(null)}
+                          className="group/link flex w-[124px] flex-col items-center justify-center gap-2.5 rounded-xl bg-black/[0.035] px-3 py-6 text-center text-black/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-black/[0.06]"
+                        >
+                          <Icon className="size-6 text-black/70" aria-hidden />
+                          <span className="text-sm font-semibold leading-tight">
+                            <MegaMenuWaveText text={t(card.tkey)} />
+                          </span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        </div>
+
+        {/* Centre: decorative pill → pilot form */}
+        <Link
+          href={resolveHref("#pilots")}
+          onMouseEnter={() => setActiveMegaMenu(null)}
+          className={cn(
+            "absolute left-1/2 top-1/2 hidden w-[clamp(320px,34vw,540px)] -translate-x-1/2 -translate-y-1/2 items-center justify-between gap-3 rounded-full py-2.5 pl-4 pr-2 text-sm transition-colors lg:flex",
+            navIsLight
+              ? "bg-black/[0.05] text-black/55 hover:bg-black/[0.08]"
+              : "bg-white/[0.08] text-white/60 hover:bg-white/[0.12]",
+          )}
+        >
+          <span className="flex min-w-0 items-center gap-3">
+            <AlignLeft className="size-4 shrink-0 opacity-70" aria-hidden />
+            <span className="truncate">{t("nav.pill")}</span>
+          </span>
+          <span
+            className={cn(
+              "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
+              navIsLight ? "bg-black/[0.07] text-black/70" : "bg-white/15 text-white/85",
+            )}
+          >
+            {t("nav.pillChip")}
+          </span>
+        </Link>
 
         <div
           className="flex shrink-0 items-center gap-2 sm:gap-2.5"
           onMouseEnter={() => setActiveMegaMenu(null)}
         >
-          <a
-            href="mailto:contact@shadowy.lv"
-            aria-label="Rakstīt uz contact@shadowy.lv"
-            className={cn(
-              "hidden size-9 place-items-center rounded-full transition-colors sm:grid",
-              navIsLight
-                ? "text-black/60 hover:bg-black/5 hover:text-black"
-                : "text-white/70 hover:bg-white/10 hover:text-white",
-            )}
-          >
-            <Mail className="size-[18px]" aria-hidden />
-          </a>
+          <div className="group relative hidden sm:block">
+            <a
+              href="mailto:contact@shadowy.lv"
+              aria-label="Rakstīt uz contact@shadowy.lv"
+              className={cn(
+                "grid size-9 place-items-center rounded-full transition-colors",
+                navIsLight
+                  ? "text-black/60 hover:bg-black/5 hover:text-black"
+                  : "text-white/70 hover:bg-white/10 hover:text-white",
+              )}
+            >
+              <Mail className="size-[18px]" aria-hidden />
+            </a>
+            {/* Tooltip on hover, like the reference */}
+            <span
+              role="tooltip"
+              className={cn(
+                "pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold opacity-0 shadow-lg transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100",
+                navIsLight ? "bg-black text-white" : "bg-white text-black",
+              )}
+            >
+              contact@shadowy.lv
+            </span>
+          </div>
 
           <Link
             href="/login"
@@ -444,20 +588,85 @@ export function LandingNav({
                 : "bg-white/15 text-white hover:bg-white/25",
             )}
           >
-            Pieslēgties
+            {t("nav.login")}
           </Link>
 
-          <Link
-            href={resolveHref("#pilots")}
-            className={cn(
-              "rounded-full px-4 py-1.5 text-[13px] font-bold transition-all active:scale-95 sm:px-5 sm:py-2 sm:text-sm",
-              navIsLight
-                ? "bg-black text-white hover:bg-black/85"
-                : "bg-white text-black hover:bg-white/90",
-            )}
+          {/* CTA that opens a small panel — contact + language + privacy.
+              Hidden on mobile, where the hamburger already carries the same
+              pixel-grid icon and the full menu. */}
+          <div
+            className="relative hidden lg:block"
+            onMouseEnter={() => setCtaOpen(true)}
+            onMouseLeave={() => setCtaOpen(false)}
           >
-            Pieteikt pilotu
-          </Link>
+            <button
+              type="button"
+              aria-expanded={ctaOpen}
+              aria-haspopup="true"
+              aria-label={t("nav.cta")}
+              className={cn(
+                "grid size-9 place-items-center transition-colors",
+                navIsLight
+                  ? ctaOpen ? "text-black" : "text-black/70 hover:text-black"
+                  : ctaOpen ? "text-white" : "text-white/70 hover:text-white",
+              )}
+            >
+              <PixelMenuIcon open={ctaOpen} />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {ctaOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                  className="absolute right-0 top-[calc(100%+12px)] z-50 w-[290px] origin-top-right rounded-2xl border border-black/[0.06] bg-white p-2.5 text-black shadow-[0_28px_70px_rgba(20,25,30,0.22)]"
+                >
+                  <div className="flex items-center gap-3 px-2 py-2">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-black text-white">
+                      <Rocket className="size-4" aria-hidden />
+                    </span>
+                    <div className="min-w-0">
+                      <div className="text-sm font-bold">{t("cta.title")}</div>
+                      <div className="text-xs text-black/50">{t("cta.subtitle")}</div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={resolveHref("#pilots")}
+                    onClick={() => setCtaOpen(false)}
+                    className="mt-1 block rounded-xl bg-black py-2.5 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
+                  >
+                    {t("nav.cta")}
+                  </Link>
+
+                  <a
+                    href="mailto:contact@shadowy.lv"
+                    className="mt-1.5 flex items-center gap-2.5 rounded-lg px-2 py-2 text-sm font-medium text-black/80 transition-colors hover:bg-black/[0.04]"
+                  >
+                    <Mail className="size-4 text-black/50" aria-hidden />
+                    contact@shadowy.lv
+                  </a>
+
+                  <div className="my-1.5 h-px bg-black/[0.07]" />
+
+                  <div className="flex items-center justify-between px-2 py-1.5">
+                    <span className="text-sm font-semibold">{t("cta.language")}</span>
+                    <LocaleToggle light />
+                  </div>
+
+                  <Link
+                    href="/privacy"
+                    onClick={() => setCtaOpen(false)}
+                    className="block rounded-lg px-2 py-2 text-sm text-black/50 transition-colors hover:bg-black/[0.04] hover:text-black/80"
+                  >
+                    {t("cta.privacy")}
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <button
             type="button"
@@ -476,102 +685,6 @@ export function LandingNav({
           </button>
         </div>
       </div>
-
-      <AnimatePresence initial={false}>
-        {megaMenu && (
-          <motion.div
-            id="landing-mega-menu"
-            initial={{
-              opacity: 0,
-              y: -12,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={{
-              opacity: 0,
-              y: -8,
-            }}
-            transition={{ duration: 0.58, ease: [0.22, 1, 0.36, 1] }}
-            className="absolute left-0 right-0 top-[calc(100%-1px)] hidden origin-top overflow-visible rounded-b-[4px] bg-white text-black shadow-[0_28px_70px_rgba(0,0,0,0.16)] lg:grid lg:grid-cols-[minmax(0,1fr)_320px] xl:grid-cols-[minmax(0,1fr)_360px]"
-            onMouseEnter={cancelScheduledClose}
-          >
-            <motion.div
-              key={`mega-columns-${activeMegaMenu}`}
-              initial={{ opacity: 0.86, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-              className="grid grid-cols-3 gap-10 px-8 py-9 xl:gap-14 xl:px-12 xl:py-11"
-            >
-            {megaMenu.columns.map((column) => (
-              <section key={column.label}>
-                <span className="inline-flex rounded-full bg-[#f1f1f1] px-4 py-2 text-sm font-extrabold leading-none text-black">
-                  {column.label}
-                </span>
-                <ul className="mt-7 space-y-4">
-                  {column.links.map((link) => {
-                    const external = link.href.startsWith("http");
-
-                    return (
-                      <li key={`${column.label}-${link.label}`}>
-                        <Link
-                          href={resolveHref(link.href)}
-                          target={external ? "_blank" : undefined}
-                          rel={external ? "noopener noreferrer" : undefined}
-                          onClick={() => setActiveMegaMenu(null)}
-                          className="group/link inline-flex items-center gap-2 text-[15px] font-extrabold tracking-tight text-black/88 transition-colors duration-200 hover:text-[#1f7775]"
-                        >
-                          <MegaMenuWaveText text={link.label} />
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </section>
-            ))}
-
-            <Link
-              href={resolveHref("#pilots")}
-              onClick={() => setActiveMegaMenu(null)}
-              className="group/partner col-span-3 mt-2 flex items-center justify-between rounded-[18px] bg-black/[0.055] px-6 py-5 text-base font-extrabold transition-colors duration-500 hover:bg-black/[0.085]"
-            >
-              <span>Pieteikt Shadowy pilotu savai komandai</span>
-            </Link>
-            </motion.div>
-
-            <motion.aside
-              key={`mega-feature-${activeMegaMenu}`}
-              initial={{ opacity: 0.86, y: 5 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.66, ease: [0.22, 1, 0.36, 1] }}
-              className="border-l border-black/[0.07] p-6 xl:p-8"
-            >
-            <Link
-              href={resolveHref(megaMenu.feature.href)}
-              onClick={() => setActiveMegaMenu(null)}
-              className="group/feature flex h-full min-h-[340px] flex-col"
-            >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-[22px] bg-black">
-                <Image
-                  src={megaMenu.feature.image}
-                  alt=""
-                  fill
-                  sizes="360px"
-                  className="object-cover transition-transform duration-1000 ease-out group-hover/feature:scale-[1.04]"
-                />
-              </div>
-              <h3 className="mt-5 text-balance font-display text-2xl font-bold leading-tight tracking-[-0.025em]">
-                {megaMenu.feature.title}
-              </h3>
-              <span className="mt-6 inline-flex w-fit items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-transform duration-500 group-hover/feature:-translate-y-0.5">
-                {megaMenu.feature.cta}
-              </span>
-            </Link>
-            </motion.aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       </div>
     </header>
@@ -595,81 +708,82 @@ export function LandingNav({
               role="dialog"
               aria-modal="true"
               aria-label="Mobilā navigācija"
-              // Grown from the top rather than clipped: a rounded clip-path cut
-              // its own corners out of the white, which showed as dark nicks
-              // where the card meets the bar above it.
-              initial={{ opacity: 0, scaleY: 0.92 }}
-              animate={{ opacity: 1, scaleY: 1 }}
-              exit={{ opacity: 0, scaleY: 0.96 }}
-              style={{ transformOrigin: "top center" }}
-              transition={{ duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-              // A card that hugs its content rather than a full-height sheet:
-              // the header bar above it is white while the menu is open, so the
-              // two read as one panel dropped from the top, and the page stays
-              // visible under it.
-              className="fixed inset-x-3 top-3 z-[60] flex max-h-[calc(100dvh-1.5rem)] flex-col overflow-y-auto rounded-b-[22px] rounded-t-[22px] bg-white px-4 pb-5 pt-[58px] md:px-6 text-black shadow-[0_30px_100px_rgba(0,0,0,0.28)] lg:hidden"
+              // A compact card dropping from the top-right corner, under the
+              // pixel icon — the atoms.technology mobile menu, not a full sheet.
+              initial={{ opacity: 0, y: -10, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.97 }}
+              style={{ transformOrigin: "top right" }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="fixed right-3 top-[72px] z-[60] flex max-h-[calc(100dvh-5.5rem)] w-[300px] max-w-[calc(100vw-1.5rem)] flex-col overflow-y-auto rounded-[22px] bg-white p-2.5 text-black shadow-[0_30px_100px_rgba(0,0,0,0.28)] lg:hidden"
             >
-              <motion.nav
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  hidden: {},
-                  visible: { transition: { delayChildren: 0.14, staggerChildren: 0.06 } },
-                }}
-                className="flex flex-col"
-                aria-label="Mobilā navigācija"
-              >
-                {[
-                  ...NAV_LINKS.map((link) => ({ ...link, submenu: true })),
-                  { label: "Pilotprojekts", href: "/pilotprojekts", submenu: false },
-                  { label: "Pieslēgties", href: "/login", submenu: false },
-                ].map((link) => (
-                  <motion.div
-                    key={link.href}
-                    variants={{
-                      hidden: { opacity: 0, x: 18 },
-                      visible: { opacity: 1, x: 0, transition: { duration: 0.48, ease: [0.22, 1, 0.36, 1] } },
-                    }}
-                  >
-                    <Link
-                      href={resolveHref(link.href)}
-                      onClick={() => setMenuOpen(false)}
-                      className="flex items-center justify-between border-b border-black/[0.08] py-[18px] text-[20px] font-bold tracking-[-0.025em] text-black"
-                    >
-                      {link.label}
-                      {/* Only the entries that open something else carry the
-                          chevron, the way the reference marks its two submenu
-                          rows and leaves the plain links bare. */}
-                      {link.submenu && (
-                        <ChevronRight className="size-5 text-black/25" strokeWidth={1.5} aria-hidden />
-                      )}
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.nav>
+              {/* Header: who answers, how fast */}
+              <div className="flex items-center gap-3 px-2 py-2">
+                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-black text-white">
+                  <Rocket className="size-[18px]" aria-hidden />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold">{t("cta.title")}</div>
+                  <div className="text-xs text-black/50">{t("cta.subtitle")}</div>
+                </div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.42, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                className="grid gap-3 pt-5"
+              <Link
+                href={resolveHref("#pilots")}
+                onClick={() => setMenuOpen(false)}
+                className="mt-1 block rounded-xl bg-black py-3 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
               >
+                {t("nav.cta")}
+              </Link>
+
+              {/* Icon rows — the same six cards as the desktop "Izpēti" menu */}
+              <nav className="mt-1.5 flex flex-col" aria-label="Mobilā navigācija">
+                {MENU_CARDS.map((card) => {
+                  const Icon = card.icon;
+                  return (
+                    <Link
+                      key={card.tkey}
+                      href={resolveHref(card.href)}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
+                    >
+                      <Icon className="size-[18px] shrink-0 text-black/55" aria-hidden />
+                      {t(card.tkey)}
+                    </Link>
+                  );
+                })}
                 <a
                   href="mailto:contact@shadowy.lv"
                   onClick={() => setMenuOpen(false)}
-                  className="flex min-h-[52px] items-center justify-center gap-2 rounded-full bg-black/[0.055] px-4 text-[15px] font-bold text-black"
+                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
                 >
-                  <Mail className="size-[18px] text-black/60" aria-hidden />
-                  E-pasts
+                  <Mail className="size-[18px] shrink-0 text-black/55" aria-hidden />
+                  {t("nav.email")}
                 </a>
                 <Link
-                  href={resolveHref("#pilots")}
+                  href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="flex min-h-[56px] items-center justify-center rounded-full bg-black px-6 text-base font-bold text-white"
+                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
                 >
-                  Pieteikt pilotu
+                  <LogIn className="size-[18px] shrink-0 text-black/55" aria-hidden />
+                  {t("nav.login")}
                 </Link>
-              </motion.div>
+              </nav>
+
+              <div className="my-1.5 h-px bg-black/[0.07]" />
+
+              <div className="flex items-center justify-between px-2 py-1.5">
+                <span className="text-sm font-semibold">{t("cta.language")}</span>
+                <LocaleToggle light />
+              </div>
+
+              <Link
+                href="/privacy"
+                onClick={() => setMenuOpen(false)}
+                className="block rounded-lg px-2 py-2 text-sm text-black/50 transition-colors hover:bg-black/[0.04] hover:text-black/80"
+              >
+                {t("cta.privacy")}
+              </Link>
             </motion.div>
           </>
         )}

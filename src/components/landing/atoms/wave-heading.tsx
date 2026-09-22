@@ -26,14 +26,17 @@ export function WaveHeading({
   children,
   className,
   tone = "dark",
+  settledColor,
 }: {
   children: string;
   className?: string;
   /** Colour the letters settle into. `currentColor` cannot be interpolated. */
   tone?: "dark" | "light";
+  /** Overrides the tone default — e.g. a muted body colour for a paragraph. */
+  settledColor?: string;
 }) {
   const words = React.useMemo(() => children.split(" "), [children]);
-  const settled = tone === "light" ? "#ffffff" : "#0a0a0a";
+  const settled = settledColor ?? (tone === "light" ? "#ffffff" : "#0a0a0a");
   let index = -1;
 
   return (

@@ -9,14 +9,17 @@ import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primiti
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 import { HoverWaveText } from "@/components/landing/atoms/hover-wave-text";
 import { cn } from "@/lib/utils";
+import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
-type Figure = { value: string; label: string };
+type L = Record<Locale, string>;
+
+type Figure = { value: string; label: L };
 
 type HelpEdge = {
-  to: string;
+  to: L;
   times: number;
   minutes: number;
-  topCategory: string;
+  topCategory: L;
 };
 
 /**
@@ -29,24 +32,24 @@ type HelpEdge = {
  * showed that.
  */
 const HELP_FLOW: readonly HelpEdge[] = [
-  { to: "Kolēģis A", times: 30, minutes: 1240, topCategory: "Dokumentu skenēšana" },
-  { to: "Kolēģis B", times: 24, minutes: 1119, topCategory: "Rēķinu grāmatošana" },
-  { to: "Kolēģis C", times: 18, minutes: 965, topCategory: "Avansu grāmatošana" },
-  { to: "Kolēģis D", times: 14, minutes: 650, topCategory: "Kases grāmatošana" },
-  { to: "Kolēģis E", times: 12, minutes: 590, topCategory: "Rēķinu grāmatošana" },
-  { to: "Kolēģis F", times: 3, minutes: 125, topCategory: "Dokumentu skenēšana" },
-  { to: "Kolēģis G", times: 1, minutes: 45, topCategory: "Dokumentu arhivēšana" },
+  { to: { lv: "Kolēģis A", en: "Colleague A" }, times: 30, minutes: 1240, topCategory: { lv: "Dokumentu skenēšana", en: "Document scanning" } },
+  { to: { lv: "Kolēģis B", en: "Colleague B" }, times: 24, minutes: 1119, topCategory: { lv: "Rēķinu grāmatošana", en: "Invoice posting" } },
+  { to: { lv: "Kolēģis C", en: "Colleague C" }, times: 18, minutes: 965, topCategory: { lv: "Avansu grāmatošana", en: "Advance posting" } },
+  { to: { lv: "Kolēģis D", en: "Colleague D" }, times: 14, minutes: 650, topCategory: { lv: "Kases grāmatošana", en: "Cash posting" } },
+  { to: { lv: "Kolēģis E", en: "Colleague E" }, times: 12, minutes: 590, topCategory: { lv: "Rēķinu grāmatošana", en: "Invoice posting" } },
+  { to: { lv: "Kolēģis F", en: "Colleague F" }, times: 3, minutes: 125, topCategory: { lv: "Dokumentu skenēšana", en: "Document scanning" } },
+  { to: { lv: "Kolēģis G", en: "Colleague G" }, times: 1, minutes: 45, topCategory: { lv: "Dokumentu arhivēšana", en: "Document archiving" } },
 ];
 
 type Audience = {
-  name: string;
-  desc: string;
+  name: L;
+  desc: L;
   /** The case the row has to make once it is opened. */
-  why: string;
-  examples: readonly string[];
+  why: L;
+  examples: readonly L[];
   figures?: readonly Figure[];
   /** Arithmetic on the figures above, so the reader can check it rather than trust it. */
-  figuresNote?: string;
+  figuresNote?: L;
   /** Real help relationships, drawn as a distribution rather than listed. */
   helpFlow?: readonly HelpEdge[];
   image?: {
@@ -54,9 +57,9 @@ type Audience = {
     width: number;
     height: number;
     alt: string;
-    caption: string;
+    caption: L;
   };
-  link: { label: string; href: string };
+  link: { label: L; href: string };
 };
 
 /**
@@ -80,102 +83,134 @@ type Audience = {
  */
 const AUDIENCES: readonly Audience[] = [
   {
-    name: "Darbiniekiem",
-    desc: "Vienkārša darba fiksēšana bez papildu kontroles - 30 sekundes dienā, un pats darbinieks izlemj, ko iesniegt",
-    why: "Papildu darbs, ko darbinieks izdara, nekur neparādās. Kad plānotais darbs kavējas, redzams tikai kavējums - nevis tās stundas, kas aizgāja palīdzībai kolēģiem, gaidīšanai un pārtraukumiem. Shadowy dod vietu, kur to pateikt, neizklausoties pēc attaisnošanās",
+    name: { lv: "Darbiniekiem", en: "For employees" },
+    desc: {
+      lv: "Vienkārša darba fiksēšana bez papildu kontroles - 30 sekundes dienā, un pats darbinieks izlemj, ko iesniegt",
+      en: "Simple logging with no extra oversight - 30 seconds a day, and the employee decides what to submit",
+    },
+    why: {
+      lv: "Papildu darbs, ko darbinieks izdara, nekur neparādās. Kad plānotais darbs kavējas, redzams tikai kavējums - nevis tās stundas, kas aizgāja palīdzībai kolēģiem, gaidīšanai un pārtraukumiem. Shadowy dod vietu, kur to pateikt, neizklausoties pēc attaisnošanās",
+      en: "The extra work an employee does shows up nowhere. When planned work runs late, only the delay is visible - not the hours that went into helping colleagues, waiting and interruptions. Shadowy gives a place to say it without it sounding like an excuse",
+    },
     examples: [
-      "Čeku un rēķinu grāmatošana kolēģa vietā - 135 ieraksti, 113 stundas",
-      "Dokumentu skenēšana citas komandas vietā - biežākais palīdzības veids",
-      "Bankas izraksta manuāla ievade, kad automātiskais imports neaizgāja",
-      "Darba devēja ziņojumi un sarakste ar VID ārpus savas lomas",
-      "Jaunā darbinieka ievadīšana - vidēji 54 minūtes par reizi",
+      { lv: "Čeku un rēķinu grāmatošana kolēģa vietā - 135 ieraksti, 113 stundas", en: "Posting receipts and invoices for a colleague - 135 entries, 113 hours" },
+      { lv: "Dokumentu skenēšana citas komandas vietā - biežākais palīdzības veids", en: "Scanning documents for another team - the most common kind of help" },
+      { lv: "Bankas izraksta manuāla ievade, kad automātiskais imports neaizgāja", en: "Entering a bank statement by hand when the automatic import failed" },
+      { lv: "Darba devēja ziņojumi un sarakste ar VID ārpus savas lomas", en: "Employer reports and correspondence with the tax authority outside one's role" },
+      { lv: "Jaunā darbinieka ievadīšana - vidēji 54 minūtes par reizi", en: "Onboarding a new hire - 54 minutes on average each time" },
     ],
     figures: [
-      { value: "100%", label: "ierakstu apstiprināti - neviens nav atgriezts" },
-      { value: "19%", label: "no visa fiksētā laika bija palīdzība kolēģiem" },
-      { value: "76%", label: "tās palīdzības veica viens cilvēks" },
-      { value: "113 h", label: "palīdzības 2 mēnešos - gandrīz 3 darba nedēļas" },
-      { value: "26 min", label: "mediānais ieraksts" },
-      { value: "25%", label: "ierakstu īsāki par 10 minūtēm" },
+      { value: "100%", label: { lv: "ierakstu apstiprināti - neviens nav atgriezts", en: "of entries approved - none returned" } },
+      { value: "19%", label: { lv: "no visa fiksētā laika bija palīdzība kolēģiem", en: "of all logged time was helping colleagues" } },
+      { value: "76%", label: { lv: "tās palīdzības veica viens cilvēks", en: "of that help was done by one person" } },
+      { value: "113 h", label: { lv: "palīdzības 2 mēnešos - gandrīz 3 darba nedēļas", en: "of help in 2 months - nearly 3 working weeks" } },
+      { value: "26 min", label: { lv: "mediānais ieraksts", en: "median entry" } },
+      { value: "25%", label: { lv: "ierakstu īsāki par 10 minūtēm", en: "of entries shorter than 10 minutes" } },
     ],
-    figuresNote:
-      "Reāli PB Finanses pilota dati no 2026. gada 6. jūlija līdz 9. septembrim: 830 ieraksti, 10 cilvēku komanda, 599 fiksētas stundas",
+    figuresNote: {
+      lv: "Reāli PB Finanses pilota dati no 2026. gada 6. jūlija līdz 9. septembrim: 830 ieraksti, 10 cilvēku komanda, 599 fiksētas stundas",
+      en: "Real PB Finanses pilot data from 6 July to 9 September 2026: 830 entries, a team of 10, 599 logged hours",
+    },
     helpFlow: HELP_FLOW,
     image: {
       src: "/images/pic11.png",
       width: 1672,
       height: 941,
       alt: "Darbinieka skats Shadowy: iesniegtie ieraksti, apstiprinātās stundas un sadalījums pa kategorijām",
-      caption: "Darbinieka skats. Ekrānattēlā - demonstrācijas dati",
+      caption: { lv: "Darbinieka skats. Ekrānattēlā - demonstrācijas dati", en: "Employee view. The screen shows demo data" },
     },
-    link: { label: "Ko fiksēt un ko nē", href: "#ko-fikset" },
+    link: { label: { lv: "Ko fiksēt un ko nē", en: "What to log and what not to" }, href: "#ko-fikset" },
   },
   {
-    name: "Vadītājiem",
-    desc: "Skaidrs skats uz savas komandas slodzi: izvērtējiet un apstipriniet ierakstus, redziet, kas atkārtojas",
-    why: "Slodzi plāno pēc oficiālajiem pienākumiem, bet komanda strādā pēc faktiskajiem. Tāpēc plāns nesanāk, un iemesls nav redzams nevienā atskaitē. Vadītājam tas dod divas lietas, kuras citādi nav no kā paņemt: kurš process atkārtojas tik bieži, ka to ir lētāk salabot nekā izturēt, un kurš cilvēks komandā nes vairāk, nekā izskatās no malas",
+    name: { lv: "Vadītājiem", en: "For managers" },
+    desc: {
+      lv: "Skaidrs skats uz savas komandas slodzi: izvērtējiet un apstipriniet ierakstus, redziet, kas atkārtojas",
+      en: "A clear view of your team's workload: review and approve entries, see what recurs",
+    },
+    why: {
+      lv: "Slodzi plāno pēc oficiālajiem pienākumiem, bet komanda strādā pēc faktiskajiem. Tāpēc plāns nesanāk, un iemesls nav redzams nevienā atskaitē. Vadītājam tas dod divas lietas, kuras citādi nav no kā paņemt: kurš process atkārtojas tik bieži, ka to ir lētāk salabot nekā izturēt, un kurš cilvēks komandā nes vairāk, nekā izskatās no malas",
+      en: "Workload is planned by official duties, but the team works by the real ones. So the plan doesn't hold, and the reason shows up in no report. It gives a manager two things there's otherwise nowhere to get: which process repeats often enough that fixing it is cheaper than enduring it, and which person carries more than it looks from the outside",
+    },
     examples: [
-      "82 atkārtojušies procesi: viena un tā pati kategorija pie viena klienta trīs un vairāk reizes",
-      "Trīs cilvēki nes 59% no visa fiksētā laika - pārējie septiņi pārējo",
-      "Noslogotākajam 153 stundas, viszemākajam 8 - vienā un tajā pašā komandā",
-      "42 dažādas kategorijas: darbs ir krietni sadrumstalotāks, nekā izskatās plānā",
-      "Jūlijs 217 h, augusts 240 h - slodze aug, nevis svārstās",
+      { lv: "82 atkārtojušies procesi: viena un tā pati kategorija pie viena klienta trīs un vairāk reizes", en: "82 recurring processes: the same category with the same client three or more times" },
+      { lv: "Trīs cilvēki nes 59% no visa fiksētā laika - pārējie septiņi pārējo", en: "Three people carry 59% of all logged time - the other seven the rest" },
+      { lv: "Noslogotākajam 153 stundas, viszemākajam 8 - vienā un tajā pašā komandā", en: "The busiest has 153 hours, the lowest 8 - in the same team" },
+      { lv: "42 dažādas kategorijas: darbs ir krietni sadrumstalotāks, nekā izskatās plānā", en: "42 different categories: the work is far more fragmented than the plan suggests" },
+      { lv: "Jūlijs 217 h, augusts 240 h - slodze aug, nevis svārstās", en: "July 217 h, August 240 h - the load is growing, not fluctuating" },
     ],
     figures: [
-      { value: "48%", label: "ierakstu ietilpst darbā, kas atkārtojas" },
-      { value: "82", label: "atkārtoti procesi, ko var labot pa vienam" },
-      { value: "59%", label: "visa laika - uz trim cilvēkiem no desmit" },
-      { value: "26%", label: "visa laika - uz vienu noslogotāko cilvēku" },
-      { value: "42", label: "dažādas kategorijas vienā komandā" },
-      { value: "43 min", label: "vidējais ieraksts" },
+      { value: "48%", label: { lv: "ierakstu ietilpst darbā, kas atkārtojas", en: "of entries fall into work that repeats" } },
+      { value: "82", label: { lv: "atkārtoti procesi, ko var labot pa vienam", en: "recurring processes you can fix one by one" } },
+      { value: "59%", label: { lv: "visa laika - uz trim cilvēkiem no desmit", en: "of all time - on three people out of ten" } },
+      { value: "26%", label: { lv: "visa laika - uz vienu noslogotāko cilvēku", en: "of all time - on the single busiest person" } },
+      { value: "42", label: { lv: "dažādas kategorijas vienā komandā", en: "different categories in one team" } },
+      { value: "43 min", label: { lv: "vidējais ieraksts", en: "average entry" } },
     ],
-    figuresNote:
-      "Reāli PB Finanses pilota dati (06.07.-09.09.2026.), 830 ieraksti no 10 cilvēkiem. \"Atkārtojas\" nozīmē vienu kategoriju pie viena klienta trīs un vairāk reizes - tieši tur meklējams process, nevis atsevišķs gadījums",
-    link: { label: "Kā notiek izskatīšana", href: "#process" },
+    figuresNote: {
+      lv: "Reāli PB Finanses pilota dati (06.07.-09.09.2026.), 830 ieraksti no 10 cilvēkiem. \"Atkārtojas\" nozīmē vienu kategoriju pie viena klienta trīs un vairāk reizes - tieši tur meklējams process, nevis atsevišķs gadījums",
+      en: "Real PB Finanses pilot data (06.07.-09.09.2026), 830 entries from 10 people. \"Repeats\" means one category with one client three or more times - that's where a process is, not a one-off",
+    },
+    link: { label: { lv: "Kā notiek izskatīšana", en: "How the review works" }, href: "#process" },
   },
   {
-    name: "Uzņēmumam",
-    desc: "Organizācijas līmeņa pārskats - stundas, kategorijas, izmaksas un klientu rentabilitāte vienuviet",
-    why: "Ar fiksētu pakalpojumu maksu klients var būt nerentabls mēnešiem, un tas atklājas gada beigās - ja vispār. Kad komandas laiks ir piesaistīts klientam un reizināts ar stundas likmi, pārsniegums kļūst redzams tajā pašā mēnesī, kad tas notiek - un kļūst redzams arī tas, cik nevienmērīgi portfelis patiesībā ir sadalīts",
+    name: { lv: "Uzņēmumam", en: "For the company" },
+    desc: {
+      lv: "Organizācijas līmeņa pārskats - stundas, kategorijas, izmaksas un klientu rentabilitāte vienuviet",
+      en: "An organisation-level overview - hours, categories, cost and client profitability in one place",
+    },
+    why: {
+      lv: "Ar fiksētu pakalpojumu maksu klients var būt nerentabls mēnešiem, un tas atklājas gada beigās - ja vispār. Kad komandas laiks ir piesaistīts klientam un reizināts ar stundas likmi, pārsniegums kļūst redzams tajā pašā mēnesī, kad tas notiek - un kļūst redzams arī tas, cik nevienmērīgi portfelis patiesībā ir sadalīts",
+      en: "On a fixed service fee a client can be unprofitable for months, and it only surfaces at year end - if at all. When the team's time is tied to a client and multiplied by an hourly rate, the overrun becomes visible in the same month it happens - and so does how unevenly the portfolio is really split",
+    },
     examples: [
-      "Pieci lielākie klienti aizņem 30% no visa komandas laika",
-      "Lielākais klients - 58 stundas divos mēnešos, nākamais 37",
-      "Mediānais klients - 2,4 stundas: lielākā daļa portfeļa ir maza",
-      "17 klienti zem vienas stundas, 15 klienti virs desmit",
-      "Rēķinu grāmatošana un izrakstīšana - 140 ieraksti, 139 stundas kopā",
-      "Trešdaļa ierakstu ir īsāki par 15 minūtēm - tie, ko neviens neuzskaita",
+      { lv: "Pieci lielākie klienti aizņem 30% no visa komandas laika", en: "The five largest clients take up 30% of all team time" },
+      { lv: "Lielākais klients - 58 stundas divos mēnešos, nākamais 37", en: "The largest client - 58 hours in two months, the next 37" },
+      { lv: "Mediānais klients - 2,4 stundas: lielākā daļa portfeļa ir maza", en: "The median client - 2.4 hours: most of the portfolio is small" },
+      { lv: "17 klienti zem vienas stundas, 15 klienti virs desmit", en: "17 clients under one hour, 15 clients over ten" },
+      { lv: "Rēķinu grāmatošana un izrakstīšana - 140 ieraksti, 139 stundas kopā", en: "Invoice posting and issuing - 140 entries, 139 hours in total" },
+      { lv: "Trešdaļa ierakstu ir īsāki par 15 minūtēm - tie, ko neviens neuzskaita", en: "A third of entries are under 15 minutes - the ones nobody counts" },
     ],
     figures: [
-      { value: "94", label: "klienti ar ierakstiem divos mēnešos" },
-      { value: "30%", label: "laika - uz pieciem lielākajiem klientiem" },
-      { value: "58 h", label: "lielākais klients; mediānais - 2,4 h" },
-      { value: "15", label: "klienti virs 10 stundām" },
-      { value: "17", label: "klienti zem vienas stundas" },
-      { value: "599 h", label: "kopā, sadalītas pa klientiem" },
+      { value: "94", label: { lv: "klienti ar ierakstiem divos mēnešos", en: "clients with entries in two months" } },
+      { value: "30%", label: { lv: "laika - uz pieciem lielākajiem klientiem", en: "of time - on the five largest clients" } },
+      { value: "58 h", label: { lv: "lielākais klients; mediānais - 2,4 h", en: "largest client; median - 2.4 h" } },
+      { value: "15", label: { lv: "klienti virs 10 stundām", en: "clients over 10 hours" } },
+      { value: "17", label: { lv: "klienti zem vienas stundas", en: "clients under one hour" } },
+      { value: "599 h", label: { lv: "kopā, sadalītas pa klientiem", en: "in total, split across clients" } },
     ],
-    figuresNote:
-      "Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kad šīs stundas ir piesaistītas klientam un reizinātas ar komandas stundas likmi, kļūst redzams, kurš klients ar fiksētu maksu nesedz savu darbu",
+    figuresNote: {
+      lv: "Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kad šīs stundas ir piesaistītas klientam un reizinātas ar komandas stundas likmi, kļūst redzams, kurš klients ar fiksētu maksu nesedz savu darbu",
+      en: "Real PB Finanses pilot data (06.07.-09.09.2026). When these hours are tied to a client and multiplied by the team's hourly rate, it becomes clear which fixed-fee client doesn't cover its own work",
+    },
     image: {
       src: "/images/shadowy-dashboard-wide.png",
       width: 1916,
       height: 821,
       alt: "Shadowy organizācijas pārskats: klientiem veltītās stundas, darba pašizmaksa un limita pārsniegums",
-      caption:
-        "Organizācijas pārskats. Klientu nosaukumi un summas - izdomāts piemērs",
+      caption: {
+        lv: "Organizācijas pārskats. Klientu nosaukumi un summas - izdomāts piemērs",
+        en: "Organisation overview. Client names and amounts - an illustrative example",
+      },
     },
-    link: { label: "Skatīt reālu projektu", href: "/projekti/pb-finanses" },
+    link: { label: { lv: "Skatīt reālu projektu", en: "See a real project" }, href: "/projekti/pb-finanses" },
   },
   {
-    name: "Datu drošībai",
-    desc: "Vadītājiem pieejami tikai savas komandas ieraksti, administratoriem - savas organizācijas dati. Nekas vairāk",
-    why: "Ja komanda uztver rīku kā novērošanu, tā to neizmanto, un dati ir bezvērtīgi. Tāpēc redzamība ir ierobežota pēc lomas, un darbinieks pats izlemj, kas nonāk sistēmā",
+    name: { lv: "Datu drošībai", en: "For data safety" },
+    desc: {
+      lv: "Vadītājiem pieejami tikai savas komandas ieraksti, administratoriem - savas organizācijas dati. Nekas vairāk",
+      en: "Managers can only access their own team's entries, administrators only their organisation's data. Nothing more",
+    },
+    why: {
+      lv: "Ja komanda uztver rīku kā novērošanu, tā to neizmanto, un dati ir bezvērtīgi. Tāpēc redzamība ir ierobežota pēc lomas, un darbinieks pats izlemj, kas nonāk sistēmā",
+      en: "If a team sees the tool as surveillance, they won't use it, and the data is worthless. So visibility is limited by role, and the employee decides what goes into the system",
+    },
     examples: [
-      "Vadītājs redz savas komandas apstiprinātos ierakstus - ne citu komandu",
-      "Ekrāna aktivitāte, taustiņi un privātas sarunas netiek fiksētas vispār",
-      "AI veido tikai melnrakstu - nekas netiek saglabāts bez darbinieka apstiprinājuma",
-      "Pēc pilota datus var eksportēt, un pēc glabāšanas perioda tie tiek dzēsti",
+      { lv: "Vadītājs redz savas komandas apstiprinātos ierakstus - ne citu komandu", en: "A manager sees their own team's approved entries - not other teams'" },
+      { lv: "Ekrāna aktivitāte, taustiņi un privātas sarunas netiek fiksētas vispār", en: "Screen activity, keystrokes and private conversations are not logged at all" },
+      { lv: "AI veido tikai melnrakstu - nekas netiek saglabāts bez darbinieka apstiprinājuma", en: "The AI only makes a draft - nothing is saved without the employee's approval" },
+      { lv: "Pēc pilota datus var eksportēt, un pēc glabāšanas perioda tie tiek dzēsti", en: "After the pilot the data can be exported, and after the retention period it is deleted" },
     ],
-    link: { label: "Privātuma politika", href: "/privacy" },
+    link: { label: { lv: "Privātuma politika", en: "Privacy policy" }, href: "/privacy" },
   },
 ];
 
@@ -368,6 +403,7 @@ const PANEL_ITEM = {
 };
 
 function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
+  const { locale } = useLocale();
   const maxMinutes = Math.max(...flow.map((edge) => edge.minutes));
   const totalMinutes = flow.reduce((sum, edge) => sum + edge.minutes, 0);
   const totalTimes = flow.reduce((sum, edge) => sum + edge.times, 0);
@@ -379,12 +415,22 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
       <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="mb-3 inline-block">
-            <SectionBadge>Kas kuram palīdzēja</SectionBadge>
+            <SectionBadge>{locale === "lv" ? "Kas kuram palīdzēja" : "Who helped whom"}</SectionBadge>
           </div>
           <p className="max-w-xl text-base font-semibold leading-relaxed text-black/70 md:text-lg">
-            Viens cilvēks komandā fiksēja {totalTimes} no {135} palīdzības
-            ierakstiem - {hours(totalMinutes)} stundas septiņiem kolēģiem divos
-            mēnešos. Neviena iepriekšējā atskaite to nerādīja.
+            {locale === "lv" ? (
+              <>
+                Viens cilvēks komandā fiksēja {totalTimes} no {135} palīdzības
+                ierakstiem - {hours(totalMinutes)} stundas septiņiem kolēģiem divos
+                mēnešos. Neviena iepriekšējā atskaite to nerādīja.
+              </>
+            ) : (
+              <>
+                One person on the team logged {totalTimes} of {135} help
+                entries - {hours(totalMinutes)} hours for seven colleagues over
+                two months. No previous report showed it.
+              </>
+            )}
           </p>
         </div>
         <CountUpHours minutes={totalMinutes} />
@@ -400,9 +446,9 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
           const labelInside = share >= 0.35;
 
           return (
-            <li key={edge.to} className="flex items-center gap-4">
+            <li key={edge.to.lv} className="flex items-center gap-4">
               <span className="w-24 shrink-0 text-sm font-bold tracking-tight text-black md:w-28">
-                {edge.to}
+                {edge.to[locale]}
               </span>
 
               <span className="relative h-9 flex-1 overflow-hidden rounded-lg bg-black/[0.04]">
@@ -425,7 +471,7 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
                 >
                   {labelInside && (
                     <span className="hidden whitespace-nowrap pr-3 text-xs font-semibold text-white/85 sm:block">
-                      {edge.topCategory}
+                      {edge.topCategory[locale]}
                     </span>
                   )}
                 </motion.span>
@@ -435,7 +481,7 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
                     style={{ left: `calc(${share * 100}% + 0.75rem)` }}
                     className="absolute inset-y-0 hidden items-center whitespace-nowrap text-xs font-semibold text-black/45 sm:flex"
                   >
-                    {edge.topCategory}
+                    {edge.topCategory[locale]}
                   </span>
                 )}
               </span>
@@ -449,14 +495,16 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
       </ul>
 
       <p className="mt-6 text-xs font-medium leading-relaxed text-black/45">
-        Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kolēģi apzīmēti ar
-        burtiem - nozīme ir slodzes sadalījumam, nevis konkrētiem cilvēkiem.
+        {locale === "lv"
+          ? "Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kolēģi apzīmēti ar burtiem - nozīme ir slodzes sadalījumam, nevis konkrētiem cilvēkiem."
+          : "Real PB Finanses pilot data (06.07.-09.09.2026). Colleagues are lettered - what matters is how the load is distributed, not the individuals."}
       </p>
     </div>
   );
 }
 
 export function LandingAudience() {
+  const { locale, t } = useLocale();
   const [openName, setOpenName] = React.useState<string | null>(null);
   const rowRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -470,38 +518,11 @@ export function LandingAudience() {
    * the click and its result in the same place. Only on open: closing a row
    * should leave the reader where they are.
    */
+  // Opens like the FAQ: a plain toggle, with the panel height handled purely in
+  // CSS (grid-template-rows 0fr → 1fr below). No scroll correction — that hack
+  // is what made the page lurch on open/close.
   const openRow = React.useCallback((name: string, isOpen: boolean) => {
-    const node = rowRefs.current[name];
-    // Where the row sits in the viewport at the moment of the click. That is the
-    // position it has to keep.
-    const anchor = node?.getBoundingClientRect().top ?? null;
-
     setOpenName(isOpen ? null : name);
-
-    if (node === null || anchor === null) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
-    // Correcting once is not enough: the panels do not snap, they animate their
-    // height over half a second, so the content above keeps moving for frames
-    // after the click. Scrolling once - which is what the earlier attempt did -
-    // measured a layout that was still in motion and landed somewhere else
-    // again. This holds the row against its anchor for the whole transition.
-    //
-    // Runs for a fixed stretch rather than stopping when the row looks settled.
-    // The panels animate over 0.5s and do not begin moving on the very first
-    // frame, so a "has it stopped drifting" test saw those still frames as the
-    // end and let go before the collapse above had even started - which is how
-    // the click still threw the page down.
-    const HOLD_MS = 800;
-    const started = performance.now();
-
-    const hold = (now: number) => {
-      const drift = node.getBoundingClientRect().top - anchor;
-      if (Math.abs(drift) > 0.5) window.scrollBy(0, drift);
-      if (now - started < HOLD_MS) requestAnimationFrame(hold);
-    };
-
-    requestAnimationFrame(hold);
   }, []);
 
   return (
@@ -510,28 +531,29 @@ export function LandingAudience() {
       // No top padding: "Ko fiksē Shadowy" above is the same paper colour and
       // already ends on its own py-24/py-32, so a second one stacked a band of
       // empty white with no colour change to justify it.
-      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] pb-24 pt-0 md:pb-32"
+      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] pb-16 pt-0 md:pb-32"
     >
       <div className="relative z-10 w-full px-4 md:px-8">
-        <Reveal className="mb-12 max-w-3xl md:mb-16">
+        <Reveal className="mb-8 max-w-3xl md:mb-16">
           <div className="mb-3 inline-block">
-            <SectionBadge>Lomas</SectionBadge>
+            <SectionBadge>{t("audience.badge")}</SectionBadge>
           </div>
           <h2 className="text-landing-h2 text-black">
-            <WaveHeading tone="dark">Kam Shadowy noder</WaveHeading>
+            <WaveHeading tone="dark">{t("audience.heading")}</WaveHeading>
           </h2>
         </Reveal>
 
         <Reveal className="border-t border-black/10">
           {AUDIENCES.map((audience) => {
-            const isOpen = openName === audience.name;
-            const panelId = `audience-${audience.name}`;
+            const key = audience.name.lv;
+            const isOpen = openName === key;
+            const panelId = `audience-${key}`;
 
             return (
               <div
-                key={audience.name}
+                key={key}
                 ref={(node) => {
-                  rowRefs.current[audience.name] = node;
+                  rowRefs.current[key] = node;
                 }}
                 className="scroll-mt-28 border-b border-black/10"
               >
@@ -541,14 +563,14 @@ export function LandingAudience() {
                     link it carried lives on at the foot of the panel. */}
                 <button
                   type="button"
-                  onClick={() => openRow(audience.name, isOpen)}
+                  onClick={() => openRow(key, isOpen)}
                   aria-expanded={isOpen}
                   aria-controls={panelId}
                   className="group relative flex w-full flex-row items-center justify-between py-6 text-left md:py-8"
                 >
                   <div className="flex flex-col gap-0.5 pr-8">
                     <span className="text-2xl font-bold leading-tight tracking-tight text-black md:text-3xl">
-                      <HoverWaveText text={audience.name} />
+                      <HoverWaveText text={audience.name[locale]} />
                     </span>
                     <p
                       className={cn(
@@ -558,7 +580,7 @@ export function LandingAudience() {
                           : "text-black/40 group-hover:text-black/60",
                       )}
                     >
-                      {audience.desc}
+                      {audience.desc[locale]}
                     </p>
                   </div>
                   {/* A chevron, not the arrow: this row expands in place, and
@@ -577,17 +599,13 @@ export function LandingAudience() {
                   </span>
                 </button>
 
-                <motion.div
+                <div
                   id={panelId}
-                  initial={false}
-                  animate={{
-                    height: isOpen ? "auto" : 0,
-                    opacity: isOpen ? 1 : 0,
-                  }}
-                  transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
-                  className="overflow-hidden"
                   aria-hidden={!isOpen}
+                  className="grid transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
+                  style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
+                  <div className="overflow-hidden">
                   {/* The panel's text arrives in sequence once the row opens.
                       Driven by `animate` off `isOpen` rather than `whileInView`:
                       the panel is collapsed to zero height, so a viewport-based
@@ -607,16 +625,16 @@ export function LandingAudience() {
                         variants={PANEL_ITEM}
                         className="max-w-xl text-base font-semibold leading-relaxed text-black/70 md:text-lg"
                       >
-                        {audience.why}
+                        {audience.why[locale]}
                       </motion.p>
 
                       <motion.div variants={PANEL_ITEM} className="mt-7 inline-block">
-                        <SectionBadge>Piemēri</SectionBadge>
+                        <SectionBadge>{t("audience.examples")}</SectionBadge>
                       </motion.div>
                       <ul className="mt-4 flex flex-col gap-2">
                         {audience.examples.map((example) => (
                           <motion.li
-                            key={example}
+                            key={example.lv}
                             variants={PANEL_ITEM}
                             className="flex gap-2.5 text-sm font-semibold leading-relaxed text-black/60 md:text-base"
                           >
@@ -624,7 +642,7 @@ export function LandingAudience() {
                               aria-hidden
                               className="mt-[0.55em] h-px w-3 shrink-0 bg-black/25"
                             />
-                            {example}
+                            {example[locale]}
                           </motion.li>
                         ))}
                       </ul>
@@ -634,7 +652,7 @@ export function LandingAudience() {
                         href={audience.link.href}
                         className="mt-7 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-bold text-white transition-all hover:bg-black/85 active:scale-[0.98]"
                       >
-                        {audience.link.label}
+                        {audience.link.label[locale]}
                         {/* Only routes get the arrow. Two of these links are
                             in-page anchors that merely scroll, and an arrow
                             there promises a departure that never happens. */}
@@ -656,7 +674,7 @@ export function LandingAudience() {
                                 straight at them. */}
                             {audience.figures.map((figure, figureIndex) => (
                               <motion.div
-                                key={figure.label}
+                                key={figure.label.lv}
                                 variants={PANEL_ITEM}
                                 style={{
                                   backgroundColor:
@@ -668,7 +686,7 @@ export function LandingAudience() {
                               >
                                 <CountUpFigure value={figure.value} />
                                 <p className="mt-2.5 text-xs font-semibold leading-snug text-black/70 md:text-sm">
-                                  {figure.label}
+                                  {figure.label[locale]}
                                 </p>
                               </motion.div>
                             ))}
@@ -679,7 +697,7 @@ export function LandingAudience() {
                             variants={PANEL_ITEM}
                             className="mt-3 text-xs font-medium leading-relaxed text-black/45"
                           >
-                            {audience.figuresNote}
+                            {audience.figuresNote[locale]}
                           </motion.p>
                         </div>
                       )}
@@ -697,7 +715,7 @@ export function LandingAudience() {
                             />
                           </div>
                           <figcaption className="mt-2.5 text-xs font-medium leading-relaxed text-black/45">
-                            {audience.image.caption}
+                            {audience.image.caption[locale]}
                           </figcaption>
                         </figure>
                       )}
@@ -705,7 +723,8 @@ export function LandingAudience() {
                   </motion.div>
 
                   {audience.helpFlow && <HelpFlow flow={audience.helpFlow} />}
-                </motion.div>
+                  </div>
+                </div>
               </div>
             );
           })}

@@ -7,15 +7,17 @@ import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primiti
 import { cn } from "@/lib/utils";
 import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 import { FAQ_ITEMS } from "@/components/landing/atoms/landing-faq-items";
+import { useLocale } from "@/components/landing/atoms/i18n";
 
 
 export function LandingFaq() {
+  const { locale, t } = useLocale();
   const [openIndex, setOpenIndex] = React.useState<number | null>(0);
 
   return (
     <section
       id="faq"
-      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-night)] py-24 md:py-32"
+      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-night)] py-16 md:py-32"
     >
       <div className="relative z-10 w-full px-4 md:px-8">
         <div className="flex w-full flex-col items-start gap-12 lg:flex-row lg:justify-between">
@@ -24,11 +26,12 @@ export function LandingFaq() {
               <SectionBadge tone="dark">FAQ</SectionBadge>
             </div>
             <h2 className="text-landing-h2 mb-6 text-white">
-              <WaveHeading tone="light">Biežāk uzdotie jautājumi</WaveHeading>
+              <WaveHeading tone="light">{t("faq.heading")}</WaveHeading>
             </h2>
-            <p className="text-sm font-medium leading-relaxed text-white/50 md:text-base">
-              Ja neatrodat atbildi, uzdodiet jautājumu pieteikuma formā - mēs
-              atbildēsim godīgi, arī tad, ja Shadowy jūsu situācijai neder
+            <p className="text-sm font-medium leading-relaxed md:text-base">
+              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.5)">
+                {t("faq.subtitle")}
+              </WaveHeading>
             </p>
           </Reveal>
 
@@ -38,7 +41,7 @@ export function LandingFaq() {
 
               return (
                 <div
-                  key={item.question}
+                  key={item.question.lv}
                   className={cn(
                     "w-full overflow-hidden rounded-xl transition-all duration-500",
                     isOpen
@@ -54,7 +57,7 @@ export function LandingFaq() {
                     className="flex w-full items-center justify-between gap-4 p-5 text-left md:p-6"
                   >
                     <h3 className="text-[15px] font-medium leading-tight text-white md:text-[17px]">
-                      {item.question}
+                      {item.question[locale]}
                     </h3>
                     <motion.span
                       animate={{ rotate: isOpen ? 180 : 0 }}
@@ -75,7 +78,7 @@ export function LandingFaq() {
                     aria-hidden={!isOpen}
                   >
                     <p className="px-5 pb-5 pt-0 text-sm font-medium leading-relaxed text-white/60 md:px-6 md:pb-6 md:text-base">
-                      {item.answer}
+                      {item.answer[locale]}
                     </p>
                   </motion.div>
                 </div>

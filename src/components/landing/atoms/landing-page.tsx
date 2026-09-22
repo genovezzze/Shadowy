@@ -9,9 +9,10 @@ import { LandingAudience } from "@/components/landing/atoms/landing-audience";
 import { LandingPilotBanner } from "@/components/landing/atoms/landing-pilot-banner";
 import { LandingFaq } from "@/components/landing/atoms/landing-faq";
 import { LandingContact } from "@/components/landing/atoms/landing-contact";
+import { LandingClosing } from "@/components/landing/atoms/landing-closing";
+import { LocaleProvider } from "@/components/landing/atoms/i18n";
 import { LandingFooter } from "@/components/landing/atoms/landing-footer";
 import { LandingIntro } from "@/components/landing/atoms/landing-intro";
-import { LandingInterestModal } from "@/components/landing/atoms/landing-interest-modal";
 
 /**
  * The page runs dark → light → dark: the hero lockup over its video, the
@@ -24,15 +25,15 @@ import { LandingInterestModal } from "@/components/landing/atoms/landing-interes
  */
 export function LandingPage() {
   return (
+    <LocaleProvider>
     <div className="atoms-landing bg-[#070809] font-sans antialiased">
       <LandingIntro />
-      <LandingInterestModal />
       <LandingNav />
       <main>
         <LandingHero />
-        <LandingCases />
-        <LandingApproach />
         <LandingProduct />
+        <LandingApproach />
+        <LandingCases />
         <LandingOutcomes />
         <LandingWhatToLog />
         <LandingAudience />
@@ -41,6 +42,8 @@ export function LandingPage() {
         <LandingContact />
       </main>
       <LandingFooter />
+      <LandingClosing />
     </div>
+    </LocaleProvider>
   );
 }
