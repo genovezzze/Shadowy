@@ -216,7 +216,7 @@ function MegaMenuWaveText({ text }: { text: string }) {
         {letters.map((letter, index) => (
           <span
             key={`${letter}-${index}`}
-            className="transition-colors duration-[180ms] ease-out group-hover/link:text-[color:var(--mega-wave)] group-focus-visible/link:text-[color:var(--mega-wave)]"
+            className="transition-colors [transition-duration:180ms] ease-out group-hover/link:text-[color:var(--mega-wave)] group-focus-visible/link:text-[color:var(--mega-wave)]"
             style={
               {
                 "--mega-wave": menuWaveColor(index, letters.length),

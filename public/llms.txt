@@ -1,25 +1,25 @@
 # Shadowy
 
-> Shadowy ir darba slodzes pārskatāmības rīks Latvijas uzņēmumiem. Tas palīdz
-> ieraudzīt neredzamo darbu - palīdzību kolēģiem, pārtraukumus, koordināciju,
-> steidzamus uzdevumus ārpus lomas - un aprēķināt darba patieso pašizmaksu pa
-> klientiem un projektiem, nenovērojot darbiniekus.
+> Shadowy is a team workload transparency platform that makes invisible work visible: helping colleagues, onboarding, waiting for information, coordination and other tasks that never show up in normal reports. Employees log extra work in about 30 seconds, managers review it, and the company sees real workload, recurring processes and which clients cost the most. It is a transparency tool, not employee surveillance: no screen or keystroke tracking, and employees choose what to submit.
 
-Shadowy nav laika uzskaites vai novērošanas rīks. Darbinieks pats fiksē tikai
-tās situācijas, kas bija ārpus pamatdarba; vadītājs tās izvērtē un apstiprina;
-administrators redz organizācijas līmeņa pārskatu. AI veido tikai melnrakstus -
-nekas netiek saglabāts bez darbinieka apstiprinājuma.
+Based in Latvia. Primary language Latvian (lv), with an English version. Free 30 day pilot, no credit card.
 
-Kam paredzēts: pakalpojumu uzņēmumiem ar 5-50 cilvēku komandu - grāmatvedības,
-finanšu, konsultāciju un aģentūru komandām, īpaši tām, kas strādā ar fiksētu
-pakalpojumu maksu.
+## Key pages
+- [Home (Latvian)](https://www.shadowy.lv/): product overview, how it works, who it is for, FAQ.
+- [Home (English)](https://www.shadowy.lv/en): English version of the landing page.
+- [Pilot program](https://www.shadowy.lv/pilotprojekts): who the pilot is for, what you get, how it runs.
+- [PB Finanses case study](https://www.shadowy.lv/projekti/pb-finanses): a real accounting firm that used Shadowy to see invisible work, team load and true client cost.
+- [Privacy policy](https://www.shadowy.lv/privacy)
 
-Cena: 30 dienu pilotprojekts ir bez maksas un bez kredītkartes.
-Valoda: latviešu. Kontakts: contact@shadowy.lv
+## What Shadowy shows
+- Invisible / extra work hours that normal reports miss
+- Team workload and where it is distributed unevenly
+- Recurring processes worth fixing
+- True cost per client, so fixed-fee clients that do not cover their work become visible
+- Concrete process suggestions after a pilot
 
-## Lapas
+## Who it is for
+Service teams of roughly 5 to 50 people: accounting and finance firms, consultancies, agencies and other professional services where part of the work stays invisible.
 
-- [Sākumlapa](https://shadowy.lv/): produkts, ieguvumi, ko fiksēt, biežāk uzdotie jautājumi
-- [Pilotprojekts](https://shadowy.lv/pilotprojekts): kam paredzēts 30 dienu pilots, ko saņemsiet un ko sagaidām
-- [PB Finanses gadījums](https://shadowy.lv/projekti/pb-finanses): kā grāmatvedības uzņēmums ieraudzīja klientu patieso pašizmaksu
-- [Privātuma politika](https://shadowy.lv/privacy): datu apstrāde, pieejamība, eksports un dzēšana
+## Contact
+Email: contact@shadowy.lv

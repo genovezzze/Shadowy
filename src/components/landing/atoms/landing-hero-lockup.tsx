@@ -336,9 +336,12 @@ export function LandingHeroLockup() {
             </span>
           </div>
 
-          {/* `text-balance` evens out the two lines. The key phrases carry the
-              intro's pixel wave so they read as the emphasis of the sentence. */}
-          <p className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-2xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
+          {/* The page's single <h1>. It carries the descriptive, keyword-rich
+              sentence (not the bare "Shadowy" wordmark) so search engines have
+              something to match the queries a buyer types. `text-balance` evens
+              out the two lines; the key phrases carry the intro's pixel wave so
+              they read as the emphasis of the sentence. */}
+          <h1 className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-2xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
             {locale === "lv" ? (
               <>
                 Komandu slodzes pārskatāmības platforma: redziet{" "}
@@ -349,7 +352,7 @@ export function LandingHeroLockup() {
             ) : (
               t("hero.subtitle")
             )}
-          </p>
+          </h1>
 
           <LandingHeroTrust className="mt-5 sm:mt-6" />
 
