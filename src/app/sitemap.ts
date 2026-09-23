@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getSiteUrl } from "@/lib/site-url";
+import { ARTICLES } from "@/content/blog";
 
 const siteUrl = getSiteUrl();
 
@@ -17,5 +18,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${siteUrl}/projekti/pb-finanses`, lastModified: now, changeFrequency: "monthly", priority: 0.8 },
     { url: `${siteUrl}/register`, lastModified: now, changeFrequency: "yearly", priority: 0.4 },
     { url: `${siteUrl}/privacy`, lastModified: now, changeFrequency: "yearly", priority: 0.2 },
+    { url: `${siteUrl}/blog`, lastModified: now, changeFrequency: "weekly", priority: 0.7 },
+    ...ARTICLES.map((a) => ({
+      url: `${siteUrl}/blog/${a.slug}`,
+      lastModified: new Date(a.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    })),
   ];
 }

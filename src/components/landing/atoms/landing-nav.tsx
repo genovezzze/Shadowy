@@ -15,6 +15,7 @@ import {
   LayoutGrid,
   Gauge,
   HelpCircle,
+  Newspaper,
   Eye,
   LogIn,
   AlignLeft,
@@ -157,6 +158,7 @@ const MENU_CARDS: { tkey: StringKey; href: string; icon: LucideIcon }[] = [
   { tkey: "menu.overview", href: "#produkts", icon: BarChart3 },
   { tkey: "menu.forWhom", href: "#kam-noder", icon: Users },
   { tkey: "menu.clients", href: "#klienti", icon: Building2 },
+  { tkey: "menu.blog", href: "/blog", icon: Newspaper },
   { tkey: "menu.faq", href: "#faq", icon: HelpCircle },
 ];
 

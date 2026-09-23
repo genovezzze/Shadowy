@@ -7,6 +7,7 @@ import { HoverWaveText } from "@/components/landing/atoms/hover-wave-text";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
+import { AskAi } from "@/components/landing/atoms/ask-ai";
 
 type Tone = "dark" | "light";
 
@@ -47,6 +48,7 @@ const FOOTER_COLUMNS: readonly {
     links: [
       { label: { lv: "Ieguvumi", en: "Benefits" }, href: "#ieguvumi" },
       { label: { lv: "Klienti", en: "Clients" }, href: "#klienti" },
+      { label: { lv: "Raksti", en: "Blog" }, href: "/blog" },
       { label: { lv: "FAQ", en: "FAQ" }, href: "#faq" },
       { label: { lv: "Pieteikties pilotam", en: "Apply for a pilot" }, href: "#pilots" },
     ],
@@ -176,15 +178,26 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
           </div>
         </div>
 
+        <div className={cn("mt-14 border-t pt-8", isDark ? "border-white/10" : "border-black/10")}>
+          <AskAi tone={isDark ? "dark" : "light"} />
+        </div>
+
         <div
           className={cn(
-            "mt-14 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between",
+            "mt-10 flex flex-col gap-3 border-t pt-6 sm:flex-row sm:items-center sm:justify-between",
             isDark ? "border-white/10" : "border-black/10",
           )}
         >
-          <p className={cn("text-xs", isDark ? "text-white/35" : "text-black/40")}>
-            &copy; {new Date().getFullYear()} Shadowy
-          </p>
+          <div className="flex flex-col gap-1">
+            <p className={cn("text-xs", isDark ? "text-white/35" : "text-black/40")}>
+              &copy; {new Date().getFullYear()} Shadowy
+            </p>
+            <p className={cn("text-xs", isDark ? "text-white/35" : "text-black/40")}>
+              {locale === "lv"
+                ? "Visi dati ir aizsargāti. Dati tiek glabāti Eiropas Savienībā."
+                : "All data is protected. Data stored in the European Union."}
+            </p>
+          </div>
           <Link
             href="/privacy"
             className={cn(
