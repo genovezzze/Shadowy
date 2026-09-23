@@ -23,7 +23,10 @@ const description =
 export const metadata: Metadata = {
   title: { absolute: title },
   description,
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    languages: { lv: "/", en: "/en", "x-default": "/" },
+  },
   // Next.js replaces the whole `openGraph` object when a page declares one, so
   // omitting `images` here did not fall back to the root layout's - it left the
   // homepage with no share image at all. Every field it needs is repeated.
@@ -62,7 +65,7 @@ export default function HomePage() {
           faqPageNode,
         ]}
       />
-      <LandingPage />
+      <LandingPage forcedLocale="lv" />
     </>
   );
 }

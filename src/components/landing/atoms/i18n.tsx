@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useRouter } from "next/navigation";
 
 export type Locale = "lv" | "en";
 
@@ -161,19 +162,41 @@ const LocaleContext = React.createContext<LocaleContextValue>({
 
 const STORAGE_KEY = "shadowy:locale";
 
-export function LocaleProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = React.useState<Locale>("lv");
+export function LocaleProvider({
+  children,
+  forcedLocale,
+}: {
+  children: React.ReactNode;
+  /**
+   * When set, the whole subtree renders in this language on the server and the
+   * saved-choice lookup is skipped. This is how the dedicated `/en` route ships
+   * English HTML that Google can index, instead of only swapping to English in
+   * the browser after hydration.
+   */
+  forcedLocale?: Locale;
+}) {
+  const [locale, setLocaleState] = React.useState<Locale>(forcedLocale ?? "lv");
 
   // Read the saved choice after mount to avoid a hydration mismatch (server and
-  // first client render are both "lv").
+  // first client render are both "lv"). Skipped when a route forces a locale -
+  // there the URL is the source of truth, so it also wins over any saved choice.
   React.useEffect(() => {
+    if (forcedLocale) {
+      document.documentElement.lang = forcedLocale;
+      try {
+        localStorage.setItem(STORAGE_KEY, forcedLocale);
+      } catch {
+        // ignore
+      }
+      return;
+    }
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === "en" || saved === "lv") setLocaleState(saved);
     } catch {
       // Blocked storage - just keep the default.
     }
-  }, []);
+  }, [forcedLocale]);
 
   const setLocale = React.useCallback((next: Locale) => {
     setLocaleState(next);
@@ -199,6 +222,30 @@ export function useLocale() {
 /** The LV / EN pill toggle for the nav. */
 export function LocaleToggle({ light }: { light?: boolean }) {
   const { locale, setLocale } = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
+  // The homepage has real per-language URLs (/ = Latvian, /en = English), so the
+  // toggle navigates between them - the language IS the page there, which is what
+  // lets Google index each language separately. On other pages (case studies)
+  // there is no separate URL, so it falls back to switching text in place.
+  const onHome = pathname === "/" || pathname === "/en";
+
+  const choose = (code: Locale) => {
+    if (onHome) {
+      const target = code === "en" ? "/en" : "/";
+      if (pathname !== target) {
+        try {
+          localStorage.setItem(STORAGE_KEY, code);
+        } catch {
+          // ignore
+        }
+        router.push(target);
+      }
+      return;
+    }
+    setLocale(code);
+  };
+
   return (
     <div
       className={
@@ -212,7 +259,7 @@ export function LocaleToggle({ light }: { light?: boolean }) {
           <button
             key={code}
             type="button"
-            onClick={() => setLocale(code)}
+            onClick={() => choose(code)}
             aria-pressed={active}
             className={
               "rounded-full px-2.5 py-1 text-xs font-bold uppercase transition-colors " +

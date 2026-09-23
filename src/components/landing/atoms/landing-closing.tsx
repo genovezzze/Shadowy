@@ -46,28 +46,34 @@ export function LandingClosing() {
   const hillsY = useSpring(useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]), SPRING);
   const foliageY = useSpring(useTransform(scrollYProgress, [0, 1], ["10%", "-6%"]), SPRING);
 
-  // The wordmark reveals as the section climbs into view (progress ~0.15→0.5).
-  const textOpacity = useTransform(scrollYProgress, [0.12, 0.32, 0.55], [0, 0.7, 1]);
+  // The wordmark rises and settles as the section climbs into view. Opacity is
+  // left at 1 (see below) so it never disappears on phones.
   const textScale = useSpring(useTransform(scrollYProgress, [0.12, 0.55], [0.86, 1]), SPRING);
   const textY = useSpring(useTransform(scrollYProgress, [0.12, 0.55], [44, 0]), SPRING);
 
   return (
-    <section ref={ref} className="relative hidden w-full overflow-hidden bg-black sm:block">
-      <div className="relative mx-auto aspect-[1962/801] w-full">
+    <section ref={ref} className="relative w-full overflow-hidden bg-black">
+      {/* A bit taller than the wide desktop ratio for presence on phones, but
+          anchored to the bottom so the empty sky above the hills stays small. */}
+      <div className="relative mx-auto aspect-[16/10] w-full sm:aspect-[1962/801]">
         {/* Hills — slower, drifting layer, at the back */}
         <motion.div className="absolute inset-0 z-0" style={reduce ? undefined : { y: hillsY }}>
-          <Image src="/images/back13.png" alt="" aria-hidden fill sizes="100vw" className="scale-[1.14] object-cover" />
+          <Image src="/images/back13.png" alt="" aria-hidden fill sizes="100vw" className="scale-[1.35] object-cover object-bottom sm:scale-[1.14] sm:object-center" />
         </motion.div>
 
         {/* Wordmark sits BETWEEN the layers, so the foliage in front covers its
             lower edge and the letters rise out of the treetops, like the ref. */}
         <motion.div
-          className="absolute inset-x-0 top-[43%] z-10 flex justify-center px-4"
-          style={reduce ? undefined : { opacity: textOpacity, scale: textScale, y: textY }}
+          className="absolute inset-x-0 top-[42%] z-10 flex justify-center px-4 sm:top-[43%]"
+          // Opacity stays at 1 so the wordmark is always visible; the scroll
+          // reveal only drives the subtle rise/scale. The opacity-on-scroll left
+          // it invisible on phones, where this last section never scrolls far
+          // enough to cross the reveal threshold.
+          style={reduce ? undefined : { scale: textScale, y: textY }}
         >
           <span
             aria-label={WORDMARK}
-            className="select-none text-[clamp(3rem,15.5vw,12rem)] font-normal leading-none tracking-[0.015em] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.55)]"
+            className="select-none text-[clamp(3.25rem,19vw,12rem)] font-normal leading-none tracking-[0.015em] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.55)] sm:text-[clamp(3rem,15.5vw,12rem)]"
           >
             {[...WORDMARK].map((letter, index) => (
               <span key={index} aria-hidden style={{ fontFamily: PIXEL_FONTS[(index + tick) % PIXEL_FONTS.length] }}>
@@ -79,11 +85,11 @@ export function LandingClosing() {
 
         {/* Foliage — foreground layer, in front of the wordmark so it covers it */}
         <motion.div className="absolute inset-0 z-20" style={reduce ? undefined : { y: foliageY }}>
-          <Image src="/images/back14.png" alt="" aria-hidden fill sizes="100vw" className="scale-[1.14] object-cover" />
+          <Image src="/images/back14.png" alt="" aria-hidden fill sizes="100vw" className="object-cover object-bottom sm:scale-[1.14] sm:object-center" />
         </motion.div>
 
         {/* Top fade into the page above, bottom fade into the black footer. */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-30 h-1/2 bg-gradient-to-b from-black via-black/80 to-transparent" />
+        <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 z-30 h-1/4 bg-gradient-to-b from-black via-black/70 to-transparent sm:h-1/2 sm:via-black/80" />
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 z-30 h-1/5 bg-gradient-to-t from-black to-transparent" />
       </div>
     </section>

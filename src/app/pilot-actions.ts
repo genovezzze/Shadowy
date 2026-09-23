@@ -72,3 +72,76 @@ export async function submitPilotApplication(formData: FormData) {
 
   return { ok: true as const };
 }
+
+const chatSchema = z.object({
+  email: z.string().email("Lūdzu, ievadiet derīgu e-pastu."),
+  teamSize: z.string().max(100).optional().default(""),
+  niche: z.string().max(200).optional().default(""),
+  message: z.string().max(1000).optional().default(""),
+});
+
+/**
+ * The landing concierge chat's pilot intake: team size, niche, wishes and an
+ * email, gathered step by step. It lands in the same place as the full pilot
+ * form (the PilotLead table plus the notification email); the niche and wishes
+ * are folded into the comment, with a placeholder name so it is easy to spot as
+ * a chat lead.
+ */
+export async function submitChatLead(input: {
+  email: string;
+  teamSize?: string;
+  niche?: string;
+  message?: string;
+}) {
+  const parsed = chatSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false as const, error: parsed.error.issues[0].message };
+  }
+
+  const ip = getClientIp();
+  if (await isActionRateLimited(RATE_LIMIT_KEY, ip, RATE_LIMIT_MAX, RATE_LIMIT_WINDOW_MINUTES)) {
+    return { ok: false as const, error: ACTION_RATE_LIMIT_MESSAGE };
+  }
+  await recordActionHit(RATE_LIMIT_KEY, ip, RATE_LIMIT_WINDOW_MINUTES);
+
+  const commentParts = [
+    parsed.data.niche ? `Nozare: ${parsed.data.niche}` : "",
+    parsed.data.message ? `Vēlmes: ${parsed.data.message}` : "",
+  ].filter(Boolean);
+
+  const lead = {
+    name: "Čata pieteikums",
+    company: parsed.data.niche || "-",
+    email: parsed.data.email,
+    teamSize: parsed.data.teamSize || "-",
+    comment: commentParts.join(" · "),
+  };
+
+  let savedToDatabase = false;
+  let emailSent = false;
+
+  try {
+    await prisma.pilotLead.create({
+      data: { ...lead, comment: lead.comment || null },
+    });
+    savedToDatabase = true;
+  } catch (error) {
+    console.error("[chat-lead] Database save failed", error);
+  }
+
+  try {
+    await sendPilotInquiry(lead);
+    emailSent = true;
+  } catch (error) {
+    console.error("[chat-lead] Email notification failed", error);
+  }
+
+  if (!savedToDatabase && !emailSent) {
+    return {
+      ok: false as const,
+      error: "Neizdevās nosūtīt. Lūdzu, mēģiniet vēlreiz.",
+    };
+  }
+
+  return { ok: true as const };
+}

@@ -24,6 +24,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useLocale, LocaleToggle, type StringKey } from "@/components/landing/atoms/i18n";
+import { LandingChat } from "@/components/landing/atoms/landing-chat";
 
 // Cycled per letter so the wordmark mixes pixel faces, like the Atoms wordmark.
 // Sparse faces (line, triangle) map to the outer letters and the dense ones
@@ -290,6 +291,7 @@ export function LandingNav({
 } = {}) {
   const [onLight, setOnLight] = React.useState(alwaysLight);
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [chatOpen, setChatOpen] = React.useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = React.useState<MegaMenuKey | null>(null);
   const closeTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -525,10 +527,12 @@ export function LandingNav({
         </div>
         </div>
 
-        {/* Centre: decorative pill → pilot form */}
-        <Link
-          href={resolveHref("#pilots")}
+        {/* Centre: pill → opens the concierge chat */}
+        <button
+          type="button"
+          onClick={() => setChatOpen(true)}
           onMouseEnter={() => setActiveMegaMenu(null)}
+          aria-haspopup="dialog"
           className={cn(
             "absolute left-1/2 top-1/2 hidden w-[clamp(320px,34vw,540px)] -translate-x-1/2 -translate-y-1/2 items-center justify-between gap-3 rounded-full py-2.5 pl-4 pr-2 text-sm transition-colors lg:flex",
             navIsLight
@@ -548,7 +552,7 @@ export function LandingNav({
           >
             {t("nav.pillChip")}
           </span>
-        </Link>
+        </button>
 
         <div
           className="flex shrink-0 items-center gap-2 sm:gap-2.5"
@@ -788,6 +792,8 @@ export function LandingNav({
           </>
         )}
       </AnimatePresence>
+
+      <LandingChat open={chatOpen} onClose={() => setChatOpen(false)} />
     </>
   );
 }

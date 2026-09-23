@@ -10,7 +10,7 @@ import { LandingPilotBanner } from "@/components/landing/atoms/landing-pilot-ban
 import { LandingFaq } from "@/components/landing/atoms/landing-faq";
 import { LandingContact } from "@/components/landing/atoms/landing-contact";
 import { LandingClosing } from "@/components/landing/atoms/landing-closing";
-import { LocaleProvider } from "@/components/landing/atoms/i18n";
+import { LocaleProvider, type Locale } from "@/components/landing/atoms/i18n";
 import { LandingFooter } from "@/components/landing/atoms/landing-footer";
 import { LandingIntro } from "@/components/landing/atoms/landing-intro";
 
@@ -23,9 +23,9 @@ import { LandingIntro } from "@/components/landing/atoms/landing-intro";
  * The nav reads the first of those switches to decide whether to paint itself
  * light or dark, so the hero has to stay one viewport tall and stay first.
  */
-export function LandingPage() {
+export function LandingPage({ forcedLocale }: { forcedLocale?: Locale } = {}) {
   return (
-    <LocaleProvider>
+    <LocaleProvider forcedLocale={forcedLocale}>
     <div className="atoms-landing bg-[#070809] font-sans antialiased">
       <LandingIntro />
       <LandingNav />

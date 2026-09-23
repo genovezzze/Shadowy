@@ -146,7 +146,7 @@ export function LandingIntro() {
           the capitals well short of the mark. */}
       <span
         aria-hidden
-        className={`absolute left-1/2 top-[40%] flex -translate-x-1/2 -translate-y-1/2 select-none items-center gap-1.5 [--intro-cap:26.6px] md:top-1/2 md:gap-2 md:[--intro-cap:43.9px] ${
+        className={`absolute left-1/2 top-[40%] flex -translate-x-1/2 -translate-y-1/2 select-none items-center gap-1.5 [--intro-cap:20px] md:top-1/2 md:gap-2 md:[--intro-cap:43.9px] ${
           fontsReady ? "visible" : "invisible"
         }`}
       >

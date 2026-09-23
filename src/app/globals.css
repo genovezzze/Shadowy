@@ -802,6 +802,11 @@ body.client-case-open {
 
   html {
     scroll-behavior: smooth;
+    /* Always reserve the scrollbar's space on the document scroller. Without
+       this, any overlay that locks body scroll (e.g. the Radix Select dropdown
+       on the pilot form) removes the scrollbar and shifts the whole page -
+       including the full-bleed hero/contact background images. */
+    scrollbar-gutter: stable;
   }
 
   html, body {

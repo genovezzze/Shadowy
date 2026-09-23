@@ -85,8 +85,8 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
         // on the grass instead of clearing it - the content now stops where the
         // hills begin.
         isDark
-          ? "border-white/10 bg-black pb-14 pt-14 sm:pt-16 md:pb-20 md:pt-20"
-          : "border-black/10 bg-white pb-14 pt-14 sm:pt-16 md:pb-20 md:pt-20",
+          ? "border-white/10 bg-black pb-6 pt-14 sm:pb-14 sm:pt-16 md:pb-20 md:pt-20"
+          : "border-black/10 bg-white pb-6 pt-14 sm:pb-14 sm:pt-16 md:pb-20 md:pt-20",
       )}
     >
       <div className="relative z-10 w-full px-4 md:px-8">
@@ -197,15 +197,6 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
             {t("cta.privacy")}
           </Link>
         </div>
-      </div>
-      <div aria-hidden className="relative z-10 mt-10 h-[220px] w-full sm:hidden">
-        <Image
-          src={isDark ? "/images/pic8.webp" : "/images/pic8-cutout.png"}
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover object-bottom"
-        />
       </div>
     </footer>
   );
