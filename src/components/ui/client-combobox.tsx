@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Check, ChevronsUpDown, Search } from "lucide-react";
+import { Check, ChevronDown, Search } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ClientOption {
@@ -57,18 +57,23 @@ export function ClientCombobox({
         type="button"
         onClick={() => setOpen(!open)}
         className={cn(
-          "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background",
-          "hover:bg-accent/50 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+          "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          "dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-foreground dark:focus-visible:border-emerald-400/40 dark:focus-visible:ring-emerald-500/30",
           !selected && "text-muted-foreground"
         )}
       >
         <span className="truncate">{selected ? selected.name : placeholder}</span>
-        <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+        <ChevronDown className="h-4 w-4 shrink-0 opacity-50" />
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-full rounded-md border border-border bg-card shadow-md">
-          <div className="flex items-center border-b border-border px-3">
+        <div
+          className={cn(
+            "absolute z-50 mt-2 w-max min-w-full max-w-[min(94vw,720px)] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+            "dark:border-white/[0.08] dark:bg-[#141416] dark:text-foreground dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)]"
+          )}
+        >
+          <div className="flex items-center border-b border-border px-3 dark:border-white/[0.08]">
             <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
             <input
               ref={inputRef}
@@ -78,32 +83,40 @@ export function ClientCombobox({
               className="flex h-9 w-full bg-transparent py-2 pl-2 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <div className="max-h-60 overflow-y-auto py-1">
+          <div className="max-h-72 overflow-auto p-1">
+            {/* "Nav klienta" stays a full-width row on top; the clients below
+                are laid out in columns of five so the list is easy to scan. */}
             <button
               type="button"
               onClick={() => { onChange("__none__"); setOpen(false); }}
               className={cn(
-                "flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent",
+                "relative flex w-full cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground",
                 value === "__none__" || !value ? "text-foreground" : "text-muted-foreground"
               )}
             >
-              <Check className={cn("h-4 w-4 shrink-0", (!value || value === "__none__") ? "opacity-100" : "opacity-0")} />
+              <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                {(!value || value === "__none__") && <Check className="h-4 w-4" />}
+              </span>
               Nav klienta
             </button>
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-sm text-muted-foreground">Nav rezultātu</p>
+              <p className="px-2 py-6 text-center text-sm text-muted-foreground">Nav rezultātu</p>
             ) : (
-              filtered.map((c) => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => { onChange(c.id); setOpen(false); }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm hover:bg-accent"
-                >
-                  <Check className={cn("h-4 w-4 shrink-0", value === c.id ? "opacity-100" : "opacity-0")} />
-                  {c.name}
-                </button>
-              ))
+              <div className="grid grid-flow-col grid-rows-5">
+                {filtered.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => { onChange(c.id); setOpen(false); }}
+                    className="relative flex min-h-[40px] w-full min-w-[12rem] cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm text-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground"
+                  >
+                    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+                      {value === c.id && <Check className="h-4 w-4" />}
+                    </span>
+                    <span className="truncate">{c.name}</span>
+                  </button>
+                ))}
+              </div>
             )}
           </div>
         </div>
