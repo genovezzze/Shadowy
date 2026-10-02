@@ -90,7 +90,7 @@ export function ClientCombobox({
               type="button"
               onClick={() => { onChange("__none__"); setOpen(false); }}
               className={cn(
-                "relative flex w-full cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground",
+                "relative flex min-h-[46px] w-full cursor-pointer select-none items-center rounded-md py-0 pl-6 pr-3 text-[13px] outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground",
                 value === "__none__" || !value ? "text-foreground" : "text-muted-foreground"
               )}
             >
@@ -103,17 +103,23 @@ export function ClientCombobox({
               <p className="px-2 py-6 text-center text-sm text-muted-foreground">Nav rezultātu</p>
             ) : (
               <div className="grid grid-flow-col grid-rows-5">
-                {filtered.map((c) => (
+                {filtered.map((c, i) => (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => { onChange(c.id); setOpen(false); }}
-                    className="relative flex min-h-[40px] w-full min-w-[12rem] cursor-pointer select-none items-center rounded-md py-2 pl-8 pr-3 text-sm text-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground"
+                    className="relative flex min-h-[46px] w-full min-w-[13rem] cursor-pointer select-none items-center rounded-md py-0 pl-6 pr-3 text-[13px] text-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground"
                   >
                     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
                       {value === c.id && <Check className="h-4 w-4" />}
                     </span>
-                    <span className="truncate">{c.name}</span>
+                    <span className="flex min-w-0 items-baseline gap-2">
+                      <span className="w-4 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className="text-muted-foreground/40">|</span>
+                      <span className="min-w-0 truncate leading-snug">{c.name}</span>
+                    </span>
                   </button>
                 ))}
               </div>
