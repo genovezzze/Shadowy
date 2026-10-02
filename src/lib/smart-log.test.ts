@@ -64,7 +64,7 @@ describe("categoriesForWorkRole", () => {
 });
 
 describe("assistant category set", () => {
-  it("has exactly the 8 current assistant tasks", () => {
+  it("has exactly the current assistant tasks", () => {
     expect(GRAMATVEZU_PALIGS_CATEGORIES.map((c) => c.value)).toEqual([
       "bookkeeping_invoices",
       "bookkeeping_receipts",
@@ -74,6 +74,9 @@ describe("assistant category set", () => {
       "payroll_calculation",
       "invoicing",
       "payment_preparation",
+      "document_scanning",
+      "document_archiving",
+      "other",
     ]);
   });
 
@@ -225,7 +228,7 @@ describe("smartLogCategorySchema (zod validation of AI output)", () => {
   });
 
   it("rejects a legacy-only / retired value", () => {
-    for (const v of ["reconciliation", "statistics_reports", "annual_report", "cits"]) {
+    for (const v of ["reconciliation", "statistics_reports", "annual_report", "document_processing"]) {
       expect(smartLogCategorySchema.safeParse(v).success).toBe(false);
     }
   });

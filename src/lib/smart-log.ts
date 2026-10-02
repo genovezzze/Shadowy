@@ -56,6 +56,9 @@ export const GRAMATVEZU_PALIGS_CATEGORIES: readonly SmartLogCategoryDef[] = [
   { value: "payroll_calculation", code: "06", label: "darba algas aprēķini un grāmatošana", group: "Grāmatvežu palīgs", hint: "darba algas aprēķini un algu grāmatošana" },
   { value: "invoicing", code: "07", label: "rēķinu izrakstīšana", group: "Grāmatvežu palīgs", hint: "rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana)" },
   { value: "payment_preparation", code: "08", label: "maksājumu sagatavošana", group: "Grāmatvežu palīgs", hint: "maksājumu sagatavošana" },
+  { value: "document_scanning", code: "09", label: "skenēšana", group: "Grāmatvežu palīgs", hint: "dokumentu skenēšana un digitalizēšana" },
+  { value: "document_archiving", code: "10", label: "arhivēšana", group: "Grāmatvežu palīgs", hint: "dokumentu arhivēšana un sakārtošana" },
+  { value: "other", code: "11", label: "cits", group: "Grāmatvežu palīgs", hint: "citi darbi, kas neietilpst pārējās kategorijās" },
 ];
 
 export const GRAMATVEDIS_CATEGORIES: readonly SmartLogCategoryDef[] = [
@@ -117,8 +120,6 @@ export const LEGACY_SMART_LOG_CATEGORIES = [
   { value: "document_processing", label: "dokumentu apstrāde un arhivēšana" },
   // Retired from the selectable list but kept here so past entries still carry
   // a human label and fold into the right key in the reports (parskats).
-  { value: "document_scanning", label: "dokumentu skenēšana un digitalizēšana" },
-  { value: "document_archiving", label: "dokumentu arhivēšana un sakārtošana" },
   { value: "legal_documents", label: "juridisko dokumentu sagatavošana" },
   { value: "client_communication", label: "saziņa ar klientu" },
   { value: "client_meeting", label: "klātienes tikšanās ar klientiem" },
@@ -129,7 +130,6 @@ export const LEGACY_SMART_LOG_CATEGORIES = [
   { value: "urgent_extra_task", label: "steidzams papildu uzdevums" },
   { value: "work_outside_role", label: "darbs ārpus lomas" },
   { value: "fixing_mistakes", label: "kļūdu labošana" },
-  { value: "other", label: "cits" },
   // Retired from the assistant set but kept so past entries keep their label
   // and still fold into the right key in the reports.
   { value: "reconciliation", label: "pārbaudes un saskaņošana" },
@@ -151,6 +151,9 @@ export const CATEGORY_LABEL_ALIASES: Record<string, string> = {
   "darba algas aprēķini": "payroll_calculation",
   // Plural spelling used by some entries.
   "palīdzība kolēģiem": "helping_colleague",
+  // Shortened when these became assistant categories (skenēšana / arhivēšana).
+  "dokumentu skenēšana un digitalizēšana": "document_scanning",
+  "dokumentu arhivēšana un sakārtošana": "document_archiving",
 };
 
 const ALL_CATEGORY_VALUES = SMART_LOG_CATEGORIES.map((c) => c.value);
