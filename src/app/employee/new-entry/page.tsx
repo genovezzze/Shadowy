@@ -1,5 +1,6 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { categoriesForUser } from "@/lib/smart-log-server";
 import { PageHeader } from "@/components/layout/page-header";
 import { EntryForm } from "@/components/entries/entry-form";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,6 +12,7 @@ export default async function NewEntryPage({
   searchParams: { copyFrom?: string };
 }) {
   const session = await requireUser(["EMPLOYEE"]);
+  const categories = await categoriesForUser(session.userId);
 
   const employee = await prisma.user.findUnique({
     where: { id: session.userId },
@@ -89,6 +91,7 @@ export default async function NewEntryPage({
               c.name ? [{ id: c.id, name: c.name }] : []
             )}
             initialValues={initialValues}
+            categories={categories}
           />
 
           {/* Duties sidebar */}

@@ -7,10 +7,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ClientCombobox } from "@/components/ui/client-combobox";
+import { DurationInput } from "@/components/entries/duration-input";
 import { NoClientsNotice } from "@/components/entries/no-clients-notice";
 import { createEntry } from "@/app/employee/new-entry/actions";
-import { CATEGORY_GROUPS, SMART_LOG_CATEGORIES } from "@/lib/smart-log";
+import { SMART_LOG_CATEGORIES, type SmartLogCategoryDef } from "@/lib/smart-log";
 import { WORK_NATURE_FLAGS } from "@/lib/work-nature";
 
 const HELP_FLAG = WORK_NATURE_FLAGS[0];
@@ -38,11 +40,21 @@ export function EntryForm({
   clients = [],
   colleagues = [],
   initialValues,
+  categories = SMART_LOG_CATEGORIES,
 }: {
   clients?: ClientOption[];
   colleagues?: ColleagueOption[];
   initialValues?: EntryFormInitialValues;
+  categories?: readonly SmartLogCategoryDef[];
 }) {
+  // Group labels in the order they first appear in the given set.
+  const categoryGroups = Array.from(new Set(categories.map((c) => c.group)));
+  // When more than one group is available (the assistant sees both), the
+  // dropdown shows tab buttons and only the active group's categories.
+  const [categoryTab, setCategoryTab] = useState(categoryGroups[0] ?? "");
+  const activeGroup = categoryGroups.includes(categoryTab)
+    ? categoryTab
+    : categoryGroups[0];
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -111,19 +123,69 @@ export function EntryForm({
                 <SelectTrigger id="category">
                   <SelectValue placeholder="Izvēlieties kategoriju" />
                 </SelectTrigger>
-                <SelectContent>
-                  {CATEGORY_GROUPS.map((group) => (
-                    <SelectGroup key={group}>
-                      <SelectLabel>{group}</SelectLabel>
-                      {SMART_LOG_CATEGORIES.filter((c) => c.group === group).map(
-                        ({ value, label }) => (
-                          <SelectItem key={value} value={value}>
-                            {label}
-                          </SelectItem>
-                        )
+                <SelectContent className="w-auto max-w-[min(94vw,720px)]">
+                  {/* Tabs: only when more than one group is available (the
+                      assistant). Clicking a tab reveals that group's
+                      categories. onPointerDown so the select does not treat it
+                      as an item selection or close. */}
+                  {categoryGroups.length > 1 && (
+                    <div className="mb-1 flex gap-1 border-b border-border p-1">
+                      {categoryGroups.map((group) => (
+                        <button
+                          key={group}
+                          type="button"
+                          onPointerDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setCategoryTab(group);
+                          }}
+                          className={cn(
+                            "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+                            activeGroup === group
+                              ? "bg-muted text-foreground"
+                              : "text-muted-foreground hover:bg-muted/50",
+                          )}
+                        >
+                          {group}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                  <SelectGroup>
+                    {/* Columns of five. Every row is the same height (fits a
+                        two-line label) so the spacing stays even; the number is
+                        a right-aligned muted prefix so labels line up. */}
+                    <div
+                      className={cn(
+                        "grid grid-flow-col",
+                        activeGroup === "Grāmatvežu palīgs"
+                          ? "grid-rows-4"
+                          : "grid-rows-5",
                       )}
-                    </SelectGroup>
-                  ))}
+                    >
+                      {categories
+                        .filter((c) => c.group === activeGroup)
+                        .map((c) => (
+                          <SelectItem
+                            key={c.value}
+                            value={c.value}
+                            className="min-h-[46px] items-center py-0 pl-6 pr-3 text-[13px]"
+                          >
+                            <span className="flex min-w-0 items-baseline gap-2">
+                              {c.code && (
+                                <>
+                                  <span className="w-4 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
+                                    {c.code}
+                                  </span>
+                                  <span className="text-muted-foreground/40">|</span>
+                                </>
+                              )}
+                              <span className="min-w-0 leading-snug">{c.label}</span>
+                            </span>
+                          </SelectItem>
+                        ))}
+                    </div>
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
@@ -163,16 +225,11 @@ export function EntryForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="durationMinutes">Ilgums (minūtēs)</Label>
-            <Input
+            <Label htmlFor="durationMinutes">Ilgums</Label>
+            <DurationInput
               id="durationMinutes"
               name="durationMinutes"
-              type="number"
-              min={1}
-              max={1440}
-              required
-              defaultValue={initialValues?.durationMinutes}
-              placeholder="piem., 30"
+              defaultMinutes={initialValues?.durationMinutes}
             />
             <p className="text-xs text-muted-foreground">
               Norādiet aptuveno laiku, kas tika veltīts šim neredzamajam darbam.
@@ -219,12 +276,12 @@ export function EntryForm({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="description">Apraksts</Label>
+            <Label htmlFor="description">
+              Apraksts <span className="text-muted-foreground">(nav obligāts)</span>
+            </Label>
             <Textarea
               id="description"
               name="description"
-              required
-              minLength={10}
               maxLength={2000}
               defaultValue={initialValues?.description}
               placeholder="Pastāstiet vairāk: kam palīdzējāt, kāds bija konteksts, kāpēc tas bija nepieciešams."

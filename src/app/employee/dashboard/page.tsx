@@ -12,6 +12,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer, Flame, Zap, TrendingUp, Copy } from "lucide-react";
+import { categoriesForUser } from "@/lib/smart-log-server";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
 import { AddTimeButton } from "@/components/entries/add-time-button";
 import { EditEntryButton } from "@/components/entries/edit-entry-button";
@@ -67,6 +68,7 @@ function weekStartMs(dateStr: string): number {
 
 export default async function EmployeeDashboard() {
   const session = await requireUser(["EMPLOYEE"]);
+  const categories = await categoriesForUser(session.userId);
 
   const now = new Date();
   const todayStr = now.toISOString().slice(0, 10);
@@ -682,6 +684,7 @@ export default async function EmployeeDashboard() {
                       clients={editableClients}
                       clientId={e.clientId}
                       clientName={e.clientName}
+                      categories={categories}
                     />
                   ) : e.status === "APPROVED" ? (
                     <>
@@ -696,6 +699,7 @@ export default async function EmployeeDashboard() {
                         clients={editableClients}
                         clientId={e.clientId}
                         clientName={e.clientName}
+                        categories={categories}
                       />
                       <DeleteEntryButton entryId={e.id} />
                     </>

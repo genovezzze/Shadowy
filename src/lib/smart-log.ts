@@ -18,40 +18,93 @@ export const CATEGORY_GROUPS = [
 
 export type CategoryGroup = (typeof CATEGORY_GROUPS)[number];
 
+export type SmartLogCategoryDef = {
+  value: string;
+  label: string;
+  group: string;
+  /** Short hint for the AI prompt, describing what belongs in the category. */
+  hint?: string;
+  /**
+   * Display-only ordering number shown in the picker (e.g. "01"). It is NOT
+   * part of the category label or the stored value - only a visual aid to find
+   * the right row quickly.
+   */
+  code?: string;
+};
+
+/** The label shown in a picker: the ordering number (if any) plus the label. */
+export function categoryDisplay(c: SmartLogCategoryDef): string {
+  return c.code ? `${c.code} | ${c.label}` : c.label;
+}
+
 /**
- * Bookkeeping is split by the object being posted (invoices, receipts, cash,
- * advances, bank) rather than kept as one "accounting" bucket. A single
- * `bookkeeping` category still hid the answer a manager needs - 60 of the 117
- * misfiled entries landed in it, and "60 entries of bookkeeping" is not
- * something anyone can act on, whereas "23 invoice postings, 16 receipt
- * postings" points at what to automate first.
+ * Categories are role-based. The selectable set depends on the employee's work
+ * role (see `categoriesForWorkRole`): a bookkeeping assistant ("grāmatvežu
+ * palīgs") logs the specific bookkeeping task; an accountant or chief accountant
+ * ("grāmatvedis" / "galvenais grāmatvedis") logs the accounting area the work
+ * belongs to. General non-bookkeeping categories were retired from the
+ * selectable list (they live in LEGACY_SMART_LOG_CATEGORIES so past entries
+ * still label and group correctly in the reports). "Helping a colleague" is not
+ * a category - it is a separate flag, see WORK_NATURE_FLAGS.
  */
-export const SMART_LOG_CATEGORIES = [
-  { value: "bookkeeping_invoices", label: "rēķinu un pavadzīmju grāmatošana", group: "Grāmatvedība" },
-  { value: "bookkeeping_receipts", label: "čeku grāmatošana", group: "Grāmatvedība" },
-  { value: "bookkeeping_cash", label: "kases operāciju grāmatošana", group: "Grāmatvedība" },
-  { value: "bookkeeping_advances", label: "avansa norēķinu grāmatošana", group: "Grāmatvedība" },
-  { value: "bookkeeping_bank", label: "bankas operāciju grāmatošana", group: "Grāmatvedība" },
-  { value: "payroll_calculation", label: "darba algas aprēķini un grāmatošana", group: "Grāmatvedība" },
-  { value: "reconciliation", label: "pārbaudes un saskaņošana", group: "Grāmatvedība" },
-  { value: "invoicing", label: "rēķinu izrakstīšana", group: "Grāmatvedība" },
-  { value: "payment_preparation", label: "maksājumu sagatavošana", group: "Grāmatvedība" },
-  { value: "statistics_reports", label: "statistikas pārskatu sagatavošana", group: "Grāmatvedība" },
-  { value: "annual_report", label: "gada pārskatu sastādīšana", group: "Grāmatvedība" },
-  { value: "document_scanning", label: "dokumentu skenēšana un digitalizēšana", group: "Dokumenti" },
-  { value: "document_archiving", label: "dokumentu arhivēšana un sakārtošana", group: "Dokumenti" },
-  { value: "legal_documents", label: "juridisko dokumentu sagatavošana", group: "Dokumenti" },
-  { value: "client_communication", label: "saziņa ar klientu", group: "Klienti un komunikācija" },
-  { value: "client_meeting", label: "klātienes tikšanās ar klientiem", group: "Klienti un komunikācija" },
-  { value: "hortus_digital_communication", label: "saziņa ar Hortus Digital", group: "Klienti un komunikācija" },
-  { value: "vid_communication", label: "saziņa ar VID", group: "Klienti un komunikācija" },
-  { value: "onboarding", label: "ievadīšana darbā", group: "Cits" },
-  { value: "repeated_questions", label: "atkārtoti jautājumi", group: "Cits" },
-  { value: "urgent_extra_task", label: "steidzams papildu uzdevums", group: "Cits" },
-  { value: "work_outside_role", label: "darbs ārpus lomas", group: "Cits" },
-  { value: "fixing_mistakes", label: "kļūdu labošana", group: "Cits" },
-  { value: "other", label: "cits", group: "Cits" },
-] as const;
+export const GRAMATVEZU_PALIGS_CATEGORIES: readonly SmartLogCategoryDef[] = [
+  { value: "bookkeeping_invoices", code: "01", label: "rēķinu un pavadzīmju grāmatošana", group: "Grāmatvežu palīgs", hint: "rēķinu, pavadzīmju, kreditoru un debitoru grāmatošana, ievade programmā" },
+  { value: "bookkeeping_receipts", code: "02", label: "čeku grāmatošana", group: "Grāmatvežu palīgs", hint: "čeku grāmatošana, apstrāde, līmēšana" },
+  { value: "bookkeeping_cash", code: "03", label: "kases operāciju grāmatošana", group: "Grāmatvežu palīgs", hint: "kase, kases žurnāls, Z atskaites, kases orderi" },
+  { value: "bookkeeping_advances", code: "04", label: "avansa norēķinu grāmatošana", group: "Grāmatvežu palīgs", hint: "avansa norēķinu grāmatošana" },
+  { value: "bookkeeping_bank", code: "05", label: "bankas operāciju grāmatošana", group: "Grāmatvežu palīgs", hint: "bankas izraksti, bankas datu ievade, karšu maksājumi" },
+  { value: "payroll_calculation", code: "06", label: "darba algas aprēķini un grāmatošana", group: "Grāmatvežu palīgs", hint: "darba algas aprēķini un algu grāmatošana" },
+  { value: "invoicing", code: "07", label: "rēķinu izrakstīšana", group: "Grāmatvežu palīgs", hint: "rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana)" },
+  { value: "payment_preparation", code: "08", label: "maksājumu sagatavošana", group: "Grāmatvežu palīgs", hint: "maksājumu sagatavošana" },
+];
+
+export const GRAMATVEDIS_CATEGORIES: readonly SmartLogCategoryDef[] = [
+  { value: "gl_vg_zo", code: "01", label: "VG un ZO", group: "Grāmatvedis", hint: "VG un ZO" },
+  { value: "tax_vid_pvn_uin", code: "02", label: "VID, PVN, UIN, citas (izņemot algas)", group: "Grāmatvedis", hint: "VID, PVN, UIN un citas deklarācijas un nodokļi, izņemot algas" },
+  { value: "payroll_area", code: "03", label: "Algas", group: "Grāmatvedis", hint: "algas un ar algām saistītais darbs" },
+  { value: "debtors", code: "04", label: "Debitori", group: "Grāmatvedis", hint: "debitoru uzskaite" },
+  { value: "creditors", code: "05", label: "Kreditori", group: "Grāmatvedis", hint: "kreditoru uzskaite" },
+  { value: "advances_area", code: "06", label: "Avansa norēķini", group: "Grāmatvedis", hint: "avansa norēķini" },
+  { value: "fixed_assets", code: "07", label: "Pamatlīdzekļu nolietojums", group: "Grāmatvedis", hint: "pamatlīdzekļu uzskaite un nolietojums" },
+  { value: "bank_area", code: "08", label: "Banka", group: "Grāmatvedis", hint: "bankas operācijas un izraksti" },
+  { value: "cash_area", code: "09", label: "Kase", group: "Grāmatvedis", hint: "kases operācijas" },
+  { value: "contracts", code: "10", label: "Līgumi", group: "Grāmatvedis", hint: "līgumu sagatavošana un uzskaite" },
+  { value: "annual_report_area", code: "11", label: "Gada pārskats", group: "Grāmatvedis", hint: "gada pārskata sastādīšana" },
+  { value: "other_work", code: "12", label: "Citi darbi", group: "Grāmatvedis", hint: "citi darbi, kas neietilpst pārējās kategorijās" },
+];
+
+/**
+ * Every currently-selectable category across both roles. Used where the viewer
+ * is not a single employee (managers, admins, history filters) and for building
+ * the label map and the validation enum.
+ */
+export const SMART_LOG_CATEGORIES: readonly SmartLogCategoryDef[] = [
+  ...GRAMATVEZU_PALIGS_CATEGORIES,
+  ...GRAMATVEDIS_CATEGORIES,
+];
+
+/**
+ * Picks the selectable category set for an employee from their work-role name.
+ * A name containing "palīgs" (assistant) gets the detailed bookkeeping tasks;
+ * "grāmatvedis" / "galvenais grāmatvedis" and anything else get the accounting
+ * areas.
+ */
+export function categoriesForWorkRole(
+  workRoleName: string | null | undefined,
+): readonly SmartLogCategoryDef[] {
+  const n = (workRoleName ?? "").toLowerCase();
+  // A bookkeeping assistant sees their own detailed "Grāmatvežu palīgs" tasks.
+  // A plain accountant / chief accountant sees the accountant areas.
+  if (n.includes("palīg") || n.includes("palig")) {
+    return GRAMATVEZU_PALIGS_CATEGORIES;
+  }
+  return GRAMATVEDIS_CATEGORIES;
+}
+
+/** The category guidance block for the AI prompt, built from a category set. */
+export function buildCategoryGuidance(categories: readonly SmartLogCategoryDef[]): string {
+  return categories.map((c) => `  - ${c.value}: ${c.hint ?? c.label}`).join("\n");
+}
 
 /**
  * No longer selectable, but entries already carry these. Kept so historical
@@ -62,6 +115,26 @@ export const LEGACY_SMART_LOG_CATEGORIES = [
   { value: "helping_colleague", label: "palīdzība kolēģim" },
   { value: "bookkeeping", label: "grāmatvedības uzskaite" },
   { value: "document_processing", label: "dokumentu apstrāde un arhivēšana" },
+  // Retired from the selectable list but kept here so past entries still carry
+  // a human label and fold into the right key in the reports (parskats).
+  { value: "document_scanning", label: "dokumentu skenēšana un digitalizēšana" },
+  { value: "document_archiving", label: "dokumentu arhivēšana un sakārtošana" },
+  { value: "legal_documents", label: "juridisko dokumentu sagatavošana" },
+  { value: "client_communication", label: "saziņa ar klientu" },
+  { value: "client_meeting", label: "klātienes tikšanās ar klientiem" },
+  { value: "hortus_digital_communication", label: "saziņa ar Hortus Digital" },
+  { value: "vid_communication", label: "saziņa ar VID" },
+  { value: "onboarding", label: "ievadīšana darbā" },
+  { value: "repeated_questions", label: "atkārtoti jautājumi" },
+  { value: "urgent_extra_task", label: "steidzams papildu uzdevums" },
+  { value: "work_outside_role", label: "darbs ārpus lomas" },
+  { value: "fixing_mistakes", label: "kļūdu labošana" },
+  { value: "other", label: "cits" },
+  // Retired from the assistant set but kept so past entries keep their label
+  // and still fold into the right key in the reports.
+  { value: "reconciliation", label: "pārbaudes un saskaņošana" },
+  { value: "statistics_reports", label: "statistikas pārskatu sagatavošana" },
+  { value: "annual_report", label: "gada pārskatu sastādīšana" },
 ] as const;
 
 /**
@@ -80,34 +153,15 @@ export const CATEGORY_LABEL_ALIASES: Record<string, string> = {
   "palīdzība kolēģiem": "helping_colleague",
 };
 
-export const smartLogCategorySchema = z.enum([
-  "bookkeeping_invoices",
-  "bookkeeping_receipts",
-  "bookkeeping_cash",
-  "bookkeeping_advances",
-  "bookkeeping_bank",
-  "payroll_calculation",
-  "reconciliation",
-  "invoicing",
-  "payment_preparation",
-  "statistics_reports",
-  "annual_report",
-  "document_scanning",
-  "document_archiving",
-  "legal_documents",
-  "client_communication",
-  "client_meeting",
-  "hortus_digital_communication",
-  "vid_communication",
-  "onboarding",
-  "repeated_questions",
-  "urgent_extra_task",
-  "work_outside_role",
-  "fixing_mistakes",
-  "other",
-]);
+const ALL_CATEGORY_VALUES = SMART_LOG_CATEGORIES.map((c) => c.value);
 
-export type SmartLogCategory = z.infer<typeof smartLogCategorySchema>;
+// Accepts any currently-selectable category from either role. The AI is further
+// constrained to one role's set by the per-request JSON schema.
+export const smartLogCategorySchema = z.enum(
+  ALL_CATEGORY_VALUES as [string, ...string[]],
+);
+
+export type SmartLogCategory = string;
 
 /** Labels for every category ever written to the DB, current and retired. */
 export const SMART_LOG_CATEGORY_LABELS = Object.fromEntries(
@@ -141,7 +195,12 @@ export const smartLogResponseSchema = z.object({
 
 export type SmartLogDraft = z.infer<typeof smartLogDraftSchema>;
 
-export const SMART_LOG_JSON_SCHEMA = {
+/**
+ * Builds the response JSON schema for a specific category set, so the AI can
+ * only pick a category that is valid for the logging employee's role.
+ */
+export function buildSmartLogJsonSchema(categoryValues: readonly string[]) {
+  return {
   type: "object",
   additionalProperties: false,
   properties: {
@@ -155,7 +214,7 @@ export const SMART_LOG_JSON_SCHEMA = {
           title: { type: "string", minLength: 3, maxLength: 120 },
           category: {
             type: "string",
-            enum: SMART_LOG_CATEGORIES.map((category) => category.value),
+            enum: [...categoryValues],
           },
           description: { type: "string", minLength: 3, maxLength: 2000 },
           work_date: {
@@ -211,4 +270,7 @@ export const SMART_LOG_JSON_SCHEMA = {
     },
   },
   required: ["tickets"],
-} as const;
+  } as const;
+}
+
+export const SMART_LOG_JSON_SCHEMA = buildSmartLogJsonSchema(ALL_CATEGORY_VALUES);

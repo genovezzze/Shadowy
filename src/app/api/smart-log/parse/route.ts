@@ -7,9 +7,12 @@ import {
   recordActionHit,
 } from "@/lib/rate-limit";
 import {
-  SMART_LOG_JSON_SCHEMA,
+  buildCategoryGuidance,
+  buildSmartLogJsonSchema,
+  categoriesForWorkRole,
   smartLogResponseSchema,
 } from "@/lib/smart-log";
+import { prisma } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -17,7 +20,7 @@ const requestSchema = z.object({
   text: z.string().trim().min(10).max(4000),
 });
 
-function systemPrompt(currentDate: string) {
+function systemPrompt(currentDate: string, categoryGuidance: string) {
   return `
 Tu esi Shadowy darba žurnāla palīgs. Pārvērt darbinieka brīvā teksta aprakstu
 atsevišķos neredzamā darba melnraksta ierakstos latviešu valodā.
@@ -38,29 +41,11 @@ Noteikumi:
 
 Kategorija (KAS tika darīts):
 - Kategorija apraksta tikai darba saturu, nevis iemeslu vai apstākļus.
-- Izmanto tikai JSON shēmā atļautās enum vērtības.
-- Grāmatošanai izvēlies kategoriju pēc TĀ, KO grāmato, nevis vispārīgu:
-  - bookkeeping_invoices: rēķinu, pavadzīmju, kreditoru un debitoru grāmatošana,
-    ievade programmā.
-  - bookkeeping_receipts: čeku grāmatošana, apstrāde, līmēšana.
-  - bookkeeping_cash: kase, kases žurnāls, Z atskaites, kases orderi.
-  - bookkeeping_advances: avansa norēķinu grāmatošana.
-  - bookkeeping_bank: bankas izraksti, bankas datu ievade, karšu maksājumi.
-  - payroll_calculation: darba algas aprēķini un algu grāmatošana.
-- Dokumentu darbs:
-  - document_scanning: skenēšana, ieskenēšana, digitalizēšana.
-  - document_archiving: arhivēšana, sakārtošana, saglabāšana, mapēs likšana.
-  - Ja nosaukumā ir gan skenēšana, gan sakārtošana, izvēlies document_scanning.
-- reconciliation: pārbaudes, salīdzināšana, saskaņošana, PVN vai partneru pārbaude.
-- invoicing: rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana).
-- vid_communication: saziņa ar Valsts ieņēmumu dienestu (VID) - zvani, vēstules, iesniegumi,
-  jautājumu noskaidrošana. NEVIS pati grāmatošana vai deklarācijas sagatavošana - tikai saziņa.
-- annual_report: gada pārskata sastādīšana - bilance, peļņas vai zaudējumu aprēķins,
-  pielikumi, gada slēgšana. Ikmēneša vai ceturkšņa atskaites NAV gada pārskats;
-  statistikas pārskatiem ir statistics_reports.
-- other izmanto tikai tad, ja neviena cita kategorija tiešām neder.
+- Izmanto tikai JSON shēmā atļautās enum vērtības. Izvēlies pēc tā, KAS tika
+  darīts vai kurā jomā darbs ietilpst. Pieejamās kategorijas:
+${categoryGuidance}
 - NEIZVĒLIES kategoriju pēc tā, kam darbs tika darīts. "Iegrāmatoju čekus, jo
-  kolēģe bija slima" ir bookkeeping_receipts - palīdzībai ir atsevišķs karodziņš.
+  kolēģe bija slima" ir čeku grāmatošana - palīdzībai ir atsevišķs karodziņš.
 
 Palīdzība kolēģim (atsevišķs karodziņš, nevis kategorija):
 - is_helping_colleague ir true tikai tad, ja darbs tika darīts kolēģa vietā vai
@@ -110,6 +95,16 @@ export async function POST(request: Request) {
   if (!session || session.role !== "EMPLOYEE") {
     return NextResponse.json({ error: "Nav atļauts." }, { status: 401 });
   }
+
+  // The selectable categories depend on the employee's work role, so the AI is
+  // only offered the categories that role actually logs.
+  const userRecord = await prisma.user.findUnique({
+    where: { id: session.userId },
+    select: { workRole: { select: { name: true } } },
+  });
+  const categorySet = categoriesForWorkRole(userRecord?.workRole?.name);
+  const categoryGuidance = buildCategoryGuidance(categorySet);
+  const categoryJsonSchema = buildSmartLogJsonSchema(categorySet.map((c) => c.value));
 
   let body: unknown;
   try {
@@ -172,7 +167,7 @@ export async function POST(request: Request) {
         store: false,
         max_output_tokens: 2500,
         input: [
-          { role: "system", content: systemPrompt(currentDate) },
+          { role: "system", content: systemPrompt(currentDate, categoryGuidance) },
           { role: "user", content: parsedRequest.data.text },
         ],
         text: {
@@ -180,7 +175,7 @@ export async function POST(request: Request) {
             type: "json_schema",
             name: "shadowy_smart_log_tickets",
             strict: true,
-            schema: SMART_LOG_JSON_SCHEMA,
+            schema: categoryJsonSchema,
           },
         },
       }),

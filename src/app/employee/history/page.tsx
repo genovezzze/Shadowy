@@ -5,6 +5,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EntriesFilter } from "@/components/entries/entries-filter";
 import { Pagination } from "@/components/entries/pagination";
+import { categoriesForUser } from "@/lib/smart-log-server";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
 import { AddTimeButton } from "@/components/entries/add-time-button";
 import { EditEntryButton } from "@/components/entries/edit-entry-button";
@@ -29,6 +30,7 @@ export default async function EmployeeHistoryPage({
   searchParams: EntrySearchParams & { page?: string };
 }) {
   const session = await requireUser(["EMPLOYEE"]);
+  const categories = await categoriesForUser(session.userId);
   // Scope goes LAST. Spread the other way round, a URL filter such as
   // ?employee=<other id> overwrites employeeId and exposes someone else's
   // entries — there is no organizationId in this query to fall back on.
@@ -170,6 +172,7 @@ export default async function EmployeeHistoryPage({
                         clients={editableClients}
                         clientId={e.clientId}
                         clientName={e.clientName}
+                        categories={categories}
                       />
                     ) : e.status === "APPROVED" ? (
                       <>
@@ -184,6 +187,7 @@ export default async function EmployeeHistoryPage({
                           clients={editableClients}
                           clientId={e.clientId}
                           clientName={e.clientName}
+                          categories={categories}
                         />
                         <DeleteEntryButton entryId={e.id} />
                       </>

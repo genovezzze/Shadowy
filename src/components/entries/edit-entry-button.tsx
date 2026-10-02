@@ -8,8 +8,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ClientCombobox } from "@/components/ui/client-combobox";
+import { DurationInput } from "@/components/entries/duration-input";
 import { updateEntry } from "@/app/employee/history/actions";
-import { SMART_LOG_CATEGORIES } from "@/lib/smart-log";
+import { SMART_LOG_CATEGORIES, categoryDisplay, type SmartLogCategoryDef } from "@/lib/smart-log";
+import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { Pencil } from "lucide-react";
 
 interface ClientOption {
@@ -27,6 +29,7 @@ interface EditEntryButtonProps {
   clients?: ClientOption[];
   clientId?: string | null;
   clientName?: string | null;
+  categories?: readonly SmartLogCategoryDef[];
 }
 
 export function EditEntryButton({
@@ -39,6 +42,7 @@ export function EditEntryButton({
   clients = [],
   clientId,
   clientName,
+  categories = SMART_LOG_CATEGORIES,
 }: EditEntryButtonProps) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,6 +50,14 @@ export function EditEntryButton({
   const [selectedClientId, setSelectedClientId] = useState(clientId ?? "");
 
   const today = new Date().toISOString().slice(0, 10);
+
+  // The selectable set is role-scoped and categories can be retired, so an older
+  // entry may hold a category that is no longer in the list. Keep it as an extra
+  // option (with a human label) so it stays selected and is not lost on save.
+  const categoryInList = categories.some((c) => c.label === category);
+  const missingCategoryLabel = categoryInList
+    ? null
+    : categoryLabel(normalizeCategoryKey(category));
 
   function handleEdit(formData: FormData) {
     setError(null);
@@ -90,8 +102,11 @@ export function EditEntryButton({
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {SMART_LOG_CATEGORIES.map(({ value, label }) => (
-                      <SelectItem key={value} value={label}>{label}</SelectItem>
+                    {missingCategoryLabel && category ? (
+                      <SelectItem value={category}>{missingCategoryLabel}</SelectItem>
+                    ) : null}
+                    {categories.map((c) => (
+                      <SelectItem key={c.value} value={c.label}>{categoryDisplay(c)}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -127,15 +142,11 @@ export function EditEntryButton({
               )}
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-duration">Ilgums (minūtēs)</Label>
-              <Input
+              <Label htmlFor="edit-duration">Ilgums</Label>
+              <DurationInput
                 id="edit-duration"
                 name="durationMinutes"
-                type="number"
-                min={1}
-                max={1440}
-                required
-                defaultValue={durationMinutes}
+                defaultMinutes={durationMinutes}
               />
             </div>
             <div className="grid gap-2">

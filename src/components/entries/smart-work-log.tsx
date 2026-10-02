@@ -21,10 +21,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { VercelV0Chat } from "@/components/ui/v0-ai-chat";
 import {
-  CATEGORY_GROUPS,
   SMART_LOG_CATEGORIES,
   SMART_LOG_CATEGORY_LABELS,
+  categoryDisplay,
   type SmartLogCategory,
+  type SmartLogCategoryDef,
   type SmartLogDraft,
   smartLogResponseSchema,
 } from "@/lib/smart-log";
@@ -63,11 +64,14 @@ export function SmartWorkLog({
   clients = [],
   colleagues = [],
   preview = false,
+  categories = SMART_LOG_CATEGORIES,
 }: {
   clients?: ClientOption[];
   colleagues?: ClientOption[];
   preview?: boolean;
+  categories?: readonly SmartLogCategoryDef[];
 }) {
+  const categoryGroups = Array.from(new Set(categories.map((c) => c.group)));
   const [description, setDescription] = useState("");
   const [inputSource, setInputSource] = useState<"text" | "voice">("text");
   const [tickets, setTickets] = useState<ReviewTicket[]>([]);
@@ -583,13 +587,13 @@ export function SmartWorkLog({
                             }
                             className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                           >
-                            {CATEGORY_GROUPS.map((group) => (
+                            {categoryGroups.map((group) => (
                               <optgroup key={group} label={group}>
-                                {SMART_LOG_CATEGORIES.filter(
+                                {categories.filter(
                                   (category) => category.group === group
                                 ).map((category) => (
                                   <option key={category.value} value={category.value}>
-                                    {category.label}
+                                    {categoryDisplay(category)}
                                   </option>
                                 ))}
                               </optgroup>

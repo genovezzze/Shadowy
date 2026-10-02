@@ -1,10 +1,12 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { categoriesForUser } from "@/lib/smart-log-server";
 import { Card, CardContent } from "@/components/ui/card";
 import { SmartWorkLog } from "@/components/entries/smart-work-log";
 
 export default async function SmartLogPage() {
   const session = await requireUser(["EMPLOYEE"]);
+  const categories = await categoriesForUser(session.userId);
 
   const employee = await prisma.user.findFirst({
     where: { id: session.userId, organizationId: session.organizationId },
@@ -52,6 +54,7 @@ export default async function SmartLogPage() {
       colleagues={colleagues.flatMap((c) =>
         c.name ? [{ id: c.id, name: c.name }] : []
       )}
+      categories={categories}
     />
   );
 }
