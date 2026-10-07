@@ -28,14 +28,17 @@ import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const LV_DAYS = ["P", "O", "T", "C", "Pk", "S", "Sv"];
 
-function buildMonthlyData(entries: { createdAt: Date }[]) {
+function buildMonthlyData(entries: { workDate: Date }[]) {
   const now = new Date();
   return Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
     const year = d.getFullYear();
     const month = d.getMonth();
+    // Group by workDate (when the work was done), not createdAt (when it was
+    // logged) - a bookkeeper often logs work on a later day, so createdAt would
+    // put hours in the wrong month.
     const count = entries.filter(
-      (e) => e.createdAt.getFullYear() === year && e.createdAt.getMonth() === month
+      (e) => e.workDate.getFullYear() === year && e.workDate.getMonth() === month
     ).length;
     return { label: LV_MONTHS[month], value: count };
   });
@@ -131,17 +134,19 @@ export default async function EmployeeDashboard() {
   const approvedMinutes = approvedEntries.reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0);
   const approvedHours = Math.round((approvedMinutes / 60) * 10) / 10;
 
+  // Period stats are based on workDate (when the work happened), not createdAt
+  // (when it was entered), so the hours line up with what the employee did.
   const currentMonthMinutes = approvedEntries
-    .filter((e: EntrySlice) => e.createdAt >= thirtyDaysAgo)
+    .filter((e: EntrySlice) => e.workDate >= thirtyDaysAgo)
     .reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0);
   const prevMonthMinutes = approvedEntries
-    .filter((e: EntrySlice) => e.createdAt >= sixtyDaysAgo && e.createdAt < thirtyDaysAgo)
+    .filter((e: EntrySlice) => e.workDate >= sixtyDaysAgo && e.workDate < thirtyDaysAgo)
     .reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0);
   const hoursHint = trendHint(currentMonthMinutes, prevMonthMinutes);
 
-  const currentEntries = allEntries.filter((e: EntrySlice) => e.createdAt >= thirtyDaysAgo).length;
+  const currentEntries = allEntries.filter((e: EntrySlice) => e.workDate >= thirtyDaysAgo).length;
   const prevEntries = allEntries.filter(
-    (e: EntrySlice) => e.createdAt >= sixtyDaysAgo && e.createdAt < thirtyDaysAgo
+    (e: EntrySlice) => e.workDate >= sixtyDaysAgo && e.workDate < thirtyDaysAgo
   ).length;
   const entriesHint = trendHint(currentEntries, prevEntries);
 
@@ -159,7 +164,7 @@ export default async function EmployeeDashboard() {
     const year = d.getFullYear();
     const month = d.getMonth();
     const mins = approvedEntries
-      .filter((e: EntrySlice) => e.createdAt.getFullYear() === year && e.createdAt.getMonth() === month)
+      .filter((e: EntrySlice) => e.workDate.getFullYear() === year && e.workDate.getMonth() === month)
       .reduce((s: number, e: EntrySlice) => s + e.durationMinutes, 0);
     return { label: LV_MONTHS[month], value: Math.round((mins / 60) * 10) / 10 };
   });
@@ -458,13 +463,13 @@ export default async function EmployeeDashboard() {
             <TrendingUp className="h-5 w-5" />
           </div>
           <div className="text-sm text-muted-foreground">Labākais mēnesis</div>
-          <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{thisMonthHours}h</div>
+          <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{bestMonthHoursAll}h</div>
           {bestMonthHoursAll > 0 ? (
             <>
               <div className="mt-2.5 h-1.5 w-full rounded-full bg-muted overflow-hidden">
                 <div className="h-full rounded-full bg-emerald-500/80" style={{ width: `${bestProgress}%` }} />
               </div>
-              <div className="mt-1 text-xs text-muted-foreground">{bestProgress}% no rekorda ({bestMonthHoursAll}h)</div>
+              <div className="mt-1 text-xs text-muted-foreground">Šomēnes: {thisMonthHours}h ({bestProgress}% no rekorda)</div>
             </>
           ) : (
             <div className="mt-1.5 text-xs text-muted-foreground">Pievieno ierakstus, lai redzētu progresu</div>

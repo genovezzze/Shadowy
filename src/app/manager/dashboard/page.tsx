@@ -284,7 +284,7 @@ export default async function ManagerDashboard({
       select: { clientId: true, clientName: true, durationMinutes: true },
     }),
     prisma.invisibleWorkEntry.count({
-      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { workDate: periodFilter } : {}) },
     }),
     prisma.invisibleWorkEntry.count({
       where: { organizationId: orgId, managerId, deletedAt: null },
@@ -322,7 +322,7 @@ export default async function ManagerDashboard({
     }),
     prisma.invisibleWorkEntry.groupBy({
       by: ["employeeId"],
-      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { createdAt: periodFilter } : {}) },
+      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { workDate: periodFilter } : {}) },
       _count: { _all: true },
     }),
     prisma.clientEmployee.findMany({
