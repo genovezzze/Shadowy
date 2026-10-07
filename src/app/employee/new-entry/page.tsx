@@ -69,7 +69,7 @@ export default async function NewEntryPage({
   return (
     <>
       <PageHeader
-        title="Jauns ieraksts par neredzamo darbu"
+        title="Jauns darba ieraksts"
         description="Aprakstiet īsi un godīgi paveikto. Šis ieraksts tiks nosūtīts jūsu vadītājam izskatīšanai."
       />
 

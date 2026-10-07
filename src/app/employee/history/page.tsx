@@ -103,7 +103,7 @@ export default async function EmployeeHistoryPage({
     <>
       <PageHeader
         title="Mana vēsture"
-        description="Visi jūsu iesniegtie neredzamā darba ieraksti un to statuss."
+        description="Visi jūsu iesniegtie darba ieraksti un to statuss."
         actions={
           <>
             <Button asChild variant="outline">

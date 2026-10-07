@@ -25,6 +25,10 @@ export function PixelBrand({
   iridescent = false,
 }: PixelBrandProps) {
   const [elapsed, setElapsed] = React.useState(0);
+  // The logo is a white box clipped by a PNG mask. Until that image has decoded,
+  // the mask is not applied and the box shows as a plain white square. Keep the
+  // fill transparent until the mask is ready so no square flashes on first load.
+  const [maskReady, setMaskReady] = React.useState(false);
   const isIntro = variant === "intro";
   const fontCycleMs = isIntro ? 600 : 900;
   const letterStaggerMs = isIntro ? 250 : 375;
@@ -38,13 +42,22 @@ export function PixelBrand({
     return () => window.clearInterval(timer);
   }, []);
 
+  React.useEffect(() => {
+    const img = new window.Image();
+    img.onload = () => setMaskReady(true);
+    img.src = "/pixel_logo.png";
+    if (img.complete) setMaskReady(true);
+  }, []);
+
   return (
     <span
       className={`flex items-center ${isIntro ? "gap-2" : "gap-1.5"}`}
       aria-hidden
     >
       <span
-        className={`pixel-brand-logo block shrink-0 bg-white [image-rendering:pixelated] ${
+        className={`pixel-brand-logo block shrink-0 [image-rendering:pixelated] ${
+          maskReady ? "bg-white" : "bg-transparent"
+        } ${
           iridescent ? "pixel-brand-logo-shimmer" : ""
         } ${
           isIntro ? "size-[66px]" : "size-10"

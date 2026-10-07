@@ -29,7 +29,8 @@ export function ClientCombobox({
 
   const selected = clients.find((c) => c.id === value);
 
-  const filtered = search.trim()
+  const isSearching = search.trim().length > 0;
+  const filtered = isSearching
     ? clients.filter((c) => c.name.toLowerCase().includes(search.toLowerCase()))
     : clients;
 
@@ -69,7 +70,7 @@ export function ClientCombobox({
       {open && (
         <div
           className={cn(
-            "absolute z-50 mt-2 w-max min-w-full max-w-[min(94vw,720px)] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
+            "absolute z-50 mt-2 min-w-full max-w-[min(94vw,720px)] overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-card",
             "dark:border-white/[0.08] dark:bg-[#141416] dark:text-foreground dark:shadow-[0_16px_40px_-16px_rgba(0,0,0,0.85)]"
           )}
         >
@@ -83,9 +84,10 @@ export function ClientCombobox({
               className="flex h-9 w-full bg-transparent py-2 pl-2 text-sm outline-none placeholder:text-muted-foreground"
             />
           </div>
-          <div className="max-h-72 overflow-auto p-1">
+          <div className="max-h-72 overflow-y-auto p-1">
             {/* "Nav klienta" stays a full-width row on top; the clients below
-                are laid out in columns of five so the list is easy to scan. */}
+                fill a fixed number of columns and wrap onto new rows (scrolling
+                down) instead of overflowing off the right edge. */}
             <button
               type="button"
               onClick={() => { onChange("__none__"); setOpen(false); }}
@@ -102,13 +104,13 @@ export function ClientCombobox({
             {filtered.length === 0 ? (
               <p className="px-2 py-6 text-center text-sm text-muted-foreground">Nav rezultātu</p>
             ) : (
-              <div className="grid grid-flow-col grid-rows-5">
+              <div className={cn("grid gap-x-1", isSearching ? "grid-cols-1" : "grid-cols-2 sm:grid-cols-3")}>
                 {filtered.map((c, i) => (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => { onChange(c.id); setOpen(false); }}
-                    className="relative flex min-h-[46px] w-full min-w-[13rem] cursor-pointer select-none items-center rounded-md py-0 pl-6 pr-3 text-[13px] text-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground"
+                    className="relative flex min-h-[46px] w-full cursor-pointer select-none items-center rounded-md py-0 pl-6 pr-3 text-[13px] text-foreground outline-none transition-colors hover:bg-accent hover:text-accent-foreground dark:hover:bg-white/[0.06] dark:hover:text-foreground"
                   >
                     <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
                       {value === c.id && <Check className="h-4 w-4" />}
@@ -118,7 +120,9 @@ export function ClientCombobox({
                         {String(i + 1).padStart(2, "0")}
                       </span>
                       <span className="text-muted-foreground/40">|</span>
-                      <span className="min-w-0 truncate leading-snug">{c.name}</span>
+                      {/* While searching, show the full name (single column, no
+                          truncation); in the browse grid, keep it on one line. */}
+                      <span className={cn("min-w-0 leading-snug", isSearching ? "break-words" : "truncate")}>{c.name}</span>
                     </span>
                   </button>
                 ))}

@@ -85,7 +85,7 @@ export function EditEntryButton({
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-50" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-background border border-border rounded-xl shadow-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto focus:outline-none">
+        <Dialog.Content className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-background border border-border rounded-xl shadow-xl p-6 sm:p-8 w-[min(94vw,42rem)] max-w-[94vw] max-h-[90vh] overflow-y-auto focus:outline-none">
           <Dialog.Title className="text-lg font-semibold mb-4">
             Rediģēt ierakstu
           </Dialog.Title>
@@ -150,15 +150,15 @@ export function EditEntryButton({
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="edit-description">Apraksts</Label>
+              <Label htmlFor="edit-description">
+                Apraksts <span className="text-muted-foreground">(nav obligāts)</span>
+              </Label>
               <Textarea
                 id="edit-description"
                 name="description"
-                required
-                minLength={10}
                 maxLength={2000}
                 defaultValue={description}
-                rows={4}
+                rows={5}
               />
             </div>
             {error && (

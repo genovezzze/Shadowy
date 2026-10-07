@@ -490,7 +490,7 @@ export function SmartWorkLog({
           <CardContent className="p-8 text-center">
             <Sparkles className="mx-auto h-6 w-6 text-muted-foreground" />
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-muted-foreground">
-              Netika atrasti skaidri neredzamā darba ieraksti. Pamēģini
+              Netika atrasti skaidri darba ieraksti. Pamēģini
               aprakstīt situāciju konkrētāk.
             </p>
           </CardContent>

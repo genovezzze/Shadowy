@@ -232,7 +232,7 @@ export function EntryForm({
               defaultMinutes={initialValues?.durationMinutes}
             />
             <p className="text-xs text-muted-foreground">
-              Norādiet aptuveno laiku, kas tika veltīts šim neredzamajam darbam.
+              Norādiet aptuveno laiku, kas tika veltīts šim darbam.
             </p>
           </div>
 

@@ -369,7 +369,7 @@ export default async function EmployeeDashboard() {
           </div>
           <h1 className="text-3xl font-bold tracking-tight">Mans darba pārskats</h1>
           <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
-            Šeit jūs varat iesniegt neredzamo darbu un sekot līdzi savu ierakstu statusam.
+            Šeit jūs varat iesniegt darba ierakstus un sekot līdzi savu ierakstu statusam.
           </p>
         </div>
         <Button asChild>
@@ -653,7 +653,7 @@ export default async function EmployeeDashboard() {
       {recent.length === 0 ? (
         <EmptyState
           title="Vēl nav iesniegtu ierakstu"
-          description="Iesāciet ar pirmo neredzamā darba ierakstu - tas aizņems mazāk nekā minūti."
+          description="Iesāciet ar pirmo darba ierakstu - tas aizņems mazāk nekā minūti."
           action={
             <Button asChild>
               <Link href="/employee/new-entry">Iesniegt pirmo ierakstu</Link>
