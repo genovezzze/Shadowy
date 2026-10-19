@@ -7,7 +7,7 @@ import { requireUser } from "@/lib/auth";
 
 const updateSchema = z.object({
   entryId: z.string().min(1),
-  title: z.string().min(3, "Nosaukums ir pārāk īss.").max(120),
+  title: z.string().min(2, "Nosaukums ir pārāk īss.").max(120),
   category: z.string().min(1, "Lūdzu, izvēlieties kategoriju.").max(80),
   description: z.string().trim().max(2000).optional().default(""),
   clientName: z.string().trim().max(120).optional(),
