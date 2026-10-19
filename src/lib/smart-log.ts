@@ -56,7 +56,7 @@ export const GRAMATVEZU_PALIGS_CATEGORIES: readonly SmartLogCategoryDef[] = [
   { value: "payroll_calculation", code: "06", label: "darba algas aprēķini un grāmatošana", group: "Grāmatvežu palīgs", hint: "darba algas aprēķini un algu grāmatošana" },
   { value: "invoicing", code: "07", label: "rēķinu izrakstīšana", group: "Grāmatvežu palīgs", hint: "rēķinu vai kvīšu izrakstīšana klientam (NEVIS saņemtu rēķinu grāmatošana)" },
   { value: "payment_preparation", code: "08", label: "maksājumu sagatavošana", group: "Grāmatvežu palīgs", hint: "maksājumu sagatavošana" },
-  { value: "document_scanning", code: "09", label: "skenēšana", group: "Grāmatvežu palīgs", hint: "dokumentu skenēšana un digitalizēšana" },
+  { value: "document_scanning", code: "09", label: "digitalizācija un skenēšana", group: "Grāmatvežu palīgs", hint: "dokumentu skenēšana un digitalizēšana" },
   { value: "document_archiving", code: "10", label: "arhivēšana", group: "Grāmatvežu palīgs", hint: "dokumentu arhivēšana un sakārtošana" },
   { value: "other", code: "11", label: "cits", group: "Grāmatvežu palīgs", hint: "citi darbi, kas neietilpst pārējās kategorijās" },
 ];
@@ -153,6 +153,7 @@ export const CATEGORY_LABEL_ALIASES: Record<string, string> = {
   "palīdzība kolēģiem": "helping_colleague",
   // Shortened when these became assistant categories (skenēšana / arhivēšana).
   "dokumentu skenēšana un digitalizēšana": "document_scanning",
+  "skenēšana": "document_scanning",
   "dokumentu arhivēšana un sakārtošana": "document_archiving",
 };
 
