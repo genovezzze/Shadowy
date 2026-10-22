@@ -754,23 +754,23 @@ body.client-case-open {
   .slate {
     color-scheme: dark;
 
-    --background: 222 28% 7%;
-    --foreground: 210 40% 93%;
+    --background: 222 24% 11%;
+    --foreground: 210 40% 94%;
 
-    --card: 222 28% 11%;
-    --card-foreground: 210 40% 93%;
+    --card: 222 22% 15%;
+    --card-foreground: 210 40% 94%;
 
-    --muted: 217 25% 15%;
-    --muted-foreground: 215 12% 55%;
+    --muted: 217 20% 20%;
+    --muted-foreground: 215 14% 62%;
 
     --primary: 160 70% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 25% 15%;
-    --secondary-foreground: 210 40% 93%;
+    --secondary: 217 20% 20%;
+    --secondary-foreground: 210 40% 94%;
 
-    --accent: 217 30% 18%;
-    --accent-foreground: 210 40% 93%;
+    --accent: 217 24% 23%;
+    --accent-foreground: 210 40% 94%;
 
     --destructive: 0 63% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -781,14 +781,14 @@ body.client-case-open {
     --warning: 38 92% 55%;
     --warning-foreground: 0 0% 0%;
 
-    --border: 213 20% 16%;
-    --input: 213 20% 18%;
+    --border: 213 18% 21%;
+    --input: 213 18% 23%;
     --ring: 160 84% 39%;
 
-    --sidebar: 222 35% 9%;
-    --sidebar-foreground: 210 40% 93%;
-    --sidebar-accent: 217 30% 16%;
-    --sidebar-border: 213 20% 14%;
+    --sidebar: 222 28% 13%;
+    --sidebar-foreground: 210 40% 94%;
+    --sidebar-accent: 217 24% 21%;
+    --sidebar-border: 213 18% 19%;
 
     --kpi-default-glow: hsl(160 84% 45% / 0.15);
     --kpi-warning-glow: hsl(38 92% 50% / 0.15);
@@ -1335,15 +1335,31 @@ input[type="checkbox"]:focus-visible {
   box-shadow: 0 0 0 2px hsl(var(--ring) / 0.35);
 }
 
-/* Recolor native number/date spin controls to match dark theme */
+/* Recolor native number spin controls to match dark theme */
 .dark input[type="number"]::-webkit-inner-spin-button,
 .dark input[type="number"]::-webkit-outer-spin-button,
-.dark input[type="date"]::-webkit-calendar-picker-indicator,
 .slate input[type="number"]::-webkit-inner-spin-button,
-.slate input[type="number"]::-webkit-outer-spin-button,
-.slate input[type="date"]::-webkit-calendar-picker-indicator {
+.slate input[type="number"]::-webkit-outer-spin-button {
   filter: invert(1) brightness(0.5);
   opacity: 0.6;
+  cursor: pointer;
+}
+
+/* Native date picker: show a LIGHT calendar popup even in dark mode.
+   color-scheme:light makes the popup light, but it would also let the field's
+   translucent fill reveal a white native background, so give the field an
+   explicit opaque dark fill. The indicator icon is then dark, so invert it. */
+.dark input[type="date"],
+.slate input[type="date"] {
+  color-scheme: light;
+  /* Match the other fields (white/3% over the card), but opaque so the
+     light color-scheme does not reveal a white native background. */
+  background-color: color-mix(in srgb, hsl(var(--card)), #fff 3%);
+}
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.slate input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.75;
   cursor: pointer;
 }
 

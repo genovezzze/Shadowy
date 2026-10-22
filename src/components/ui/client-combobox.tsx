@@ -59,7 +59,7 @@ export function ClientCombobox({
         onClick={() => setOpen(!open)}
         className={cn(
           "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-          "dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-foreground dark:focus-visible:border-emerald-400/40 dark:focus-visible:ring-emerald-500/30",
+          "dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-foreground dark:focus-visible:border-white/20 dark:focus-visible:ring-white/20",
           !selected && "text-muted-foreground"
         )}
       >
