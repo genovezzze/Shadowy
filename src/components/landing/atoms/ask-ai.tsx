@@ -66,7 +66,7 @@ export function AskAi({ tone = "dark" }: { tone?: "dark" | "light" }) {
               dark ? "bg-white/[0.06] hover:bg-white/[0.12]" : "bg-neutral-900 hover:bg-neutral-800",
             )}
           >
-            <Icon />
+            <Icon aria-hidden />
           </a>
         ))}
       </div>

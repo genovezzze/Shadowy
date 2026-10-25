@@ -602,6 +602,7 @@ export function LandingAudience() {
                 <div
                   id={panelId}
                   aria-hidden={!isOpen}
+                  inert={!isOpen ? true : undefined}
                   className="grid transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >

@@ -72,6 +72,7 @@ export function LandingClosing() {
           style={reduce ? undefined : { scale: textScale, y: textY }}
         >
           <span
+            role="img"
             aria-label={WORDMARK}
             className="select-none text-[clamp(3.25rem,19vw,12rem)] font-normal leading-none tracking-[0.015em] text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.55)] sm:text-[clamp(3rem,15.5vw,12rem)]"
           >

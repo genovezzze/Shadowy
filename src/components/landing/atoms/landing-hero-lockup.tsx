@@ -167,7 +167,7 @@ export function LandingHeroLockup() {
   return (
     <section
       ref={sectionRef}
-      className="relative isolate flex h-auto min-h-0 items-start justify-center overflow-hidden bg-[#070809] px-5 pb-20 pt-[16vh] sm:h-[100dvh] sm:items-center sm:px-6 sm:py-24"
+      className="relative isolate flex h-auto min-h-0 items-start justify-center overflow-hidden bg-[#070809] px-5 pb-20 pt-[16svh] sm:h-[100dvh] sm:items-center sm:px-6 sm:py-24"
     >
       <motion.div
         aria-hidden

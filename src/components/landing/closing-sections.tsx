@@ -239,7 +239,7 @@ export function ClosingSections() {
             className="relative hidden min-h-[500px] overflow-hidden border-l border-white/[0.1] bg-neutral-950 lg:block"
           >
             <Image
-              src="/images/shadowy_login-background.png"
+              src="/images/shadowy_login-background.webp"
               alt=""
               fill
               sizes="50vw"

@@ -27,7 +27,7 @@ export default function AuthLayout({
         className="relative my-2 mr-2 hidden min-h-[calc(100svh-1rem)] overflow-hidden rounded-md bg-neutral-950 lg:block"
       >
         <Image
-          src="/images/shadowy_login-background.png"
+          src="/images/shadowy_login-background.webp"
           alt=""
           fill
           priority

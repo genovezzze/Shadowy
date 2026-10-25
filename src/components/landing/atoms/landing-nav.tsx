@@ -140,7 +140,7 @@ const MEGA_MENUS = {
       },
     ],
     feature: {
-      image: "/images/shadowy_login.png",
+      image: "/images/shadowy_login.webp",
       title: "Izrunāsim jūsu komandas situāciju",
       href: "#pilots",
       cta: "Pieteikties",
@@ -447,6 +447,7 @@ export function LandingNav({
               word's box back out of step with the mark. */}
           {/* Each letter in a different pixel face, like the Atoms wordmark. */}
           <span
+            role="img"
             aria-label="Shadowy"
             className={cn(
               "text-[20px] leading-none tracking-tight transition-colors duration-500 ease-out sm:text-[22px]",
