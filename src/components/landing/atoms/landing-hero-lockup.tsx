@@ -64,15 +64,41 @@ export function LandingHeroLockup() {
   const { locale, t } = useLocale();
   const sectionRef = React.useRef<HTMLElement | null>(null);
   const [pixelElapsed, setPixelElapsed] = React.useState(0);
+  // Parallax is desktop-only: on phones the scroll-linked transforms stuttered
+  // and dragged the copy around, so there the hero just scrolls normally.
+  const [isDesktop, setIsDesktop] = React.useState(false);
+  // The shine timer re-renders the hero ~20x/s; pause it while the hero is off
+  // screen so it costs nothing once the page is scrolled past the hero.
+  const [heroInView, setHeroInView] = React.useState(true);
 
   React.useEffect(() => {
+    const mq = window.matchMedia("(min-width: 640px)");
+    const update = () => setIsDesktop(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+
+  React.useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setHeroInView(entry.isIntersecting),
+      { threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  React.useEffect(() => {
+    if (!heroInView) return;
     const timer = window.setInterval(
       () => setPixelElapsed((current) => current + HERO_PIXEL_FRAME_MS),
       HERO_PIXEL_FRAME_MS,
     );
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [heroInView]);
   // Runs from the moment the hero's top meets the viewport top until its bottom
   // does - one screen of scrolling.
   const { scrollYProgress } = useScroll({
@@ -146,7 +172,7 @@ export function LandingHeroLockup() {
       <motion.div
         aria-hidden
         style={{
-          y: backgroundY,
+          y: isDesktop ? backgroundY : 0,
           top: `-${PARALLAX_LAG * 100}%`,
           height: `${layerHeight * 100}%`,
         }}
@@ -167,7 +193,7 @@ export function LandingHeroLockup() {
           its own width instead of stretching across the section. Rises and
           fades on scroll via the parallax transforms above. */}
       <motion.div
-        style={{ y: contentY, opacity: contentOpacity }}
+        style={{ y: isDesktop ? contentY : 0, opacity: isDesktop ? contentOpacity : 1 }}
         className="relative z-10 mx-auto w-full min-w-0 max-w-3xl motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
       >
         <AnimatedGroup
