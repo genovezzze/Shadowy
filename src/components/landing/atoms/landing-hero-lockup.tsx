@@ -169,13 +169,20 @@ export function LandingHeroLockup() {
       ref={sectionRef}
       className="relative isolate flex h-auto min-h-0 items-start justify-center overflow-hidden bg-[#070809] px-5 pb-20 pt-[16svh] sm:h-[100dvh] sm:items-center sm:px-6 sm:py-24"
     >
+      {/* Desktop: an oversized layer shifted up so the parallax lag has room to
+          travel. Mobile: a plain inset-0 cover with no oversize and no scroll
+          transform, so the backdrop cannot grow or drift as the page scrolls. */}
       <motion.div
         aria-hidden
-        style={{
-          y: isDesktop ? backgroundY : 0,
-          top: `-${PARALLAX_LAG * 100}%`,
-          height: `${layerHeight * 100}%`,
-        }}
+        style={
+          isDesktop
+            ? {
+                y: backgroundY,
+                top: `-${PARALLAX_LAG * 100}%`,
+                height: `${layerHeight * 100}%`,
+              }
+            : { y: 0, top: 0, bottom: 0 }
+        }
         className="pointer-events-none absolute inset-x-0 -z-10"
       >
         <HeroVideoBackground />
