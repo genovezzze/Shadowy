@@ -56,7 +56,7 @@ export function LandingContact() {
           the top where there is nothing but sky to lose. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 hidden sm:block">
         <Image
-          src="/images/back15.png"
+          src="/images/back15.webp"
           alt=""
           fill
           sizes="100vw"

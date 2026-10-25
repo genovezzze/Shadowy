@@ -723,28 +723,17 @@ export function LandingNav({
               transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
               className="fixed right-3 top-[72px] z-[60] flex max-h-[calc(100dvh-5.5rem)] w-[300px] max-w-[calc(100vw-1.5rem)] flex-col overflow-y-auto rounded-[22px] bg-white p-2.5 text-black shadow-[0_30px_100px_rgba(0,0,0,0.28)] lg:hidden"
             >
-              {/* Header: who answers, how fast */}
-              <div className="flex items-center gap-3 px-2 py-2">
-                <span className="grid size-10 shrink-0 place-items-center rounded-full bg-black text-white">
-                  <Rocket className="size-[18px]" aria-hidden />
-                </span>
-                <div className="min-w-0">
-                  <div className="text-sm font-bold">{t("cta.title")}</div>
-                  <div className="text-xs text-black/50">{t("cta.subtitle")}</div>
-                </div>
-              </div>
-
               <Link
                 href={resolveHref("#pilots")}
                 onClick={() => setMenuOpen(false)}
-                className="mt-1 block rounded-xl bg-black py-3 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
+                className="block rounded-xl bg-black py-3 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
               >
                 {t("nav.cta")}
               </Link>
 
               {/* Icon rows — the same six cards as the desktop "Izpēti" menu */}
               <nav className="mt-1.5 flex flex-col" aria-label="Mobilā navigācija">
-                {MENU_CARDS.map((card) => {
+                {MENU_CARDS.filter((card) => card.tkey !== "menu.whatToLog").map((card) => {
                   const Icon = card.icon;
                   return (
                     <Link
@@ -758,14 +747,6 @@ export function LandingNav({
                     </Link>
                   );
                 })}
-                <a
-                  href="mailto:contact@shadowy.lv"
-                  onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
-                >
-                  <Mail className="size-[18px] shrink-0 text-black/55" aria-hidden />
-                  {t("nav.email")}
-                </a>
                 <Link
                   href="/login"
                   onClick={() => setMenuOpen(false)}

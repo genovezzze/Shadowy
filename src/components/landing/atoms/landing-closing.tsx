@@ -58,7 +58,7 @@ export function LandingClosing() {
       <div className="relative mx-auto aspect-[16/10] w-full sm:aspect-[1962/801]">
         {/* Hills — slower, drifting layer, at the back */}
         <motion.div className="absolute inset-0 z-0" style={reduce ? undefined : { y: hillsY }}>
-          <Image src="/images/back13.png" alt="" aria-hidden fill sizes="100vw" className="scale-[1.35] object-cover object-bottom sm:scale-[1.14] sm:object-center" />
+          <Image src="/images/back13.webp" alt="" aria-hidden fill sizes="100vw" className="scale-[1.35] object-cover object-bottom sm:scale-[1.14] sm:object-center" />
         </motion.div>
 
         {/* Wordmark sits BETWEEN the layers, so the foliage in front covers its
@@ -85,7 +85,7 @@ export function LandingClosing() {
 
         {/* Foliage — foreground layer, in front of the wordmark so it covers it */}
         <motion.div className="absolute inset-0 z-20" style={reduce ? undefined : { y: foliageY }}>
-          <Image src="/images/back14.png" alt="" aria-hidden fill sizes="100vw" className="object-cover object-bottom sm:scale-[1.14] sm:object-center" />
+          <Image src="/images/back14.webp" alt="" aria-hidden fill sizes="100vw" className="object-cover object-bottom sm:scale-[1.14] sm:object-center" />
         </motion.div>
 
         {/* Top fade into the page above, bottom fade into the black footer. */}

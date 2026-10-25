@@ -11,12 +11,12 @@ import { getSiteUrl } from "@/lib/site-url";
 const inter = localFont({
   src: [
     {
-      path: "../../public/fonts/Inter-Regular.woff",
+      path: "../../public/fonts/Inter-Regular.woff2",
       weight: "400",
       style: "normal",
     },
     {
-      path: "../../public/fonts/Inter-SemiBold.woff",
+      path: "../../public/fonts/Inter-SemiBold.woff2",
       weight: "600",
       style: "normal",
     },
@@ -44,10 +44,11 @@ const inter = localFont({
 });
 
 const jetBrainsMono = localFont({
-  src: "../../public/fonts/JetBrainsMono-Regular.woff",
+  src: "../../public/fonts/JetBrainsMono-Regular.woff2",
   weight: "400",
   style: "normal",
   variable: "--font-mono",
+  preload: false,
   display: "swap",
   fallback: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
 });
@@ -80,6 +81,7 @@ const neueHaasLight = localFont({
   weight: "300",
   style: "normal",
   variable: "--font-accent",
+  preload: false,
   display: "swap",
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });

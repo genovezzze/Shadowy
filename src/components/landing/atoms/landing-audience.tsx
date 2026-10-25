@@ -113,7 +113,7 @@ const AUDIENCES: readonly Audience[] = [
     },
     helpFlow: HELP_FLOW,
     image: {
-      src: "/images/pic11.png",
+      src: "/images/pic11.webp",
       width: 1672,
       height: 941,
       alt: "Darbinieka skats Shadowy: iesniegtie ieraksti, apstiprinātās stundas un sadalījums pa kategorijām",

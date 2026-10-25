@@ -17,7 +17,7 @@ export function HowItWorksHero() {
       <div className="relative left-1/2 w-screen -translate-x-1/2">
         <div className="relative h-[clamp(430px,56vh,560px)] w-full overflow-hidden">
           <Image
-            src="/images/ktd-background.png"
+            src="/images/ktd-background.webp"
             alt=""
             fill
             priority

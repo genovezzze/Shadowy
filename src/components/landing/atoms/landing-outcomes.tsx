@@ -90,7 +90,7 @@ export function LandingOutcomes() {
           edges is simply hidden, not clipped. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         <Image
-          src="/images/Blue-Tree-Enhanced.svg"
+          src="/images/Blue-Tree-Enhanced.webp"
           alt=""
           width={1732}
           height={908}

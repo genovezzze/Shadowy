@@ -230,7 +230,7 @@ const STAGES: Stage[] = [
       lv: "30 sekundes dienā. Tikai tas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto",
       en: "30 seconds a day. Only what fell outside the core work, added extra load or got in the way of the plan",
     },
-    bg: "/images/01-Golden-Valley.svg",
+    bg: "/images/01-Golden-Valley.webp",
     panel: <EntryPanel />,
   },
   {
@@ -241,7 +241,7 @@ const STAGES: Stage[] = [
       lv: "No brīvi uzrakstīta teikuma top strukturēts ieraksts ar kategoriju un laiku. Darbinieks to pārskata un apstiprina",
       en: "A free-written sentence becomes a structured entry with a category and time. The employee reviews and approves it",
     },
-    bg: "/images/02-Mountain-Lake.svg",
+    bg: "/images/02-Mountain-Lake.webp",
     panel: <DraftPanel />,
   },
   {
@@ -252,7 +252,7 @@ const STAGES: Stage[] = [
       lv: "Vadītājs redz savas komandas iesniegtos ierakstus, apstiprina tos vai atgriež precizēšanai",
       en: "The manager sees their team's submitted entries and approves them or returns them for clarification",
     },
-    bg: "/images/03-Autumn-Bridge.svg",
+    bg: "/images/03-Autumn-Bridge.webp",
     panel: <ReviewPanel />,
   },
   {
@@ -263,7 +263,7 @@ const STAGES: Stage[] = [
       lv: "Apstiprinātie ieraksti veido kategorijas, tendences un atkārtojošos šķēršļus - nevis atsevišķus stāstus",
       en: "Approved entries form categories, trends and recurring obstacles - not isolated stories",
     },
-    bg: "/images/04-Hillside-Windmill.svg",
+    bg: "/images/04-Hillside-Windmill.webp",
     panel: <CategoriesPanel />,
   },
   {
@@ -274,7 +274,7 @@ const STAGES: Stage[] = [
       lv: "Slodze, aptuvenās izmaksas un dārgākie klienti vienā pārskatā. Ar konkrētiem procesu ieteikumiem",
       en: "Workload, approximate cost and the costliest clients in one overview. With concrete process suggestions",
     },
-    bg: "/images/05-Forest-Waterfall.svg",
+    bg: "/images/05-Forest-Waterfall.webp",
     panel: <CostPanel />,
   },
 ];
