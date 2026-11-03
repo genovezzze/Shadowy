@@ -14,6 +14,7 @@ import { NoClientsNotice } from "@/components/entries/no-clients-notice";
 import { createEntry } from "@/app/employee/new-entry/actions";
 import { SMART_LOG_CATEGORIES, type SmartLogCategoryDef } from "@/lib/smart-log";
 import { WORK_NATURE_FLAGS } from "@/lib/work-nature";
+import { DateInput, localToday } from "@/components/ui/date-input";
 
 const HELP_FLAG = WORK_NATURE_FLAGS[0];
 
@@ -89,7 +90,7 @@ export function EntryForm({
     });
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
 
   return (
     <Card>
@@ -191,14 +192,7 @@ export function EntryForm({
             </div>
             <div className="grid gap-2">
               <Label htmlFor="workDate">Darba datums</Label>
-              <Input
-                id="workDate"
-                name="workDate"
-                type="date"
-                required
-                defaultValue={today}
-                max={today}
-              />
+              <DateInput id="workDate" name="workDate" required defaultValue={today} max={today} />
             </div>
           </div>
 

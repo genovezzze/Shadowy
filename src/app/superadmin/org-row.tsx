@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { extendTrial, setTrialExpired, updateOrg, deleteOrg } from "./actions";
+import { DateInput } from "@/components/ui/date-input";
 
 interface OrgRowProps {
   id: string;
@@ -73,12 +74,7 @@ export function OrgRow(props: OrgRowProps) {
             </div>
             <div className="grid gap-1">
               <label className="text-xs text-muted-foreground">Izmēģinājums līdz (tukšs = bez ierobežojuma)</label>
-              <input
-                type="date"
-                value={editTrial}
-                onChange={(e) => setEditTrial(e.target.value)}
-                className="h-8 rounded-md border border-input bg-background px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
-              />
+              <DateInput value={editTrial} onChange={setEditTrial} className="h-8" />
             </div>
             <div className="flex items-center gap-2 pb-0.5">
               <button

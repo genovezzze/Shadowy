@@ -12,6 +12,7 @@ import type { EntryStatus } from "@prisma/client";
 import { categoryLabel } from "@/lib/work-insights";
 import { parseEmployeeIds } from "@/lib/entry-filter";
 import { startNavigationLoading } from "@/lib/navigation-loading";
+import { DateInput } from "@/components/ui/date-input";
 
 const STATUSES: EntryStatus[] = ["PENDING", "APPROVED", "REJECTED", "RETURNED"];
 
@@ -185,12 +186,12 @@ export function EntriesFilter({
 
       <div className="grid gap-1.5">
         <Label htmlFor="from">No datuma</Label>
-        <Input id="from" name="from" type="date" defaultValue={params.get("from") ?? ""} />
+        <DateInput key={`from-${params.get("from") ?? ""}`} id="from" name="from" defaultValue={params.get("from") ?? ""} />
       </div>
 
       <div className="grid gap-1.5">
         <Label htmlFor="to">Līdz datumam</Label>
-        <Input id="to" name="to" type="date" defaultValue={params.get("to") ?? ""} />
+        <DateInput key={`to-${params.get("to") ?? ""}`} id="to" name="to" defaultValue={params.get("to") ?? ""} />
       </div>
 
       <div className="flex items-end gap-2">

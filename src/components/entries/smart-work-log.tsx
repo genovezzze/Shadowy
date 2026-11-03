@@ -36,6 +36,7 @@ import {
 import { normalizeClientName } from "@/lib/client-name";
 import { normalizePersonName } from "@/lib/work-nature";
 import { NoClientsNotice } from "@/components/entries/no-clients-notice";
+import { DateInput, localToday } from "@/components/ui/date-input";
 
 interface ClientOption {
   id: string;
@@ -52,7 +53,7 @@ type ReviewTicket = SmartLogDraft & {
   helped_user_id: string | null;
 };
 
-const today = new Date().toISOString().slice(0, 10);
+const today = localToday();
 
 function roleLabel(value: boolean | null) {
   if (value === true) return "Ārpus lomas";
@@ -602,16 +603,11 @@ export function SmartWorkLog({
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor={`date-${ticket.id}`}>Datums</Label>
-                          <Input
+                          <DateInput
                             id={`date-${ticket.id}`}
-                            type="date"
                             max={today}
                             value={ticket.workDate}
-                            onChange={(event) =>
-                              updateTicket(ticket.id, {
-                                workDate: event.target.value,
-                              })
-                            }
+                            onChange={(workDate) => updateTicket(ticket.id, { workDate })}
                           />
                         </div>
                         <div className="grid gap-2">

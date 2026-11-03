@@ -1345,24 +1345,6 @@ input[type="checkbox"]:focus-visible {
   cursor: pointer;
 }
 
-/* Native date picker: show a LIGHT calendar popup even in dark mode.
-   color-scheme:light makes the popup light, but it would also let the field's
-   translucent fill reveal a white native background, so give the field an
-   explicit opaque dark fill. The indicator icon is then dark, so invert it. */
-.dark input[type="date"],
-.slate input[type="date"] {
-  color-scheme: light;
-  /* Match the other fields (white/3% over the card), but opaque so the
-     light color-scheme does not reveal a white native background. */
-  background-color: color-mix(in srgb, hsl(var(--card)), #fff 3%);
-}
-.dark input[type="date"]::-webkit-calendar-picker-indicator,
-.slate input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.75;
-  cursor: pointer;
-}
-
 /* Reusable glass card */
 .glass {
   backdrop-filter: blur(18px);
