@@ -18,12 +18,16 @@ const SHINE_DURATION_MS = 7200;
 type PixelBrandProps = {
   variant?: "compact" | "intro";
   iridescent?: boolean;
+  /** Paint in the theme's text colour instead of fixed white. */
+  themed?: boolean;
 };
 
 export function PixelBrand({
   variant = "compact",
   iridescent = false,
+  themed = false,
 }: PixelBrandProps) {
+  const fill = themed ? "bg-foreground" : "bg-white";
   const [elapsed, setElapsed] = React.useState(0);
   // The logo is a white box clipped by a PNG mask. Until that image has decoded,
   // the mask is not applied and the box shows as a plain white square. Keep the
@@ -56,7 +60,7 @@ export function PixelBrand({
     >
       <span
         className={`pixel-brand-logo block shrink-0 [image-rendering:pixelated] ${
-          maskReady ? "bg-white" : "bg-transparent"
+          maskReady ? fill : "bg-transparent"
         } ${
           iridescent ? "pixel-brand-logo-shimmer" : ""
         } ${
@@ -71,7 +75,7 @@ export function PixelBrand({
       <span
         className={`pixel-brand-wordmark whitespace-nowrap text-center font-bold leading-none tracking-[-0.05em] ${
           isIntro ? "text-[54px]" : "text-[32px]"
-        } text-white ${
+        } ${themed ? "text-foreground" : "text-white"} ${
           iridescent ? "pixel-brand-wordmark-shimmer" : ""
         }`}
       >

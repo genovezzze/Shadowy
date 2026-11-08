@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { Users } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { MultiSelect } from "@/components/ui/multi-select";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_SEPARATOR, METRIC_SURFACE, METRIC_TINTS, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 import type { MatrixClientRow, MatrixEmployee } from "@/lib/client-matrix";
 
 function hours(minutes: number): number {
@@ -11,9 +13,14 @@ function hours(minutes: number): number {
 }
 
 /** Emerald heat fill scaled to the busiest cell in the row. */
-function cellStyle(minutes: number, rowMax: number): React.CSSProperties | undefined {
+function cellStyle(minutes: number, rowMax: number, apple = false): React.CSSProperties | undefined {
   if (!minutes || !rowMax) return undefined;
   const r = minutes / rowMax;
+  if (apple) {
+    // The accent blue, scaled the same way.
+    const a = 0.16 + r * 0.44;
+    return { backgroundColor: `rgba(10, 132, 255, ${a.toFixed(2)})` };
+  }
   const alpha = 0.14 + r * 0.42; // 0.14 → 0.56
   return { backgroundColor: `rgba(52, 211, 153, ${alpha.toFixed(2)})` };
 }
@@ -27,6 +34,8 @@ interface EmployeeClientMatrixProps {
   /** Client ⇄ employee assignments, so a worker's clients still appear even
    * with no logged hours yet. */
   assignments?: ClientAssignment[];
+  /** Apple-style surface and colours, used on the admin overview. */
+  apple?: boolean;
 }
 
 /**
@@ -35,7 +44,7 @@ interface EmployeeClientMatrixProps {
  * selected workers do not touch are still listed with a dash, so the full
  * client picture stays visible.
  */
-export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments = [] }: EmployeeClientMatrixProps) {
+export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments = [], apple = false }: EmployeeClientMatrixProps) {
   // Empty selection = nothing chosen yet; the matrix stays collapsed until the
   // user picks at least one worker (or "Visi darbinieki").
   const [selected, setSelected] = useState<string[]>([]);
@@ -105,33 +114,50 @@ export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments 
     </div>
   );
 
+  // The Apple variant skips Card: its glass shadow and gradient would show through.
+  const Shell = apple ? "div" : Card;
+  const cellBg = apple ? "bg-card dark:bg-card" : "bg-card";
+  const rowLine = apple ? APPLE_SEPARATOR : "border-border/40";
+
   // ── Collapsed prompt ──
   if (!chosen) {
     return (
-      <Card className="relative z-30 mb-8 p-5">
+      <Shell className={apple ? cn(METRIC_SURFACE, "relative z-30 mb-8 p-5") : "relative z-30 mb-8 p-5"}>
         <div className="flex flex-col items-center gap-4 py-6 text-center sm:flex-row sm:justify-between sm:py-2 sm:text-left">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
-              <Users className="h-5 w-5" />
-            </div>
+          {apple ? (
             <div>
-              <div className="text-sm font-semibold">Darbinieku klienti</div>
-              <p className="text-xs text-muted-foreground">
-                Izvēlieties darbinieku, lai redzētu viņa klientus un nostrādātās stundas.
+              <div className={cn(APPLE_CARD_LABEL, "justify-center sm:justify-start", TINT_TILE.neutral, QUIET_LABEL)}>
+                <Users />
+                Darbinieku klienti
+              </div>
+              <p className="mt-1 text-[15px] text-muted-foreground">
+                Izvēlieties darbinieku, lai redzētu viņa klientus un nostrādātās stundas
               </p>
             </div>
-          </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-500">
+                <Users className="h-5 w-5" />
+              </div>
+              <div>
+                <div className="text-sm font-semibold">Darbinieku klienti</div>
+                <p className="text-xs text-muted-foreground">
+                  Izvēlieties darbinieku, lai redzētu viņa klientus un nostrādātās stundas.
+                </p>
+              </div>
+            </div>
+          )}
           {selector}
         </div>
-      </Card>
+      </Shell>
     );
   }
 
   // ── Expanded matrix ──
   return (
-    <Card className="mb-8 overflow-hidden p-0">
-      <div className="flex flex-col gap-3 border-b border-border/60 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+    <Shell className={apple ? cn(METRIC_SURFACE, "mb-8 overflow-hidden") : "mb-8 overflow-hidden p-0"}>
+      <div className={cn("flex flex-col gap-3 border-b sm:flex-row sm:items-center sm:justify-between", apple ? cn(APPLE_SEPARATOR, "px-5 py-4") : "border-border/60 px-4 py-3")}>
+        <div className={apple ? cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL) : "flex items-center gap-2 text-xs text-muted-foreground"}>
           <Users className="h-3.5 w-3.5" />
           <span>
             {selected.length === employees.length
@@ -149,20 +175,20 @@ export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments 
         <table className="w-full border-separate border-spacing-0 text-sm">
           <thead>
             <tr>
-              <th className="sticky left-0 z-20 border-b border-border bg-card px-4 py-2.5 text-left text-xs font-medium text-muted-foreground">
+              <th className={cn("sticky left-0 z-20 border-b px-4 py-2.5 text-left text-xs font-medium text-muted-foreground", cellBg, apple ? APPLE_SEPARATOR : "border-border")}>
                 Klients
               </th>
               {activeEmployees.map((e) => (
                 <th
                   key={e.id}
-                  className="min-w-[64px] border-b border-border bg-card px-2 py-2.5 text-center text-xs font-medium text-muted-foreground"
+                  className={cn("min-w-[64px] border-b px-2 py-2.5 text-center text-xs font-medium text-muted-foreground", cellBg, apple ? APPLE_SEPARATOR : "border-border")}
                 >
                   <span className="block truncate" title={e.name}>
                     {e.name.split(" ")[0]}
                   </span>
                 </th>
               ))}
-              <th className="border-b border-border bg-card px-4 py-2.5 text-right text-xs font-medium text-muted-foreground">
+              <th className={cn("border-b px-4 py-2.5 text-right text-xs font-medium text-muted-foreground", cellBg, apple ? APPLE_SEPARATOR : "border-border")}>
                 Kopā
               </th>
             </tr>
@@ -171,17 +197,24 @@ export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments 
             {clientRows.map((r, idx) => (
               <tr
                 key={r.clientId}
-                className={`transition-colors hover:bg-muted/30 ${idx % 2 ? "bg-muted/[0.04]" : ""} ${r.total === 0 ? "opacity-45" : ""}`}
+                className={cn(
+                  "transition-colors",
+                  apple ? cn(cellBg, "hover:bg-black/[0.03] dark:hover:bg-[#2a2a2e]") : cn("hover:bg-muted/30", idx % 2 && "bg-muted/[0.04]"),
+                  r.total === 0 && "opacity-45"
+                )}
               >
-                <td className="sticky left-0 z-10 max-w-[170px] truncate border-b border-border/40 bg-inherit px-4 py-2.5 font-medium">
+                <td className={cn("sticky left-0 z-10 max-w-[170px] truncate border-b bg-inherit px-4 py-2.5", rowLine, !apple && "font-medium")}>
                   {r.clientName}
                 </td>
                 {r.perEmployee.map((min, i) => (
-                  <td key={i} className="border-b border-border/40 px-2 py-2 text-center">
+                  <td key={i} className={cn("border-b px-2 py-2 text-center", rowLine)}>
                     {min > 0 ? (
                       <span
-                        className="inline-block min-w-[42px] rounded-md px-1.5 py-1 text-xs font-medium tabular-nums text-emerald-50"
-                        style={cellStyle(min, r.rowMax)}
+                        className={cn(
+                          "inline-block min-w-[42px] px-1.5 py-1 text-xs font-medium tabular-nums",
+                          apple ? "rounded-full text-foreground" : "rounded-md text-emerald-50"
+                        )}
+                        style={cellStyle(min, r.rowMax, apple)}
                       >
                         {hours(min)}h
                       </span>
@@ -190,15 +223,15 @@ export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments 
                     )}
                   </td>
                 ))}
-                <td className="border-b border-border/40 px-4 py-2.5 text-right text-xs font-semibold tabular-nums text-emerald-400">
+                <td className={cn("border-b px-4 py-2.5 text-right text-xs font-semibold tabular-nums", rowLine, apple ? METRIC_TINTS.blue : "text-emerald-400")}>
                   {r.total > 0 ? `${hours(r.total)}h` : <span className="text-muted-foreground/30">-</span>}
                 </td>
               </tr>
             ))}
           </tbody>
           <tfoot>
-            <tr className="bg-muted/40">
-              <td className="sticky left-0 z-10 bg-muted/40 px-4 py-3 text-xs font-semibold">
+            <tr className={apple ? "bg-[#f5f5f7] dark:bg-[#2a2a2e]" : "bg-muted/40"}>
+              <td className={cn("sticky left-0 z-10 px-4 py-3 text-xs font-semibold", apple ? "bg-[#f5f5f7] dark:bg-[#2a2a2e]" : "bg-muted/40")}>
                 Kopā
               </td>
               {employeeTotals.map((min, i) => (
@@ -206,13 +239,13 @@ export function EmployeeClientMatrix({ rows, employees, monthLabel, assignments 
                   {hours(min)}h
                 </td>
               ))}
-              <td className="px-4 py-3 text-right text-xs font-bold tabular-nums text-emerald-400">
+              <td className={cn("px-4 py-3 text-right text-xs tabular-nums", apple ? cn("font-semibold", METRIC_TINTS.blue) : "font-bold text-emerald-400")}>
                 {hours(grandTotal)}h
               </td>
             </tr>
           </tfoot>
         </table>
       </div>
-    </Card>
+    </Shell>
   );
 }

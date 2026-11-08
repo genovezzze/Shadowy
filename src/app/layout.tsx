@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
+import { Albert_Sans } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -134,6 +135,15 @@ const geistPixelLine = localFont({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
+// The application's interface face: a geometric grotesque in the spirit of
+// Aeonik, with the Latin Extended set Latvian needs (ā, ē, ķ, ļ, ņ, š, ž).
+const appFont = Albert_Sans({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-app",
+  display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
 // Keep the variables inline as well as in the generated Next.js classes.
 // This prevents a stale development stylesheet from dropping the global font
 // stack and falling all the way back to the browser's serif default.
@@ -142,6 +152,7 @@ const fontVariables = {
   "--font-display": neueHaas.style.fontFamily,
   "--font-accent": neueHaasLight.style.fontFamily,
   "--font-mono": jetBrainsMono.style.fontFamily,
+  "--font-app": appFont.style.fontFamily,
   "--font-pixel-square": geistPixelSquare.style.fontFamily,
   "--font-pixel-circle": geistPixelCircle.style.fontFamily,
   "--font-pixel-grid": geistPixelGrid.style.fontFamily,
@@ -221,7 +232,7 @@ export default function RootLayout({
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable} ${geistPixelSquare.variable} ${geistPixelCircle.variable} ${geistPixelGrid.variable} ${geistPixelTriangle.variable} ${geistPixelLine.variable}`}
+      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable} ${appFont.variable} ${geistPixelSquare.variable} ${geistPixelCircle.variable} ${geistPixelGrid.variable} ${geistPixelTriangle.variable} ${geistPixelLine.variable}`}
       style={fontVariables}
       suppressHydrationWarning
     >

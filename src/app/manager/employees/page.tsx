@@ -32,9 +32,8 @@ export default async function ManagerEmployeesPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-1">
           <Card className="relative overflow-hidden p-0">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
             <div className="flex items-center gap-3 px-6 py-4 border-b border-border dark:border-white/[0.07]">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#007AFF]/12 text-[#007AFF] dark:bg-[#0A84FF]/20 dark:text-[#4DA3FF]">
                 <UserPlus className="h-4 w-4" />
               </div>
               <div>

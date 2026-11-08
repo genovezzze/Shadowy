@@ -13,7 +13,8 @@ interface ProfileViewProps {
   title?: string | null;
 }
 
-const glassInner = "absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden";
+// The old glass highlight line; kept as a no-op so the markup stays simple.
+const glassInner = "hidden";
 
 export function ProfileView({ name, email, role, title }: ProfileViewProps) {
   return (
@@ -57,7 +58,7 @@ export function ProfileView({ name, email, role, title }: ProfileViewProps) {
         <Card className="relative min-w-0 overflow-hidden p-0">
           <div className={glassInner} />
           <div className="flex items-center gap-3 px-6 py-4 border-b border-border dark:border-white/[0.07]">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#34C759] dark:bg-[#30D158] text-white">
               <KeyRound className="h-4 w-4" />
             </div>
             <div className="text-sm font-semibold">Mainīt paroli</div>

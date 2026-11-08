@@ -1,24 +1,22 @@
 import Link from "next/link";
-import Image from "next/image";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { KpiCard } from "@/components/dashboard/kpi-card";
 import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { WorkTypeChart } from "@/components/dashboard/work-type-chart";
 import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
 import { FocusHeatmap } from "@/components/dashboard/focus-heatmap";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { EntryCard } from "@/components/entries/entry-card";
 import { EmptyState } from "@/components/ui/empty-state";
-import { CheckCircle2, Clock, RotateCcw, PlusCircle, Timer, Flame, Zap, TrendingUp, Copy } from "lucide-react";
+import { BadgeCheck, Building2, CalendarDays, CheckCircle2, Clock, Copy, Flame, RotateCcw, Shuffle, Sparkles, Timer, TrendingUp, Zap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_FILL, APPLE_PILL, APPLE_PRIMARY_BUTTON, APPLE_SEPARATOR, METRIC_SURFACE, METRIC_TINTS, TINT_FILL, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
+import { StatTile } from "@/components/dashboard/stat-tile";
+import { OverviewSections, type OverviewSection } from "@/components/dashboard/overview-sections";
 import { categoriesForUser } from "@/lib/smart-log-server";
 import { EmployeeEntryActions } from "@/components/entries/employee-entry-actions";
 import { AddTimeButton } from "@/components/entries/add-time-button";
 import { EditEntryButton } from "@/components/entries/edit-entry-button";
 import { DeleteEntryButton } from "@/components/entries/delete-entry-button";
-import { SectionDivider } from "@/components/dashboard/section-divider";
-import { ArrowRight } from "lucide-react";
 import { resolveWorkType } from "@/lib/work-type";
 import { normalizeClientName } from "@/lib/client-name";
 import { DailyDigestCard } from "@/components/dashboard/daily-digest-card";
@@ -252,12 +250,6 @@ export default async function EmployeeDashboard() {
     invisibilityScore >= 46 ? "Labs progress" :
     invisibilityScore >= 21 ? "Attīstās" :
     "Sāc veidot paradumu";
-  const scoreStroke =
-    invisibilityScore >= 76 ? "stroke-emerald-500" :
-    invisibilityScore >= 46 ? "stroke-indigo-400" :
-    "stroke-amber-400";
-  const circ = 99.9;
-  const scoreDash = (invisibilityScore / 100) * circ;
 
   // ── Day-of-week pattern ───────────────────────────────────────────────────
   const dowMinutes = Array(7).fill(0) as number[];
@@ -359,327 +351,283 @@ export default async function EmployeeDashboard() {
     })),
   };
 
-  return (
-    <>
-      {/* ── Header ── */}
-      <div className="flex flex-col gap-4 pb-8 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-foreground/50 dark:text-white/40">
-            Pārskats
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Mans darba pārskats</h1>
-          <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
-            Šeit jūs varat iesniegt darba ierakstus un sekot līdzi savu ierakstu statusam.
-          </p>
-        </div>
-        <Button asChild>
-          <Link href="/employee/new-entry">
-            <PlusCircle className="h-4 w-4" />
-            Jauns ieraksts
-          </Link>
-        </Button>
-      </div>
+  // Blocks inside a section sit in one column with an even gap.
+  const stack = "flex flex-col gap-3 [&>*]:!mb-0 [&>*]:!mt-0";
 
-      <Card className="mb-8 overflow-hidden">
-        <CardContent className="relative flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
-          <div className="relative flex items-start gap-3">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-border bg-muted/30 dark:border-white/[0.1] dark:bg-white/[0.035]">
-              <Image src="/shadowy.svg" alt="" width={25} height={25} className="invert dark:invert-0" />
-            </div>
-            <div>
-              <h2 className="font-semibold">Shadowy AI ieraksts</h2>
-              <p className="mt-1 max-w-2xl text-sm leading-6 text-muted-foreground">
-                Apraksti vai ierunā, kas šodien aizņēma papildu laiku, un pārskati Shadowy AI izveidotos melnrakstus.
-              </p>
-            </div>
-          </div>
-          <Button asChild variant="outline" className="relative shrink-0">
-            <Link href="/employee/smart-log">
-              Atvērt Shadowy AI
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </CardContent>
-      </Card>
-
+  // ── Kopsavilkums ──
+  const summaryContent = (
+    <div className={stack}>
       <DailyDigestCard {...todayDigest} />
-
-      {/* ── Status KPIs ── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-4">
-        <KpiCard formal label="Gaida izskatīšanu" value={pendingCount} icon={<Clock className="h-5 w-5" />} />
-        <KpiCard formal label="Apstiprināti" value={approvedCount} hint={entriesHint} icon={<CheckCircle2 className="h-5 w-5" />} />
-        <KpiCard formal label="Apstiprinātās stundas" value={`${approvedHours}h`} hint={hoursHint} icon={<Timer className="h-5 w-5" />} />
-        <KpiCard formal label="Atpakaļ / Noraidīti" value={`${returnedCount} / ${rejectedCount}`} icon={<RotateCcw className="h-5 w-5" />} />
-      </div>
-
-      {/* ── Personal analytics KPIs ── */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        {/* Invisibility score */}
-        <div className="glass rounded-xl border border-border bg-card p-5 text-card-foreground dark:border-white/[0.08] dark:bg-gradient-to-b dark:from-white/[0.05] dark:via-white/[0.03] dark:to-white/[0.01] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-16px_rgba(0,0,0,0.6)]">
-          <div className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <div className="text-sm text-muted-foreground">Neredzamais ieguldījums</div>
-              <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{invisibilityScore}</div>
-              <div className="mt-1 text-xs text-muted-foreground">{scoreLabel}</div>
-            </div>
-            <svg viewBox="0 0 36 36" className="h-14 w-14 shrink-0 -rotate-90">
-              <circle cx="18" cy="18" r="15.9" fill="none" strokeWidth="2.8" stroke="currentColor" className="text-muted/30" />
-              <circle
-                cx="18" cy="18" r="15.9" fill="none" strokeWidth="2.8" stroke="currentColor"
-                strokeDasharray={`${scoreDash} ${circ - scoreDash}`}
-                strokeLinecap="round"
-                className={scoreStroke}
-              />
-            </svg>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatTile quiet tint="neutral" icon={<Clock />} title="Gaida izskatīšanu" value={pendingCount} />
+        <StatTile quiet tint="neutral" icon={<CheckCircle2 />} title="Apstiprināti" value={approvedCount} description={entriesHint} />
+        <StatTile quiet tint="neutral" icon={<Timer />} title="Apstiprinātās stundas" value={`${approvedHours}h`} description={hoursHint} />
+        <StatTile quiet tint="neutral" icon={<RotateCcw />} title="Atpakaļ / Noraidīti" value={`${returnedCount} / ${rejectedCount}`} />
+        <StatTile quiet tint="neutral" icon={<Sparkles />} title="Neredzamais ieguldījums" value={invisibilityScore} description={scoreLabel}>
+          <div className={cn("mt-3 h-1.5 overflow-hidden rounded-full", APPLE_FILL)}>
+            <div className={cn("h-full rounded-full", TINT_FILL.blue)} style={{ width: `${invisibilityScore}%` }} />
           </div>
-        </div>
-
-        {/* Streak + best */}
-        <KpiCard
-          formal
-          label="Nedēļu sērija"
+        </StatTile>
+        <StatTile
+          quiet
+          tint="neutral"
+          icon={<Flame />}
+          title="Nedēļu sērija"
           value={streak === 0 ? "-" : String(streak)}
-          hint={
+          description={
             streak === 0 ? "Pievieno ierakstu šonedēļ" :
-            streak === bestStreak && streak > 1 ? "Personīgais rekords!" :
+            streak === bestStreak && streak > 1 ? "Personīgais rekords" :
             bestStreak > streak ? `Rekords: ${bestStreak} ned.` :
             `${streak} ned. pēc kārtas`
           }
-          icon={<Flame className="h-5 w-5" />}
         />
-
-        {/* Deep work */}
-        <KpiCard
-          formal
-          label="Dziļā darba bloki"
+        <StatTile
+          quiet
+          tint="neutral"
+          icon={<Zap />}
+          title="Dziļā darba bloki"
           value={deepWork === 0 ? "-" : String(deepWork)}
-          hint="Ieraksti ≥ 60 min šomēnesī"
-          icon={<Zap className="h-5 w-5" />}
+          description="Ieraksti ≥ 60 min šomēnesī"
         />
+        <StatTile
+          quiet
+          tint="neutral"
+          icon={<TrendingUp />}
+          title="Labākais mēnesis"
+          value={`${bestMonthHoursAll}h`}
+          description={bestMonthHoursAll > 0 ? `Šomēnes: ${thisMonthHours}h (${bestProgress}% no rekorda)` : "Pievieno ierakstus, lai redzētu progresu"}
+        >
+          {bestMonthHoursAll > 0 && (
+            <div className={cn("mt-3 h-1.5 overflow-hidden rounded-full", APPLE_FILL)}>
+              <div className={cn("h-full rounded-full", TINT_FILL.green)} style={{ width: `${bestProgress}%` }} />
+            </div>
+          )}
+        </StatTile>
+      </div>
+    </div>
+  );
 
-        {/* Best month progress */}
-        <div className="glass rounded-xl border border-border bg-card p-5 text-card-foreground dark:border-white/[0.08] dark:bg-gradient-to-b dark:from-white/[0.05] dark:via-white/[0.03] dark:to-white/[0.01] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08),0_16px_40px_-16px_rgba(0,0,0,0.6)]">
-          <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-muted/40 text-muted-foreground [&>svg]:h-4 [&>svg]:w-4 dark:border-white/[0.1] dark:bg-white/[0.06] dark:text-white/70">
-            <TrendingUp className="h-5 w-5" />
+  // ── Aktivitāte ──
+  const activityContent = (
+    <div className={stack}>
+      <div className="grid gap-3 lg:grid-cols-2">
+        <ActivityChart tint="green" iconTint="neutral" quietLabel title="Mana aktivitāte (pēdējie 6 mēneši)" data={monthlyData} />
+        <WorkTypeChart title="Apstiprinātie ieraksti pēc kategorijas" data={categoryData} />
+      </div>
+      {approvedHours > 0 && (
+        <HoursTrendChart
+          tint="blue"
+          iconTint="neutral"
+          quietLabel
+          title="Apstiprinātās stundas pa mēnešiem"
+          data={monthlyHours}
+          badge={
+            bestMonthChart.value > 0 ? (
+              <>Labākais mēnesis: <span className="font-medium text-foreground">{bestMonthChart.label} ({bestMonthChart.value}h)</span></>
+            ) : undefined
+          }
+        />
+      )}
+    </div>
+  );
+
+  // ── Fokuss ──
+  const focusContent = (
+    <div className="grid gap-3 lg:grid-cols-2">
+      <div className={cn(METRIC_SURFACE, "p-5")}>
+        <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+          <Shuffle />
+          Kontekstu maiņa
+        </div>
+        <p className="mb-4 mt-2 text-[13px] text-muted-foreground">
+          Krāsa parāda, cik kategorijās tu strādāji vienā dienā. Jo vairāk - jo izkaisītāks fokuss.
+        </p>
+        <FocusHeatmap days={focusDays} />
+      </div>
+
+      <div className="flex flex-col gap-3">
+        <div className={cn(METRIC_SURFACE, "flex-1 p-5")}>
+          <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <BadgeCheck />
+            Darba sadalījums pēc lomas
           </div>
-          <div className="text-sm text-muted-foreground">Labākais mēnesis</div>
-          <div className="mt-1.5 text-3xl font-bold tracking-tight tabular-nums">{bestMonthHoursAll}h</div>
-          {bestMonthHoursAll > 0 ? (
-            <>
-              <div className="mt-2.5 h-1.5 w-full rounded-full bg-muted overflow-hidden">
-                <div className="h-full rounded-full bg-emerald-500/80" style={{ width: `${bestProgress}%` }} />
-              </div>
-              <div className="mt-1 text-xs text-muted-foreground">Šomēnes: {thisMonthHours}h ({bestProgress}% no rekorda)</div>
-            </>
+          <p className="mb-4 mt-2 text-[13px] text-muted-foreground">
+            Cik daudz no taviem apstiprinātajiem ierakstiem ietilpst tavā oficiālajā lomā.
+          </p>
+          {approvedEntries.length === 0 ? (
+            <p className="text-[14px] text-muted-foreground">Nav datu.</p>
           ) : (
-            <div className="mt-1.5 text-xs text-muted-foreground">Pievieno ierakstus, lai redzētu progresu</div>
+            <div className="space-y-3">
+              {[
+                { label: "Ietilpst lomā", pct: inRolePct, count: roleCount.in_role, color: TINT_FILL.green },
+                { label: "Papildu ieguldījums", pct: extraPct, count: roleCount.extra, color: TINT_FILL.indigo },
+              ].map((row) => (
+                <div key={row.label} className="flex items-center gap-3">
+                  <div className="w-36 shrink-0 text-[14px]">{row.label}</div>
+                  <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", APPLE_FILL)}>
+                    <div className={cn("h-full rounded-full", row.color)} style={{ width: `${row.pct}%` }} />
+                  </div>
+                  <div className="w-16 shrink-0 text-right text-[13px] tabular-nums text-muted-foreground">
+                    {row.pct}% <span className="opacity-60">({row.count})</span>
+                  </div>
+                </div>
+              ))}
+              {duties.length === 0 && (
+                <p className="pt-1 text-[13px] text-muted-foreground">
+                  Lai redzētu precīzu sadalījumu, lūdz vadītāju piešķirt tev lomu.
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className={cn(METRIC_SURFACE, "flex-1 p-5")}>
+          <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <CalendarDays />
+            Aktīvākā nedēļas diena
+          </div>
+          <p className="mb-4 mt-2 text-[13px] text-muted-foreground">
+            {approvedEntries.length > 0
+              ? `Visvairāk strādā ${["pirmdienās", "otrdienās", "trešdienās", "ceturtdienās", "piektdienās", "sestdienās", "svētdienās"][peakDow]}.`
+              : "Nav datu."}
+          </p>
+          {approvedEntries.length > 0 && (
+            <div className="flex h-16 items-end gap-1.5">
+              {dowMinutes.map((mins, i) => {
+                const pct = Math.max((mins / maxDow) * 100, mins > 0 ? 4 : 0);
+                const isPeak = i === peakDow;
+                return (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <div className="flex w-full items-end" style={{ height: "44px" }}>
+                      <div
+                        title={`${LV_DAYS[i]}: ${Math.round((mins / 60) * 10) / 10}h`}
+                        className={cn("w-full rounded-md transition-colors", isPeak ? TINT_FILL.blue : APPLE_FILL)}
+                        style={{ height: `${pct}%` }}
+                      />
+                    </div>
+                    <div className={cn("text-[12px]", isPeak ? "font-semibold text-foreground" : "text-muted-foreground")}>
+                      {LV_DAYS[i]}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           )}
         </div>
       </div>
+    </div>
+  );
 
-      <SectionDivider label="Aktivitāte" />
-
-      <div className="grid gap-4 sm:grid-cols-2 mb-8">
-        <ActivityChart title="Mana aktivitāte (pēdējie 6 mēneši)" data={monthlyData} />
-        <WorkTypeChart title="Apstiprinātie ieraksti pēc kategorijas" data={categoryData} />
+  // ── Mani klienti ──
+  const clientsContent = clientDist.length > 0 && (
+    <div className={cn(METRIC_SURFACE, "p-5")}>
+      <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+        <Building2 />
+        Laika sadalījums pa klientiem
       </div>
+      <p className="mb-5 mt-2 text-[13px] text-muted-foreground">
+        Cik daudz apstiprinātā darba laika devies katram klientam kopumā.
+      </p>
+      <div className="space-y-3">
+        {clientDist.map((c) => {
+          const pct = Math.round((c.minutes / maxClientMin) * 100);
+          const hours = Math.round((c.minutes / 60) * 10) / 10;
+          return (
+            <div key={c.name} className="flex items-center gap-3">
+              <div className="w-40 shrink-0 truncate text-[14px]" title={c.name}>{c.name}</div>
+              <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", APPLE_FILL)}>
+                <div className={cn("h-full rounded-full", TINT_FILL.indigo)} style={{ width: `${pct}%` }} />
+              </div>
+              <div className="w-14 shrink-0 text-right text-[13px] tabular-nums text-muted-foreground">
+                {hours}h
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
-      {approvedHours > 0 && (
-        <div className="mb-8">
-          <HoursTrendChart
-            title="Apstiprinātās stundas pa mēnešiem"
-            data={monthlyHours}
-            badge={
-              bestMonthChart.value > 0 ? (
-                <>Labākais mēnesis: <span className="font-medium text-foreground">{bestMonthChart.label} ({bestMonthChart.value}h)</span></>
-              ) : undefined
+  // ── Kategorijas dziļumā ──
+  const categoriesContent = categoryAxis.length > 0 && (
+    <div className={stack}>
+      {clientAxis.length > 0 && (
+        <CategoryMatrix
+          title="Kategorija × Klients"
+          description="Kurš klients dod visvairāk katras kategorijas darba tieši tev."
+          rows={categoryAxis}
+          cols={clientAxis}
+          minutes={catClientMinutes}
+          unit="klientus"
+        />
+      )}
+      <CategoryMatrix
+        title="Kategorija × Mēnesis"
+        description="Kā tavs fokuss pa kategorijām mainījies pēdējo 6 mēnešu laikā."
+        rows={categoryAxis}
+        cols={monthAxis}
+        minutes={catMonthMinutes}
+        previewCols={12}
+        previewRows={99}
+      />
+    </div>
+  );
+
+  // ── Pēdējie ieraksti ──
+  const recentContent = (
+    <div className={stack}>
+      <div className="flex justify-end">
+        <Link href="/employee/history" className={cn("text-[14px] font-medium hover:underline", METRIC_TINTS.blue)}>
+          Skatīt visu vēsturi
+        </Link>
+      </div>
+      {recent.length === 0 ? (
+        <div className={cn(METRIC_SURFACE, "p-8")}>
+          <EmptyState
+            title="Vēl nav iesniegtu ierakstu"
+            description="Iesāciet ar pirmo darba ierakstu - tas aizņems mazāk nekā minūti."
+            action={
+              <Link href="/employee/new-entry" className={APPLE_PRIMARY_BUTTON}>
+                Iesniegt pirmo ierakstu
+              </Link>
             }
           />
         </div>
-      )}
-
-      {/* ── Focus analysis ── */}
-      <SectionDivider label="Fokusa analīze" />
-
-      <div className="grid gap-4 sm:grid-cols-2 mb-8">
-        <Card>
-          <CardContent className="p-5">
-            <div className="text-sm font-semibold mb-1">Kontekstu maiņa</div>
-            <p className="text-xs text-muted-foreground mb-4">
-              Krāsa parāda, cik kategorijās tu strādāji vienā dienā. Jo vairāk - jo izkaisītāks fokuss.
-            </p>
-            <FocusHeatmap days={focusDays} />
-          </CardContent>
-        </Card>
-
-        <div className="flex flex-col gap-4">
-          <Card className="flex-1">
-            <CardContent className="p-5">
-              <div className="text-sm font-semibold mb-1">Darba sadalījums pēc lomas</div>
-              <p className="text-xs text-muted-foreground mb-4">
-                Cik daudz no taviem apstiprinātajiem ierakstiem ietilpst tavā officiālajā lomā.
-              </p>
-              {approvedEntries.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Nav datu.</p>
-              ) : (
-                <div className="space-y-3">
-                  {[
-                    { label: "Ietilpst lomā", pct: inRolePct, count: roleCount.in_role, color: "bg-emerald-500" },
-                    { label: "Papildu ieguldījums", pct: extraPct, count: roleCount.extra, color: "bg-indigo-500" },
-                  ].map((row) => (
-                    <div key={row.label} className="flex items-center gap-3">
-                      <div className="w-36 shrink-0 text-sm">{row.label}</div>
-                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                        <div className={`h-full rounded-full ${row.color}`} style={{ width: `${row.pct}%` }} />
-                      </div>
-                      <div className="w-14 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
-                        {row.pct}% <span className="opacity-60">({row.count})</span>
-                      </div>
-                    </div>
-                  ))}
-                  {duties.length === 0 && (
-                    <p className="text-xs text-muted-foreground pt-1">
-                      Lai redzētu precīzu sadalījumu, lūdz vadītāju piešķirt tev lomu.
-                    </p>
-                  )}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="flex-1">
-            <CardContent className="p-5">
-              <div className="text-sm font-semibold mb-1">Aktīvākā nedēļas diena</div>
-              <p className="text-xs text-muted-foreground mb-4">
-                {approvedEntries.length > 0
-                  ? `Visvairāk strādā ${["pirmdienās", "otrdienās", "trešdienās", "ceturtdienās", "piektdienās", "sestdienās", "svētdienās"][peakDow]}.`
-                  : "Nav datu."}
-              </p>
-              {approvedEntries.length > 0 && (
-                <div className="flex items-end gap-1.5 h-16">
-                  {dowMinutes.map((mins, i) => {
-                    const pct = Math.max((mins / maxDow) * 100, mins > 0 ? 4 : 0);
-                    const isPeak = i === peakDow;
-                    return (
-                      <div key={i} className="flex flex-1 flex-col items-center gap-1">
-                        <div className="w-full flex items-end" style={{ height: "44px" }}>
-                          <div
-                            title={`${LV_DAYS[i]}: ${Math.round((mins / 60) * 10) / 10}h`}
-                            className={`w-full rounded-t transition-colors ${isPeak ? "bg-emerald-500/80" : "bg-muted-foreground/25"}`}
-                            style={{ height: `${pct}%` }}
-                          />
-                        </div>
-                        <div className={`text-[10px] ${isPeak ? "text-foreground font-semibold" : "text-muted-foreground"}`}>
-                          {LV_DAYS[i]}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* ── Client distribution ── */}
-      {clientDist.length > 0 && (
-        <>
-          <SectionDivider label="Mani klienti" />
-          <Card className="mb-8">
-            <CardContent className="p-5">
-              <div className="text-sm font-semibold mb-1">Laika sadalījums pa klientiem</div>
-              <p className="text-xs text-muted-foreground mb-5">
-                Cik daudz apstiprinātā darba laika devies katram klientam kopumā.
-              </p>
-              <div className="space-y-3">
-                {clientDist.map((c) => {
-                  const pct = Math.round((c.minutes / maxClientMin) * 100);
-                  const hours = Math.round((c.minutes / 60) * 10) / 10;
-                  return (
-                    <div key={c.name} className="flex items-center gap-3">
-                      <div className="w-36 shrink-0 text-sm truncate" title={c.name}>{c.name}</div>
-                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-indigo-500/70" style={{ width: `${pct}%` }} />
-                      </div>
-                      <div className="w-14 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
-                        {hours}h
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
-
-      {/* ── Personal matrices ── */}
-      {categoryAxis.length > 0 && (
-        <>
-          <SectionDivider label="Kategorijas dziļumā" />
-          <div className="grid gap-4 mb-8">
-            {clientAxis.length > 0 && (
-              <CategoryMatrix
-                title="Kategorija × Klients"
-                description="Kurš klients dod visvairāk katras kategorijas darba tieši tev."
-                rows={categoryAxis}
-                cols={clientAxis}
-                minutes={catClientMinutes}
-                unit="klientus"
-              />
-            )}
-            <CategoryMatrix
-              title="Kategorija × Mēnesis"
-              description="Kā tavs fokuss pa kategorijām mainījies pēdējo 6 mēnešu laikā."
-              rows={categoryAxis}
-              cols={monthAxis}
-              minutes={catMonthMinutes}
-              previewCols={12}
-              previewRows={99}
-            />
-          </div>
-        </>
-      )}
-
-      <SectionDivider label="Pēdējie ieraksti" />
-
-      <div className="mb-4 flex items-center justify-end">
-        <Link href="/employee/history" className="text-sm font-medium underline-offset-4 hover:underline">
-          Skatīt visu vēsturi →
-        </Link>
-      </div>
-
-      {recent.length === 0 ? (
-        <EmptyState
-          title="Vēl nav iesniegtu ierakstu"
-          description="Iesāciet ar pirmo darba ierakstu - tas aizņems mazāk nekā minūti."
-          action={
-            <Button asChild>
-              <Link href="/employee/new-entry">Iesniegt pirmo ierakstu</Link>
-            </Button>
-          }
-        />
       ) : (
-        <div className="grid gap-4">
-          {recent.map((e: any) => (
-            <EntryCard
-              key={e.id}
-              title={e.title}
-              category={e.category}
-              description={e.description}
-              clientName={e.clientName ?? e.client?.name ?? undefined}
-              workDate={e.workDate}
-              createdAt={e.createdAt}
-              durationMinutes={e.durationMinutes}
-              status={e.status}
-              managerComment={e.managerComment}
-              helpedColleague={e.helpedColleague}
-              helpedName={e.helpedUser?.name}
-              footer={
-                <div className="flex flex-wrap items-center gap-2">
-                  {e.status === "PENDING" || e.status === "RETURNED" ? (
-                    <EmployeeEntryActions
+        recent.map((e: any) => (
+          <EntryCard
+            apple
+            key={e.id}
+            title={e.title}
+            category={e.category}
+            description={e.description}
+            clientName={e.clientName ?? e.client?.name ?? undefined}
+            workDate={e.workDate}
+            createdAt={e.createdAt}
+            durationMinutes={e.durationMinutes}
+            status={e.status}
+            managerComment={e.managerComment}
+            helpedColleague={e.helpedColleague}
+            helpedName={e.helpedUser?.name}
+            footer={
+              <div className="flex flex-wrap items-center gap-2">
+                {e.status === "PENDING" || e.status === "RETURNED" ? (
+                  <EmployeeEntryActions
+                    entryId={e.id}
+                    title={e.title}
+                    category={e.category}
+                    description={e.description}
+                    workDate={e.workDate.toISOString().slice(0, 10)}
+                    durationMinutes={e.durationMinutes}
+                    clients={editableClients}
+                    clientId={e.clientId}
+                    clientName={e.clientName}
+                    categories={categories}
+                  />
+                ) : e.status === "APPROVED" ? (
+                  <>
+                    <AddTimeButton entryId={e.id} />
+                    <EditEntryButton
                       entryId={e.id}
                       title={e.title}
                       category={e.category}
@@ -691,36 +639,70 @@ export default async function EmployeeDashboard() {
                       clientName={e.clientName}
                       categories={categories}
                     />
-                  ) : e.status === "APPROVED" ? (
-                    <>
-                      <AddTimeButton entryId={e.id} />
-                      <EditEntryButton
-                        entryId={e.id}
-                        title={e.title}
-                        category={e.category}
-                        description={e.description}
-                        workDate={e.workDate.toISOString().slice(0, 10)}
-                        durationMinutes={e.durationMinutes}
-                        clients={editableClients}
-                        clientId={e.clientId}
-                        clientName={e.clientName}
-                        categories={categories}
-                      />
-                      <DeleteEntryButton entryId={e.id} />
-                    </>
-                  ) : null}
-                  <Button asChild variant="outline" size="sm">
-                    <Link href={`/employee/new-entry?copyFrom=${e.id}`}>
-                      <Copy className="h-3.5 w-3.5" />
-                      Kopēt
-                    </Link>
-                  </Button>
-                </div>
-              }
-            />
-          ))}
-        </div>
+                    <DeleteEntryButton entryId={e.id} />
+                  </>
+                ) : null}
+                <Link href={`/employee/new-entry?copyFrom=${e.id}`} className={APPLE_PILL}>
+                  <Copy className="h-3.5 w-3.5" />
+                  Kopēt
+                </Link>
+              </div>
+            }
+          />
+        ))
       )}
+    </div>
+  );
+
+  const sections: OverviewSection[] = [
+    {
+      key: "summary",
+      label: "Kopsavilkums",
+      count: 9,
+      keywords: "Šodien Gaida izskatīšanu Apstiprināti stundas Atpakaļ Noraidīti Neredzamais ieguldījums Nedēļu sērija Dziļā darba bloki Labākais mēnesis",
+      content: summaryContent,
+    },
+    {
+      key: "activity",
+      label: "Aktivitāte",
+      count: 2 + (approvedHours > 0 ? 1 : 0),
+      keywords: "Mana aktivitāte kategorijas stundas pa mēnešiem",
+      content: activityContent,
+    },
+    {
+      key: "focus",
+      label: "Fokuss",
+      count: 3,
+      keywords: "Kontekstu maiņa Darba sadalījums pēc lomas Aktīvākā nedēļas diena",
+      content: focusContent,
+    },
+    ...(clientsContent
+      ? [{ key: "clients", label: "Klienti", count: 1, keywords: "Laika sadalījums pa klientiem", content: clientsContent }]
+      : []),
+    ...(categoriesContent
+      ? [{
+          key: "categories",
+          label: "Kategorijas",
+          count: clientAxis.length > 0 ? 2 : 1,
+          keywords: "Kategorija Klients Mēnesis",
+          content: categoriesContent,
+        }]
+      : []),
+    {
+      key: "entries",
+      label: "Ieraksti",
+      count: recent.length,
+      keywords: "Pēdējie ieraksti vēsture",
+      content: recentContent,
+    },
+  ];
+
+  return (
+    <>
+      <h1 className="sr-only">Mans darba pārskats</h1>
+
+
+      <OverviewSections quiet sections={sections} />
     </>
   );
 }

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { HeartHandshake } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { METRIC_SURFACE } from "@/components/dashboard/apple";
 import { StatusBadge } from "./status-badge";
 import { WorkTypeBadge } from "./work-type-badge";
 import { formatDateLV, formatDurationLV } from "@/lib/utils";
@@ -10,6 +12,8 @@ import { categoryLabel } from "@/lib/work-insights";
 type EntryStatus = "PENDING" | "APPROVED" | "REJECTED" | "RETURNED";
 
 interface EntryCardProps {
+  /** New card style, used on the employee overview. */
+  apple?: boolean;
   title: string;
   category: string;
   description: string;
@@ -48,10 +52,14 @@ export function EntryCard({
   helpedColleague,
   helpedName,
   footer,
+  apple = false,
 }: EntryCardProps) {
+  // The new-style variant skips Card: its glass shadow and gradient would show through.
+  const Shell = apple ? "div" : Card;
+  const Body = apple ? "div" : CardContent;
   return (
-    <Card>
-      <CardContent className="p-6">
+    <Shell className={apple ? cn(METRIC_SURFACE, "p-5") : undefined}>
+      <Body className={apple ? undefined : "p-6"}>
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -79,7 +87,7 @@ export function EntryCard({
                 </span>
               ) : null}
             </div>
-            <h3 className="mt-1 text-base font-semibold leading-snug">
+            <h3 className={cn("mt-1 font-semibold leading-snug", apple ? "font-display text-[15px]" : "text-base")}>
               {title}
             </h3>
             {employeeName ? (
@@ -106,7 +114,7 @@ export function EntryCard({
           {description}
         </p>
         {managerComment ? (
-          <div className="mt-4 rounded-lg border border-border bg-muted/40 p-3 text-sm">
+          <div className={cn("mt-4 p-3 text-sm", apple ? "rounded-xl bg-black/[0.04] dark:bg-white/[0.06]" : "rounded-lg border border-border bg-muted/40")}>
             <div className="text-xs font-medium text-muted-foreground mb-1">
               Vadītāja komentārs
             </div>
@@ -114,7 +122,7 @@ export function EntryCard({
           </div>
         ) : null}
         {footer ? <div className="mt-4">{footer}</div> : null}
-      </CardContent>
-    </Card>
+      </Body>
+    </Shell>
   );
 }

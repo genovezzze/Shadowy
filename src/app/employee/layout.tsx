@@ -6,6 +6,7 @@ import { isTrialExpired, getTrialDaysLeft } from "@/lib/trial";
 import { getUnreadNotificationCount } from "@/lib/notifications";
 import { getUnreadAnnouncementForUser } from "@/lib/announcements";
 import { AnnouncementModal } from "@/components/employee/announcement-modal";
+import { NewDesignScope } from "@/components/layout/new-design-scope";
 
 export default async function EmployeeLayout({
   children,
@@ -29,8 +30,10 @@ export default async function EmployeeLayout({
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}
       unreadNotificationCount={unreadNotificationCount}
     >
-      <AnnouncementModal announcement={unreadAnnouncement} />
-      {children}
+      <NewDesignScope>
+        <AnnouncementModal announcement={unreadAnnouncement} />
+        {children}
+      </NewDesignScope>
     </AppShell>
   );
 }

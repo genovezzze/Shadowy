@@ -1,14 +1,13 @@
 "use client";
 
-import Link from "next/link";
-import { ArrowUpRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/components/landing/atoms/i18n";
 
 /**
- * The three things a visitor was previously made to hunt for, moved up beside
- * the call to action: what the pilot costs, that the employee stays in control
- * of what is submitted, and that a real named company is already running it.
+ * The things a visitor was previously made to hunt for, moved up beside the
+ * call to action: what the pilot costs and that the employee stays in control
+ * of what is submitted.
  *
  * Price and the "not surveillance" objection each had their own FAQ entry five
  * sections down, which is far past the point where someone decides whether to
@@ -41,20 +40,6 @@ export function LandingHeroTrust({ className }: { className?: string }) {
         ))}
       </ul>
 
-      {/* The one piece of proof on the page that is not illustrative: a named
-          client. It links to their case rather than asserting a result, because
-          every figure in that case is explicitly a worked example, not measured
-          data. */}
-      <Link
-        href="/projekti/pb-finanses"
-        className="group inline-flex items-center gap-1.5 text-[12px] font-semibold leading-tight text-white/70 underline-offset-4 transition-colors hover:text-white hover:underline sm:text-[13px]"
-      >
-        {t("hero.partner")}
-        <ArrowUpRight
-          className="size-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-          aria-hidden
-        />
-      </Link>
     </div>
   );
 }

@@ -121,7 +121,7 @@ function ClientRow({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-sm truncate">{client.name}</span>
-          <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${isActive ? "bg-emerald-500/15 text-emerald-500" : "bg-muted text-muted-foreground"}`}>
+          <span className={`shrink-0 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-medium ${isActive ? "bg-[#34C759]/15 text-[#248A3D] dark:text-[#30D158]" : "bg-muted text-muted-foreground"}`}>
             {isActive ? "Aktīvs" : "Neaktīvs"}
           </span>
         </div>
@@ -157,7 +157,7 @@ function ClientRow({
           disabled={isToggling}
           title={isActive ? "Deaktivizēt klientu" : "Aktivizēt klientu"}
         >
-          {isActive ? <X className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-emerald-500" />}
+          {isActive ? <X className="h-3.5 w-3.5 text-muted-foreground" /> : <Check className="h-3.5 w-3.5 text-[#248A3D] dark:text-[#30D158]" />}
         </Button>
         <Button
           size="sm"

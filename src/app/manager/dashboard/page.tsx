@@ -1,10 +1,7 @@
-import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
-import { SectionDivider } from "@/components/dashboard/section-divider";
+import { TopBarSlot } from "@/components/layout/top-bar-slot";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
@@ -12,7 +9,7 @@ import { CategoryList } from "@/components/dashboard/category-list";
 import { WorkNatureCard } from "@/components/dashboard/work-nature-card";
 import { groupByWorkNature, groupHelpPairs } from "@/lib/work-nature";
 import { resolveWorkType } from "@/lib/work-type";
-import { formatDurationLV } from "@/lib/utils";
+import { cn, formatDurationLV } from "@/lib/utils";
 import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { ClientEmployeeMatrix } from "@/components/dashboard/client-employee-matrix";
@@ -24,14 +21,10 @@ import { ClientMonthSelector } from "@/components/dashboard/client-month-selecto
 import { EntryLeaderboard } from "@/components/dashboard/entry-leaderboard";
 import { EmployeeClientMatrix } from "@/components/dashboard/employee-client-matrix";
 import { DeltaBadge } from "@/components/dashboard/delta-badge";
-import {
-  AlertTriangle,
-  Clock,
-  FileText,
-  Timer,
-  TrendingUp,
-  Users,
-} from "lucide-react";
+import { Activity, AlertTriangle, BarChart3, CalendarDays, Clock, FileText, Gauge, Timer, TrendingUp, Users } from "lucide-react";
+import { APPLE_CARD_LABEL, APPLE_FILL, APPLE_SEPARATOR, METRIC_SURFACE, METRIC_TINTS, TILE_BADGE, TINT_FILL, TINT_TILE } from "@/components/dashboard/apple";
+import { StatTile } from "@/components/dashboard/stat-tile";
+import { OverviewSections, type OverviewSection } from "@/components/dashboard/overview-sections";
 
 const HOURLY_RATE_EUR = 20;
 
@@ -225,7 +218,7 @@ export default async function ManagerDashboard({
   const nowDate = new Date();
   const currentMonthStart = new Date(Date.UTC(nowDate.getUTCFullYear(), nowDate.getUTCMonth(), 1));
 
-  const [teamCount, clients, approved, pending, pendingCount, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear, clientMatrixEntries, clientMonthHistory, entryCountsByEmployee, clientAssignmentRows] = await Promise.all([
+  const [teamCount, clients, approved, teamMembers, recentHeatmapEntries, currentMonthEntries, totalTeamEntries, allTimeTeamEntries, teamEntriesLastYear, clientMatrixEntries, clientMonthHistory, entryCountsByEmployee, clientAssignmentRows] = await Promise.all([
     prisma.user.count({ where: { organizationId: orgId, managerId } }),
     prisma.client.findMany({
       where: { organizationId: orgId },
@@ -260,15 +253,6 @@ export default async function ManagerDashboard({
           },
         },
       },
-    }),
-    prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: orgId, managerId, status: "PENDING", deletedAt: null },
-      orderBy: { createdAt: "desc" },
-      take: 5,
-      include: { employee: { select: { name: true } } },
-    }),
-    prisma.invisibleWorkEntry.count({
-      where: { organizationId: orgId, managerId, status: "PENDING", deletedAt: null },
     }),
     prisma.user.findMany({
       where: { organizationId: orgId, managerId, role: "EMPLOYEE" },
@@ -562,263 +546,71 @@ export default async function ManagerDashboard({
     };
   });
 
-  return (
-    <>
-      {/* Header */}
-      <div className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <div className="mb-1 text-[11px] font-semibold uppercase tracking-widest text-foreground/50">
-            Kopsavilkums
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight">Komandas pārskats</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Neredzamais darbs · {periodLabel(period)}
-          </p>
-        </div>
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-          <PeriodTabs current={period} />
-          <Button asChild variant="outline" size="sm">
-            <Link href="/manager/report">
-              <TrendingUp className="h-4 w-4" /> Pilna atskaite
-            </Link>
-          </Button>
-        </div>
-      </div>
+  const periodCaption = periodLabel(period);
+  const periodBadge = period === "all" ? "Viss" : period.replace("d", " d.");
 
-      {/* KPI strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 mb-8">
-        {[
-          { label: "Darbinieki", value: teamCount, icon: Users, sub: "komandā", delta: null as React.ReactNode },
-          {
-            label: "Kopā stundas",
-            value: `${totalHours}h`,
-            icon: Clock,
-            sub: "ierakstītas",
-            delta: <DeltaBadge current={curWindowHours} previous={prevWindowHours} label={deltaLabel} />,
-          },
-          { label: "Papildu darbs", value: `${extraHours}h`, icon: FileText, sub: "nereģistrēts", delta: null as React.ReactNode },
-          {
-            label: "Izskatīšana",
-            value: avgApprovalDays !== null ? `${avgApprovalDays}d` : "-",
-            icon: Timer,
-            sub: "vid. laiks",
-            delta: null as React.ReactNode,
-          },
-        ].map((k, i) => (
-          <Card key={i} className="p-4">
-            <div className="flex items-center gap-1.5 text-muted-foreground mb-1">
-              <k.icon className="h-4 w-4" />
-              <span className="text-xs">{k.label}</span>
-            </div>
-            <div className="flex items-baseline gap-2">
-              <div className="text-2xl font-bold tabular-nums">{k.value}</div>
-              {k.delta}
-            </div>
-            <div className="text-xs text-muted-foreground">{k.sub}</div>
-          </Card>
-        ))}
+  // Blocks inside a section sit in one column with an even gap; components that
+  // carry their own outer margin elsewhere get it reset here.
+  const stack = "flex flex-col gap-3 [&>*]:!mb-0 [&>*]:!mt-0";
+
+  // ── Kopsavilkums ──
+  const summaryContent = (
+    <div className={stack}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        <StatTile tint="neutral" icon={<Users />} title="Darbinieki" value={teamCount} description="Komandā" />
+        <StatTile
+          tint="neutral"
+          icon={<Clock />}
+          title="Kopā stundas"
+          value={`${totalHours}h`}
+          description={<DeltaBadge current={curWindowHours} previous={prevWindowHours} label={deltaLabel} />}
+        />
+        <StatTile tint="neutral" icon={<TrendingUp />} title="Papildu darbs" value={`${extraHours}h`} description="Nereģistrēts budžetā" />
+        <StatTile
+          tint="neutral"
+          icon={<Timer />}
+          title="Izskatīšana"
+          value={avgApprovalDays !== null ? `${avgApprovalDays}d` : "-"}
+          description="Vidējais laiks līdz lēmumam"
+        />
         <EntriesBreakdownCard
+          tint="neutral"
           label="Visi ieraksti"
           value={totalTeamEntries}
-          icon={<FileText className="h-5 w-5" />}
+          icon={<FileText />}
           breakdown={teamEntriesBreakdown}
         />
       </div>
+      <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdown} apple />
+    </div>
+  );
 
-      <CostCalculatorWidget extraMinutes={extraMinutes} dailyBreakdown={extraDailyBreakdown} />
-      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />
+  // ── Klienti ──
+  const clientsContent = (
+    <div className={stack}>
+      <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} apple />
       <ClientOverrunWidget
         overrunCount={overrunClientCount}
         totalClients={matrixRows.length}
         totalOverrunEur={totalOverrunEur}
         monthLabel={clientMonth.label}
         detailEventName="client-employee-matrix:open"
+        apple
       />
-      {matrixRows.length === 0 && (
-        <Card className="mb-8 p-5 text-center text-sm text-muted-foreground">
-          {clientMonth.label}: nav apstiprinātu ierakstu ar klientu.
-        </Card>
-      )}
-
-      {/* ── Komanda ── */}
-      {teamMembers.length > 0 && (
+      {matrixRows.length === 0 ? (
+        <div className={cn(METRIC_SURFACE, "p-5 text-center text-[13px] text-muted-foreground")}>
+          {clientMonth.label}: nav apstiprinātu ierakstu ar klientu
+        </div>
+      ) : (
         <>
-          <SectionDivider label="Komanda" />
-          <div className="mb-6 space-y-4">
-            {/* Adoption rate */}
-            <div className={`flex items-center justify-between gap-4 rounded-xl border px-5 py-3.5 ${
-              thisWeekActiveIds.size === teamMembers.length
-                ? "border-emerald-500/30 bg-emerald-500/5"
-                : thisWeekActiveIds.size === 0
-                ? "border-amber-500/30 bg-amber-500/5"
-                : "border-border bg-card"
-            }`}>
-              <div className="text-sm">
-                <span className="font-medium">Aktivitāte šonedēļ - </span>
-                <span className="font-semibold text-foreground">{thisWeekActiveIds.size}</span>
-                <span className="text-muted-foreground"> / {teamMembers.length} darbinieki</span>
-              </div>
-              <div className="flex items-center gap-1 shrink-0">
-                {teamMembers.map(m => (
-                  <div
-                    key={m.id}
-                    title={`${m.name}: ${thisWeekActiveIds.has(m.id) ? "aktīvs" : "nav ierakstu"}`}
-                    className={`h-2.5 w-2.5 rounded-full ${thisWeekActiveIds.has(m.id) ? "bg-emerald-500" : "bg-muted-foreground/30"}`}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Silent employees */}
-            {silentMembers.length > 0 && (
-              <div className="flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/[0.04] px-5 py-3.5">
-                <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
-                <p className="text-sm">
-                  <span className="font-medium">Nav logojuši 14+ dienas: </span>
-                  <span className="text-muted-foreground">{silentMembers.map(m => m.name).join(", ")}</span>
-                </p>
-              </div>
-            )}
-
-            {/* Heatmap + Workload */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              <Card className="p-5">
-                <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-                  Aktivitātes karte (8 nedēļas)
-                </div>
-                <TeamHeatmap rows={heatmapRows} weekLabels={weekSlots.map(w => w.label)} />
-              </Card>
-
-              {workloadRows.length > 0 && (
-                <Card className="p-5">
-                  <div className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-                    Darba noslodze ({periodLabel(period)})
-                  </div>
-                  <div className="space-y-2.5">
-                    {workloadRows.map(emp => {
-                      const pct = maxWorkload > 0 ? Math.round((emp.hours / maxWorkload) * 100) : 0;
-                      const overloaded = avgWorkload > 0 && emp.hours > avgWorkload * 2 && workloadRows.length > 1;
-                      return (
-                        <div key={emp.id} className="flex items-center gap-3">
-                          <div className="w-28 shrink-0 truncate text-xs">{emp.name}</div>
-                          <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                            <div
-                              className={`h-full rounded-full ${overloaded ? "bg-amber-500/70" : "bg-foreground/60"}`}
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                          <div className={`w-10 shrink-0 text-right text-xs tabular-nums ${overloaded ? "text-amber-500 font-semibold" : "text-muted-foreground"}`}>
-                            {emp.hours}h
-                          </div>
-                        </div>
-                      );
-                    })}
-                    {workloadRows.length > 1 && (
-                      <div className="pt-1.5 border-t border-border text-xs text-muted-foreground flex items-center justify-between">
-                        <span>Vidēji: {Math.round(avgWorkload * 10) / 10}h</span>
-                        {maxWorkload > avgWorkload * 2 && (
-                          <span className="text-amber-500 flex items-center gap-1">
-                            <AlertTriangle className="h-3 w-3" /> Nevienmērīga slodze
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Card>
-              )}
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* Analytics */}
-      {approved.length > 0 && (
-        <>
-          <SectionDivider label="Analītika" />
-
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 mb-6">
-            {/* Employee breakdown */}
-            {employeeBreakdown.length > 0 && (
-              <Card className="p-5">
-                <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                  Papildu darbs pa darbiniekiem
-                </div>
-                <div className="space-y-2.5">
-                  {employeeBreakdown.map((emp) => {
-                    const pct = Math.round((emp.extraH / maxEmpExtraH) * 100);
-                    return (
-                      <div key={emp.id} className="flex items-center gap-3">
-                        <div className="w-28 shrink-0 truncate text-xs">{emp.name}</div>
-                        <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-foreground/60 rounded-full"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <div className="w-10 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
-                          {emp.extraH}h
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </Card>
-            )}
-
-            {/* Hours trend */}
-            <HoursTrendChart
-              title="Papildu darba tendence"
-              data={weeklyTrendData}
-              badge={periodLabel(period)}
-            />
-          </div>
-
-          {/* Interruption pattern alert */}
-          {patternCategory && (
-            <div className="mb-6 flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/[0.04] p-4">
-              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5 text-amber-500" />
-              <div>
-                <div className="text-sm font-semibold">Sistemātisks traucējums</div>
-                <p className="mt-0.5 text-sm text-muted-foreground">
-                  Kategorija{" "}
-                  <span className="font-medium text-foreground">&ldquo;{patternCategory}&rdquo;</span>{" "}
-                  ir biežākā pēdējās 4 nedēļās - iespējama strukturāla problēma, ne gadījuma rakstura.
-                </p>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* Entry activity */}
-      {leaderboardRows.length > 0 && (
-        <>
-          <SectionDivider label="Ierakstu aktivitāte" />
-          <EntryLeaderboard
-            rows={leaderboardRows}
-            subtitle={periodLabel(period)}
-          />
-        </>
-      )}
-
-      {/* Employee → clients matrix */}
-      {matrixRows.length > 0 && (
-        <>
-          <SectionDivider label="Darbinieku klienti" />
           <EmployeeClientMatrix
             rows={matrixRows}
             employees={matrixEmployees}
             monthLabel={clientMonth.label}
             assignments={clientAssignments}
+            apple
           />
-        </>
-      )}
-
-      {/* Client x Employee matrix */}
-      {matrixRows.length > 0 && (
-        <>
-          <SectionDivider label="Noslodze pa darbiniekiem" />
-          <div id="client-employee-matrix" className="mb-8 scroll-mt-20">
+          <div id="client-employee-matrix" className="scroll-mt-20">
             <ClientEmployeeMatrix
               rows={matrixRows}
               employees={matrixEmployees}
@@ -827,111 +619,277 @@ export default async function ManagerDashboard({
               detailEventName="client-employee-matrix:open"
               selectedMonth={clientMonth.key}
               monthOptions={availableClientMonths}
+              apple
             />
           </div>
         </>
       )}
-
-      {/* Client budget forecast */}
       {clientForecasts.length > 0 && (
-        <>
-          <SectionDivider label="Klientu budžets" />
-          <Card className="mb-8 overflow-hidden p-0">
-            <div className="flex items-center gap-2 border-b border-border/60 px-5 py-3">
-              <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                Budžeta brīdinājumi
-              </span>
-              <span className="ml-auto text-xs text-muted-foreground">{clientForecasts.length} klients/-i</span>
+        <div className={cn(METRIC_SURFACE, "overflow-hidden")}>
+          <div className="flex items-center justify-between gap-4 px-5 pb-2 pt-5">
+            <div className={cn(APPLE_CARD_LABEL, TINT_TILE.orange)}>
+              <AlertTriangle />
+              Budžeta brīdinājumi
             </div>
-            <div className="divide-y divide-border/30">
-              {clientForecasts.map((f) => {
-                const usedPct = Math.min(100, Math.round((f.usedMin / f.freeMin) * 100));
-                const urgent = f.daysLeft === 0;
-                const soon = f.daysLeft <= 2;
-                return (
-                  <div key={f.id} className="flex items-center gap-4 px-5 py-3.5">
-                    <div className="w-40 shrink-0 min-w-0">
-                      <div className="truncate text-sm font-medium">{f.name}</div>
-                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+            <span className={TILE_BADGE}>{clientForecasts.length} klients/-i</span>
+          </div>
+          <div>
+            {clientForecasts.map((f, i) => {
+              const usedPct = Math.min(100, Math.round((f.usedMin / f.freeMin) * 100));
+              const urgent = f.daysLeft === 0;
+              return (
+                <div key={f.id} className="pl-5">
+                  <div className={cn("flex items-center gap-4 py-3 pr-5", i > 0 && cn("border-t", APPLE_SEPARATOR))}>
+                    <div className="w-40 min-w-0 shrink-0">
+                      <div className="truncate text-[14px] font-medium">{f.name}</div>
+                      <div className="mt-0.5 text-[12px] text-muted-foreground">
                         {formatDurationLV(f.usedMin)} / {formatDurationLV(f.freeMin)} · {f.dailyRateH}h/d.
                       </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div className="min-w-0 flex-1">
+                      <div className={cn("h-1.5 overflow-hidden rounded-full", APPLE_FILL)}>
                         <div
-                          className={`h-full rounded-full ${urgent ? "bg-rose-500/70" : soon ? "bg-amber-500/70" : "bg-amber-400/50"}`}
+                          className={cn("h-full rounded-full", urgent ? TINT_FILL.red : TINT_FILL.orange)}
                           style={{ width: `${usedPct}%` }}
                         />
                       </div>
-                      <div className="mt-1 text-[10px] text-muted-foreground">{usedPct}% no mēneša limita</div>
+                      <div className="mt-1 text-[12px] text-muted-foreground">{usedPct}% no mēneša limita</div>
                     </div>
-                    <div className={`shrink-0 text-right text-xs font-semibold tabular-nums ${urgent ? "text-rose-400" : "text-amber-500"}`}>
+                    <div className={cn("w-16 shrink-0 text-right text-[14px] font-semibold tabular-nums", urgent ? METRIC_TINTS.red : METRIC_TINTS.orange)}>
                       {urgent ? "Šodien" : `~${Math.max(1, f.daysLeft)} d.`}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className={cn("border-t px-5 py-3", APPLE_SEPARATOR)}>
+            <p className="text-[12px] text-muted-foreground">
+              Prognoze balstīta uz šī mēneša vidējo tempu ({daysSoFar} dienas)
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ── Komanda ──
+  const teamContent = teamMembers.length > 0 && (
+    <div className={stack}>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className={cn(METRIC_SURFACE, "flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between")}>
+          <div>
+            <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral)}>
+              <Activity />
+              Aktivitāte šonedēļ
+            </div>
+            <div className="mt-2 text-[14px] text-muted-foreground">
+              <span className="font-display text-[22px] font-medium tabular-nums text-foreground">{thisWeekActiveIds.size}</span>
+              {" "}/ {teamMembers.length} darbinieki
+            </div>
+          </div>
+          <div className="flex max-w-[220px] flex-wrap items-center gap-1.5">
+            {teamMembers.map((m) => (
+              <div
+                key={m.id}
+                title={`${m.name}: ${thisWeekActiveIds.has(m.id) ? "aktīvs" : "nav ierakstu"}`}
+                className={cn("h-2.5 w-2.5 rounded-full", thisWeekActiveIds.has(m.id) ? TINT_FILL.green : APPLE_FILL)}
+              />
+            ))}
+          </div>
+        </div>
+        {silentMembers.length > 0 && (
+          <div className={cn(METRIC_SURFACE, "p-5")}>
+            <div className="flex items-center justify-between gap-4">
+              <div className={cn(APPLE_CARD_LABEL, TINT_TILE.orange)}>
+                <AlertTriangle />
+                Nav logojuši 14+ dienas
+              </div>
+              <span className={TILE_BADGE}>{silentMembers.length}</span>
+            </div>
+            <p className="mt-3 text-[14px]">{silentMembers.map((m) => m.name).join(", ")}</p>
+          </div>
+        )}
+      </div>
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        <div className={cn(METRIC_SURFACE, "p-5")}>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral)}>
+              <CalendarDays />
+              Aktivitātes karte
+            </div>
+            <span className={TILE_BADGE}>8 nedēļas</span>
+          </div>
+          <TeamHeatmap rows={heatmapRows} weekLabels={weekSlots.map((w) => w.label)} apple />
+        </div>
+
+        {workloadRows.length > 0 && (
+          <div className={cn(METRIC_SURFACE, "p-5")}>
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral)}>
+                <Gauge />
+                Darba noslodze
+              </div>
+              <span className={TILE_BADGE}>{periodBadge}</span>
+            </div>
+            <div className="space-y-3">
+              {workloadRows.map((emp) => {
+                const pct = maxWorkload > 0 ? Math.round((emp.hours / maxWorkload) * 100) : 0;
+                const overloaded = avgWorkload > 0 && emp.hours > avgWorkload * 2 && workloadRows.length > 1;
+                return (
+                  <div key={emp.id} className="flex items-center gap-3">
+                    <div className="w-28 shrink-0 truncate text-[14px]">{emp.name}</div>
+                    <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", APPLE_FILL)}>
+                      <div
+                        className={cn("h-full rounded-full", overloaded ? TINT_FILL.orange : TINT_FILL.blue)}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    <div className={cn("w-14 shrink-0 text-right text-[13px] tabular-nums", overloaded ? cn("font-semibold", METRIC_TINTS.orange) : "text-muted-foreground")}>
+                      {emp.hours}h
                     </div>
                   </div>
                 );
               })}
+              {workloadRows.length > 1 && (
+                <div className={cn("flex items-center justify-between border-t pt-3 text-[12px] text-muted-foreground", APPLE_SEPARATOR)}>
+                  <span>Vidēji: {Math.round(avgWorkload * 10) / 10}h</span>
+                  {maxWorkload > avgWorkload * 2 && (
+                    <span className={cn("flex items-center gap-1", METRIC_TINTS.orange)}>
+                      <AlertTriangle className="h-3.5 w-3.5" /> Nevienmērīga slodze
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
-            <div className="border-t border-border/40 bg-muted/10 px-5 py-2.5">
-              <p className="text-[11px] text-muted-foreground">
-                Prognoze balstīta uz šī mēneša vidējo tempu ({daysSoFar} dienas).
-              </p>
-            </div>
-          </Card>
-        </>
-      )}
-
-      {/* Top categories */}
-      {categoryItems.length > 0 && (
-        <>
-          <SectionDivider label="Kategorijas" />
-          {workNatureRows.length > 0 && (
-            <div className="mb-4">
-              <WorkNatureCard
-                rows={workNatureRows}
-                totalEntries={approved.length}
-                helpPairs={helpPairs}
-              />
-            </div>
-          )}
-          <Card className="mb-8 p-4">
-            <CategoryList items={categoryItems} patternCategory={patternCategory} />
-          </Card>
-        </>
-      )}
-
-      {/* Pending manual entries */}
-      {pendingCount > 0 && (
-        <>
-          <SectionDivider label="Gaida manuālu apstiprinājumu" />
-          <div className="mb-8 space-y-3">
-            {pending.map((e) => (
-              <Card key={e.id}>
-                <CardContent className="p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-xs text-muted-foreground">
-                        {e.employee.name} · {categoryLabel(e.category)}
-                        {e.clientName ? ` · ${e.clientName}` : ""}
-                      </div>
-                      <div className="mt-0.5 text-sm font-medium truncate">{e.title}</div>
-                    </div>
-                    <div className="text-xs tabular-nums text-muted-foreground shrink-0">
-                      {e.durationMinutes} min
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-            <Button asChild variant="outline" className="w-full sm:w-auto">
-              <Link href="/manager/entries">
-                Skatīt visus {pendingCount} gaida ierakstus →
-              </Link>
-            </Button>
           </div>
-        </>
+        )}
+      </div>
+    </div>
+  );
+
+  // ── Analītika ──
+  const analyticsContent = approved.length > 0 && (
+    <div className={stack}>
+      {patternCategory && (
+        <div className={cn(METRIC_SURFACE, "p-5")}>
+          <div className={cn(APPLE_CARD_LABEL, TINT_TILE.orange)}>
+            <AlertTriangle />
+            Sistemātisks traucējums
+          </div>
+          <p className="mt-2 text-[14px] text-muted-foreground">
+            Kategorija{" "}
+            <span className="font-medium text-foreground">&ldquo;{patternCategory}&rdquo;</span>{" "}
+            ir biežākā pēdējās 4 nedēļās - iespējama strukturāla problēma, ne gadījuma rakstura.
+          </p>
+        </div>
       )}
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+        {employeeBreakdown.length > 0 && (
+          <div className={cn(METRIC_SURFACE, "p-5")}>
+            <div className="mb-4 flex items-center justify-between gap-4">
+              <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral)}>
+                <BarChart3 />
+                Papildu darbs pa darbiniekiem
+              </div>
+              <span className={TILE_BADGE}>{periodBadge}</span>
+            </div>
+            <div className="space-y-3">
+              {employeeBreakdown.map((emp) => {
+                const pct = Math.round((emp.extraH / maxEmpExtraH) * 100);
+                return (
+                  <div key={emp.id} className="flex items-center gap-3">
+                    <div className="w-28 shrink-0 truncate text-[14px]">{emp.name}</div>
+                    <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", APPLE_FILL)}>
+                      <div className={cn("h-full rounded-full", TINT_FILL.blue)} style={{ width: `${pct}%` }} />
+                    </div>
+                    <div className="w-14 shrink-0 text-right text-[13px] tabular-nums text-muted-foreground">{emp.extraH}h</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+        <HoursTrendChart tint="blue" iconTint="neutral" quietLabel title="Papildu darba tendence" data={weeklyTrendData} badge={periodCaption} />
+      </div>
+    </div>
+  );
+
+  // ── Kategorijas ──
+  const categoriesContent = categoryItems.length > 0 && (
+    <div className={stack}>
+      {workNatureRows.length > 0 && (
+        <WorkNatureCard rows={workNatureRows} totalEntries={approved.length} helpPairs={helpPairs} apple />
+      )}
+      <div className={cn(METRIC_SURFACE, "p-2")}>
+        <CategoryList items={categoryItems} patternCategory={patternCategory} apple />
+      </div>
+    </div>
+  );
+
+  const sections: OverviewSection[] = [
+    {
+      key: "summary",
+      label: "Kopsavilkums",
+      count: 6,
+      keywords: "Darbinieki Kopā stundas Papildu darbs Izskatīšana Visi ieraksti Neredzamo izmaksu aprēķins",
+      content: summaryContent,
+    },
+    {
+      key: "clients",
+      label: "Klienti",
+      count: (overrunClientCount > 0 ? 1 : 0) + (matrixRows.length > 0 ? 2 : 1) + (clientForecasts.length > 0 ? 1 : 0),
+      keywords: "Klientu mēneša limiti pārsniegums Darbinieku klienti Noslodze pa darbiniekiem Budžeta brīdinājumi",
+      content: clientsContent,
+    },
+    ...(teamContent
+      ? [{
+          key: "team",
+          label: "Komanda",
+          count: 2 + (workloadRows.length > 0 ? 1 : 0) + (silentMembers.length > 0 ? 1 : 0),
+          keywords: "Aktivitāte šonedēļ Aktivitātes karte Darba noslodze Nav logojuši",
+          content: teamContent,
+        }]
+      : []),
+    ...(analyticsContent
+      ? [{
+          key: "analytics",
+          label: "Analītika",
+          count: 1 + (employeeBreakdown.length > 0 ? 1 : 0) + (patternCategory ? 1 : 0),
+          keywords: "Papildu darbs pa darbiniekiem tendence Sistemātisks traucējums",
+          content: analyticsContent,
+        }]
+      : []),
+    ...(leaderboardRows.length > 0
+      ? [{
+          key: "activity",
+          label: "Aktivitāte",
+          count: 1,
+          keywords: "Ierakstu aktivitāte",
+          content: <EntryLeaderboard rows={leaderboardRows} subtitle={periodCaption} apple />,
+        }]
+      : []),
+    ...(categoriesContent
+      ? [{
+          key: "categories",
+          label: "Kategorijas",
+          count: 1 + (workNatureRows.length > 0 ? 1 : 0),
+          keywords: "Darba raksturs Kas kuram palīdz kategorijas",
+          content: categoriesContent,
+        }]
+      : []),
+  ];
+
+  return (
+    <>
+      <h1 className="sr-only">Komandas pārskats</h1>
+
+      {/* The period switcher sits on the right of the shell's top bar. */}
+      <TopBarSlot>
+        <PeriodTabs current={period} apple />
+      </TopBarSlot>
+
+      <OverviewSections quiet sections={sections} />
     </>
   );
 }

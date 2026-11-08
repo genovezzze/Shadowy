@@ -105,16 +105,11 @@ export default async function EmployeeHistoryPage({
         title="Mana vēsture"
         description="Visi jūsu iesniegtie darba ieraksti un to statuss."
         actions={
-          <>
-            <Button asChild variant="outline">
-              <a href={buildExportHref(searchParams)}>
-                <Download className="h-4 w-4" /> Eksportēt CSV
-              </a>
-            </Button>
-            <Button asChild className="!min-h-10 !rounded-[10px]">
-              <Link href="/employee/new-entry">Jauns ieraksts</Link>
-            </Button>
-          </>
+          <Button asChild variant="outline">
+            <a href={buildExportHref(searchParams)}>
+              <Download className="h-4 w-4" /> Eksportēt CSV
+            </a>
+          </Button>
         }
       />
 

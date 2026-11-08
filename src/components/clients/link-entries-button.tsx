@@ -29,7 +29,7 @@ export function LinkEntriesButton() {
 
   if (result) {
     return (
-      <div className="flex items-center gap-1.5 text-sm text-emerald-500">
+      <div className="flex items-center gap-1.5 text-sm text-[#248A3D] dark:text-[#30D158]">
         <CheckCircle2 className="h-4 w-4 shrink-0" />
         {result}
       </div>

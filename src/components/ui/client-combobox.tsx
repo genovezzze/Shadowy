@@ -14,6 +14,8 @@ interface ClientComboboxProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  /** Extra classes for the trigger button, merged over the defaults. */
+  className?: string;
 }
 
 export function ClientCombobox({
@@ -21,6 +23,7 @@ export function ClientCombobox({
   value,
   onChange,
   placeholder = "Izvēlieties klientu (neobligāti)",
+  className,
 }: ClientComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -60,7 +63,8 @@ export function ClientCombobox({
         className={cn(
           "flex h-10 w-full items-center justify-between gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm ring-offset-background transition-shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
           "dark:border-white/[0.08] dark:bg-white/[0.03] dark:text-foreground dark:focus-visible:border-white/20 dark:focus-visible:ring-white/20",
-          !selected && "text-muted-foreground"
+          !selected && "text-muted-foreground",
+          className
         )}
       >
         <span className="truncate">{selected ? selected.name : placeholder}</span>

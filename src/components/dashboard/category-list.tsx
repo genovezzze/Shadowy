@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { APPLE_FILL, TINT_FILL } from "@/components/dashboard/apple";
 
 type TitleRow = {
   title: string;
@@ -18,7 +19,7 @@ type CategoryItem = {
   titles: TitleRow[];
 };
 
-function DrillPanel({ item }: { item: CategoryItem }) {
+function DrillPanel({ item, apple }: { item: CategoryItem; apple: boolean }) {
   return (
     <div className="mx-1 mb-2 mt-1 rounded-xl border border-border/50 bg-muted/10 overflow-hidden">
       <div className="px-4 py-2.5 border-b border-border/40 flex items-center justify-between">
@@ -34,7 +35,7 @@ function DrillPanel({ item }: { item: CategoryItem }) {
             <div className="flex-1 truncate text-xs text-foreground/80 min-w-0">{t.title}</div>
             <div className="w-28 h-1.5 bg-muted/60 rounded-full overflow-hidden shrink-0">
               <div
-                className="h-full bg-emerald-500/50 rounded-full"
+                className={`h-full rounded-full ${apple ? TINT_FILL.blue : "bg-emerald-500/50"}`}
                 style={{ width: `${t.barPct}%` }}
               />
             </div>
@@ -51,9 +52,12 @@ function DrillPanel({ item }: { item: CategoryItem }) {
 export function CategoryList({
   items,
   patternCategory,
+  apple = false,
 }: {
   items: CategoryItem[];
   patternCategory?: string | null;
+  /** Apple-style colours, used on the admin overview. */
+  apple?: boolean;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -72,9 +76,9 @@ export function CategoryList({
                 hasTitles ? "cursor-pointer" : "cursor-default"
               } ${
                 isOpen
-                  ? "bg-muted/50 ring-1 ring-border/60"
+                  ? apple ? APPLE_FILL : "bg-muted/50 ring-1 ring-border/60"
                   : hasTitles
-                  ? "hover:bg-muted/40 ring-1 ring-transparent hover:ring-border/40"
+                  ? apple ? "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]" : "hover:bg-muted/40 ring-1 ring-transparent hover:ring-border/40"
                   : ""
               }`}
             >
@@ -91,10 +95,10 @@ export function CategoryList({
                 {cat.name}
                 {isPattern && " ⚠"}
               </div>
-              <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
+              <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${apple ? APPLE_FILL : "bg-muted"}`}>
                 <div
                   className={`h-full rounded-full transition-colors ${
-                    isPattern ? "bg-amber-500/70" : isOpen ? "bg-emerald-500/80" : "bg-foreground/40"
+                    isPattern ? "bg-amber-500/70" : apple ? TINT_FILL.blue : isOpen ? "bg-emerald-500/80" : "bg-foreground/40"
                   }`}
                   style={{ width: `${cat.pct}%` }}
                 />
@@ -106,7 +110,7 @@ export function CategoryList({
                 <div
                   className={`flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-medium shrink-0 transition-all ${
                     isOpen
-                      ? "bg-emerald-500/20 text-emerald-400"
+                      ? apple ? "bg-[#007AFF]/12 text-[#007AFF] dark:bg-[#0A84FF]/20 dark:text-[#4DA3FF]" : "bg-emerald-500/20 text-emerald-400"
                       : "bg-muted text-muted-foreground/60 group-hover:bg-muted/80 group-hover:text-foreground/70"
                   }`}
                 >
@@ -117,7 +121,7 @@ export function CategoryList({
                 </div>
               )}
             </button>
-            {isOpen && <DrillPanel item={cat} />}
+            {isOpen && <DrillPanel item={cat} apple={apple} />}
           </div>
         );
       })}

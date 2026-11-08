@@ -24,7 +24,7 @@ export default async function AdminSettingsPage() {
         description="Konfigurējiet organizācijas paziņojumu preferences."
       />
 
-      <Card className="max-w-2xl">
+      <Card>
         <CardContent className="p-6">
           <h2 className="text-sm font-semibold mb-1">E-pasta paziņojumi</h2>
           <p className="text-xs text-muted-foreground mb-4">

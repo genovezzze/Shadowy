@@ -1,5 +1,7 @@
 import { formatDurationLV } from "@/lib/utils";
 import type { HelpPair } from "@/lib/work-nature";
+import { cn } from "@/lib/utils";
+import { APPLE_SEPARATOR } from "@/components/dashboard/apple";
 
 function firstName(name: string): string {
   return name.split(" ")[0];
@@ -13,7 +15,7 @@ function initials(name: string): string {
  * the right, each link's thickness scaled to time spent. Framed as mutual aid,
  * not a ranking of people.
  */
-export function HelpFlowChart({ pairs }: { pairs: HelpPair[] }) {
+export function HelpFlowChart({ pairs, apple = false }: { pairs: HelpPair[]; apple?: boolean }) {
   if (pairs.length === 0) return null;
 
   // Distinct nodes per side, weighted by total minutes through them.
@@ -44,8 +46,8 @@ export function HelpFlowChart({ pairs }: { pairs: HelpPair[] }) {
   const maxMinutes = Math.max(...pairs.map((p) => p.minutes), 1);
 
   return (
-    <div className="border-t border-border/40 bg-muted/10 px-4 py-4">
-      <div className="mb-2 text-[10px] uppercase tracking-widest text-muted-foreground">
+    <div className={apple ? cn("border-t px-5 py-4", APPLE_SEPARATOR) : "border-t border-border/40 bg-muted/10 px-4 py-4"}>
+      <div className={apple ? "mb-2 text-[13px] text-muted-foreground" : "mb-2 text-[10px] uppercase tracking-widest text-muted-foreground"}>
         Kas kuram palīdz
       </div>
       <svg
@@ -68,7 +70,7 @@ export function HelpFlowChart({ pairs }: { pairs: HelpPair[] }) {
               key={i}
               d={`M ${leftX + 32} ${y1} C ${midX} ${y1}, ${midX} ${y2}, ${rightX - 32} ${y2}`}
               fill="none"
-              className="stroke-emerald-500"
+              className={apple ? "stroke-[#007AFF] dark:stroke-[#0A84FF]" : "stroke-emerald-500"}
               strokeWidth={sw}
               strokeOpacity={op}
               strokeLinecap="round"
@@ -83,8 +85,8 @@ export function HelpFlowChart({ pairs }: { pairs: HelpPair[] }) {
           const y = leftY.get(name)!;
           return (
             <g key={`l-${name}`}>
-              <circle cx={leftX} cy={y} r={17} className="fill-emerald-500/15 stroke-emerald-500/50" strokeWidth={1.5} />
-              <text x={leftX} y={y} dy="0.35em" textAnchor="middle" className="fill-emerald-600 dark:fill-emerald-400" fontSize="11" fontWeight="600">
+              <circle cx={leftX} cy={y} r={17} className={apple ? "fill-[#0A84FF]/15 stroke-[#0A84FF]/50" : "fill-emerald-500/15 stroke-emerald-500/50"} strokeWidth={1.5} />
+              <text x={leftX} y={y} dy="0.35em" textAnchor="middle" className={apple ? "fill-[#007AFF] dark:fill-[#4DA3FF]" : "fill-emerald-600 dark:fill-emerald-400"} fontSize="11" fontWeight="600">
                 {initials(name)}
               </text>
               <text x={leftX - 26} y={y} dy="0.35em" textAnchor="end" className="fill-foreground" fontSize="13" fontWeight="500">

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Layers } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_FILL, APPLE_SEPARATOR, METRIC_SURFACE, TINT_FILL, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 import type { HelpPair, WorkNatureBreakdown } from "@/lib/work-nature";
 import { formatDurationLV } from "@/lib/utils";
 import { HelpFlowChart } from "@/components/dashboard/help-flow-chart";
@@ -15,25 +17,38 @@ export function WorkNatureCard({
   rows,
   totalEntries,
   helpPairs = [],
+  apple = false,
 }: {
   rows: WorkNatureBreakdown[];
   totalEntries: number;
   helpPairs?: HelpPair[];
+  /** Apple-style surface and colours, used on the admin overview. */
+  apple?: boolean;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
   if (rows.length === 0) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-card">
-      <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
-        <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
-          Darba raksturs
-        </span>
-        <span className="text-[10px] text-muted-foreground/60">
-          {totalEntries} ieraksti
-        </span>
-      </div>
+    <div className={apple ? cn(METRIC_SURFACE, "overflow-hidden") : "overflow-hidden rounded-xl border border-border bg-card"}>
+      {apple ? (
+        <div className="flex items-center justify-between gap-4 px-5 pb-1 pt-5">
+          <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <Layers />
+            Darba raksturs
+          </div>
+          <span className="text-[13px] text-muted-foreground">{totalEntries} ieraksti</span>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between border-b border-border/40 px-4 py-2.5">
+          <span className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+            Darba raksturs
+          </span>
+          <span className="text-[10px] text-muted-foreground/60">
+            {totalEntries} ieraksti
+          </span>
+        </div>
+      )}
 
       <div className="space-y-0.5 p-3">
         {rows.map((row) => {
@@ -47,19 +62,19 @@ export function WorkNatureCard({
                   hasDetail ? "cursor-pointer" : "cursor-default"
                 } ${
                   isOpen
-                    ? "bg-muted/50 ring-1 ring-border/60"
+                    ? apple ? APPLE_FILL : "bg-muted/50 ring-1 ring-border/60"
                     : hasDetail
-                      ? "ring-1 ring-transparent hover:bg-muted/40 hover:ring-border/40"
+                      ? apple ? "hover:bg-black/[0.03] dark:hover:bg-white/[0.04]" : "ring-1 ring-transparent hover:bg-muted/40 hover:ring-border/40"
                       : ""
                 }`}
               >
                 <div className="w-44 shrink-0 truncate text-sm font-medium text-foreground/80">
                   {row.label}
                 </div>
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
+                <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", apple ? APPLE_FILL : "bg-muted")}>
                   <div
                     className={`h-full rounded-full ${
-                      isOpen ? "bg-emerald-500/80" : "bg-foreground/40"
+                      apple ? TINT_FILL.blue : isOpen ? "bg-emerald-500/80" : "bg-foreground/40"
                     }`}
                     style={{ width: `${row.barPct}%` }}
                   />
@@ -104,10 +119,10 @@ export function WorkNatureCard({
         })}
       </div>
 
-      {helpPairs.length > 0 && <HelpFlowChart pairs={helpPairs} />}
+      {helpPairs.length > 0 && <HelpFlowChart pairs={helpPairs} apple={apple} />}
 
-      <div className="border-t border-border/40 px-4 py-2">
-        <p className="text-[11px] text-muted-foreground">
+      <div className={apple ? cn("border-t px-5 py-3", APPLE_SEPARATOR) : "border-t border-border/40 px-4 py-2"}>
+        <p className={apple ? "text-[13px] text-muted-foreground" : "text-[11px] text-muted-foreground"}>
           Procenti no visiem ierakstiem, nevis no kategorijām - šis ir atsevišķs
           griezums, kas krustojas ar tām.
         </p>

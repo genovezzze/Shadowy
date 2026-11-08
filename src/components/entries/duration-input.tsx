@@ -21,10 +21,13 @@ export function DurationInput({
   name,
   id,
   defaultMinutes,
+  apple = false,
 }: {
   name: string;
   id?: string;
   defaultMinutes?: number;
+  /** Soft rounded field and blue chips, used on the new entry form. */
+  apple?: boolean;
 }) {
   const [hours, setHours] = useState(
     defaultMinutes != null && defaultMinutes >= 60
@@ -46,9 +49,16 @@ export function DurationInput({
     "w-10 bg-transparent text-right text-base font-semibold tabular-nums text-foreground outline-none placeholder:text-muted-foreground/50 [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none";
 
   return (
-    <div className="flex flex-col gap-2.5">
-      <div className="inline-flex w-fit items-stretch divide-x divide-input overflow-hidden rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0">
-        <label className="flex items-baseline gap-1.5 px-3.5 py-2.5">
+    <div className={apple ? "flex flex-wrap items-center gap-2" : "flex flex-col gap-2.5"}>
+      <div
+        className={cn(
+          "inline-flex w-fit items-stretch divide-x overflow-hidden",
+          apple
+            ? "h-10 [@media(min-height:1000px)]:h-12 rounded-xl border border-black/[0.08] bg-black/[0.02] divide-black/[0.08] focus-within:border-[#007AFF]/50 focus-within:ring-2 focus-within:ring-[#007AFF]/20 dark:border-white/[0.08] dark:bg-white/[0.04] dark:divide-white/[0.08] dark:focus-within:border-[#0A84FF]/50"
+            : "divide-input rounded-lg border border-input bg-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-0"
+        )}
+      >
+        <label className={cn("flex gap-1.5 px-3.5", apple ? "items-center" : "items-baseline py-2.5")}>
           <input
             id={id}
             type="number"
@@ -63,7 +73,7 @@ export function DurationInput({
           />
           <span className="text-sm text-muted-foreground">st.</span>
         </label>
-        <label className="flex items-baseline gap-1.5 px-3.5 py-2.5">
+        <label className={cn("flex gap-1.5 px-3.5", apple ? "items-center" : "items-baseline py-2.5")}>
           <input
             type="number"
             inputMode="numeric"
@@ -79,17 +89,26 @@ export function DurationInput({
         </label>
       </div>
 
-      <div className="flex flex-wrap gap-1.5">
+      <div className={cn("flex flex-wrap", apple ? "gap-1.5" : "gap-1.5")}>
         {PRESETS.map((p) => (
           <button
             key={p.m}
             type="button"
             onClick={() => setFromMinutes(p.m)}
             className={cn(
-              "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-              total === p.m
-                ? "border-foreground bg-foreground text-background"
-                : "border-input text-muted-foreground hover:bg-muted",
+              apple
+                ? cn(
+                    "h-8 rounded-full px-3 text-[14px] font-medium transition-colors [@media(min-height:1000px)]:h-9 [@media(min-height:1000px)]:px-3.5 [@media(min-height:1000px)]:text-[15px]",
+                    total === p.m
+                      ? "bg-[#007AFF] text-white dark:bg-[#0A84FF]"
+                      : "bg-black/[0.04] text-foreground/80 hover:bg-black/[0.07] hover:text-foreground dark:bg-white/[0.06] dark:hover:bg-white/[0.1]"
+                  )
+                : cn(
+                    "rounded-full border px-3 py-1 text-xs font-medium transition-colors",
+                    total === p.m
+                      ? "border-foreground bg-foreground text-background"
+                      : "border-input text-muted-foreground hover:bg-muted"
+                  ),
             )}
           >
             {p.label}

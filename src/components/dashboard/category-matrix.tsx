@@ -3,7 +3,9 @@
 import { useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Maximize2, X } from "lucide-react";
-import { Card } from "@/components/ui/card";
+import { Grid3x3 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_FILL, APPLE_SEPARATOR, METRIC_SURFACE, QUIET_LABEL, TINT_FILL, TINT_TILE } from "@/components/dashboard/apple";
 
 export interface MatrixAxis {
   key: string;
@@ -133,6 +135,59 @@ function MatrixTable({ rows, cols, allCols, minutes, hiddenCount, compact }: Mat
   );
 }
 
+interface MatrixListProps {
+  rows: MatrixAxis[];
+  cols: MatrixAxis[];
+  minutes: Record<string, Record<string, number>>;
+  /** Show at most this many columns per category; the rest fold into "+N". */
+  maxItems?: number;
+}
+
+/**
+ * Phones get the matrix as a list: each category with its non-empty columns,
+ * largest first, as thin bars. No sideways scrolling, nothing hidden behind a
+ * sticky column.
+ */
+function MatrixList({ rows, cols, minutes, maxItems }: MatrixListProps) {
+  return (
+    <div className="space-y-4">
+      {rows.map((r) => {
+        const items = cols
+          .map((c) => ({ col: c, min: minutes[r.key]?.[c.key] ?? 0 }))
+          .filter((x) => x.min > 0)
+          .sort((a, b) => b.min - a.min);
+        if (items.length === 0) return null;
+        const total = items.reduce((s, x) => s + x.min, 0);
+        const top = items[0].min;
+        const shown = maxItems ? items.slice(0, maxItems) : items;
+        const rest = items.length - shown.length;
+        return (
+          <div key={r.key}>
+            <div className="mb-2 flex items-baseline justify-between gap-3">
+              <span className="min-w-0 text-[14px] font-medium leading-snug">{r.label}</span>
+              <span className="shrink-0 text-[13px] font-semibold tabular-nums">{fmtHours(total)}</span>
+            </div>
+            <div className="space-y-1.5">
+              {shown.map(({ col, min }) => (
+                <div key={col.key} className="flex items-center gap-3">
+                  <span className="w-28 shrink-0 truncate text-[13px] text-muted-foreground" title={col.label}>
+                    {col.label}
+                  </span>
+                  <div className={cn("h-1.5 flex-1 overflow-hidden rounded-full", APPLE_FILL)}>
+                    <div className={cn("h-full rounded-full", TINT_FILL.blue)} style={{ width: `${(min / top) * 100}%` }} />
+                  </div>
+                  <span className="w-12 shrink-0 text-right text-[13px] tabular-nums">{fmtHours(min)}</span>
+                </div>
+              ))}
+              {rest > 0 && <div className="text-[12px] text-muted-foreground">+{rest} vēl</div>}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 function Legend() {
   return (
     <div className="flex items-center gap-2">
@@ -170,11 +225,17 @@ export function CategoryMatrix({
 
   return (
     <>
-      <Card className="overflow-hidden p-0">
+      <div className={cn(METRIC_SURFACE, "overflow-hidden")}>
         <div className="p-5">
-          <h2 className="text-sm font-semibold mb-1">{title}</h2>
-          <p className="text-xs text-muted-foreground mb-4">{description}</p>
-          <div className="overflow-x-auto">
+          <h2 className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <Grid3x3 />
+            {title}
+          </h2>
+          <p className="mb-4 mt-2 text-[13px] text-muted-foreground">{description}</p>
+          <div className="sm:hidden">
+            <MatrixList rows={visibleRows} cols={cols} minutes={minutes} maxItems={3} />
+          </div>
+          <div className="hidden overflow-x-auto sm:block">
             <MatrixTable
               rows={visibleRows}
               cols={visibleCols}
@@ -185,11 +246,11 @@ export function CategoryMatrix({
             />
           </div>
           {hiddenRowCount > 0 && (
-            <p className="mt-2 text-[11px] text-muted-foreground/60">
+            <p className="mt-2 text-[13px] text-muted-foreground">
               +{hiddenRowCount} vēl kategorijas
             </p>
           )}
-          <div className="mt-3">
+          <div className="mt-3 hidden sm:block">
             <Legend />
           </div>
         </div>
@@ -197,18 +258,21 @@ export function CategoryMatrix({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="flex w-full items-center justify-center gap-2 border-t border-teal-500/30 bg-teal-500/15 px-4 py-3.5 text-sm font-semibold text-teal-600 transition-colors hover:bg-teal-500/25 dark:text-teal-300"
+            className={cn(
+              "flex h-12 w-full items-center justify-center gap-2 border-t text-[14px] font-medium text-[#007AFF] transition-colors hover:bg-black/[0.03] dark:text-[#0A84FF] dark:hover:bg-white/[0.04]",
+              APPLE_SEPARATOR
+            )}
           >
-            <Maximize2 className="h-4 w-4" />
+            <Maximize2 className="h-3.5 w-3.5" />
             {`Skatīt visu - ${rows.length} kategorijas × ${cols.length}${unit ? ` ${unit}` : ""}`}
           </button>
         )}
-      </Card>
+      </div>
 
       <Dialog.Root open={open} onOpenChange={setOpen}>
         <Dialog.Portal>
           <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-          <Dialog.Content className="fixed left-1/2 top-1/2 z-50 flex h-[92vh] w-[96vw] -translate-x-1/2 -translate-y-1/2 flex-col overflow-hidden rounded-xl border border-border bg-card shadow-2xl focus:outline-none">
+          <Dialog.Content className="fixed inset-0 z-50 flex flex-col overflow-hidden bg-card focus:outline-none sm:inset-auto sm:left-1/2 sm:top-1/2 sm:h-[92vh] sm:w-[96vw] sm:-translate-x-1/2 sm:-translate-y-1/2 sm:rounded-xl sm:border sm:border-border sm:shadow-2xl">
             <div className="flex items-center justify-between gap-3 border-b border-border px-5 py-3">
               <div className="min-w-0">
                 <Dialog.Title className="text-sm font-semibold">{title}</Dialog.Title>
@@ -227,7 +291,10 @@ export function CategoryMatrix({
                 </button>
               </Dialog.Close>
             </div>
-            <div className="flex-1 overflow-auto px-2 py-1">
+            <div className="flex-1 overflow-y-auto px-5 py-4 sm:hidden">
+              <MatrixList rows={rows} cols={cols} minutes={minutes} />
+            </div>
+            <div className="hidden flex-1 overflow-auto px-2 py-1 sm:block">
               <MatrixTable
                 rows={rows}
                 cols={cols}
@@ -236,7 +303,7 @@ export function CategoryMatrix({
                 hiddenCount={0}
               />
             </div>
-            <div className="border-t border-border/40 bg-muted/10 px-5 py-2.5">
+            <div className="hidden border-t border-border/40 bg-muted/10 px-5 py-2.5 sm:block">
               <Legend />
             </div>
           </Dialog.Content>

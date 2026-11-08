@@ -115,7 +115,7 @@ export function RoleCard({ id, name, description, duties, assignedEmployees, all
 
         {/* Duties */}
         <div>
-          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">Officiālie pienākumi</div>
+          <div className="mb-2 text-[13px] font-medium text-muted-foreground">Officiālie pienākumi</div>
           {duties.length === 0 && (
             <p className="text-sm text-muted-foreground italic mb-2">Vēl nav pievienoti pienākumi.</p>
           )}
@@ -151,7 +151,7 @@ export function RoleCard({ id, name, description, duties, assignedEmployees, all
 
         {/* Assigned employees */}
         <div>
-          <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
+          <div className="mb-2 text-[13px] font-medium text-muted-foreground">
             Darbinieki ar šo lomu
           </div>
           {assignedEmployees.length === 0 ? (

@@ -10,6 +10,8 @@ import type { MatrixClientRow, MatrixEmployee } from "@/lib/client-matrix";
 import { normalizeClientName } from "@/lib/client-name";
 import type { ClientMonthOption } from "@/lib/client-month";
 import { ClientMonthDropdown } from "@/components/dashboard/client-month-selector";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_SEPARATOR, METRIC_SURFACE, METRIC_TINTS, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 
 function overrunEur(minutes: number, rateEur: number): number {
   return Math.round((minutes / 60) * rateEur);
@@ -36,9 +38,19 @@ function monthBreakdown(row: MatrixClientRow): string {
 const MAX_EMP_COLS = 8;
 const PREVIEW_ROWS = 5;
 
-function cellClasses(minutes: number, rowMax: number, overLimit: boolean): string {
+/** Apple blue (within the limit) and orange (over it), four steps each. */
+const APPLE_HEAT = {
+  within: ["bg-[#007AFF]/[0.1]", "bg-[#007AFF]/[0.18]", "bg-[#007AFF]/[0.28]", "bg-[#007AFF]/[0.4]"],
+  over: ["bg-[#FF9500]/[0.12]", "bg-[#FF9500]/[0.2]", "bg-[#FF9500]/[0.3]", "bg-[#FF9500]/[0.42]"],
+} as const;
+
+function cellClasses(minutes: number, rowMax: number, overLimit: boolean, apple = false): string {
   if (!minutes || !rowMax) return "";
   const r = minutes / rowMax;
+  if (apple) {
+    const steps = overLimit ? APPLE_HEAT.over : APPLE_HEAT.within;
+    return steps[Math.min(steps.length - 1, Math.floor(r * steps.length))];
+  }
   if (overLimit) {
     if (r < 0.33) return "bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300";
     if (r < 0.66) return "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200";
@@ -56,25 +68,28 @@ interface MatrixTableProps {
   hiddenCount: number;
   rateEur: number;
   compact?: boolean;
+  apple?: boolean;
 }
 
-function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixTableProps) {
+function MatrixTable({ rows, employees, hiddenCount, rateEur, compact, apple = false }: MatrixTableProps) {
   const cellPad = compact ? "px-1 py-1.5 sm:px-2" : "px-2 py-3";
   const namePad = compact ? "px-2 py-1.5 sm:px-3" : "px-5 py-3";
   const numPad = compact ? "px-2 py-1.5 sm:px-3" : "px-4 py-3";
   const textSize = compact ? "text-[11px] sm:text-xs" : "text-sm";
+  // Header cells: in the Apple variant they sit on the card surface, not a grey band.
+  const headBg = apple ? cn("bg-card dark:bg-card", APPLE_SEPARATOR) : "border-border bg-muted";
 
   return (
     <table className={`w-full border-separate border-spacing-0 ${compact ? "table-fixed" : ""} ${textSize}`}>
       <thead>
-        <tr className="border-b border-border bg-muted">
-          <th className={`${namePad} sticky left-0 top-0 z-40 border-b border-border bg-muted text-left text-xs font-medium text-muted-foreground ${compact ? "w-[98px] sm:w-28" : "w-36"}`}>
+        <tr className={apple ? "" : "border-b border-border bg-muted"}>
+          <th className={`${namePad} sticky left-0 top-0 z-40 border-b ${headBg} text-left text-xs font-medium text-muted-foreground ${compact ? "w-[98px] sm:w-28" : "w-36"}`}>
             Klients
           </th>
           {employees.map((emp) => (
             <th
               key={emp.id}
-              className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[42px] sm:min-w-[52px]" : "min-w-[68px]"}`}
+              className={`${cellPad} sticky top-0 z-30 border-b ${headBg} text-center text-xs font-medium text-muted-foreground ${compact ? "min-w-[42px] sm:min-w-[52px]" : "min-w-[68px]"}`}
             >
               <span className="block truncate max-w-[80px] mx-auto" title={emp.name}>
                 {emp.name.split(" ")[0]}
@@ -82,24 +97,24 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
             </th>
           ))}
           {hiddenCount > 0 && (
-            <th className={`${cellPad} sticky top-0 z-30 border-b border-border bg-muted text-center text-xs text-muted-foreground/50`}>
+            <th className={`${cellPad} sticky top-0 z-30 border-b ${headBg} text-center text-xs text-muted-foreground/50`}>
               +{hiddenCount}
             </th>
           )}
-          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-[10px] font-medium text-muted-foreground sm:text-xs`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b ${headBg} text-right text-[10px] font-medium text-muted-foreground sm:text-xs`}>
             Kopā
           </th>
           {!compact && (
-            <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground`}>
+            <th className={`${numPad} sticky top-0 z-30 border-b ${headBg} text-right text-xs font-medium text-muted-foreground`}>
               Limits
             </th>
           )}
-          <th className={`${numPad} sticky top-0 z-30 border-b border-border bg-muted text-right text-xs font-medium text-muted-foreground ${compact ? "hidden sm:table-cell" : ""}`}>
+          <th className={`${numPad} sticky top-0 z-30 border-b ${headBg} text-right text-xs font-medium text-muted-foreground ${compact ? "hidden sm:table-cell" : ""}`}>
             Statuss
           </th>
         </tr>
       </thead>
-      <tbody className="divide-y divide-border">
+      <tbody className={apple ? "divide-y divide-black/[0.08] dark:divide-white/[0.08]" : "divide-y divide-border"}>
         {rows.map((row) => {
           const overLimit = row.overrunMinutes > 0;
           const months = Math.max(1, row.monthlyMinutes.length);
@@ -113,10 +128,14 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
           return (
             <tr
               key={row.clientId}
-              className={`transition-colors hover:bg-muted/20 ${overLimit ? "bg-amber-500/[0.02]" : ""}`}
+              className={
+                apple
+                  ? "bg-card transition-colors hover:bg-black/[0.03] dark:bg-card dark:hover:bg-[#2a2a2e]"
+                  : `transition-colors hover:bg-muted/20 ${overLimit ? "bg-amber-500/[0.02]" : ""}`
+              }
             >
               <td
-                className={`${namePad} sticky left-0 z-10 max-w-[140px] bg-inherit font-medium hover:z-50`}
+                className={`${namePad} sticky left-0 z-10 max-w-[140px] bg-inherit hover:z-50 ${apple ? "" : "font-medium"}`}
               >
                 <div className="group relative min-w-0">
                   {row.clientId.startsWith("name:") ? (
@@ -136,12 +155,12 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               </td>
               {employees.map((emp) => {
                 const min = row.byEmployee[emp.id] ?? 0;
-                const cls = cellClasses(min, rowMax, overLimit);
+                const cls = cellClasses(min, rowMax, overLimit, apple);
                 return (
                   <td key={emp.id} className={`${cellPad} text-center`}>
                     {min > 0 ? (
                       <span
-                        className={`inline-block rounded px-1.5 py-0.5 text-xs tabular-nums font-medium ${cls}`}
+                        className={`inline-block px-1.5 py-0.5 text-xs tabular-nums font-medium ${apple ? "min-w-[44px] rounded-full text-foreground" : "rounded"} ${cls}`}
                       >
                         {Math.round((min / 60) * 10) / 10}h
                       </span>
@@ -179,18 +198,24 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
               )}
               <td className={`${numPad} text-right ${compact ? "hidden sm:table-cell" : ""}`}>
                 {overLimit ? (
-                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-500 tabular-nums whitespace-nowrap">
-                    <AlertTriangle className="h-3 w-3" />
+                  <span
+                    className={
+                      apple
+                        ? cn("inline-flex items-center gap-1 whitespace-nowrap text-xs font-semibold tabular-nums", METRIC_TINTS.orange)
+                        : "inline-flex items-center gap-1 text-xs font-semibold text-amber-500 tabular-nums whitespace-nowrap"
+                    }
+                  >
+                    {!apple && <AlertTriangle className="h-3 w-3" />}
                     +{Math.round((row.overrunMinutes / 60) * 10) / 10}h
                     {!compact && (
-                      <span className="font-normal text-amber-500/70">
+                      <span className={apple ? "font-normal text-muted-foreground" : "font-normal text-amber-500/70"}>
                         · −€{overrunEur(row.overrunMinutes, rateEur)}
                       </span>
                     )}
                   </span>
                 ) : row.freeMinutes !== null ? (
                   <span
-                    className="text-xs font-medium text-emerald-500"
+                    className={apple ? "text-xs text-muted-foreground" : "text-xs font-medium text-emerald-500"}
                     title={months > 1
                       ? `Neviens mēnesis nepārsniedz bezmaksas limitu. ${monthBreakdown(row)}`
                       : undefined}
@@ -209,7 +234,30 @@ function MatrixTable({ rows, employees, hiddenCount, rateEur, compact }: MatrixT
   );
 }
 
-function Legend() {
+function Legend({ apple = false }: { apple?: boolean }) {
+  if (apple) {
+    return (
+      <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[13px] text-muted-foreground">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {APPLE_HEAT.within.map((c) => (
+              <div key={c} className={`h-3 w-3 rounded-full ${c}`} />
+            ))}
+          </div>
+          klients ietilpst limitā - maz → daudz stundu
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {APPLE_HEAT.over.map((c) => (
+              <div key={c} className={`h-3 w-3 rounded-full ${c}`} />
+            ))}
+          </div>
+          klients pārsniedz limitu - jo tumšāks, jo lielāka daļa no darbinieka laika
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
       <div className="flex items-center gap-1.5">
@@ -244,6 +292,8 @@ interface ClientEmployeeMatrixProps {
   detailEventName?: string;
   selectedMonth: string;
   monthOptions: ClientMonthOption[];
+  /** Apple-style surface and colours, used on the admin overview. */
+  apple?: boolean;
 }
 
 export function ClientEmployeeMatrix({
@@ -254,6 +304,7 @@ export function ClientEmployeeMatrix({
   detailEventName,
   selectedMonth,
   monthOptions,
+  apple = false,
 }: ClientEmployeeMatrixProps) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -283,15 +334,23 @@ export function ClientEmployeeMatrix({
   const totalOverrunEur = rows.reduce((s, r) => s + overrunEur(r.overrunMinutes, hourlyRateEur), 0);
   const previewRows = rows.slice(0, PREVIEW_ROWS);
   const remainingCount = rows.length - previewRows.length;
+  // The Apple variant skips Card: its glass shadow and gradient would show through.
+  const Shell = apple ? "div" : Card;
 
   return (
     <>
-      <Card className="overflow-hidden p-0">
-        <div className="flex min-w-0 items-center justify-between gap-2 overflow-hidden border-b border-border/60 px-3 py-2 sm:px-4">
+      {/* isolate: the sticky header z-indexes stay inside this card instead of covering menus above it. */}
+      <Shell className={apple ? cn(METRIC_SURFACE, "isolate overflow-hidden") : "isolate overflow-hidden p-0"}>
+        <div
+          className={cn(
+            "flex min-w-0 items-center justify-between gap-2 overflow-hidden border-b",
+            apple ? cn(APPLE_SEPARATOR, "px-5 py-4") : "border-border/60 px-3 py-2 sm:px-4"
+          )}
+        >
           {overrunCount > 0 ? (
-            <div className="flex min-w-0 items-center gap-2">
+            <div className={apple ? cn(APPLE_CARD_LABEL, "min-w-0", TINT_TILE.orange, QUIET_LABEL) : "flex min-w-0 items-center gap-2"}>
               <AlertTriangle className="h-3.5 w-3.5 text-amber-500" />
-              <span className="truncate text-xs text-muted-foreground">
+              <span className={apple ? "truncate" : "truncate text-xs text-muted-foreground"}>
                 {overrunCount} {overrunCount === 1 ? "klients pārsniedz" : "klienti pārsniedz"} mēneša limitu
                 {totalOverrunEur > 0 && ` · kopā −€${totalOverrunEur}`}
                 {` · ${monthLabel}`}
@@ -301,23 +360,27 @@ export function ClientEmployeeMatrix({
             <span className="text-xs text-muted-foreground">{rows.length} klienti</span>
           )}
           {spansMonths && (
-            <span className="shrink-0 text-[11px] text-muted-foreground/70">
+            <span className={apple ? "hidden shrink-0 text-[13px] text-muted-foreground lg:inline" : "shrink-0 text-[11px] text-muted-foreground/70"}>
               Bezmaksas limits atjaunojas katru mēnesi - kolonna “Limits” rāda to par visu periodu
             </span>
           )}
         </div>
         <div className="overflow-x-auto">
-          <MatrixTable rows={previewRows} employees={visibleEmps} hiddenCount={hiddenCount} rateEur={hourlyRateEur} compact />
+          <MatrixTable rows={previewRows} employees={visibleEmps} hiddenCount={hiddenCount} rateEur={hourlyRateEur} compact apple={apple} />
         </div>
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="flex w-full items-center justify-center gap-2 border-t border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-600 transition-colors hover:bg-amber-500/20 dark:text-amber-400"
+          className={
+            apple
+              ? cn("flex h-12 w-full items-center justify-center gap-2 border-t text-[15px] transition-colors hover:bg-black/[0.03] dark:hover:bg-white/[0.04]", APPLE_SEPARATOR, METRIC_TINTS.blue)
+              : "flex w-full items-center justify-center gap-2 border-t border-amber-500/25 bg-amber-500/10 px-4 py-3 text-sm font-semibold text-amber-600 transition-colors hover:bg-amber-500/20 dark:text-amber-400"
+          }
         >
-          <Maximize2 className="h-4 w-4" />
+          {!apple && <Maximize2 className="h-4 w-4" />}
           {remainingCount > 0 ? `Skatīt visus ${rows.length} klientus pilnā skatā` : "Atvērt pilnā skatā"}
         </button>
-      </Card>
+      </Shell>
 
       <Dialog.Root open={open} onOpenChange={(o) => { setOpen(o); if (!o) setQuery(""); }}>
         <Dialog.Portal>
@@ -357,7 +420,7 @@ export function ClientEmployeeMatrix({
             </div>
             <div className="relative z-0 min-h-0 flex-1 isolate overflow-auto bg-card">
               {filteredRows.length > 0 ? (
-                <MatrixTable rows={filteredRows} employees={employees} hiddenCount={0} rateEur={hourlyRateEur} />
+                <MatrixTable rows={filteredRows} employees={employees} hiddenCount={0} rateEur={hourlyRateEur} apple={apple} />
               ) : (
                 <p className="px-5 py-8 text-center text-sm text-muted-foreground">
                   Nav klientu, kas atbilst meklējumam &ldquo;{query}&rdquo;.
@@ -365,7 +428,7 @@ export function ClientEmployeeMatrix({
               )}
             </div>
             <div className="relative z-40 shrink-0 border-t border-border/40 bg-card px-5 py-2.5">
-              <Legend />
+              <Legend apple={apple} />
             </div>
           </Dialog.Content>
         </Dialog.Portal>

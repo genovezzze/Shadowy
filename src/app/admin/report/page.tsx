@@ -212,7 +212,7 @@ export default async function AdminReportPage({
   const avgReviewDays = avgMs !== null ? Math.round((avgMs / 86400000) * 10) / 10 : null;
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto w-full print:max-w-4xl">
       {/* Screen header */}
       <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 print:hidden">
         <div>

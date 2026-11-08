@@ -99,12 +99,12 @@ export default async function EmployeeBonusesPage() {
       {eligible.length > 0 && (
         <section className="mb-8">
           <h2 className="text-base font-semibold mb-3 flex items-center gap-2">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-[#34C759] dark:bg-[#30D158]" />
             Pieejami pieprasīšanai ({eligible.length})
           </h2>
           <div className="grid gap-3">
             {eligible.map(({ rule, result }) => (
-              <Card key={rule.id} className="border-emerald-500/20">
+              <Card key={rule.id}>
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -193,7 +193,7 @@ export default async function EmployeeBonusesPage() {
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-primary transition-all"
+                            className="h-full rounded-full bg-[#007AFF] transition-[width] dark:bg-[#0A84FF]"
                             style={{ width: `${result.progressPercent}%` }}
                           />
                         </div>

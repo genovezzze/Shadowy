@@ -154,7 +154,10 @@ export async function saveConfirmedSmartLogTickets(input: {
           organizationId: session.organizationId,
           userId: managerId,
           title: "Jauni darba ieraksti",
-          body: `${employee.name} pievienoja ${parsed.data.tickets.length} ierakstus - tie automātiski apstiprināti.`,
+          body:
+            parsed.data.tickets.length === 1
+              ? `${employee.name} pievienoja 1 ierakstu - tas automātiski apstiprināts.`
+              : `${employee.name} pievienoja ${parsed.data.tickets.length} ierakstus - tie automātiski apstiprināti.`,
           link: "/manager/dashboard",
         },
       });

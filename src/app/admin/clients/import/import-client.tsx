@@ -105,7 +105,7 @@ export function ImportClient() {
   }
 
   return (
-    <div className="space-y-6 max-w-4xl">
+    <div className="space-y-6">
       {/* Upload zone */}
       <div
         className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border p-10 cursor-pointer hover:border-foreground/30 transition-colors"

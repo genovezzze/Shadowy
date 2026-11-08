@@ -55,7 +55,7 @@ export default async function MyRolePage() {
               </div>
 
               <div>
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-3">
+                <div className="mb-3 text-[13px] font-medium text-muted-foreground">
                   Oficiālie pienākumi
                 </div>
                 {role.duties.length === 0 ? (

@@ -56,7 +56,6 @@ export function EmployeeCard({ id, name, email, title, entryCount, workRoleName 
   if (mode === "edit") {
     return (
       <Card className="relative overflow-hidden p-0">
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
         <CardContent className="p-5">
           <form action={handleEdit} className="space-y-3">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -94,9 +93,8 @@ export function EmployeeCard({ id, name, email, title, entryCount, workRoleName 
 
   return (
     <Card className="relative overflow-hidden p-0">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent dark:block hidden" />
       <CardContent className="flex items-center gap-4 p-5">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-sm font-semibold text-emerald-400 ring-1 ring-emerald-500/20">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#007AFF]/12 text-[#007AFF] dark:bg-[#0A84FF]/20 dark:text-[#4DA3FF] text-sm font-semibold">
           {initials(name)}
         </div>
         <div className="min-w-0 flex-1">

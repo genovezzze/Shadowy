@@ -91,7 +91,7 @@ export function ClientAliasManager({
         </div>
       )}
 
-      {info && <p className="text-xs text-emerald-500">{info}</p>}
+      {info && <p className="text-xs text-[#248A3D] dark:text-[#30D158]">{info}</p>}
 
       {adding ? (
         <div className="space-y-2">

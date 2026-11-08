@@ -58,6 +58,9 @@ export function ClientMonthChart({ data }: { data: ChartItem[] }) {
             fontSize: 12,
           }}
           labelStyle={{ color: "hsl(var(--foreground))", fontWeight: 600 }}
+          // Bars are colored per Cell, so recharts has no series color for the
+          // row and falls back to black; pin it to the theme text color.
+          itemStyle={{ color: "hsl(var(--foreground))" }}
         />
         <Bar dataKey="minutes" radius={[4, 4, 0, 0]}>
           {data.map((entry, i) => (

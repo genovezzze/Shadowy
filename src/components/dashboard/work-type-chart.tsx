@@ -3,7 +3,9 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart as PieChartIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_SEPARATOR, METRIC_SURFACE, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 
 export interface WorkTypeDataPoint {
   name: string;
@@ -23,77 +25,64 @@ export function WorkTypeChart({ title, data }: WorkTypeChartProps) {
 
   const total = data.reduce((s, d) => s + d.value, 0);
 
-  if (!mounted) {
-    return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        </CardHeader>
-        <CardContent className="h-[180px]" />
-      </Card>
-    );
-  }
+  const header = (
+    <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+      <PieChartIcon />
+      {title}
+    </div>
+  );
 
-  if (total === 0) {
+  if (!mounted || total === 0) {
     return (
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center h-[180px] text-sm text-muted-foreground">
-          Nav apstiprinātu ierakstu
-        </CardContent>
-      </Card>
+      <div className={cn(METRIC_SURFACE, "p-5")}>
+        {header}
+        <div className="flex h-[220px] items-center justify-center text-[14px] text-muted-foreground">
+          {mounted ? "Nav apstiprinātu ierakstu" : null}
+        </div>
+      </div>
     );
   }
 
   const isDark = resolvedTheme !== "light";
-  const tooltipBg = isDark ? "rgba(8, 16, 30, 0.88)" : "#ffffff";
-  const tooltipBorder = isDark ? "rgba(255,255,255,0.10)" : "#e5e7eb";
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ResponsiveContainer width="100%" height={220}>
-          <PieChart>
-            <Pie
-              data={data.map((d) => ({ ...d, fill: d.color }))}
-              cx="50%"
-              cy="50%"
-              innerRadius={48}
-              outerRadius={68}
-              dataKey="value"
-              paddingAngle={3}
-              strokeWidth={0}
-            />
-            <Tooltip
-              contentStyle={{
-                background: tooltipBg,
-                border: `1px solid ${tooltipBorder}`,
-                borderRadius: "8px",
-                fontSize: 12,
-                color: isDark ? "#f9fafb" : "#111827",
-              }}
-              formatter={(value) => [value, ""]}
-            />
-          </PieChart>
-        </ResponsiveContainer>
+    <div className={cn(METRIC_SURFACE, "p-5")}>
+      {header}
+      <ResponsiveContainer width="100%" height={200}>
+        <PieChart>
+          <Pie
+            data={data.map((d) => ({ ...d, fill: d.color }))}
+            cx="50%"
+            cy="50%"
+            innerRadius={56}
+            outerRadius={76}
+            dataKey="value"
+            paddingAngle={3}
+            cornerRadius={4}
+            strokeWidth={0}
+          />
+          <Tooltip
+            contentStyle={{
+              background: isDark ? "#2c2c2e" : "#ffffff",
+              border: "none",
+              borderRadius: "12px",
+              boxShadow: "0 8px 24px rgba(0,0,0,0.25)",
+              fontSize: 13,
+              color: isDark ? "#ffffff" : "#000000",
+            }}
+            formatter={(value) => [value, ""]}
+          />
+        </PieChart>
+      </ResponsiveContainer>
 
-        <div className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1.5">
-          {data.map((d) => (
-            <div key={d.name} className="flex items-center gap-1.5">
-              <span
-                className="h-1.5 w-1.5 shrink-0 rounded-full"
-                style={{ backgroundColor: d.color }}
-              />
-              <span className="text-[11px] text-muted-foreground">{d.name}</span>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+      <div className={cn("mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1.5 border-t pt-3", APPLE_SEPARATOR)}>
+        {data.map((d) => (
+          <div key={d.name} className="flex items-center gap-1.5">
+            <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: d.color }} />
+            <span className="text-[13px] text-muted-foreground">{d.name}</span>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }

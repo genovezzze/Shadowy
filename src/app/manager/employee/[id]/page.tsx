@@ -201,8 +201,9 @@ export default async function ManagerEmployeeDetail({
         />
       ) : (
         <>
-          {/* Chart + categories */}
-          <div className="grid gap-6 lg:grid-cols-3 mb-8">
+          {/* Chart + categories. items-start: the chart keeps its own height
+              instead of stretching to match a long category list. */}
+          <div className="grid items-start gap-6 lg:grid-cols-3 mb-8">
             <Card className="lg:col-span-2">
               <CardContent className="p-5">
                 <h2 className="text-sm font-semibold mb-4">Pēdējie 6 mēneši</h2>
@@ -212,7 +213,7 @@ export default async function ManagerEmployeeDetail({
             <Card>
               <CardContent className="p-5">
                 <h2 className="text-sm font-semibold mb-4">Pēc kategorijas</h2>
-                <div className="space-y-3">
+                <div className="max-h-[240px] space-y-3 overflow-y-auto pr-1">
                   {catRows.map((c) => (
                     <div key={c.category}>
                       <div className="flex justify-between text-xs mb-1">
@@ -246,7 +247,7 @@ export default async function ManagerEmployeeDetail({
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
                         <div
-                          className="h-full rounded-full bg-emerald-500/60"
+                          className="h-full rounded-full bg-[#34C759] dark:bg-[#30D158]"
                           style={{ width: `${(c.minutes / maxClientMin) * 100}%` }}
                         />
                       </div>
@@ -309,7 +310,7 @@ function KpiCard({
         {icon}
         <span className="text-xs">{label}</span>
       </div>
-      <div className="text-2xl font-bold tabular-nums">{value}</div>
+      <div className="font-display text-[26px] font-medium tabular-nums">{value}</div>
       <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
     </Card>
   );

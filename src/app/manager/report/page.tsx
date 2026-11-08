@@ -316,11 +316,11 @@ export default async function ManagerReportPage({
   });
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto w-full print:max-w-4xl">
       {/* Screen-only header */}
       <div className="flex flex-col gap-4 mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-8 print:hidden">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Pilota atskaite</h1>
+          <h1 className="font-display text-[26px] font-medium leading-tight">Pilota atskaite</h1>
           <p className="text-sm text-muted-foreground mt-2">{org?.name} · {session.name}</p>
           <p className="text-sm text-muted-foreground">
             {fmtDate(periodStart)} - {fmtDate(now)}
@@ -362,7 +362,7 @@ export default async function ManagerReportPage({
               {k.icon}
               <span className="text-xs">{k.label}</span>
             </div>
-            <div className="text-2xl font-bold tabular-nums">{k.value}</div>
+            <div className="font-display text-[26px] font-medium tabular-nums">{k.value}</div>
             <div className="text-xs text-muted-foreground print:text-gray-400">{k.sub}</div>
           </div>
         ))}
@@ -377,7 +377,7 @@ export default async function ManagerReportPage({
         <div className="rounded-xl border border-border bg-card p-5 print:border-gray-200">
           <div className="space-y-3">
             {[
-              { label: "Ietilpst lomā", pct: inRolePct, count: workTypeCount.in_role, color: "bg-emerald-500", desc: "Darbs atbilst amata aprakstam" },
+              { label: "Ietilpst lomā", pct: inRolePct, count: workTypeCount.in_role, color: "bg-[#34C759] dark:bg-[#30D158]", desc: "Darbs atbilst amata aprakstam" },
               { label: "Papildu ieguldījums", pct: extraPct, count: workTypeCount.extra, color: "bg-indigo-500", desc: "Darbs ārpus oficāālās lomas" },
               { label: "Bez piesaistītas lomas", pct: noRolePct, count: workTypeCount.no_role, color: "bg-gray-400", desc: "Nav piesaistīta loma" },
             ].map((row, i) => (
@@ -408,7 +408,7 @@ export default async function ManagerReportPage({
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
                 <div className="w-full flex items-end" style={{ height: "56px" }}>
                   <div
-                    className="w-full rounded-t bg-emerald-500/70 print:bg-emerald-600"
+                    className="w-full rounded-t bg-[#34C759] dark:bg-[#30D158] print:bg-emerald-600"
                     style={{ height: `${Math.max((w.count / maxWeekCount) * 100, w.count > 0 ? 8 : 0)}%` }}
                     title={`${w.count} ieraksti`}
                   />
@@ -465,7 +465,7 @@ export default async function ManagerReportPage({
                         </span>
                       )}
                       {!isInactive && !isOverloaded && (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 print:bg-emerald-100 print:text-emerald-700">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-[#34C759]/15 px-2 py-0.5 text-xs font-medium text-[#248A3D] dark:text-[#30D158] print:bg-emerald-100 print:text-emerald-700">
                           <CheckCircle2 className="h-3 w-3" />Labi
                         </span>
                       )}
@@ -498,7 +498,7 @@ export default async function ManagerReportPage({
                     <div className="w-4 text-xs text-muted-foreground print:text-gray-400">{i + 1}.</div>
                     <div className="w-36 text-sm truncate">{categoryLabel(cat)}</div>
                     <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden print:bg-gray-100">
-                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${pct}%` }} />
+                      <div className="h-full rounded-full bg-[#34C759] dark:bg-[#30D158]" style={{ width: `${pct}%` }} />
                     </div>
                     <div className="text-xs text-muted-foreground tabular-nums w-16 text-right print:text-gray-400">
                       {count} · {pct}%
@@ -552,10 +552,10 @@ export default async function ManagerReportPage({
                         {c.registered ? (c.freeMinutes !== null ? `${Math.round((c.freeMinutes / 60) * 10) / 10}h` : "∞") : "-"}
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">
-                        {c.registered && c.overrun > 0 ? <span className="font-semibold text-amber-500">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
+                        {c.registered && c.overrun > 0 ? <span className="font-semibold text-[#C93400] dark:text-[#FF9F0A]">+{Math.round((c.overrun / 60) * 10) / 10}h</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
                       </td>
                       <td className="px-5 py-3 text-right tabular-nums">
-                        {c.registered && c.eur > 0 ? <span className="font-semibold text-amber-500">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
+                        {c.registered && c.eur > 0 ? <span className="font-semibold text-[#C93400] dark:text-[#FF9F0A]">€{c.eur}</span> : <span className="text-muted-foreground print:text-gray-400">-</span>}
                       </td>
                     </tr>
                   ))}
@@ -591,7 +591,7 @@ export default async function ManagerReportPage({
                 r.tone === "warning"
                   ? "border-amber-200 bg-amber-50 dark:border-amber-800/40 dark:bg-amber-900/10"
                   : r.tone === "success"
-                  ? "border-emerald-200 bg-emerald-50 dark:border-emerald-800/40 dark:bg-emerald-900/10"
+                  ? "border-[#34C759]/30 bg-[#34C759]/10"
                   : "border-border bg-card"
               }`}
             >
@@ -599,7 +599,7 @@ export default async function ManagerReportPage({
                 {r.tone === "warning" ? (
                   <AlertTriangle className="h-4 w-4 text-amber-500" />
                 ) : r.tone === "success" ? (
-                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <CheckCircle2 className="h-4 w-4 text-[#248A3D] dark:text-[#30D158]" />
                 ) : (
                   <TrendingUp className="h-4 w-4 text-blue-500" />
                 )}

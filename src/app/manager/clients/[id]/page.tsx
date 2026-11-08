@@ -213,7 +213,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
             </div>
             <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${thisMonthOverrun > 0 ? "bg-amber-500" : "bg-emerald-500"}`}
+                className={`h-full rounded-full transition-[width] ${thisMonthOverrun > 0 ? "bg-[#FF9500] dark:bg-[#FF9F0A]" : "bg-[#34C759] dark:bg-[#30D158]"}`}
                 style={{ width: `${Math.min(100, (thisMonthMinutes / limitMin) * 100)}%` }}
               />
             </div>
@@ -237,8 +237,9 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
         />
       ) : (
         <>
-          {/* Chart + categories */}
-          <div className="grid gap-6 lg:grid-cols-3 mb-8">
+          {/* Chart + categories. items-start: the chart keeps its own height
+              instead of stretching to match a long category list. */}
+          <div className="grid items-start gap-6 lg:grid-cols-3 mb-8">
             <Card className="lg:col-span-2">
               <CardContent className="p-5">
                 <h2 className="text-sm font-semibold mb-4">Pēdējie 6 mēneši</h2>
@@ -248,7 +249,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
             <Card>
               <CardContent className="p-5">
                 <h2 className="text-sm font-semibold mb-4">Pēc kategorijas</h2>
-                <div className="space-y-3">
+                <div className="max-h-[240px] space-y-3 overflow-y-auto pr-1">
                   {catRows.map(([cat, minutes]) => (
                     <div key={cat}>
                       <div className="flex justify-between text-xs mb-1">
@@ -284,7 +285,7 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                         <span className="text-muted-foreground">{formatDurationLV(emp.minutes)} · {emp.count} ieraksti</span>
                       </div>
                       <div className="h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div className="h-full rounded-full bg-emerald-500/60" style={{ width: `${(emp.minutes / maxEmpMin) * 100}%` }} />
+                        <div className="h-full rounded-full bg-[#34C759] dark:bg-[#30D158]" style={{ width: `${(emp.minutes / maxEmpMin) * 100}%` }} />
                       </div>
                     </div>
                   ))}
@@ -320,10 +321,10 @@ export default async function ClientProfilePage({ params }: { params: { id: stri
                           {limitMin !== null ? formatDurationLV(limitMin) : "∞"}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
-                          {overrun > 0 ? <span className="font-semibold text-amber-500">+{formatDurationLV(overrun)}</span> : <span className="text-emerald-500 text-xs">Ietilpst</span>}
+                          {overrun > 0 ? <span className="font-semibold text-[#C93400] dark:text-[#FF9F0A]">+{formatDurationLV(overrun)}</span> : <span className="text-[#248A3D] dark:text-[#30D158] text-xs">Ietilpst</span>}
                         </td>
                         <td className="px-4 py-3 text-right tabular-nums">
-                          {eur > 0 ? <span className="font-semibold text-amber-500">€{eur}</span> : <span className="text-muted-foreground">-</span>}
+                          {eur > 0 ? <span className="font-semibold text-[#C93400] dark:text-[#FF9F0A]">€{eur}</span> : <span className="text-muted-foreground">-</span>}
                         </td>
                       </tr>
                     ))}
@@ -384,7 +385,7 @@ function KpiCard({ icon, label, value, sub, warn }: { icon: React.ReactNode; lab
         {icon}
         <span className="text-xs">{label}</span>
       </div>
-      <div className={`text-2xl font-bold tabular-nums ${warn ? "text-amber-500" : ""}`}>{value}</div>
+      <div className={`font-display text-[26px] font-medium tabular-nums ${warn ? "text-[#C93400] dark:text-[#FF9F0A]" : ""}`}>{value}</div>
       <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>
     </Card>
   );

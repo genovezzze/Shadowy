@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Card, CardContent } from "@/components/ui/card";
-import { formatDurationLV } from "@/lib/utils";
+import { CalendarCheck } from "lucide-react";
+import { cn, formatDurationLV } from "@/lib/utils";
+import { APPLE_CARD_LABEL, METRIC_SURFACE, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 import { categoryLabel } from "@/lib/work-insights";
 
 export function DailyDigestCard({
@@ -16,28 +17,33 @@ export function DailyDigestCard({
 }) {
   if (totalCount === 0) {
     return (
-      <Card className="mb-8">
-        <CardContent className="flex items-center justify-between gap-4 p-5">
-          <p className="text-sm text-muted-foreground">
+      <div className={cn(METRIC_SURFACE, "flex items-center justify-between gap-4 p-4")}>
+        <div className="flex min-w-0 items-center gap-3">
+          <div className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <CalendarCheck />
+          </div>
+          <p className="text-[14px] text-muted-foreground">
             Šodien vēl nav neviena ieraksta. Kad pievienosi pirmo, šeit parādīsies dienas kopsavilkums.
           </p>
-          <Link
-            href="/employee/new-entry"
-            className="shrink-0 text-sm font-medium text-foreground underline underline-offset-4 hover:text-foreground/80"
-          >
-            Pievienot
-          </Link>
-        </CardContent>
-      </Card>
+        </div>
+        <Link
+          href="/employee/new-entry"
+          className="shrink-0 text-[14px] font-medium text-[#007AFF] hover:underline dark:text-[#0A84FF]"
+        >
+          Pievienot
+        </Link>
+      </div>
     );
   }
 
   return (
-    <Card className="mb-8">
-      <CardContent className="p-4">
-        <div className="mb-2.5 flex items-baseline gap-2">
-          <span className="text-sm font-semibold">Šodien</span>
-          <span className="text-xs text-muted-foreground">
+    <div className={cn(METRIC_SURFACE, "p-4")}>
+        <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span className={cn(APPLE_CARD_LABEL, TINT_TILE.neutral, QUIET_LABEL)}>
+            <CalendarCheck />
+            Šodien
+          </span>
+          <span className="text-[13px] text-muted-foreground">
             {totalCount} ieraksti · {formatDurationLV(totalMinutes)}
             {outsideRoleMinutes > 0 ? ` · ${formatDurationLV(outsideRoleMinutes)} ārpus lomas` : ""}
           </span>
@@ -46,14 +52,13 @@ export function DailyDigestCard({
         <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
           {entries.map((e) => (
             <div key={e.id} className="min-w-0">
-              <div className="truncate text-sm text-foreground/90" title={e.title}>{e.title}</div>
-              <div className="text-xs text-muted-foreground">
+              <div className="truncate text-[14px] font-medium" title={e.title}>{e.title}</div>
+              <div className="text-[13px] text-muted-foreground">
                 {categoryLabel(e.category)} · {formatDurationLV(e.durationMinutes)}
               </div>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+    </div>
   );
 }

@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { ChevronDown, Settings2, TrendingUp } from "lucide-react";
-import { formatDurationLV } from "@/lib/utils";
+import { cn, formatDurationLV } from "@/lib/utils";
+import { APPLE_CARD_LABEL, APPLE_PILL, APPLE_SEPARATOR, METRIC_SURFACE, TINT_FILL, TINT_TILE , QUIET_LABEL} from "@/components/dashboard/apple";
 
 const LV_DAYS_SHORT = ["Pirm", "Otr", "Tre", "Ceturt", "Piekt", "Sest", "Svētd"];
 
@@ -37,9 +38,11 @@ interface DailyBreakdownEntry {
 interface Props {
   extraMinutes: number;
   dailyBreakdown?: DailyBreakdownEntry[];
+  /** Apple-style surface and type, used on the admin overview. */
+  apple?: boolean;
 }
 
-export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Props) {
+export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [], apple = false }: Props) {
   const [mode, setMode] = useState<"hourly" | "monthly">("hourly");
   const [hourlyStr, setHourlyStr] = useState("20");
   const [monthlyStr, setMonthlyStr] = useState("");
@@ -142,21 +145,38 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
 
   if (extraMinutes === 0) return null;
 
+  // The Apple variant skips Card: its glass shadow and gradient would show through.
+  const Shell = apple ? "div" : Card;
+
   return (
     <>
-      <Card className="relative mb-8 border-amber-500/20 bg-amber-500/[0.03] p-0 dark:border-amber-500/15">
+      <Shell
+        className={cn(
+          "relative mb-8 p-0",
+          apple ? METRIC_SURFACE : "border-amber-500/20 bg-amber-500/[0.03] dark:border-amber-500/15"
+        )}
+      >
         <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <div className="mb-2 flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 shrink-0 text-amber-500" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            {apple ? (
+              <div className={cn(APPLE_CARD_LABEL, "mb-3", TINT_TILE.neutral, QUIET_LABEL)}>
+                <TrendingUp />
                 Neredzamo izmaksu aprēķins
-              </span>
-            </div>
+              </div>
+            ) : (
+              <div className="mb-2 flex items-center gap-2">
+                <TrendingUp className="h-4 w-4 shrink-0 text-amber-500" />
+                <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Neredzamo izmaksu aprēķins
+                </span>
+              </div>
+            )}
             {mounted ? (
               <>
-                <div className="text-4xl font-bold tabular-nums">€{cost.toLocaleString("de-DE")}</div>
-                <p className="mt-1 text-sm text-muted-foreground">
+                <div className={apple ? "font-display text-[34px] font-medium tracking-tight leading-none tabular-nums" : "text-4xl font-bold tabular-nums"}>
+                  €{cost.toLocaleString("de-DE")}
+                </div>
+                <p className={apple ? "mt-2 text-[15px] text-muted-foreground" : "mt-1 text-sm text-muted-foreground"}>
                   {hours}h papildu darba · {rateLabel} · nav atspoguļots budžetā
                 </p>
               </>
@@ -170,7 +190,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
               <button
                 type="button"
                 onClick={() => setDetailsOpen((v) => !v)}
-                className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+                className={apple ? APPLE_PILL : "flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"}
               >
                 <span>Detalizēti</span>
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${detailsOpen ? "rotate-180" : ""}`} />
@@ -180,7 +200,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
               ref={buttonRef}
               type="button"
               onClick={openPopup}
-              className="flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"
+              className={apple ? APPLE_PILL : "flex items-center gap-1.5 rounded-lg border border-border bg-background/60 px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted/60 hover:text-foreground"}
             >
               <Settings2 className="h-3.5 w-3.5" />
               <span>{mode === "monthly" && monthlyStr ? `€${monthlyStr}/mēn` : `€${hourlyStr}/h`}</span>
@@ -189,7 +209,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
         </div>
 
         {detailsOpen && breakdownRows.length > 0 && (
-          <div className="border-t border-amber-500/20 p-5 pt-4 dark:border-amber-500/15">
+          <div className={cn("border-t p-5 pt-4", apple ? APPLE_SEPARATOR : "border-amber-500/20 dark:border-amber-500/15")}>
             <div className="mb-3 flex overflow-hidden rounded-md border border-border text-xs w-fit">
               {(["week", "day"] as const).map((v) => (
                 <button
@@ -217,7 +237,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
                     <span className="w-24 shrink-0 text-muted-foreground">{row.label}</span>
                     <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted/60">
                       <div
-                        className="h-full rounded-full bg-amber-500/60"
+                        className={cn("h-full rounded-full", apple ? TINT_FILL.blue : "bg-amber-500/60")}
                         style={{ width: `${barPct}%` }}
                       />
                     </div>
@@ -233,7 +253,7 @@ export function CostCalculatorWidget({ extraMinutes, dailyBreakdown = [] }: Prop
             </div>
           </div>
         )}
-      </Card>
+      </Shell>
 
       {editing && mounted && (
         <div

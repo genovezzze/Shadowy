@@ -12,8 +12,8 @@ export function DataRequestForm() {
 
   if (done) {
     return (
-      <div className="flex items-start gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/[0.06] px-4 py-3.5">
-        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-500" />
+      <div className="flex items-start gap-3 rounded-xl border border-[#34C759]/30 bg-[#34C759]/10 px-4 py-3.5">
+        <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-[#248A3D] dark:text-[#30D158]" />
         <div className="text-sm">
           <div className="font-medium">Pieprasījums nosūtīts</div>
           <p className="mt-0.5 text-muted-foreground">

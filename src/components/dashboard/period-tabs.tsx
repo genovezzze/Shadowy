@@ -2,6 +2,7 @@
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { CHIP_GROUP, chipClass } from "@/components/dashboard/apple";
 import { startNavigationLoading } from "@/lib/navigation-loading";
 
 const PERIODS = [
@@ -11,7 +12,16 @@ const PERIODS = [
   { label: "Viss", value: "all" },
 ];
 
-export function PeriodTabs({ current, className }: { current: string; className?: string }) {
+export function PeriodTabs({
+  current,
+  className,
+  apple = false,
+}: {
+  current: string;
+  className?: string;
+  /** Pill group look, used on the admin overview. */
+  apple?: boolean;
+}) {
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -30,20 +40,28 @@ export function PeriodTabs({ current, className }: { current: string; className?
 
   return (
     <div
+      data-slot="segmented"
       className={cn(
-        "flex items-center gap-0.5 rounded-xl border border-border bg-muted/60 p-1 backdrop-blur-md dark:border-white/[0.09] dark:bg-white/[0.04] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
+        apple
+          ? CHIP_GROUP
+          : "flex items-center gap-0.5 rounded-xl border border-border bg-muted/60 p-1 backdrop-blur-md dark:border-white/[0.09] dark:bg-white/[0.04] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]",
         className
       )}
     >
       {PERIODS.map(({ label, value }) => (
         <button
           key={value}
+          data-state={active === value ? "active" : "inactive"}
           onClick={() => navigate(value)}
           className={cn(
-            "flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 sm:flex-initial sm:px-4 sm:text-xs",
-            active === value
-              ? "bg-card text-foreground shadow-sm dark:bg-white/[0.12] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
-              : "text-muted-foreground hover:bg-card/60 hover:text-foreground dark:hover:bg-white/[0.06]"
+            apple
+              ? cn(chipClass(active === value), "flex-1 justify-center sm:flex-initial")
+              : cn(
+                  "flex-1 whitespace-nowrap rounded-lg px-2 py-1.5 text-[11px] font-medium transition-all duration-150 sm:flex-initial sm:px-4 sm:text-xs",
+                  active === value
+                    ? "bg-card text-foreground shadow-sm dark:bg-white/[0.12] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.10)]"
+                    : "text-muted-foreground hover:bg-card/60 hover:text-foreground dark:hover:bg-white/[0.06]"
+                )
           )}
         >
           {label}

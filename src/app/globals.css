@@ -11,7 +11,9 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background: #070809;
+  /* Follows the viewer's theme (light, dark or slate). */
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
   opacity: 0;
   animation: app-loading-reveal 120ms ease forwards;
 }
@@ -709,23 +711,24 @@ body.client-case-open {
   .dark {
     color-scheme: dark;
 
-    --background: 0 0% 0%;
-    --foreground: 210 20% 94%;
+    /* #171719: one graphite for the page, the sidebar and the top bar. */
+    --background: 240 4% 9.4%;
+    --foreground: 0 0% 96%;
 
-    --card: 0 0% 5%;
-    --card-foreground: 210 20% 94%;
+    --card: 240 3% 14%;
+    --card-foreground: 0 0% 96%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 58%;
+    --muted: 240 3% 18%;
+    --muted-foreground: 240 4% 62%;
 
     --primary: 160 70% 22%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 210 20% 94%;
+    --secondary: 240 3% 18%;
+    --secondary-foreground: 0 0% 96%;
 
-    --accent: 0 0% 16%;
-    --accent-foreground: 210 20% 94%;
+    --accent: 240 3% 19%;
+    --accent-foreground: 0 0% 96%;
 
     --destructive: 0 63% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -736,14 +739,14 @@ body.client-case-open {
     --warning: 38 92% 55%;
     --warning-foreground: 0 0% 0%;
 
-    --border: 0 0% 16%;
-    --input: 0 0% 18%;
+    --border: 240 3% 19%;
+    --input: 240 3% 21%;
     --ring: 160 84% 39%;
 
-    --sidebar: 0 0% 0%;
-    --sidebar-foreground: 210 20% 94%;
-    --sidebar-accent: 0 0% 15%;
-    --sidebar-border: 0 0% 13%;
+    --sidebar: 240 4% 9.4%;
+    --sidebar-foreground: 0 0% 96%;
+    --sidebar-accent: 240 3% 17%;
+    --sidebar-border: 240 3% 16%;
 
     --kpi-default-glow: hsl(160 84% 45% / 0.15);
     --kpi-warning-glow: hsl(38 92% 50% / 0.15);
@@ -947,6 +950,28 @@ body.client-case-open {
 
 .animate-notif-in {
   animation: notif-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Notification side panel: slides in from the right over a dimmed page */
+@keyframes notif-drawer-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+@keyframes notif-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-notif-drawer-in {
+  animation: notif-drawer-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.animate-notif-backdrop-in {
+  animation: notif-backdrop-in 0.2s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-notif-drawer-in,
+  .animate-notif-backdrop-in {
+    animation: none;
+  }
 }
 
 /* Shimmering iridescent gradient text (e.g. hero accent) */
@@ -1345,24 +1370,6 @@ input[type="checkbox"]:focus-visible {
   cursor: pointer;
 }
 
-/* Native date picker: show a LIGHT calendar popup even in dark mode.
-   color-scheme:light makes the popup light, but it would also let the field's
-   translucent fill reveal a white native background, so give the field an
-   explicit opaque dark fill. The indicator icon is then dark, so invert it. */
-.dark input[type="date"],
-.slate input[type="date"] {
-  color-scheme: light;
-  /* Match the other fields (white/3% over the card), but opaque so the
-     light color-scheme does not reveal a white native background. */
-  background-color: color-mix(in srgb, hsl(var(--card)), #fff 3%);
-}
-.dark input[type="date"]::-webkit-calendar-picker-indicator,
-.slate input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  opacity: 0.75;
-  cursor: pointer;
-}
-
 /* Reusable glass card */
 .glass {
   backdrop-filter: blur(18px);
@@ -1608,7 +1615,7 @@ input[type="checkbox"]:focus-visible {
 
 /* Readability inside the authenticated application only. */
 .app-shell {
-  letter-spacing: 0.012em;
+  letter-spacing: 0;
 }
 
 .app-shell .text-xs {
@@ -1923,4 +1930,179 @@ input[type="checkbox"]:focus-visible {
 
 .atoms-gradient-text-reveal.is-static {
   background-position: 0 0;
+}
+
+/* ---------------------------------------------------------------------------
+   New design scope. Everything under `.ui-new` (see NewDesignScope) takes the
+   new look: white tiles with a hairline, pill buttons in Apple blue, soft
+   rounded fields, tinted badges. The primitives carry `data-slot` hooks; these
+   rules sit outside any layer and use !important so they win over the
+   primitives' own theme utilities without editing every call site.
+   --------------------------------------------------------------------------- */
+
+/* Cards */
+.ui-new [data-slot="card"] {
+  border-radius: 1rem !important;
+  border: 1px solid rgba(0, 0, 0, 0.07) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="card"],
+html:is(.dark, .slate).ui-new [data-slot="card"] {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  background: hsl(var(--card)) !important;
+}
+.ui-new [data-slot="card-title"] {
+  font-family: var(--font-display), var(--font-app), sans-serif;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+/* Page header */
+.ui-new [data-slot="page-header"] {
+  border-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+.ui-new [data-slot="page-title"] {
+  font-family: var(--font-display), var(--font-app), sans-serif;
+  font-weight: 500;
+  font-size: 26px;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* Buttons: pills; primary actions in Apple blue */
+.ui-new [data-slot="button"] {
+  border-radius: 9999px !important;
+  font-weight: 500 !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transform: none !important;
+}
+.ui-new [data-slot="button"]:is([data-variant="default"], [data-variant="solid"], [data-variant="success"]) {
+  border: 0 !important;
+  background: #007aff !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+.ui-new [data-slot="button"]:is([data-variant="default"], [data-variant="solid"], [data-variant="success"]):hover {
+  background: #0062cc !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="button"]:is([data-variant="default"], [data-variant="solid"], [data-variant="success"]),
+html:is(.dark, .slate).ui-new [data-slot="button"]:is([data-variant="default"], [data-variant="solid"], [data-variant="success"]) {
+  background: #0a84ff !important;
+}
+.ui-new [data-slot="button"][data-variant="outline"] {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+.ui-new [data-slot="button"][data-variant="outline"]:hover {
+  background: rgba(0, 0, 0, 0.03) !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="button"][data-variant="outline"],
+html:is(.dark, .slate).ui-new [data-slot="button"][data-variant="outline"] {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="button"][data-variant="outline"]:hover,
+html:is(.dark, .slate).ui-new [data-slot="button"][data-variant="outline"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+.ui-new [data-slot="button"][data-variant="secondary"] {
+  background: rgba(0, 0, 0, 0.05) !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="button"][data-variant="secondary"],
+html:is(.dark, .slate).ui-new [data-slot="button"][data-variant="secondary"] {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Fields: soft fill, rounded, blue focus */
+.ui-new [data-slot="field"] {
+  border-radius: 0.75rem !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  background-color: rgba(0, 0, 0, 0.02) !important;
+  box-shadow: none !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="field"],
+html:is(.dark, .slate).ui-new [data-slot="field"] {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.04) !important;
+}
+.ui-new [data-slot="field"]:focus-visible,
+.ui-new [data-slot="field"][data-state="open"] {
+  border-color: rgba(0, 122, 255, 0.5) !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.18) !important;
+}
+
+/* Popovers (select menus) */
+.ui-new [data-slot="popover"] {
+  border-radius: 1rem !important;
+}
+
+/* Badges: Apple tints by meaning */
+.ui-new [data-slot="badge"] {
+  border-color: transparent !important;
+  font-weight: 500;
+}
+.ui-new [data-slot="badge"][data-variant="default"] { background: rgba(0, 122, 255, 0.12) !important; color: #007aff !important; }
+.ui-new [data-slot="badge"][data-variant="success"] { background: rgba(52, 199, 89, 0.14) !important; color: #248a3d !important; }
+.ui-new [data-slot="badge"][data-variant="warning"] { background: rgba(255, 149, 0, 0.14) !important; color: #c93400 !important; }
+.ui-new [data-slot="badge"][data-variant="destructive"] { background: rgba(255, 59, 48, 0.12) !important; color: #d70015 !important; }
+:is(.dark, .slate) .ui-new [data-slot="badge"][data-variant="default"],
+html:is(.dark, .slate).ui-new [data-slot="badge"][data-variant="default"] { color: #0a84ff !important; }
+:is(.dark, .slate) .ui-new [data-slot="badge"][data-variant="success"],
+html:is(.dark, .slate).ui-new [data-slot="badge"][data-variant="success"] { color: #30d158 !important; }
+:is(.dark, .slate) .ui-new [data-slot="badge"][data-variant="warning"],
+html:is(.dark, .slate).ui-new [data-slot="badge"][data-variant="warning"] { color: #ff9f0a !important; }
+:is(.dark, .slate) .ui-new [data-slot="badge"][data-variant="destructive"],
+html:is(.dark, .slate).ui-new [data-slot="badge"][data-variant="destructive"] { color: #ff453a !important; }
+
+/* Empty states: a quiet tile instead of a dashed box */
+.ui-new [data-slot="empty-state"] {
+  border-radius: 1rem !important;
+  border-style: solid !important;
+  border-color: rgba(0, 0, 0, 0.07) !important;
+  background: #fff !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="empty-state"],
+html:is(.dark, .slate).ui-new [data-slot="empty-state"] {
+  border-color: rgba(255, 255, 255, 0.07) !important;
+  background: hsl(var(--card)) !important;
+}
+
+/* Old-style KPI tiles inside the new design: no glow, no gradient line */
+.ui-new [data-slot="kpi-glow"] {
+  display: none !important;
+}
+.ui-new [data-slot="kpi-icon"] {
+  box-shadow: none !important;
+}
+
+/* Period switcher as a pill group */
+.ui-new [data-slot="segmented"] {
+  border: 0 !important;
+  border-radius: 9999px !important;
+  background: rgba(0, 0, 0, 0.04) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="segmented"],
+html:is(.dark, .slate).ui-new [data-slot="segmented"] {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.ui-new [data-slot="segmented"] > button {
+  border-radius: 9999px !important;
+}
+.ui-new [data-slot="segmented"] > button[data-state="active"] {
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08) !important;
+}
+:is(.dark, .slate) .ui-new [data-slot="segmented"] > button[data-state="active"],
+html:is(.dark, .slate).ui-new [data-slot="segmented"] > button[data-state="active"] {
+  background: rgba(255, 255, 255, 0.14) !important;
 }

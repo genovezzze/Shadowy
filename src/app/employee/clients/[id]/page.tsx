@@ -131,7 +131,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
             <Clock className="h-4 w-4" />
             <span className="text-xs">Kopā ierakstīts</span>
           </div>
-          <div className="text-2xl font-bold tabular-nums">{formatDurationLV(totalMinutes)}</div>
+          <div className="font-display text-[26px] font-medium tabular-nums">{formatDurationLV(totalMinutes)}</div>
           <div className="text-xs text-muted-foreground mt-0.5">{entries.length} ieraksti</div>
         </Card>
         <Card className="p-4">
@@ -139,7 +139,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
             <Clock className="h-4 w-4" />
             <span className="text-xs">Šomēnes</span>
           </div>
-          <div className={`text-2xl font-bold tabular-nums ${thisMonthOverrun > 0 ? "text-amber-500" : ""}`}>
+          <div className={`font-display text-[26px] font-medium tabular-nums ${thisMonthOverrun > 0 ? "text-[#C93400] dark:text-[#FF9F0A]" : ""}`}>
             {thisMonthMinutes > 0 ? formatDurationLV(thisMonthMinutes) : "-"}
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
@@ -160,7 +160,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
             </div>
             <div className="h-2 rounded-full bg-muted overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${thisMonthOverrun > 0 ? "bg-amber-500" : "bg-emerald-500"}`}
+                className={`h-full rounded-full transition-[width] ${thisMonthOverrun > 0 ? "bg-[#FF9500] dark:bg-[#FF9F0A]" : "bg-[#34C759] dark:bg-[#30D158]"}`}
                 style={{ width: `${Math.min(100, (thisMonthMinutes / limitMin) * 100)}%` }}
               />
             </div>
@@ -176,8 +176,9 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
         />
       ) : (
         <>
-          {/* Chart + categories */}
-          <div className="grid gap-6 lg:grid-cols-3 mb-8">
+          {/* Chart + categories. items-start: the chart keeps its own height
+              instead of stretching to match a long category list. */}
+          <div className="grid items-start gap-6 lg:grid-cols-3 mb-8">
             <Card className="lg:col-span-2">
               <CardContent className="p-5">
                 <h2 className="text-sm font-semibold mb-4">Pēdējie 6 mēneši</h2>
@@ -188,7 +189,7 @@ export default async function EmployeeClientDetailPage({ params }: { params: { i
               <Card>
                 <CardContent className="p-5">
                   <h2 className="text-sm font-semibold mb-4">Pēc kategorijas</h2>
-                  <div className="space-y-3">
+                  <div className="max-h-[240px] space-y-3 overflow-y-auto pr-1">
                     {catRows.map(([cat, minutes]) => (
                       <div key={cat}>
                         <div className="flex justify-between text-xs mb-1">

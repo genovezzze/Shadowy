@@ -13,6 +13,7 @@ import { updateEntry } from "@/app/employee/history/actions";
 import { SMART_LOG_CATEGORIES, categoryDisplay, type SmartLogCategoryDef } from "@/lib/smart-log";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { Pencil } from "lucide-react";
+import { DateInput, localToday } from "@/components/ui/date-input";
 
 interface ClientOption {
   id: string;
@@ -49,7 +50,7 @@ export function EditEntryButton({
   const [pending, startTransition] = useTransition();
   const [selectedClientId, setSelectedClientId] = useState(clientId ?? "");
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = localToday();
 
   // The selectable set is role-scoped and categories can be retired, so an older
   // entry may hold a category that is no longer in the list. Keep it as an extra
@@ -113,14 +114,7 @@ export function EditEntryButton({
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="edit-workDate">Darba datums</Label>
-                <Input
-                  id="edit-workDate"
-                  name="workDate"
-                  type="date"
-                  required
-                  defaultValue={workDate}
-                  max={today}
-                />
+                <DateInput id="edit-workDate" name="workDate" required defaultValue={workDate} max={today} />
               </div>
             </div>
             <div className="grid gap-2">

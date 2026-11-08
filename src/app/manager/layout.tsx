@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { AppShell } from "@/components/layout/app-shell";
 import { isTrialExpired, getTrialDaysLeft } from "@/lib/trial";
 import { getUnreadNotificationCount } from "@/lib/notifications";
+import { NewDesignScope } from "@/components/layout/new-design-scope";
 
 export default async function ManagerLayout({
   children,
@@ -30,7 +31,7 @@ export default async function ManagerLayout({
       pendingCount={pendingCount}
       unreadNotificationCount={unreadNotificationCount}
     >
-      {children}
+      <NewDesignScope>{children}</NewDesignScope>
     </AppShell>
   );
 }

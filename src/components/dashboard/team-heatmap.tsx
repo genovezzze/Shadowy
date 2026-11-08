@@ -1,15 +1,20 @@
+import { APPLE_FILL, TINT_FILL } from "@/components/dashboard/apple";
+
 interface HeatmapRow {
   id: string;
   name: string;
   weeks: boolean[];
 }
 
+
 interface TeamHeatmapProps {
   rows: HeatmapRow[];
   weekLabels: string[];
+  /** Apple-style cells, used on the admin overview. */
+  apple?: boolean;
 }
 
-export function TeamHeatmap({ rows, weekLabels }: TeamHeatmapProps) {
+export function TeamHeatmap({ rows, weekLabels, apple = false }: TeamHeatmapProps) {
   if (rows.length === 0) return <p className="text-sm text-muted-foreground">Nav darbinieku.</p>;
 
   return (
@@ -33,7 +38,7 @@ export function TeamHeatmap({ rows, weekLabels }: TeamHeatmapProps) {
                 <td key={i} className="text-center py-0.5 px-0.5">
                   <div
                     title={`${weekLabels[i]}: ${active ? "aktīvs" : "nav ierakstu"}`}
-                    className={`inline-block h-5 w-5 rounded-sm ${active ? "bg-emerald-500/70" : "bg-muted"}`}
+                    className={`inline-block h-5 w-5 ${apple ? `rounded-[5px] ${active ? TINT_FILL.green : APPLE_FILL}` : `rounded-sm ${active ? "bg-emerald-500/70" : "bg-muted"}`}`}
                   />
                 </td>
               ))}

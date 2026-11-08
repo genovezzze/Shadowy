@@ -123,7 +123,7 @@ export function ProcessInsightsView({
           <div className="grid gap-6 xl:grid-cols-[1.35fr_0.65fr]">
             <section>
               <div className="mb-3">
-                <h2 className="text-lg font-semibold">Ieteikumi</h2>
+                <h2 className="font-display text-[17px] font-medium">Ieteikumi</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Ko mainīt vispirms un cik laika tas var atbrīvot
                 </p>
@@ -139,7 +139,7 @@ export function ProcessInsightsView({
 
             <section>
               <div className="mb-3">
-                <h2 className="text-lg font-semibold">Klientu slodze</h2>
+                <h2 className="font-display text-[17px] font-medium">Klientu slodze</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Lielākie klienti pēc patērētā laika</p>
               </div>
               <ClientLoadPanel
@@ -153,7 +153,7 @@ export function ProcessInsightsView({
           <section>
             <div className="mb-3 flex items-end justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold">Biežākie procesi</h2>
+                <h2 className="font-display text-[17px] font-medium">Biežākie procesi</h2>
                 <p className="mt-1 text-sm text-muted-foreground">Pirmie pieci pēc patērētā laika</p>
               </div>
               <Link href={tabHref("processes")} className="text-sm font-medium underline-offset-4 hover:underline">Skatīt visus</Link>

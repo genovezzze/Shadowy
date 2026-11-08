@@ -36,6 +36,7 @@ import {
 import { normalizeClientName } from "@/lib/client-name";
 import { normalizePersonName } from "@/lib/work-nature";
 import { NoClientsNotice } from "@/components/entries/no-clients-notice";
+import { DateInput, localToday } from "@/components/ui/date-input";
 
 interface ClientOption {
   id: string;
@@ -52,7 +53,7 @@ type ReviewTicket = SmartLogDraft & {
   helped_user_id: string | null;
 };
 
-const today = new Date().toISOString().slice(0, 10);
+const today = localToday();
 
 function roleLabel(value: boolean | null) {
   if (value === true) return "Ārpus lomas";
@@ -444,7 +445,7 @@ export function SmartWorkLog({
             ? "mx-auto w-full max-w-4xl pt-2"
             : preview
               ? "mx-auto flex min-h-[580px] w-full flex-col items-center justify-center"
-            : "w-full sm:mx-auto sm:flex sm:min-h-[calc(100vh-4rem)] sm:flex-col sm:items-center sm:justify-center"
+            : "w-full sm:mx-auto sm:flex sm:min-h-[calc(100vh-7rem)] sm:flex-col sm:items-center sm:justify-center"
         }
       >
         <VercelV0Chat
@@ -464,6 +465,7 @@ export function SmartWorkLog({
           isTranscribing={transcribing}
           recordingSeconds={recordingSeconds}
           compact={hasResults}
+          clients={clients}
         />
 
         {loading ? (
@@ -478,7 +480,7 @@ export function SmartWorkLog({
           </div>
         ) : null}
         {success ? (
-          <div className="mt-3 flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/5 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300">
+          <div className="mt-3 flex items-center gap-2 rounded-xl border border-[#34C759]/30 bg-[#34C759]/10 px-4 py-3 text-sm text-[#248A3D] dark:text-[#30D158]">
             <CheckCircle2 className="h-4 w-4" />
             {success}
           </div>
@@ -523,7 +525,7 @@ export function SmartWorkLog({
                 key={ticket.id}
                 className={
                   ticket.confirmed
-                    ? "border-emerald-500/30 dark:border-emerald-400/25"
+                    ? "border-[#007AFF]/40 dark:border-[#0A84FF]/40"
                     : undefined
                 }
               >
@@ -602,16 +604,11 @@ export function SmartWorkLog({
                         </div>
                         <div className="grid gap-2">
                           <Label htmlFor={`date-${ticket.id}`}>Datums</Label>
-                          <Input
+                          <DateInput
                             id={`date-${ticket.id}`}
-                            type="date"
                             max={today}
                             value={ticket.workDate}
-                            onChange={(event) =>
-                              updateTicket(ticket.id, {
-                                workDate: event.target.value,
-                              })
-                            }
+                            onChange={(workDate) => updateTicket(ticket.id, { workDate })}
                           />
                         </div>
                         <div className="grid gap-2">
@@ -699,7 +696,7 @@ export function SmartWorkLog({
                                   : { helped_user_id: null }),
                               })
                             }
-                            className="h-4 w-4 shrink-0 accent-emerald-500"
+                            className="h-4 w-4 shrink-0 accent-[#007AFF]"
                           />
                           <span>Palīdzība kolēģim</span>
                         </label>
@@ -812,7 +809,7 @@ export function SmartWorkLog({
                           <span>Klients: {ticket.client_name}</span>
                         ) : null}
                         {ticket.is_helping_colleague ? (
-                          <span className="text-emerald-500">
+                          <span className="text-[#248A3D] dark:text-[#30D158]">
                             Palīdzība kolēģim
                             {ticket.helped_user_id
                               ? `: ${
@@ -833,7 +830,7 @@ export function SmartWorkLog({
                       </p>
                       {ticket.business_impact ? (
                         <div className="mt-4 rounded-lg bg-muted/50 px-4 py-3">
-                          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          <div className="text-[13px] font-medium text-muted-foreground">
                             Ietekme uz darbu
                           </div>
                           <p className="mt-1 text-sm leading-6">
@@ -895,7 +892,7 @@ export function SmartWorkLog({
 
           <div className="mt-5 flex flex-col gap-4 rounded-xl border border-border bg-card p-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-2 text-sm text-muted-foreground">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#248A3D] dark:text-[#30D158]" />
               <span>
                 Ar vienu pogu tiks saglabāti visi iekļautie ieraksti.
               </span>

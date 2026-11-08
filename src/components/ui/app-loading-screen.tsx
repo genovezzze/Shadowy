@@ -8,7 +8,7 @@ export function AppLoadingScreen() {
       aria-live="polite"
       aria-label="Lapa tiek ielādēta"
     >
-      <PixelBrand variant="intro" />
+      <PixelBrand variant="intro" themed />
       <span className="sr-only">Lapa tiek ielādēta...</span>
     </div>
   );

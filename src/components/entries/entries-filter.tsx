@@ -12,6 +12,7 @@ import type { EntryStatus } from "@prisma/client";
 import { categoryLabel } from "@/lib/work-insights";
 import { parseEmployeeIds } from "@/lib/entry-filter";
 import { startNavigationLoading } from "@/lib/navigation-loading";
+import { DateInput } from "@/components/ui/date-input";
 
 const STATUSES: EntryStatus[] = ["PENDING", "APPROVED", "REJECTED", "RETURNED"];
 
@@ -62,8 +63,11 @@ export function EntriesFilter({
     (k) => params.get(k)
   );
 
-  function apply(form: HTMLFormElement) {
+  // `overrides` covers values the form can't see yet: DateInput reports a
+  // picked date before its hidden input re-renders with it.
+  function apply(form: HTMLFormElement, overrides: Record<string, string> = {}) {
     const data = new FormData(form);
+    for (const [key, value] of Object.entries(overrides)) data.set(key, value);
     const next = new URLSearchParams();
     for (const [key, value] of data.entries()) {
       const v = String(value).trim();
@@ -85,9 +89,10 @@ export function EntriesFilter({
       ref={formRef}
       onSubmit={onSubmit}
       onChange={(e) => {
-        // Auto-apply when a dropdown or date changes; free-text waits for submit.
+        // Auto-apply when a dropdown changes; free-text waits for submit and
+        // dates apply through DateInput's onChange once a full date is in.
         const target = e.target as HTMLElement;
-        if (target.tagName === "SELECT" || (target as HTMLInputElement).type === "date") {
+        if (target.tagName === "SELECT") {
           apply(e.currentTarget);
         }
       }}
@@ -185,12 +190,30 @@ export function EntriesFilter({
 
       <div className="grid gap-1.5">
         <Label htmlFor="from">No datuma</Label>
-        <Input id="from" name="from" type="date" defaultValue={params.get("from") ?? ""} />
+        <DateInput
+          key={`from-${params.get("from") ?? ""}`}
+          id="from"
+          name="from"
+          defaultValue={params.get("from") ?? ""}
+          onChange={(v) => {
+            // Leaving the field unchanged also reports a value; skip that.
+            if (v !== (params.get("from") ?? "") && formRef.current) apply(formRef.current, { from: v });
+          }}
+        />
       </div>
 
       <div className="grid gap-1.5">
         <Label htmlFor="to">Līdz datumam</Label>
-        <Input id="to" name="to" type="date" defaultValue={params.get("to") ?? ""} />
+        <DateInput
+          key={`to-${params.get("to") ?? ""}`}
+          id="to"
+          name="to"
+          defaultValue={params.get("to") ?? ""}
+          onChange={(v) => {
+            // Leaving the field unchanged also reports a value; skip that.
+            if (v !== (params.get("to") ?? "") && formRef.current) apply(formRef.current, { to: v });
+          }}
+        />
       </div>
 
       <div className="flex items-end gap-2">

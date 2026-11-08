@@ -1,6 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type { ReactNode } from "react";
+import type { MetricTint } from "@/components/dashboard/apple";
+import { StatTile } from "@/components/dashboard/stat-tile";
 
 interface KpiCardProps {
   label: string;
@@ -10,6 +12,8 @@ interface KpiCardProps {
   tone?: "default" | "warning" | "success" | "destructive" | "info" | "accent";
   className?: string;
   formal?: boolean;
+  /** Opts a formal card into the Apple style with this metric colour. */
+  tint?: MetricTint;
 }
 
 const TONE_STYLES: Record<
@@ -62,8 +66,13 @@ export function KpiCard({
   tone = "default",
   className,
   formal = false,
+  tint,
 }: KpiCardProps) {
   const t = TONE_STYLES[tone] ?? TONE_STYLES.default;
+
+  if (formal && tint) {
+    return <StatTile icon={icon} tint={tint} title={label} value={value} description={hint} className={className} />;
+  }
 
   if (formal) {
     return (
@@ -90,10 +99,11 @@ export function KpiCard({
     <Card className={cn("group relative overflow-hidden transition-colors duration-300 dark:hover:border-white/[0.10]", className)}>
       <div
         aria-hidden
+        data-slot="kpi-glow"
         className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-70 blur-2xl transition-opacity duration-300 group-hover:opacity-100 dark:block hidden"
         style={{ background: t.cornerGlow }}
       />
-      <div className={cn("absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent", t.line)} />
+      <div data-slot="kpi-glow" className={cn("absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent", t.line)} />
       <CardContent className="relative p-5 pt-5">
         {icon ? (
           <div
@@ -101,6 +111,7 @@ export function KpiCard({
               "mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ring-1 [&>svg]:h-4 [&>svg]:w-4",
               t.icon
             )}
+            data-slot="kpi-icon"
             style={{ boxShadow: `0 0 14px ${t.iconGlow}` }}
           >
             {icon}
