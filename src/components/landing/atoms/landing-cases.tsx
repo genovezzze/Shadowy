@@ -16,8 +16,8 @@ const OPEN_SLOTS: readonly {
     eyebrow: { lv: "Nākamais stāsts", en: "Next story" },
     title: { lv: "Šeit varētu būt jūsu uzņēmums", en: "Your company could be here" },
     text: {
-      lv: "Pievienojieties pilotam un padariet komandas neredzamo darbu izmērāmu",
-      en: "Join the pilot and make your team's invisible work measurable",
+      lv: "Pievienojieties pilotam un uzziniet, cik patiesībā izmaksā jūsu klienti",
+      en: "Join the pilot and find out what your clients really cost",
     },
   },
   {

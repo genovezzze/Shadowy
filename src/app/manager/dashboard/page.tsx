@@ -19,6 +19,7 @@ import { buildClientMatrix } from "@/lib/client-matrix";
 import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { EntryLeaderboard } from "@/components/dashboard/entry-leaderboard";
+import { ActivityChart } from "@/components/dashboard/activity-chart";
 import { EmployeeClientMatrix } from "@/components/dashboard/employee-client-matrix";
 import { DeltaBadge } from "@/components/dashboard/delta-badge";
 import { Activity, AlertTriangle, BarChart3, CalendarDays, Clock, FileText, Gauge, Timer, TrendingUp, Users } from "lucide-react";
@@ -197,6 +198,23 @@ function computeAvgApprovalDays(entries: ApprovedEntry[]): number | null {
     0
   );
   return Math.round((totalMs / entries.length / 86400000) * 10) / 10;
+}
+
+const LV_MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
+
+// Entries created per calendar month over the last 12 months, same shape as
+// the admin's organization activity chart.
+function buildMonthlyData(entries: { createdAt: Date }[]) {
+  const now = new Date();
+  return Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const count = entries.filter(
+      (e) => e.createdAt.getFullYear() === year && e.createdAt.getMonth() === month
+    ).length;
+    return { label: LV_MONTH_LABELS[month], value: count };
+  });
 }
 
 export default async function ManagerDashboard({
@@ -860,15 +878,18 @@ export default async function ManagerDashboard({
           content: analyticsContent,
         }]
       : []),
-    ...(leaderboardRows.length > 0
-      ? [{
-          key: "activity",
-          label: "Aktivitāte",
-          count: 1,
-          keywords: "Ierakstu aktivitāte",
-          content: <EntryLeaderboard rows={leaderboardRows} subtitle={periodCaption} apple />,
-        }]
-      : []),
+    {
+      key: "activity",
+      label: "Aktivitāte",
+      count: 1 + (leaderboardRows.length > 0 ? 1 : 0),
+      keywords: "Komandas aktivitāte Ierakstu aktivitāte",
+      content: (
+        <div className={stack}>
+          <ActivityChart tint="green" iconTint="neutral" quietLabel title="Komandas aktivitāte (pēdējie 12 mēneši)" data={buildMonthlyData(teamEntriesLastYear)} />
+          {leaderboardRows.length > 0 && <EntryLeaderboard rows={leaderboardRows} subtitle={periodCaption} apple />}
+        </div>
+      ),
+    },
     ...(categoriesContent
       ? [{
           key: "categories",

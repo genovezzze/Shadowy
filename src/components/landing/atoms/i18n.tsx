@@ -32,8 +32,8 @@ const STRINGS = {
 
   // Hero
   "hero.subtitle": {
-    lv: "Komandu slodzes pārskatāmības platforma: redziet neredzamo darbu, patieso noslodzi un dārgākos klientus",
-    en: "A team-workload transparency platform: see invisible work, the true load and your costliest clients",
+    lv: "Rīks grāmatvedības birojiem: redziet katra klienta stundas, patieso pašizmaksu un papildu darba iemeslus",
+    en: "For accounting firms: see each client's hours, true cost and the reasons behind extra work",
   },
   "hero.cta": { lv: "Sākt projektu", en: "Get started" },
   "hero.trust1": { lv: "30 dienas bez maksas", en: "30 days free" },
@@ -61,8 +61,8 @@ const STRINGS = {
   "cases.heading": { lv: "Pilotprojekti un klienti", en: "Pilot projects and clients" },
   "cases.done": { lv: "Realizēts", en: "Delivered" },
   "cases.pbText": {
-    lv: "Vienota platforma neredzamā darba, komandas slodzes un klientu izmaksu pārskatīšanai",
-    en: "A single platform for reviewing invisible work, team workload and client cost",
+    lv: "Klientu pašizmaksa, papildu darba iemesli un komandas slodze vienā pārskatā",
+    en: "Client cost, the reasons for extra work and team workload in one overview",
   },
   "cases.pbTag": { lv: "Grāmatvedības uzņēmums", en: "Accounting firm" },
   "cases.viewProject": { lv: "Skatīt projektu", en: "View project" },
@@ -83,14 +83,17 @@ const STRINGS = {
   "whatToLog.badge": { lv: "Saturs", en: "Content" },
   "whatToLog.heading": { lv: "Ko fiksē Shadowy", en: "What Shadowy logs" },
   "whatToLog.example": {
-    lv: "Piemērs: grāmatvedības uzņēmums",
-    en: "Example: an accounting firm",
+    lv: "Arī komandas iekšējais darbs",
+    en: "Also work inside the team",
   },
   "whatToLog.exampleNote": {
-    lv: "Kategorijas veidojam individuāli jūsu uzņēmumam - šis ir tikai piemērs tam, kā tās izskatās grāmatvedības komandā. Pilota sākumā tās sagatavojam kopā ar jums, atbilstoši tam, kā strādā jūsu komanda.",
-    en: "We build the categories individually for your company - this is only an example of how they look in an accounting team. At the start of the pilot we prepare them together with you, matching how your team actually works.",
+    lv: "Kategorijas pielāgojam jūsu birojam: varat pievienot savas, mainīt nosaukumus vai atsevišķus sarakstus grāmatvežiem un asistentiem. Pilota sākumā tās sagatavojam kopā ar jums.",
+    en: "We adapt the categories to your firm: add your own, rename them or keep separate lists for accountants and assistants. At the start of the pilot we set them up together with you.",
   },
   "whatToLog.notNeeded": { lv: "Nav jāfiksē", en: "No need to log" },
+  "whatToLog.routine": { lv: "Ikdienas darbs pie klienta", en: "Everyday work for a client" },
+  "whatToLog.extra": { lv: "Papildu darbs, ko rada klients", en: "Extra work a client causes" },
+  "whatToLog.custom": { lv: "+ jūsu kategorijas", en: "+ your own categories" },
 
   // Audience
   "audience.badge": { lv: "Lomas", en: "Roles" },
@@ -101,24 +104,24 @@ const STRINGS = {
   "pilotBanner.badge": { lv: "Pilots", en: "Pilot" },
   "pilotBanner.heading": { lv: "Izmēģiniet pilotu bez riska", en: "Try the pilot with no risk" },
   "pilotBanner.subtitle": {
-    lv: "Aizpildiet formu - sazināsimies 1-2 darba dienu laikā un palīdzēsim uzsākt pilotu jūsu komandā",
-    en: "Fill in the form - we'll get in touch within 1-2 business days and help you start the pilot in your team",
+    lv: "Aizpildiet formu, un mēs sazināsimies 1-2 darba dienu laikā un palīdzēsim uzsākt pilotu jūsu komandā",
+    en: "Fill in the form and we'll get in touch within 1-2 business days and help you start the pilot in your team",
   },
   "pilotBanner.cta": { lv: "Pieteikties pilotam", en: "Apply for the pilot" },
 
   // FAQ
   "faq.heading": { lv: "Biežāk uzdotie jautājumi", en: "Frequently asked questions" },
   "faq.subtitle": {
-    lv: "Ja neatrodat atbildi, uzdodiet jautājumu pieteikuma formā - mēs atbildēsim godīgi, arī tad, ja Shadowy jūsu situācijai neder",
-    en: "If you can't find an answer, ask in the application form - we'll answer honestly, even if Shadowy isn't right for your situation",
+    lv: "Ja neatrodat atbildi, uzdodiet jautājumu pieteikuma formā. Mēs atbildēsim godīgi, arī tad, ja Shadowy jūsu situācijai neder",
+    en: "If you can't find an answer, ask in the application form. We'll answer honestly, even if Shadowy isn't right for your situation",
   },
 
   // Contact
   "contact.badge": { lv: "Pieteikums", en: "Application" },
   "contact.heading": { lv: "Sāksim ar sarunu", en: "Let's start with a conversation" },
   "contact.subtitle": {
-    lv: "Pastāstiet par komandu - sazināsimies 1-2 darba dienu laikā Iepazīšanās zvans ilgst 20 minūtes, un ja Shadowy jūsu situācijai neder, mēs to pateiksim godīgi",
-    en: "Tell us about your team - we'll get in touch within 1-2 business days. The intro call lasts 20 minutes, and if Shadowy isn't right for your situation, we'll tell you honestly",
+    lv: "Pastāstiet par komandu, un mēs sazināsimies 1-2 darba dienu laikā. Iepazīšanās zvans ilgst 20 minūtes, un ja Shadowy jūsu situācijai neder, mēs to pateiksim godīgi",
+    en: "Tell us about your team and we'll get in touch within 1-2 business days. The intro call lasts 20 minutes, and if Shadowy isn't right for your situation, we'll tell you honestly",
   },
   "contact.sentTitle": { lv: "Pieteikums nosūtīts!", en: "Application sent!" },
   "contact.sentBody": {
@@ -132,8 +135,8 @@ const STRINGS = {
   "contact.selectPlaceholder": { lv: "Izvēlieties...", en: "Choose..." },
   "contact.comment": { lv: "Īss komentārs", en: "Short comment" },
   "contact.commentPlaceholder": {
-    lv: "Ko jūs vēlaties uzlabot komandā?",
-    en: "What would you like to improve in your team?",
+    lv: "Kurus klientus vai procesus vēlaties pārbaudīt?",
+    en: "Which clients or processes would you like to check?",
   },
   "contact.sending": { lv: "Sūta...", en: "Sending..." },
   "contact.submit": { lv: "Nosūtīt pieteikumu", en: "Send application" },

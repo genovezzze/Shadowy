@@ -35,7 +35,7 @@ export const organizationNode = {
   image: `${siteUrl}/images/shadowy-dashboard-wide.png`,
   email: "contact@shadowy.lv",
   description:
-    "Shadowy ir darba slodzes pārskatāmības rīks, kas palīdz uzņēmumiem ieraudzīt neredzamo darbu, papildu pienākumus un darba patieso pašizmaksu pa klientiem un projektiem.",
+    "Shadowy ir rīks grāmatvedības birojiem, kas parāda katra klienta patieso pašizmaksu: stundas, izmaksas un papildu darba iemeslus.",
   areaServed: { "@type": "Country", name: "Latvia" },
   knowsLanguage: ["lv", "en"],
   contactPoint: [
@@ -67,17 +67,18 @@ export const softwareApplicationNode = {
   "@id": `${siteUrl}/#software`,
   name: "Shadowy",
   applicationCategory: "BusinessApplication",
-  applicationSubCategory: "Workforce analytics",
+  applicationSubCategory: "Client profitability for accounting firms",
   operatingSystem: "Web, iOS, Android",
   url: siteUrl,
   inLanguage: "lv",
   description:
-    "Darba slodzes pārskatāmības rīks komandām: darbinieki strukturēti fiksē neredzamo darbu, vadītāji to izvērtē, un uzņēmums redz slodzi, fokusa zudumu un darba pašizmaksu pa klientiem.",
+    "Rīks grāmatvedības birojiem: darbinieki 30 sekundēs ieraksta darbu ar balsi vai tekstu, AI to sakārto, un vadītājs redz stundas, pašizmaksu un papildu darba iemeslus pa klientiem.",
   featureList: [
-    "Neredzamā darba fiksēšana ar AI melnrakstiem",
+    "Darba ieraksti 30 sekundēs ar balsi vai tekstu (AI melnraksts)",
+    "Stundas un pašizmaksa pa klientiem",
+    "Klienti, kas pārsniedz iekļauto laiku",
+    "Papildu darba iemesli pa kategorijām",
     "Vadītāja izskatīšana un apstiprināšana",
-    "Slodzes un fokusa zuduma pārskats",
-    "Darba pašizmaksa pa klientiem un projektiem",
     "Datu eksports",
   ],
   offers: {

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/landing/atoms/landing-page";
+import { getPilotStats } from "@/lib/pilot-stats";
 import {
   JsonLd,
   faqPageNode,
@@ -16,9 +17,9 @@ import {
 // someone searching the problem, and someone searching "shadowy" who is trying
 // to find *this* company. Leading with the description served the first and
 // buried the second - and the brand query is the one that was failing.
-const title = "Shadowy - neredzamā darba un komandas slodzes pārskats";
+const title = "Shadowy: cik patiesībā izmaksā katrs grāmatvedības klients";
 const description =
-  "Redziet komandas neredzamo darbu, fokusa zudumu un to, kuri klienti izmaksā visdārgāk. Shadowy ir darba slodzes pārskatāmības rīks - bez darbinieku novērošanas. 30 dienu bezmaksas pilots.";
+  "Shadowy rāda grāmatvedības birojam, cik stundu un naudas aiziet katram klientam un kāpēc. Ieraksts 30 sekundēs, bez novērošanas. 30 dienu bezmaksas pilots.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -54,7 +55,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+// The pilot figures in "Kam Shadowy noder" are recomputed once a day.
+export const revalidate = 86400;
+
+export default async function HomePage() {
+  const pilotStats = await getPilotStats();
   return (
     <>
       <JsonLd
@@ -65,7 +70,7 @@ export default function HomePage() {
           faqPageNode,
         ]}
       />
-      <LandingPage forcedLocale="lv" />
+      <LandingPage forcedLocale="lv" pilotStats={pilotStats} />
     </>
   );
 }

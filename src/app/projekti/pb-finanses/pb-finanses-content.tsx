@@ -26,7 +26,7 @@ const audiences: readonly L[] = [
 ];
 
 const keyFeatures: readonly L[] = [
-  { lv: "Papildu un neredzamā darba fiksēšana", en: "Logging extra and invisible work" },
+  { lv: "Darba fiksēšana pie konkrēta klienta", en: "Logging work against a specific client" },
   { lv: "Darba ierakstu sasaiste ar klientiem", en: "Linking work entries to clients" },
   { lv: "Komandas noslodzes pārskats", en: "Team workload overview" },
   { lv: "Klientam veltītā laika analīze", en: "Analysis of time spent per client" },
@@ -49,15 +49,15 @@ const projectDetails: readonly TitleText[] = [
   {
     title: { lv: "Uzņēmuma vajadzība", en: "The company's need" },
     text: {
-      lv: "Komanda jau iepriekš pētīja “slēpto darbu” - uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri ir nepieciešami kvalitatīvam servisam",
-      en: "The team had already been studying “hidden work” - tasks the client doesn't directly see and doesn't pay for separately, but which are needed for quality service",
+      lv: "Komanda jau iepriekš pētīja “slēpto darbu”: uzdevumus, kurus klients tieši neredz un par kuriem atsevišķi nemaksā, bet kuri ir nepieciešami kvalitatīvam servisam",
+      en: "The team had already been studying “hidden work”: tasks the client doesn't directly see and doesn't pay for separately, but which are needed for quality service",
     },
   },
   {
     title: { lv: "Ko izstrādājām", en: "What we built" },
     text: {
-      lv: "Shadowy pilotplatformu papildu darba fiksēšanai un analīzei, lai komanda reģistrētu darbu, bet vadība redzētu slodzi, atkārtojošos procesus un klientiem veltīto laiku",
-      en: "The Shadowy pilot platform for logging and analysing extra work, so the team records the work while management sees the load, recurring processes and time spent per client",
+      lv: "Shadowy pilotplatformu, kurā komanda reģistrē darbu pie konkrētiem klientiem, bet vadība redz katra klienta stundas, pašizmaksu, atkārtojošos procesus un komandas slodzi",
+      en: "The Shadowy pilot platform, where the team logs work against specific clients while management sees each client's hours and cost, recurring processes and the team's workload",
     },
   },
   {
@@ -70,8 +70,8 @@ const projectDetails: readonly TitleText[] = [
   {
     title: { lv: "Projekta formāts", en: "Project format" },
     text: {
-      lv: "Web platforma · Datu analītika · Komandas slodze · Pilotprojekts",
-      en: "Web platform · Data analytics · Team workload · Pilot project",
+      lv: "Web platforma · Klientu pašizmaksa · Komandas slodze · Pilotprojekts",
+      en: "Web platform · Client cost · Team workload · Pilot project",
     },
   },
 ];
@@ -81,8 +81,8 @@ const solutionSteps = [
     number: "01",
     title: { lv: "Fiksēt darbu", en: "Log the work" } as L,
     text: {
-      lv: "Komanda vienuviet reģistrē papildu darbu, pārtraukumus un uzdevumus, kas iepriekš palika ārpus ierastajām atskaitēm",
-      en: "The team records extra work, interruptions and tasks that previously fell outside the usual reports, all in one place",
+      lv: "Komanda 30 sekundēs ieraksta, pie kura klienta strādāja un ko darīja, arī to, kas iepriekš palika ārpus ierastajām atskaitēm",
+      en: "In 30 seconds the team notes which client they worked on and what they did, including what used to fall outside the usual reports",
     } as L,
   },
   {
@@ -97,8 +97,8 @@ const solutionSteps = [
     number: "03",
     title: { lv: "Ieraudzīt kopsakarības", en: "See the patterns" } as L,
     text: {
-      lv: "Vadība redz slodzi, atkārtojošos procesus, klientiem veltīto laiku un vietas, kurās rodas neplānotas izmaksas",
-      en: "Management sees the load, recurring processes, time spent per client and where unplanned costs arise",
+      lv: "Vadība redz, cik katrs klients izmaksā, kuri klienti pārsniedz iekļauto laiku un kāpēc, kā arī atkārtojošos procesus un komandas slodzi",
+      en: "Management sees what each client costs, which clients exceed their included time and why, plus recurring processes and team workload",
     } as L,
   },
 ];
@@ -136,10 +136,10 @@ const accountingFit: readonly TitleText[] = [
 
 const T = {
   badge: { lv: "Realizēts projekts / Grāmatvedība", en: "Delivered project / Accounting" },
-  h1: { lv: "Neredzamais darbs kļūst izmērāms", en: "Invisible work becomes measurable" },
+  h1: { lv: "Katra klienta pašizmaksa kļūst redzama", en: "The cost of every client becomes visible" },
   intro: {
-    lv: "Vienota platforma neredzamā darba, komandas slodzes un klientu izmaksu pārskatīšanai - izstrādāta kopā ar PB Finanses un pielāgojama arī jūsu grāmatvedības uzņēmumam.",
-    en: "A single platform for reviewing invisible work, team workload and client cost - built together with PB Finanses and adaptable to your accounting firm too.",
+    lv: "Stundas, pašizmaksa un papildu darba iemesli pa klientiem vienā pārskatā. Izstrādāts kopā ar PB Finanses un pielāgojams arī jūsu grāmatvedības birojam.",
+    en: "Hours, cost and the reasons for extra work per client in one overview. Built together with PB Finanses and adaptable to your accounting firm too.",
   },
   heroCta: { lv: "Vai tas der jūsu uzņēmumam?", en: "Is it right for your company?" },
   audiencesTitle: { lv: "Kam šis risinājums ir piemērots", en: "Who this solution is for" },
@@ -358,7 +358,7 @@ function PageBody() {
         <ReferenceListSection
           title={T.solutionTitle[locale]}
           items={solutionSteps.map(({ title, text, number }) => ({
-            title: { lv: `${number} - ${title.lv}`, en: `${number} - ${title.en}` } as L,
+            title: { lv: `${number}. ${title.lv}`, en: `${number}. ${title.en}` } as L,
             text,
           }))}
           bordered

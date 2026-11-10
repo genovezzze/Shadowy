@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Shadowy",
     short_name: "Shadowy",
     description:
-      "Ātrs neredzamā darba pieraksts telefonā vai datorā",
+      "Ātrs darba pieraksts pie klienta telefonā vai datorā",
     start_url: "/employee/smart-log",
     display: "standalone",
     background_color: "#000000",

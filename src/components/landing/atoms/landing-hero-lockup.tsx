@@ -377,10 +377,10 @@ export function LandingHeroLockup() {
           <h1 className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-2xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
             {locale === "lv" ? (
               <>
-                Komandu slodzes pārskatāmības platforma: redziet{" "}
-                <PixelWaveText text="neredzamo darbu" className="text-white/90" />, patieso{" "}
-                <PixelWaveText text="noslodzi" className="text-white/90" /> un{" "}
-                <PixelWaveText text="dārgākos klientus" className="text-white/90" />
+                Rīks grāmatvedības birojiem: redziet katra klienta{" "}
+                <PixelWaveText text="stundas" className="text-white/90" />, patieso{" "}
+                <PixelWaveText text="pašizmaksu" className="text-white/90" /> un{" "}
+                <PixelWaveText text="papildu darba iemeslus" className="text-white/90" />
               </>
             ) : (
               t("hero.subtitle")

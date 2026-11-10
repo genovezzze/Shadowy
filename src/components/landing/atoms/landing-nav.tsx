@@ -94,7 +94,7 @@ const MEGA_MENUS = {
         label: "Uzņēmumiem",
         links: [
           { label: "Komandas slodze", href: "#ieguvumi" },
-          { label: "Neredzamās izmaksas", href: "#ko-fikset" },
+          { label: "Klientu pašizmaksa", href: "#ko-fikset" },
           { label: "Pieteikt savu pilotu", href: "#pilots" },
         ],
       },
@@ -119,7 +119,7 @@ const MEGA_MENUS = {
         label: "Jautājumi",
         links: [
           { label: "Biežāk uzdotie jautājumi", href: "#faq" },
-          { label: "Kas ir neredzamais darbs?", href: "#faq" },
+          { label: "Kā aprēķina klienta pašizmaksu?", href: "#faq" },
           { label: "Vai Shadowy uzrauga darbiniekus?", href: "#faq" },
         ],
       },
@@ -180,7 +180,7 @@ const CARD_MENUS: Record<MegaMenuKey, { label: string; href: string; icon: Lucid
   ],
   help: [
     { label: "FAQ", href: "#faq", icon: HelpCircle },
-    { label: "Neredzamais darbs", href: "#ko-fikset", icon: Eye },
+    { label: "Ko fiksē Shadowy", href: "#ko-fikset", icon: Eye },
     { label: "Pieteikt pilotu", href: "#pilots", icon: Rocket },
     { label: "Pieslēgties", href: "/login", icon: LogIn },
     { label: "Raksti mums", href: "mailto:contact@shadowy.lv", icon: Mail },
@@ -528,6 +528,19 @@ export function LandingNav({
             )}
           </AnimatePresence>
         </div>
+
+        <Link
+          href="/blog"
+          className={cn(
+            // Pulled in against the row's gap so it reads as Izpēti's neighbour.
+            "hidden rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out lg:-ml-5 lg:block",
+            navIsLight
+              ? "text-black/80 hover:bg-black/[0.035] hover:text-black"
+              : "text-white/85 hover:bg-white/[0.08] hover:text-white",
+          )}
+        >
+          {t("menu.blog")}
+        </Link>
         </div>
 
         {/* Centre: pill → opens the concierge chat */}

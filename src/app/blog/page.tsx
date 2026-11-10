@@ -6,9 +6,9 @@ import { LandingNav } from "@/components/landing/atoms/landing-nav";
 import { LandingFooter } from "@/components/landing/atoms/landing-footer";
 import { ARTICLES, AUTHOR, type Article } from "@/content/blog";
 
-const title = "Raksti par neredzamo darbu un komandas slodzi";
+const title = "Raksti par klientu pašizmaksu un grāmatvedības biroja darbu";
 const description =
-  "Praktiski raksti par neredzamo darbu, komandas slodzes pārskatu un klientu rentabilitāti pakalpojumu uzņēmumiem.";
+  "Praktiski raksti grāmatvedības birojiem par klientu pašizmaksu, fiksētu maksu un komandas slodzi.";
 
 export const metadata: Metadata = {
   title,

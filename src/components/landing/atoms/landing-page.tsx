@@ -13,6 +13,7 @@ import { LandingClosing } from "@/components/landing/atoms/landing-closing";
 import { LocaleProvider, type Locale } from "@/components/landing/atoms/i18n";
 import { LandingFooter } from "@/components/landing/atoms/landing-footer";
 import { LandingIntro } from "@/components/landing/atoms/landing-intro";
+import type { PilotStats } from "@/lib/pilot-stats";
 
 /**
  * The page runs dark → light → dark: the hero lockup over its video, the
@@ -23,7 +24,7 @@ import { LandingIntro } from "@/components/landing/atoms/landing-intro";
  * The nav reads the first of those switches to decide whether to paint itself
  * light or dark, so the hero has to stay one viewport tall and stay first.
  */
-export function LandingPage({ forcedLocale }: { forcedLocale?: Locale } = {}) {
+export function LandingPage({ forcedLocale, pilotStats }: { forcedLocale?: Locale; pilotStats: PilotStats }) {
   return (
     <LocaleProvider forcedLocale={forcedLocale}>
     <div className="atoms-landing bg-[#070809] font-sans antialiased">
@@ -36,7 +37,7 @@ export function LandingPage({ forcedLocale }: { forcedLocale?: Locale } = {}) {
         <LandingCases />
         <LandingOutcomes />
         <LandingWhatToLog />
-        <LandingAudience />
+        <LandingAudience stats={pilotStats} />
         <LandingPilotBanner />
         <LandingFaq />
         <LandingContact />

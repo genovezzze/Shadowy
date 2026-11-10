@@ -37,8 +37,8 @@ const VIEWS: readonly ProductView[] = [
   {
     title: { lv: "Ieraksts savā valodā", en: "An entry in your own words" },
     text: {
-      lv: "Darbinieks pastāsta vai ieraksta situāciju tā, kā tā bija. Shadowy sagatavo melnrakstu, ko viņš pats pārskata un apstiprina - nekas netiek saglabāts bez viņa",
-      en: "The employee tells or types the situation as it was. Shadowy prepares a draft they review and approve themselves - nothing is saved without them",
+      lv: "Darbinieks pastāsta vai ieraksta situāciju tā, kā tā bija. Shadowy sagatavo melnrakstu, ko viņš pats pārskata un apstiprina. Bez viņa nekas netiek saglabāts",
+      en: "The employee tells or types the situation as it was. Shadowy prepares a draft they review and approve themselves. Nothing is saved without them",
     },
     src: "/images/Shadowy-Beige-Laptop.webp",
     width: 1920,
@@ -48,8 +48,8 @@ const VIEWS: readonly ProductView[] = [
   {
     title: { lv: "Kategorijas pret klientiem", en: "Categories against clients" },
     text: {
-      lv: "Viens režģis, kurā redzams, kurš klients dod visvairāk katras kategorijas darba - stundas pa kategorijām un klientiem blakus",
-      en: "One grid that shows which client generates the most work in each category - hours by category and client side by side",
+      lv: "Viens režģis, kurā redzams, kurš klients dod visvairāk katras kategorijas darba: stundas pa kategorijām un klientiem blakus",
+      en: "One grid that shows which client generates the most work in each category: hours by category and client side by side",
     },
     src: "/images/shadowy-tablet-matrix-purple.webp",
     width: 1920,
@@ -59,8 +59,8 @@ const VIEWS: readonly ProductView[] = [
   {
     title: { lv: "Atskaite, kas gatava izdrukai", en: "A report ready to print" },
     text: {
-      lv: "Mēneša pārskats pa klientiem, ko var eksportēt vai izdrukāt un likt uz galda sarunā par cenu - bez atsevišķas datu sagatavošanas",
-      en: "A monthly per-client overview you can export or print and put on the table in a pricing conversation - with no separate data prep",
+      lv: "Mēneša pārskats pa klientiem, ko var eksportēt vai izdrukāt un likt uz galda sarunā par cenu, bez atsevišķas datu sagatavošanas",
+      en: "A monthly per-client overview you can export or print and put on the table in a pricing conversation, with no separate data prep",
     },
     src: "/images/Shadowy-Paper-Flowers.webp",
     width: 1920,

@@ -9,28 +9,21 @@ import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
 type L = Record<Locale, string>;
 
-const SHOULD_LOG: readonly L[] = [
-  { lv: "Darbs ārpus pamatlomas", en: "Work outside your core role" },
-  { lv: "Palīdzība kolēģiem", en: "Helping colleagues" },
-  { lv: "Informācijas gaidīšana", en: "Waiting for information" },
-  { lv: "Atkārtoti jautājumi", en: "Repeated questions" },
-  { lv: "Kļūdu labošana", en: "Fixing errors" },
-  { lv: "Fokusa pārtraukumi", en: "Focus interruptions" },
-  { lv: "Steidzami neplānoti uzdevumi", en: "Urgent unplanned tasks" },
-  { lv: "Jauno darbinieku ievadīšana", en: "Onboarding new hires" },
-  { lv: "Koordinācija starp cilvēkiem", en: "Coordination between people" },
+// A client's cost is the routine work plus the extra work, so both are shown:
+// the routine list first (what the fee is meant to cover), then what a client
+// adds on top of it.
+const ROUTINE_WORK: readonly L[] = [
+  { lv: "Primāro dokumentu grāmatošana", en: "Posting source documents" },
+  { lv: "Bankas un kases operācijas", en: "Bank and cash transactions" },
+  { lv: "Algu aprēķini", en: "Payroll" },
+  { lv: "PVN un citas VID deklarācijas", en: "VAT and other tax returns" },
+  { lv: "Rēķinu izrakstīšana", en: "Issuing invoices" },
+  { lv: "Debitori un kreditori", en: "Receivables and payables" },
+  { lv: "Gada pārskats", en: "Annual report" },
+  { lv: "Saziņa ar klientu", en: "Talking to the client" },
 ];
 
-/**
- * The same idea in one industry's own words.
- *
- * The general list above is deliberately generic, which makes it easy to read
- * and easy to dismiss - an accountant does not think in "informācijas
- * gaidīšana", they think in missing source documents. This block shows what the
- * categories look like once they are written for a real company, and says
- * plainly that they are built per company rather than shipped as a fixed list.
- */
-const ACCOUNTING_EXAMPLE: readonly L[] = [
+const EXTRA_WORK: readonly L[] = [
   { lv: "Klienta dokumentu gaidīšana", en: "Waiting for client documents" },
   { lv: "Trūkstošu attaisnojuma dokumentu pieprasīšana", en: "Chasing missing supporting documents" },
   { lv: "Labojumi klienta iesniegtajos datos", en: "Corrections to data the client submitted" },
@@ -42,10 +35,22 @@ const ACCOUNTING_EXAMPLE: readonly L[] = [
   { lv: "Gada pārskata papildu darbi", en: "Extra work on the annual report" },
 ];
 
+/**
+ * Work inside the team that is not any one client's but still costs hours.
+ * Folded away below the client list: it matters for workload, but the page
+ * leads with what a client costs.
+ */
+const TEAM_WORK: readonly L[] = [
+  { lv: "Palīdzība kolēģiem", en: "Helping colleagues" },
+  { lv: "Jauno darbinieku ievadīšana", en: "Onboarding new hires" },
+  { lv: "Darbs ārpus savas lomas", en: "Work outside your own role" },
+  { lv: "Koordinācija starp cilvēkiem", en: "Coordination between people" },
+  { lv: "Kļūdu labošana pēc kolēģa", en: "Fixing a colleague's errors" },
+];
+
 const SHOULD_NOT_LOG: readonly L[] = [
   { lv: "Katra ikdienas darbība", en: "Every routine action" },
   { lv: "Katra minūte", en: "Every minute" },
-  { lv: "Parastais plānotais darbs", en: "Ordinary planned work" },
   { lv: "Privātas sarunas", en: "Private conversations" },
   { lv: "Ekrāna aktivitāte", en: "Screen activity" },
 ];
@@ -77,21 +82,48 @@ export function LandingWhatToLog() {
             hidden: { opacity: 0 },
             visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
           }}
-          className="flex flex-wrap gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6"
+          className="flex flex-col gap-8 md:gap-10"
         >
-          {SHOULD_LOG.map((item) => (
-            <motion.li
-              key={item.lv}
-              variants={{
-                hidden: { opacity: 0 },
-                visible: { opacity: 1, transition: { duration: 0.3 } },
-              }}
-              className="cursor-default text-lg font-bold tracking-tight text-black/60 transition-colors hover:text-black md:text-xl lg:text-2xl"
-            >
-              {item[locale]}
-            </motion.li>
+          {[
+            { label: t("whatToLog.routine"), items: ROUTINE_WORK },
+            { label: t("whatToLog.extra"), items: EXTRA_WORK },
+          ].map((group, groupIndex) => (
+            <li key={group.label}>
+              <p className="mb-3 text-sm font-semibold text-black/45 md:mb-4 md:text-base">{group.label}</p>
+              <ul className="flex flex-wrap gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6">
+                {group.items.map((item) => (
+                  <motion.li
+                    key={item.lv}
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: { opacity: 1, transition: { duration: 0.3 } },
+                    }}
+                    className="cursor-default text-lg font-bold tracking-tight text-black/60 transition-colors hover:text-black md:text-xl lg:text-2xl"
+                  >
+                    {item[locale]}
+                  </motion.li>
+                ))}
+                {/* Closes the last group: the lists are a starting point, and
+                    each firm's categories are set up with it during the pilot. */}
+                {groupIndex === 1 ? (
+                  <motion.li
+                    variants={{
+                      hidden: { opacity: 0 },
+                      visible: { opacity: 1, transition: { duration: 0.3 } },
+                    }}
+                    className="cursor-default rounded-full border border-dashed border-black/25 px-4 py-0.5 text-lg font-bold tracking-tight text-black/45 md:text-xl lg:text-2xl"
+                  >
+                    {t("whatToLog.custom")}
+                  </motion.li>
+                ) : null}
+              </ul>
+            </li>
           ))}
         </motion.ul>
+
+        <p className="mt-6 max-w-2xl text-sm font-semibold leading-relaxed text-black/60 md:mt-8 md:text-base">
+          {t("whatToLog.exampleNote")}
+        </p>
 
         <Reveal className="mt-10 md:mt-16">
           {/* Folded away behind its own label: the example is here to be opened
@@ -131,7 +163,7 @@ export function LandingWhatToLog() {
             {/* Set a step below the general list - it is an illustration of that
                 list, not a second one competing with it. */}
             <ul className="flex flex-wrap gap-x-6 gap-y-3 pt-6 md:gap-x-8">
-              {ACCOUNTING_EXAMPLE.map((item) => (
+              {TEAM_WORK.map((item) => (
                 <li
                   key={item.lv}
                   className="cursor-default text-base font-bold tracking-tight text-black/45 transition-colors hover:text-black/80 md:text-lg"
@@ -140,9 +172,6 @@ export function LandingWhatToLog() {
                 </li>
               ))}
             </ul>
-            <p className="mt-5 max-w-2xl text-sm font-semibold leading-relaxed text-black/60 md:text-base">
-              {t("whatToLog.exampleNote")}
-            </p>
           </motion.div>
         </Reveal>
 

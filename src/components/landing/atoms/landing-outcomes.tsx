@@ -14,19 +14,19 @@ type Outcome = {
 
 const OUTCOMES: Outcome[] = [
   {
-    tag: { lv: "Stundas", en: "Hours" },
-    title: { lv: "Slēptās darba stundas", en: "Hidden work hours" },
+    tag: { lv: "Klienti", en: "Clients" },
+    title: { lv: "Katra klienta pašizmaksa", en: "The cost of each client" },
     text: {
-      lv: "Cik daudz laika aizgāja papildu darbā, gaidīšanā un pārtraukumos",
-      en: "How much time went into extra work, waiting and interruptions",
+      lv: "Cik stundu un naudas katrs klients prasa mēnesī un vai tas iekļaujas līgumā paredzētajā laikā",
+      en: "How many hours and how much money each client takes per month, and whether it fits the time the contract covers",
     },
   },
   {
-    tag: { lv: "Izmaksas", en: "Cost" },
-    title: { lv: "Aptuvenās izmaksas", en: "Approximate cost" },
+    tag: { lv: "Cena", en: "Pricing" },
+    title: { lv: "Kam pārskatīt cenu", en: "Who to reprice" },
     text: {
-      lv: "Cik šis darbs varētu izmaksāt komandai mēnesī vai gadā",
-      en: "What this work could cost the team per month or per year",
+      lv: "Kuri klienti prasa vairāk, nekā maksā, ar stundām un iemesliem, ko var parādīt sarunā ar klientu",
+      en: "Which clients take more than they pay for, with hours and reasons you can show in the conversation with the client",
     },
   },
   {
@@ -38,11 +38,11 @@ const OUTCOMES: Outcome[] = [
     },
   },
   {
-    tag: { lv: "Klienti", en: "Clients" },
-    title: { lv: "Klientu patiesā cena", en: "The true cost of clients" },
+    tag: { lv: "Stundas", en: "Hours" },
+    title: { lv: "Papildu darba stundas", en: "Extra work hours" },
     text: {
-      lv: "Kuri klienti prasa visvairāk neplānota un neapmaksāta laika",
-      en: "Which clients take the most unplanned and unbilled time",
+      lv: "Cik laika aizgāja klienta dokumentu labošanā, gaidīšanā un atkārtotos jautājumos",
+      en: "How much time went into fixing client documents, waiting and repeated questions",
     },
   },
   {

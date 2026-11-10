@@ -135,7 +135,7 @@ export function LandingInterestModal() {
                     Ieinteresēja? Atstājiet pieteikumu
                   </h2>
                   <p className="m-0 max-w-sm text-base font-normal leading-tight text-white/40 md:text-lg">
-                    Pastāstiet īsi par savu komandu - mēs ar jums sazināsimies un
+                    Pastāstiet īsi par savu komandu, un mēs ar jums sazināsimies un
                     vienosimies par sarunu
                   </p>
                 </div>

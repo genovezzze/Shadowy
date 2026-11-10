@@ -4,7 +4,7 @@ import { PbFinansesContent } from "./pb-finanses-content";
 
 const caseTitle = "Grāmatvedības uzņēmuma gadījums: PB Finanses";
 const caseDescription =
-  "Kā grāmatvedības uzņēmums ar Shadowy ieraudzīja neredzamo darbu, komandas slodzi un klientu patieso pašizmaksu - reāla projekta rezultāti";
+  "Kā grāmatvedības uzņēmums ar Shadowy ieraudzīja, cik patiesībā izmaksā katrs klients: stundas, pašizmaksa un papildu darba iemesli. Reāla projekta rezultāti";
 
 export const metadata: Metadata = {
   title: caseTitle,

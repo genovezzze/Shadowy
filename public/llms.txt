@@ -1,21 +1,46 @@
 # Shadowy
 
-> Shadowy is a team workload transparency platform for service and accounting firms. Employees describe their work in about 30 seconds, AI turns it into structured entries, and managers see where the team's time goes, each client's true cost, and how workload is distributed. It is not time tracking and not employee surveillance.
+> Shadowy shows accounting firms what each client really costs them. Accountants log their work in about 30 seconds by text or voice, AI turns it into a structured entry (client, category, duration), and the firm's owner sees the hours, the cost and the reasons behind them for every client - so fixed monthly fees can be checked against the actual work. Built in Latvia for Latvian accounting offices, with a fully Latvian interface.
 
-Shadowy makes "invisible work" (Latvian: "neredzamais darbs") visible: helping colleagues, onboarding, coordination, repeated questions and out-of-role tasks. Employees log work in free text or by voice and the AI drafts a structured entry (category, client, duration) that the employee reviews and approves; managers then review entries and get analytics on hours by category and client, team workload, and which clients cost the most. Two core principles: it is not surveillance (no screen or keystroke tracking; nothing is saved without the employee's approval) and it does not rank people (per-person metrics support workload balancing, never scoring or leaderboards). Multi-tenant with role-scoped access, a fully Latvian interface with an English version, and data stored in the European Union. Based in Latvia, currently running a free 30-day pilot.
+Last updated: 2026-11-10
+
+## Who it is for
+Accounting and bookkeeping offices ("grāmatvedības biroji", outsourced accountants) with roughly 3 to 30 people, mostly in Latvia, that charge clients a fixed monthly fee. The buyer is the owner or manager who sets client prices; the daily users are accountants and accounting assistants.
+
+## The problem it solves
+Accounting firms know what each client pays but not what each client costs. Extra work - fixing a client's incomplete documents, waiting for answers, repeated questions, urgent requests, helping colleagues - is never recorded, so some fixed-fee clients quietly lose money. Shadowy makes that work measurable per client, with the reason for it, so the owner can reprice, change the agreement or redistribute work.
+
+## How it works
+- Employees describe a piece of work in free text or by voice in Latvian; AI drafts the entry with client, category and duration. Nothing is saved until the employee approves it.
+- Categories match Latvian accounting work out of the box (VAT/PVN, payroll, annual reports, primary documents, client communication) and differ for accountants and assistants.
+- Managers review entries and see hours by client and category, clients that exceed their included time, team workload and who helps whom.
+- Client-level views can be shown to the client when discussing the price.
+
+## What Shadowy is not
+- Not employee surveillance: no screenshots, no keystroke, app or website tracking; employees decide what is recorded.
+- Not a ranking tool: per-person numbers are for balancing workload, never for scoring, leaderboards or competition.
+- Not a general time tracker like Clockify or Toggl Track: it is built around accounting clients and the reasons for extra work, not only hours.
+- Not a full practice management suite like Uku or Karbon: it does not replace task, billing or CRM systems and can be started in a day next to the tools a firm already uses.
+
+## Facts
+- Company location: Latvia. Market: Latvian accounting offices.
+- Languages: Latvian (primary), English.
+- Data storage: European Union (Frankfurt).
+- Status: live with a pilot accounting firm (PB Finanses); new firms start with a free 30-day pilot.
 
 ## Main pages
-- [Home (Latvian)](https://www.shadowy.lv): what Shadowy is, who it is for, and the free pilot offer.
+- [Home (Latvian)](https://www.shadowy.lv): what Shadowy does for accounting firms and the free pilot offer.
 - [Home (English)](https://www.shadowy.lv/en): English version of the landing page.
+- [How it works](https://www.shadowy.lv/ka-tas-darbojas): logging work, AI entries and client cost views step by step.
+- [PB Finanses case](https://www.shadowy.lv/projekti/pb-finanses): results from a real accounting firm pilot.
 - [Pilot programme](https://www.shadowy.lv/pilotprojekts): the 30-day free pilot and how to join.
-- [PB Finanses case](https://www.shadowy.lv/projekti/pb-finanses): real pilot results with an accounting firm.
-- [Login](https://www.shadowy.lv/login): sign in to the app.
 
 ## Articles
-- [Blog index](https://www.shadowy.lv/blog): articles on invisible work, team workload and client profitability.
-- [What invisible work costs](https://www.shadowy.lv/blog/cik-maksa-neredzamais-darbs): hours lost unnoticed and what they cost.
+- [Blog index](https://www.shadowy.lv/blog): articles on client cost, fixed-fee pricing and workload in accounting firms.
+- [What unrecorded work costs](https://www.shadowy.lv/blog/cik-maksa-neredzamais-darbs): hours lost unnoticed and what they cost a firm.
 - [How Shadowy started](https://www.shadowy.lv/blog/ka-radas-shadowy): the origin of the product.
-- [Pilot opened](https://www.shadowy.lv/blog/shadowy-pilotprojekts-atverts): the free pilot announcement.
 
 ## Optional
+- [Pilot opened](https://www.shadowy.lv/blog/shadowy-pilotprojekts-atverts): the free pilot announcement.
 - [Privacy policy](https://www.shadowy.lv/privacy): how data is handled; data is stored in the European Union.
+- [Login](https://www.shadowy.lv/login): sign in to the app.

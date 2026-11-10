@@ -227,8 +227,8 @@ const STAGES: Stage[] = [
     icon: ClipboardList,
     title: { lv: "Darbinieks fiksē", en: "The employee logs it" },
     desc: {
-      lv: "30 sekundes dienā. Tikai tas, kas bija ārpus pamatdarba, radīja papildu slodzi vai traucēja paveikt plānoto",
-      en: "30 seconds a day. Only what fell outside the core work, added extra load or got in the way of the plan",
+      lv: "30 sekundēs ar balsi vai tekstu ieraksta, pie kura klienta strādāja un ko darīja",
+      en: "In 30 seconds, by voice or text, they note which client they worked on and what they did",
     },
     bg: "/images/01-Golden-Valley.webp",
     panel: <EntryPanel />,
@@ -260,8 +260,8 @@ const STAGES: Stage[] = [
     icon: Layers,
     title: { lv: "Dati sakārtojas", en: "The data organises itself" },
     desc: {
-      lv: "Apstiprinātie ieraksti veido kategorijas, tendences un atkārtojošos šķēršļus - nevis atsevišķus stāstus",
-      en: "Approved entries form categories, trends and recurring obstacles - not isolated stories",
+      lv: "Apstiprinātie ieraksti sakārtojas pa klientiem un kategorijām, un atkārtotie iemesli kļūst redzami, nevis atsevišķi stāsti",
+      en: "Approved entries are organised by client and category, and recurring reasons become visible, not isolated stories",
     },
     bg: "/images/04-Hillside-Windmill.webp",
     panel: <CategoriesPanel />,
@@ -269,10 +269,10 @@ const STAGES: Stage[] = [
   {
     id: "parskats",
     icon: Coins,
-    title: { lv: "Uzņēmums redz izmaksas", en: "The company sees the cost" },
+    title: { lv: "Birojs redz klientu pašizmaksu", en: "The firm sees each client's cost" },
     desc: {
-      lv: "Slodze, aptuvenās izmaksas un dārgākie klienti vienā pārskatā. Ar konkrētiem procesu ieteikumiem",
-      en: "Workload, approximate cost and the costliest clients in one overview. With concrete process suggestions",
+      lv: "Stundas un izmaksas pa klientiem, klienti, kas pārsniedz iekļauto laiku, un iemesli vienā pārskatā, ko var likt uz galda sarunā par cenu",
+      en: "Hours and cost per client, clients that exceed their included time, and the reasons in one overview you can bring to a pricing conversation",
     },
     bg: "/images/05-Forest-Waterfall.webp",
     panel: <CostPanel />,

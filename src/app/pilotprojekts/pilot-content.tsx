@@ -14,24 +14,24 @@ type InfoItem = { title: L; text: L };
 
 const companies: readonly InfoItem[] = [
   {
-    title: { lv: "Pakalpojumu uzņēmumi ar 5-50 cilvēku komandu", en: "Service firms with a team of 5-50" },
+    title: { lv: "Grāmatvedības biroji ar 3-30 cilvēku komandu", en: "Accounting firms with a team of 3-30" },
     text: {
-      lv: "Īpaši noderīgi grāmatvedības, finanšu, konsultāciju, aģentūru un citu profesionālo pakalpojumu komandām",
-      en: "Especially useful for accounting, finance, consulting, agency and other professional-services teams",
+      lv: "Ārpakalpojuma grāmatvedības un finanšu biroji, kuros vairāki cilvēki strādā ar daudziem klientiem",
+      en: "Outsourced accounting and finance offices where several people work across many clients",
     },
   },
   {
-    title: { lv: "Komandas, kurās daļa darba paliek neredzama", en: "Teams where part of the work stays invisible" },
+    title: { lv: "Biroji ar fiksētu ikmēneša maksu", en: "Firms that charge a fixed monthly fee" },
     text: {
-      lv: "Meklējam uzņēmumus, kuros papildu uzdevumi, pārtraukumi, klientu pieprasījumi vai iekšējie darbi neparādās ierastajās atskaitēs",
-      en: "We're looking for companies where extra tasks, interruptions, client requests or internal work don't show up in the usual reports",
+      lv: "Klients maksā vienu summu mēnesī, bet darba apjoms mainās: nepilni dokumenti, labojumi, steidzami jautājumi. Tieši šeit Shadowy parāda patieso pašizmaksu",
+      en: "The client pays one amount a month, but the workload changes: incomplete documents, corrections, urgent questions. That is exactly where Shadowy shows the true cost",
     },
   },
   {
-    title: { lv: "Uzņēmumi ar klientiem, projektiem vai fiksētu pakalpojumu maksu", en: "Firms with clients, projects or a fixed service fee" },
+    title: { lv: "Vadība, kas grib zināt, kuriem klientiem pārskatīt cenu", en: "Owners who want to know which clients to reprice" },
     text: {
-      lv: "Shadowy palīdz salīdzināt ieguldīto laiku, komandas slodzi un faktisko darba pašizmaksu pa klientiem vai projektiem",
-      en: "Shadowy helps compare time invested, team workload and the actual cost of work across clients or projects",
+      lv: "Shadowy salīdzina katram klientam veltīto laiku ar iekļauto apjomu un parāda, kuri klienti prasa vairāk, nekā maksā, un kāpēc",
+      en: "Shadowy compares the time spent on each client with what the fee covers and shows which clients take more than they pay for, and why",
     },
   },
   {
@@ -59,10 +59,10 @@ const benefits: readonly InfoItem[] = [
     },
   },
   {
-    title: { lv: "Skaidrs slodzes un neredzamā darba pārskats", en: "A clear view of workload and invisible work" },
+    title: { lv: "Katra klienta stundas un pašizmaksa", en: "Hours and cost for every client" },
     text: {
-      lv: "Redzēsiet, kur rodas papildu darbs, kuri procesi atkārtojas un kam komanda patiesībā velta savu laiku",
-      en: "You'll see where extra work arises, which processes repeat and what the team actually spends its time on",
+      lv: "Redzēsiet, cik laika un naudas aiziet katram klientam, kuri klienti pārsniedz iekļauto laiku un kas rada papildu darbu",
+      en: "You'll see how much time and money goes to each client, which clients exceed their included time and what causes the extra work",
     },
   },
   {
@@ -121,28 +121,28 @@ const expectations: readonly InfoItem[] = [
 
 const steps: readonly InfoItem[] = [
   {
-    title: { lv: "01 - Iepazīšanās", en: "01 - Intro" },
+    title: { lv: "01. Iepazīšanās", en: "01. Intro" },
     text: {
       lv: "20 minūšu sarunā izrunājam komandas situāciju un saprotam, vai pilotprojekts jums ir piemērots",
       en: "In a 20-minute conversation we talk through your team's situation and figure out whether the pilot fits",
     },
   },
   {
-    title: { lv: "02 - Sagatavošana", en: "02 - Preparation" },
+    title: { lv: "02. Sagatavošana", en: "02. Preparation" },
     text: {
       lv: "Vienojamies par mērķi, dalībniekiem, periodu un pielāgojam Shadowy vidi jūsu procesam",
       en: "We agree on the goal, participants and period, and tailor the Shadowy setup to your process",
     },
   },
   {
-    title: { lv: "03 - Pilotprojekts", en: "03 - Pilot" },
+    title: { lv: "03. Pilotprojekts", en: "03. Pilot" },
     text: {
       lv: "Komanda izmanto platformu ikdienā, bet mēs sekojam līdzi pieredzei un palīdzam novērst neskaidrības",
       en: "The team uses the platform daily while we follow the experience and help clear up any uncertainties",
     },
   },
   {
-    title: { lv: "04 - Rezultāti", en: "04 - Results" },
+    title: { lv: "04. Rezultāti", en: "04. Results" },
     text: {
       lv: "Kopīgi apskatām datus, secinājumus un vienojamies, vai un kā risinājumu attīstīt tālāk",
       en: "Together we review the data and conclusions and agree whether and how to develop the solution further",
@@ -152,13 +152,13 @@ const steps: readonly InfoItem[] = [
 
 const T = {
   badge: { lv: "Atvērta pilotprogramma", en: "Open pilot programme" },
-  h1: { lv: "Padariet savas komandas neredzamo darbu izmērāmu", en: "Make your team's invisible work measurable" },
+  h1: { lv: "30 dienās uzziniet, cik patiesībā izmaksā jūsu klienti", en: "In 30 days, find out what your clients really cost" },
   intro: {
-    lv: "Meklējam uzņēmumus, kuri vēlas kopā ar Shadowy pārbaudīt praktisku risinājumu komandas slodzes, papildu darba un izmaksu analīzei",
-    en: "We're looking for companies that want to test, together with Shadowy, a practical solution for analysing team workload, extra work and cost",
+    lv: "Meklējam grāmatvedības birojus, kuri vēlas kopā ar Shadowy pārbaudīt, kuri klienti prasa vairāk laika, nekā par to maksā. Bez maksas un bez kredītkartes",
+    en: "We're looking for accounting firms that want to check, together with Shadowy, which clients take more time than they pay for. Free, no credit card",
   },
   heroCta: { lv: "Pieteikt pilotprojektu", en: "Apply for the pilot" },
-  heroAlt: { lv: "Shadowy komandas analītikas platforma", en: "Shadowy team analytics platform" },
+  heroAlt: { lv: "Shadowy klientu pašizmaksas pārskats", en: "Shadowy client cost overview" },
   dashboardAlt: { lv: "Shadowy vadības pārskats", en: "Shadowy management overview" },
   companiesTitle: { lv: "Kādus uzņēmumus mēs meklējam", en: "What companies we're looking for" },
   benefitsTitle: { lv: "Ko jūs saņemsiet", en: "What you'll get" },

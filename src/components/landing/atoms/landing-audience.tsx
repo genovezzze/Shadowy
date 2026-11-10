@@ -10,6 +10,7 @@ import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 import { HoverWaveText } from "@/components/landing/atoms/hover-wave-text";
 import { cn } from "@/lib/utils";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
+import type { PilotStats } from "@/lib/pilot-stats";
 
 type L = Record<Locale, string>;
 
@@ -19,27 +20,9 @@ type HelpEdge = {
   to: L;
   times: number;
   minutes: number;
-  topCategory: L;
+  /** Category labels are Latvian domain terms; the English page shows them as is. */
+  topCategory: string | null;
 };
-
-/**
- * Who carried the helping, read from the pilot's own `helpedColleague` entries.
- *
- * Colleagues are lettered rather than named: this is one real ten-person firm,
- * and the finding is about the shape of the load, not about individuals. The
- * shape is the whole point - 103 of the 135 help entries came from a single
- * person, spread across seven colleagues, and nothing the firm had before this
- * showed that.
- */
-const HELP_FLOW: readonly HelpEdge[] = [
-  { to: { lv: "Kolēģis A", en: "Colleague A" }, times: 30, minutes: 1240, topCategory: { lv: "Dokumentu skenēšana", en: "Document scanning" } },
-  { to: { lv: "Kolēģis B", en: "Colleague B" }, times: 24, minutes: 1119, topCategory: { lv: "Rēķinu grāmatošana", en: "Invoice posting" } },
-  { to: { lv: "Kolēģis C", en: "Colleague C" }, times: 18, minutes: 965, topCategory: { lv: "Avansu grāmatošana", en: "Advance posting" } },
-  { to: { lv: "Kolēģis D", en: "Colleague D" }, times: 14, minutes: 650, topCategory: { lv: "Kases grāmatošana", en: "Cash posting" } },
-  { to: { lv: "Kolēģis E", en: "Colleague E" }, times: 12, minutes: 590, topCategory: { lv: "Rēķinu grāmatošana", en: "Invoice posting" } },
-  { to: { lv: "Kolēģis F", en: "Colleague F" }, times: 3, minutes: 125, topCategory: { lv: "Dokumentu skenēšana", en: "Document scanning" } },
-  { to: { lv: "Kolēģis G", en: "Colleague G" }, times: 1, minutes: 45, topCategory: { lv: "Dokumentu arhivēšana", en: "Document archiving" } },
-];
 
 type Audience = {
   name: L;
@@ -48,10 +31,16 @@ type Audience = {
   why: L;
   examples: readonly L[];
   figures?: readonly Figure[];
-  /** Arithmetic on the figures above, so the reader can check it rather than trust it. */
+  /** Where the figures come from and as of when, so the reader can check them. */
   figuresNote?: L;
   /** Real help relationships, drawn as a distribution rather than listed. */
-  helpFlow?: readonly HelpEdge[];
+  helpFlow?: {
+    edges: readonly HelpEdge[];
+    /** Help entries the one busiest helper logged, out of all help entries. */
+    helperEntries: number;
+    allEntries: number;
+    note: L;
+  };
   image?: {
     src: string;
     width: number;
@@ -62,157 +51,282 @@ type Audience = {
   link: { label: L; href: string };
 };
 
+const LV_MONTHS = ["Janvāris", "Februāris", "Marts", "Aprīlis", "Maijs", "Jūnijs", "Jūlijs", "Augusts", "Septembris", "Oktobris", "Novembris", "Decembris"];
+const EN_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+/** Whole hours once there are enough of them; one decimal below ten. */
+function hours(minutes: number, locale: Locale) {
+  const value = minutes / 60;
+  const text = value >= 10 ? String(Math.round(value)) : value.toFixed(1);
+  return locale === "lv" ? text.replace(".", ",") : text;
+}
+
+function both(make: (locale: Locale) => string): L {
+  return { lv: make("lv"), en: make("en") };
+}
+
+function formatDate(iso: string) {
+  const [y, m, d] = iso.split("-");
+  return `${d}.${m}.${y}`;
+}
+
 /**
- * These are measured figures from the PB Finanses pilot, not scenarios.
+ * Measured figures from the PB Finanses pilot, recomputed daily by
+ * `getPilotStats` - PB Finanses agreed to publish their aggregates live.
  *
- * Read from the pilot database on 2026-09-09: 830 approved entries by 10 people
- * across 94 clients, 6 July to 9 September 2026, 35 947 logged minutes. Only
- * aggregates are used - no entry text, no client names, no employee names, since
- * the underlying records are a real firm's working notes.
- *
- * Two things to keep straight when editing. The 599 h is *logged* work, not all
- * of it invisible - the same store holds ordinary bookkeeping - so the copy says
- * "fiksēts", never "neredzams", about that total. And the figures carry a date,
- * because they grow: re-read the database before changing them rather than
- * nudging a number to look better.
- *
- * The approval figure is the load-bearing one for employees: all 830 entries
- * were approved, none rejected, none returned, and not one carries a manager
- * comment. That is the answer to "will this be used against me", and it is worth
- * checking it still holds before it is restated.
+ * Because the numbers move, every sentence here has to stay true for any value:
+ * labels describe the measure rather than draw a conclusion from today's
+ * number, and the one trend line ("slodze aug") is only said when the last two
+ * complete months actually show it. The hours are *logged* work, not all of it
+ * extra - the same store holds ordinary bookkeeping - so totals are "fiksēts",
+ * never "neredzams".
  */
-const AUDIENCES: readonly Audience[] = [
-  {
-    name: { lv: "Darbiniekiem", en: "For employees" },
-    desc: {
-      lv: "Vienkārša darba fiksēšana bez papildu kontroles - 30 sekundes dienā, un pats darbinieks izlemj, ko iesniegt",
-      en: "Simple logging with no extra oversight - 30 seconds a day, and the employee decides what to submit",
-    },
-    why: {
-      lv: "Papildu darbs, ko darbinieks izdara, nekur neparādās. Kad plānotais darbs kavējas, redzams tikai kavējums - nevis tās stundas, kas aizgāja palīdzībai kolēģiem, gaidīšanai un pārtraukumiem. Shadowy dod vietu, kur to pateikt, neizklausoties pēc attaisnošanās",
-      en: "The extra work an employee does shows up nowhere. When planned work runs late, only the delay is visible - not the hours that went into helping colleagues, waiting and interruptions. Shadowy gives a place to say it without it sounding like an excuse",
-    },
-    examples: [
-      { lv: "Čeku un rēķinu grāmatošana kolēģa vietā - 135 ieraksti, 113 stundas", en: "Posting receipts and invoices for a colleague - 135 entries, 113 hours" },
-      { lv: "Dokumentu skenēšana citas komandas vietā - biežākais palīdzības veids", en: "Scanning documents for another team - the most common kind of help" },
-      { lv: "Bankas izraksta manuāla ievade, kad automātiskais imports neaizgāja", en: "Entering a bank statement by hand when the automatic import failed" },
-      { lv: "Darba devēja ziņojumi un sarakste ar VID ārpus savas lomas", en: "Employer reports and correspondence with the tax authority outside one's role" },
-      { lv: "Jaunā darbinieka ievadīšana - vidēji 54 minūtes par reizi", en: "Onboarding a new hire - 54 minutes on average each time" },
-    ],
-    figures: [
-      { value: "100%", label: { lv: "ierakstu apstiprināti - neviens nav atgriezts", en: "of entries approved - none returned" } },
-      { value: "19%", label: { lv: "no visa fiksētā laika bija palīdzība kolēģiem", en: "of all logged time was helping colleagues" } },
-      { value: "76%", label: { lv: "tās palīdzības veica viens cilvēks", en: "of that help was done by one person" } },
-      { value: "113 h", label: { lv: "palīdzības 2 mēnešos - gandrīz 3 darba nedēļas", en: "of help in 2 months - nearly 3 working weeks" } },
-      { value: "26 min", label: { lv: "mediānais ieraksts", en: "median entry" } },
-      { value: "25%", label: { lv: "ierakstu īsāki par 10 minūtēm", en: "of entries shorter than 10 minutes" } },
-    ],
-    figuresNote: {
-      lv: "Reāli PB Finanses pilota dati no 2026. gada 6. jūlija līdz 9. septembrim: 830 ieraksti, 10 cilvēku komanda, 599 fiksētas stundas",
-      en: "Real PB Finanses pilot data from 6 July to 9 September 2026: 830 entries, a team of 10, 599 logged hours",
-    },
-    helpFlow: HELP_FLOW,
-    image: {
-      src: "/images/pic11.webp",
-      width: 1672,
-      height: 941,
-      alt: "Darbinieka skats Shadowy: iesniegtie ieraksti, apstiprinātās stundas un sadalījums pa kategorijām",
-      caption: { lv: "Darbinieka skats. Ekrānattēlā - demonstrācijas dati", en: "Employee view. The screen shows demo data" },
-    },
-    link: { label: { lv: "Ko fiksēt un ko nē", en: "What to log and what not to" }, href: "#ko-fikset" },
-  },
-  {
-    name: { lv: "Vadītājiem", en: "For managers" },
-    desc: {
-      lv: "Skaidrs skats uz savas komandas slodzi: izvērtējiet un apstipriniet ierakstus, redziet, kas atkārtojas",
-      en: "A clear view of your team's workload: review and approve entries, see what recurs",
-    },
-    why: {
-      lv: "Slodzi plāno pēc oficiālajiem pienākumiem, bet komanda strādā pēc faktiskajiem. Tāpēc plāns nesanāk, un iemesls nav redzams nevienā atskaitē. Vadītājam tas dod divas lietas, kuras citādi nav no kā paņemt: kurš process atkārtojas tik bieži, ka to ir lētāk salabot nekā izturēt, un kurš cilvēks komandā nes vairāk, nekā izskatās no malas",
-      en: "Workload is planned by official duties, but the team works by the real ones. So the plan doesn't hold, and the reason shows up in no report. It gives a manager two things there's otherwise nowhere to get: which process repeats often enough that fixing it is cheaper than enduring it, and which person carries more than it looks from the outside",
-    },
-    examples: [
-      { lv: "82 atkārtojušies procesi: viena un tā pati kategorija pie viena klienta trīs un vairāk reizes", en: "82 recurring processes: the same category with the same client three or more times" },
-      { lv: "Trīs cilvēki nes 59% no visa fiksētā laika - pārējie septiņi pārējo", en: "Three people carry 59% of all logged time - the other seven the rest" },
-      { lv: "Noslogotākajam 153 stundas, viszemākajam 8 - vienā un tajā pašā komandā", en: "The busiest has 153 hours, the lowest 8 - in the same team" },
-      { lv: "42 dažādas kategorijas: darbs ir krietni sadrumstalotāks, nekā izskatās plānā", en: "42 different categories: the work is far more fragmented than the plan suggests" },
-      { lv: "Jūlijs 217 h, augusts 240 h - slodze aug, nevis svārstās", en: "July 217 h, August 240 h - the load is growing, not fluctuating" },
-    ],
-    figures: [
-      { value: "48%", label: { lv: "ierakstu ietilpst darbā, kas atkārtojas", en: "of entries fall into work that repeats" } },
-      { value: "82", label: { lv: "atkārtoti procesi, ko var labot pa vienam", en: "recurring processes you can fix one by one" } },
-      { value: "59%", label: { lv: "visa laika - uz trim cilvēkiem no desmit", en: "of all time - on three people out of ten" } },
-      { value: "26%", label: { lv: "visa laika - uz vienu noslogotāko cilvēku", en: "of all time - on the single busiest person" } },
-      { value: "42", label: { lv: "dažādas kategorijas vienā komandā", en: "different categories in one team" } },
-      { value: "43 min", label: { lv: "vidējais ieraksts", en: "average entry" } },
-    ],
-    figuresNote: {
-      lv: "Reāli PB Finanses pilota dati (06.07.-09.09.2026.), 830 ieraksti no 10 cilvēkiem. \"Atkārtojas\" nozīmē vienu kategoriju pie viena klienta trīs un vairāk reizes - tieši tur meklējams process, nevis atsevišķs gadījums",
-      en: "Real PB Finanses pilot data (06.07.-09.09.2026), 830 entries from 10 people. \"Repeats\" means one category with one client three or more times - that's where a process is, not a one-off",
-    },
-    link: { label: { lv: "Kā notiek izskatīšana", en: "How the review works" }, href: "#process" },
-  },
-  {
-    name: { lv: "Uzņēmumam", en: "For the company" },
-    desc: {
-      lv: "Organizācijas līmeņa pārskats - stundas, kategorijas, izmaksas un klientu rentabilitāte vienuviet",
-      en: "An organisation-level overview - hours, categories, cost and client profitability in one place",
-    },
-    why: {
-      lv: "Ar fiksētu pakalpojumu maksu klients var būt nerentabls mēnešiem, un tas atklājas gada beigās - ja vispār. Kad komandas laiks ir piesaistīts klientam un reizināts ar stundas likmi, pārsniegums kļūst redzams tajā pašā mēnesī, kad tas notiek - un kļūst redzams arī tas, cik nevienmērīgi portfelis patiesībā ir sadalīts",
-      en: "On a fixed service fee a client can be unprofitable for months, and it only surfaces at year end - if at all. When the team's time is tied to a client and multiplied by an hourly rate, the overrun becomes visible in the same month it happens - and so does how unevenly the portfolio is really split",
-    },
-    examples: [
-      { lv: "Pieci lielākie klienti aizņem 30% no visa komandas laika", en: "The five largest clients take up 30% of all team time" },
-      { lv: "Lielākais klients - 58 stundas divos mēnešos, nākamais 37", en: "The largest client - 58 hours in two months, the next 37" },
-      { lv: "Mediānais klients - 2,4 stundas: lielākā daļa portfeļa ir maza", en: "The median client - 2.4 hours: most of the portfolio is small" },
-      { lv: "17 klienti zem vienas stundas, 15 klienti virs desmit", en: "17 clients under one hour, 15 clients over ten" },
-      { lv: "Rēķinu grāmatošana un izrakstīšana - 140 ieraksti, 139 stundas kopā", en: "Invoice posting and issuing - 140 entries, 139 hours in total" },
-      { lv: "Trešdaļa ierakstu ir īsāki par 15 minūtēm - tie, ko neviens neuzskaita", en: "A third of entries are under 15 minutes - the ones nobody counts" },
-    ],
-    figures: [
-      { value: "94", label: { lv: "klienti ar ierakstiem divos mēnešos", en: "clients with entries in two months" } },
-      { value: "30%", label: { lv: "laika - uz pieciem lielākajiem klientiem", en: "of time - on the five largest clients" } },
-      { value: "58 h", label: { lv: "lielākais klients; mediānais - 2,4 h", en: "largest client; median - 2.4 h" } },
-      { value: "15", label: { lv: "klienti virs 10 stundām", en: "clients over 10 hours" } },
-      { value: "17", label: { lv: "klienti zem vienas stundas", en: "clients under one hour" } },
-      { value: "599 h", label: { lv: "kopā, sadalītas pa klientiem", en: "in total, split across clients" } },
-    ],
-    figuresNote: {
-      lv: "Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kad šīs stundas ir piesaistītas klientam un reizinātas ar komandas stundas likmi, kļūst redzams, kurš klients ar fiksētu maksu nesedz savu darbu",
-      en: "Real PB Finanses pilot data (06.07.-09.09.2026). When these hours are tied to a client and multiplied by the team's hourly rate, it becomes clear which fixed-fee client doesn't cover its own work",
-    },
-    image: {
-      src: "/images/shadowy-dashboard-wide.png",
-      width: 1916,
-      height: 821,
-      alt: "Shadowy organizācijas pārskats: klientiem veltītās stundas, darba pašizmaksa un limita pārsniegums",
-      caption: {
-        lv: "Organizācijas pārskats. Klientu nosaukumi un summas - izdomāts piemērs",
-        en: "Organisation overview. Client names and amounts - an illustrative example",
+function buildAudiences(s: PilotStats): readonly Audience[] {
+  const since = formatDate(s.startedOn);
+  const asOf = formatDate(s.asOf);
+  const source: L = {
+    lv: `Reāli PB Finanses pilota dati kopš ${since}., atjaunināti ${asOf}.`,
+    en: `Real PB Finanses pilot data since ${since}, updated ${asOf}`,
+  };
+  const others = s.people - 3;
+
+  const employeeExamples: L[] = [
+    both((l) =>
+      l === "lv"
+        ? `Palīdzība kolēģiem: ${s.helpEntries} ieraksti, ${hours(s.helpMinutes, l)} stundas`
+        : `Helping colleagues: ${s.helpEntries} entries, ${hours(s.helpMinutes, l)} hours`,
+    ),
+    { lv: "Dokumentu skenēšana un grāmatošana kolēģa vietā", en: "Scanning and posting documents for a colleague" },
+    { lv: "Bankas izraksta manuāla ievade, kad automātiskais imports neaizgāja", en: "Entering a bank statement by hand when the automatic import failed" },
+    { lv: "Darba devēja ziņojumi un sarakste ar VID ārpus savas lomas", en: "Employer reports and correspondence with the tax authority outside one's role" },
+    { lv: "Jaunā darbinieka ievadīšana", en: "Onboarding a new hire" },
+  ];
+
+  const [prevMonth, lastMonth] = s.months.slice(-2);
+  const monthLine: L | null =
+    prevMonth && lastMonth
+      ? both((l) => {
+          const names = l === "lv" ? LV_MONTHS : EN_MONTHS;
+          const a = `${names[Number(prevMonth.month.slice(5)) - 1]} ${hours(prevMonth.minutes, l)} h`;
+          const b = `${names[Number(lastMonth.month.slice(5)) - 1].toLocaleLowerCase(l === "lv" ? "lv-LV" : "en")} ${hours(lastMonth.minutes, l)} h`;
+          const ratio = lastMonth.minutes / Math.max(prevMonth.minutes, 1);
+          const trend =
+            ratio > 1.05
+              ? l === "lv" ? "slodze aug" : "the load is growing"
+              : ratio < 0.95
+                ? l === "lv" ? "slodze samazinās" : "the load is easing"
+                : l === "lv" ? "slodze stabila" : "the load is steady";
+          return `${a}, ${b}: ${trend}`;
+        })
+      : null;
+
+  const topCategory = s.topCategory;
+  const ownerExamples: L[] = [
+    both((l) =>
+      l === "lv"
+        ? `Pieci lielākie klienti aizņem ${s.top5ClientsPct}% no visa komandas laika`
+        : `The five largest clients take up ${s.top5ClientsPct}% of all team time`,
+    ),
+    both((l) =>
+      l === "lv"
+        ? `Lielākais klients: ${hours(s.largestClientMinutes, l)} stundas, nākamais ${hours(s.secondClientMinutes, l)}`
+        : `The largest client: ${hours(s.largestClientMinutes, l)} hours, the next ${hours(s.secondClientMinutes, l)}`,
+    ),
+    both((l) =>
+      l === "lv"
+        ? `Tipiskais klients: ${hours(s.medianClientMinutes, l)} stundas kopš pilota sākuma`
+        : `A typical client: ${hours(s.medianClientMinutes, l)} hours since the pilot began`,
+    ),
+    both((l) =>
+      l === "lv"
+        ? `${s.clientsUnder1h} klienti zem vienas stundas, ${s.clientsOver10h} klienti virs desmit`
+        : `${s.clientsUnder1h} clients under one hour, ${s.clientsOver10h} clients over ten`,
+    ),
+    ...(topCategory
+      ? [
+          both((l) =>
+            l === "lv"
+              ? `${topCategory.label}: ${topCategory.entries} ieraksti, ${hours(topCategory.minutes, l)} stundas kopā`
+              : `${topCategory.label}: ${topCategory.entries} entries, ${hours(topCategory.minutes, l)} hours in total`,
+          ),
+        ]
+      : []),
+    both((l) =>
+      l === "lv"
+        ? `${s.under15Pct}% ierakstu ir īsāki par 15 minūtēm, tieši tie, ko neviens neuzskaita`
+        : `${s.under15Pct}% of entries are under 15 minutes, exactly the ones nobody counts`,
+    ),
+  ];
+
+  return [
+    {
+      name: { lv: "Darbiniekiem", en: "For employees" },
+      desc: {
+        lv: "Vienkārša darba fiksēšana bez papildu kontroles: 30 sekundes dienā, un darbinieks pats izlemj, ko iesniegt",
+        en: "Simple logging with no extra oversight: 30 seconds a day, and the employee decides what to submit",
       },
+      why: {
+        lv: "Kad klients atsūta nepilnus dokumentus, kavē atbildes vai jautā vienu un to pašu, šīs stundas nekur neparādās. Kad darbs kavējas, redzams tikai kavējums, nevis iemesls. Shadowy ļauj to pierakstīt pie konkrētā klienta, un tas neizklausās pēc attaisnošanās",
+        en: "When a client sends incomplete documents, answers late or asks the same thing again, those hours show up nowhere. When work runs late, only the delay is visible, not the reason. Shadowy lets you note it against that client, and it doesn't sound like an excuse",
+      },
+      examples: employeeExamples,
+      figures: [
+        s.returned === 0
+          ? { value: "100%", label: { lv: "ierakstu apstiprināti, neviens nav atgriezts", en: "of entries approved, none returned" } }
+          : {
+              value: `${Math.round(((s.entries) / (s.entries + s.returned)) * 100)}%`,
+              label: { lv: "ierakstu apstiprināti", en: "of entries approved" },
+            },
+        { value: `${s.helpPct}%`, label: { lv: "no visa fiksētā laika bija palīdzība kolēģiem", en: "of all logged time was helping colleagues" } },
+        { value: `${s.topHelperSharePct}%`, label: { lv: "tās palīdzības veica viens cilvēks", en: "of that help was done by one person" } },
+        { value: `${hours(s.helpMinutes, "lv")} h`, label: { lv: "palīdzības kolēģiem kopš pilota sākuma", en: "of help to colleagues since the pilot began" } },
+        { value: `${s.medianEntryMinutes} min`, label: { lv: "ilgst tipisks ieraksts", en: "is a typical entry" } },
+        { value: `${s.under15Pct}%`, label: { lv: "ierakstu īsāki par 15 minūtēm", en: "of entries shorter than 15 minutes" } },
+      ],
+      figuresNote: {
+        lv: `${source.lv}: ${s.entries} ieraksti, ${s.people} cilvēku komanda, ${hours(s.totalMinutes, "lv")} fiksētas stundas`,
+        en: `${source.en}: ${s.entries} entries, a team of ${s.people}, ${hours(s.totalMinutes, "en")} logged hours`,
+      },
+      helpFlow:
+        s.helpFlow.length > 0
+          ? {
+              edges: s.helpFlow.map((edge, index) => ({
+                to: {
+                  lv: `Kolēģis ${String.fromCharCode(65 + index)}`,
+                  en: `Colleague ${String.fromCharCode(65 + index)}`,
+                },
+                times: edge.times,
+                minutes: edge.minutes,
+                topCategory: edge.topCategory,
+              })),
+              helperEntries: s.topHelperEntries,
+              allEntries: s.helpEntries,
+              note: {
+                lv: `${source.lv} Kolēģi apzīmēti ar burtiem, jo nozīme ir slodzes sadalījumam, nevis konkrētiem cilvēkiem.`,
+                en: `${source.en}. Colleagues are lettered because what matters is how the load is distributed, not the individuals.`,
+              },
+            }
+          : undefined,
+      image: {
+        src: "/images/pic11.webp",
+        width: 1672,
+        height: 941,
+        alt: "Darbinieka skats Shadowy: iesniegtie ieraksti, apstiprinātās stundas un sadalījums pa kategorijām",
+        caption: { lv: "Darbinieka skats. Ekrānattēlā demonstrācijas dati", en: "Employee view. The screen shows demo data" },
+      },
+      link: { label: { lv: "Ko fiksēt un ko nē", en: "What to log and what not to" }, href: "#ko-fikset" },
     },
-    link: { label: { lv: "Skatīt reālu projektu", en: "See a real project" }, href: "/projekti/pb-finanses" },
+    {
+      name: { lv: "Vadītājiem", en: "For managers" },
+      desc: {
+        lv: "Komandas slodze pa klientiem: apstipriniet ierakstus un redziet, kuri klienti un procesi atkārtojas",
+        en: "Your team's workload by client: approve entries and see which clients and processes keep coming back",
+      },
+      why: {
+        lv: "Klientus sadala pēc līguma, bet darba apjomu nosaka tas, kā klients patiesībā sadarbojas. Tāpēc plāns nesanāk, un iemesls nav redzams nevienā atskaitē. Vadītājs redz divas lietas, kuras citādi nav no kā paņemt: kurš process pie kura klienta atkārtojas tik bieži, ka to ir lētāk salabot nekā izturēt, un kur darbs jāpārdala, lai slodze komandā būtu vienmērīgāka",
+        en: "Clients are assigned by contract, but the amount of work depends on how each client really works with you. So the plan doesn't hold, and the reason shows up in no report. A manager sees two things there's otherwise nowhere to get: which process repeats with which client often enough that fixing it is cheaper than enduring it, and where work should be redistributed so the load is more even",
+      },
+      examples: [
+        both((l) =>
+          l === "lv"
+            ? `${s.recurringProcesses} atkārtojušies procesi: viena un tā pati kategorija pie viena klienta trīs un vairāk reizes`
+            : `${s.recurringProcesses} recurring processes: the same category with the same client three or more times`,
+        ),
+        both((l) =>
+          l === "lv"
+            ? `Trīs cilvēki nes ${s.top3PeoplePct}% no visa fiksētā laika, pārējie ${others} pārējo`
+            : `Three people carry ${s.top3PeoplePct}% of all logged time, the other ${others} the rest`,
+        ),
+        both((l) =>
+          l === "lv"
+            ? `Noslogotākajam ${hours(s.busiestPersonMinutes, l)} stundas, viszemākajam ${hours(s.quietestPersonMinutes, l)}, vienā un tajā pašā komandā`
+            : `The busiest has ${hours(s.busiestPersonMinutes, l)} hours, the lowest ${hours(s.quietestPersonMinutes, l)}, in the same team`,
+        ),
+        ...(monthLine ? [monthLine] : []),
+      ],
+      figures: [
+        { value: `${s.recurringEntriesPct}%`, label: { lv: "ierakstu ietilpst darbā, kas atkārtojas", en: "of entries fall into work that repeats" } },
+        { value: String(s.recurringProcesses), label: { lv: "atkārtoti procesi, ko var labot pa vienam", en: "recurring processes you can fix one by one" } },
+        {
+          value: `${s.top3PeoplePct}%`,
+          label: {
+            lv: `no visām stundām nostrādāja 3 no ${s.people} komandas cilvēkiem`,
+            en: `of all hours were worked by 3 of the team's ${s.people} people`,
+          },
+        },
+        { value: `${s.top1PersonPct}%`, label: { lv: "no visām stundām nostrādāja viens komandas cilvēks", en: "of all hours were worked by one person on the team" } },
+        { value: String(s.entries), label: { lv: "apstiprināti ieraksti kopš pilota sākuma", en: "approved entries since the pilot began" } },
+        { value: `${s.avgEntryMinutes} min`, label: { lv: "vidējais ieraksts", en: "average entry" } },
+      ],
+      figuresNote: {
+        lv: `${source.lv}, ${s.entries} ieraksti no ${s.people} cilvēkiem. "Atkārtojas" nozīmē vienu kategoriju pie viena klienta trīs un vairāk reizes: tieši tur meklējams process, nevis atsevišķs gadījums`,
+        en: `${source.en}, ${s.entries} entries from ${s.people} people. "Repeats" means one category with one client three or more times: that's where a process is, not a one-off`,
+      },
+      link: { label: { lv: "Kā notiek izskatīšana", en: "How the review works" }, href: "#process" },
+    },
+    {
+      name: { lv: "Biroja vadībai", en: "For the firm's owner" },
+      desc: {
+        lv: "Katra klienta stundas, pašizmaksa un rentabilitāte vienā pārskatā",
+        en: "Each client's hours, cost and profitability in one overview",
+      },
+      why: {
+        lv: "Ar fiksētu maksu klients var būt nerentabls mēnešiem, un to pamana gada beigās, ja vispār. Kad komandas laiks ir piesaistīts klientam un reizināts ar stundas likmi, pārsniegums redzams tajā pašā mēnesī. Redzams arī, cik nevienmērīgi portfelis patiesībā ir sadalīts un kuriem klientiem jāpārskata cena",
+        en: "On a fixed fee a client can be unprofitable for months, and it is noticed at year end, if at all. When the team's time is tied to a client and multiplied by an hourly rate, the overrun shows in the same month. You also see how unevenly the portfolio is really split and which clients need a new price",
+      },
+      examples: ownerExamples,
+      figures: [
+        { value: String(s.clients), label: { lv: "klienti ar ierakstiem kopš pilota sākuma", en: "clients with entries since the pilot began" } },
+        { value: `${s.top5ClientsPct}%`, label: { lv: "no visām stundām aizgāja 5 lielākajiem klientiem", en: "of all hours went to the 5 largest clients" } },
+        {
+          value: `${hours(s.largestClientMinutes, "lv")} h`,
+          label: {
+            lv: `aizgāja lielākajam klientam. Tipiskam klientam ${hours(s.medianClientMinutes, "lv")} h`,
+            en: `went to the largest client. A typical client: ${hours(s.medianClientMinutes, "en")} h`,
+          },
+        },
+        { value: String(s.clientsOver10h), label: { lv: "klientiem katram aizgāja vairāk nekā 10 stundas", en: "clients each took more than 10 hours" } },
+        { value: String(s.clientsUnder1h), label: { lv: "klientiem pietika ar mazāk nekā 1 stundu", en: "clients needed less than 1 hour" } },
+        { value: `${hours(s.totalMinutes, "lv")} h`, label: { lv: "kopā, katra piesaistīta konkrētam klientam", en: "in total, each tied to a specific client" } },
+      ],
+      figuresNote: {
+        lv: `${source.lv} Kad šīs stundas ir piesaistītas klientam un reizinātas ar komandas stundas likmi, kļūst redzams, kurš klients ar fiksētu maksu nesedz savu darbu`,
+        en: `${source.en}. When these hours are tied to a client and multiplied by the team's hourly rate, it becomes clear which fixed-fee client doesn't cover its own work`,
+      },
+      image: {
+        src: "/images/shadowy-dashboard-wide.png",
+        width: 1916,
+        height: 821,
+        alt: "Shadowy organizācijas pārskats: klientiem veltītās stundas, darba pašizmaksa un limita pārsniegums",
+        caption: {
+          lv: "Organizācijas pārskats. Klientu nosaukumi un summas ir izdomāts piemērs",
+          en: "Organisation overview. Client names and amounts are an illustrative example",
+        },
+      },
+      link: { label: { lv: "Skatīt reālu projektu", en: "See a real project" }, href: "/projekti/pb-finanses" },
+    },
+    DATA_SAFETY,
+  ];
+}
+
+const DATA_SAFETY: Audience = {
+  name: { lv: "Datu drošībai", en: "For data safety" },
+  desc: {
+    lv: "Vadītājiem pieejami tikai savas komandas ieraksti, administratoriem savas organizācijas dati. Nekas vairāk",
+    en: "Managers can only access their own team's entries, administrators only their organisation's data. Nothing more",
   },
-  {
-    name: { lv: "Datu drošībai", en: "For data safety" },
-    desc: {
-      lv: "Vadītājiem pieejami tikai savas komandas ieraksti, administratoriem - savas organizācijas dati. Nekas vairāk",
-      en: "Managers can only access their own team's entries, administrators only their organisation's data. Nothing more",
-    },
-    why: {
-      lv: "Ja komanda uztver rīku kā novērošanu, tā to neizmanto, un dati ir bezvērtīgi. Tāpēc redzamība ir ierobežota pēc lomas, un darbinieks pats izlemj, kas nonāk sistēmā",
-      en: "If a team sees the tool as surveillance, they won't use it, and the data is worthless. So visibility is limited by role, and the employee decides what goes into the system",
-    },
-    examples: [
-      { lv: "Vadītājs redz savas komandas apstiprinātos ierakstus - ne citu komandu", en: "A manager sees their own team's approved entries - not other teams'" },
-      { lv: "Ekrāna aktivitāte, taustiņi un privātas sarunas netiek fiksētas vispār", en: "Screen activity, keystrokes and private conversations are not logged at all" },
-      { lv: "AI veido tikai melnrakstu - nekas netiek saglabāts bez darbinieka apstiprinājuma", en: "The AI only makes a draft - nothing is saved without the employee's approval" },
-      { lv: "Pēc pilota datus var eksportēt, un pēc glabāšanas perioda tie tiek dzēsti", en: "After the pilot the data can be exported, and after the retention period it is deleted" },
-    ],
-    link: { label: { lv: "Privātuma politika", en: "Privacy policy" }, href: "/privacy" },
+  why: {
+    lv: "Ja komanda uztver rīku kā novērošanu, tā to neizmanto, un dati ir bezvērtīgi. Tāpēc redzamība ir ierobežota pēc lomas, un darbinieks pats izlemj, kas nonāk sistēmā",
+    en: "If a team sees the tool as surveillance, they won't use it, and the data is worthless. So visibility is limited by role, and the employee decides what goes into the system",
   },
-];
+  examples: [
+    { lv: "Vadītājs redz savas komandas apstiprinātos ierakstus, ne citu komandu", en: "A manager sees their own team's approved entries, not other teams'" },
+    { lv: "Ekrāna aktivitāte, taustiņi un privātas sarunas netiek fiksētas vispār", en: "Screen activity, keystrokes and private conversations are not logged at all" },
+    { lv: "AI veido tikai melnrakstu. Nekas netiek saglabāts bez darbinieka apstiprinājuma", en: "The AI only makes a draft. Nothing is saved without the employee's approval" },
+    { lv: "Pēc pilota datus var eksportēt, un pēc glabāšanas perioda tie tiek dzēsti", en: "After the pilot the data can be exported, and after the retention period it is deleted" },
+  ],
+  link: { label: { lv: "Privātuma politika", en: "Privacy policy" }, href: "/privacy" },
+};
 
 /**
  * The help distribution, drawn rather than listed.
@@ -402,13 +516,13 @@ const PANEL_ITEM = {
   },
 };
 
-function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
+function HelpFlow({ data }: { data: NonNullable<Audience["helpFlow"]> }) {
+  const flow = data.edges;
   const { locale } = useLocale();
   const maxMinutes = Math.max(...flow.map((edge) => edge.minutes));
   const totalMinutes = flow.reduce((sum, edge) => sum + edge.minutes, 0);
-  const totalTimes = flow.reduce((sum, edge) => sum + edge.times, 0);
-  const hours = (minutes: number) =>
-    (minutes / 60).toFixed(1).replace(".", ",");
+  const toHours = (minutes: number) =>
+    (minutes / 60).toFixed(1).replace(".", locale === "lv" ? "," : ".");
 
   return (
     <div className="mb-10 overflow-hidden rounded-2xl bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] md:p-8">
@@ -420,15 +534,15 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
           <p className="max-w-xl text-base font-semibold leading-relaxed text-black/70 md:text-lg">
             {locale === "lv" ? (
               <>
-                Viens cilvēks komandā fiksēja {totalTimes} no {135} palīdzības
-                ierakstiem - {hours(totalMinutes)} stundas septiņiem kolēģiem divos
-                mēnešos. Neviena iepriekšējā atskaite to nerādīja.
+                Viens cilvēks komandā fiksēja {data.helperEntries} no {data.allEntries} palīdzības
+                ierakstiem: {toHours(totalMinutes)} stundas {flow.length} kolēģiem. Neviena
+                iepriekšējā atskaite to nerādīja.
               </>
             ) : (
               <>
-                One person on the team logged {totalTimes} of {135} help
-                entries - {hours(totalMinutes)} hours for seven colleagues over
-                two months. No previous report showed it.
+                One person on the team logged {data.helperEntries} of {data.allEntries} help
+                entries: {toHours(totalMinutes)} hours for {flow.length} colleagues. No
+                previous report showed it.
               </>
             )}
           </p>
@@ -471,7 +585,7 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
                 >
                   {labelInside && (
                     <span className="hidden whitespace-nowrap pr-3 text-xs font-semibold text-white/85 sm:block">
-                      {edge.topCategory[locale]}
+                      {edge.topCategory}
                     </span>
                   )}
                 </motion.span>
@@ -481,13 +595,13 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
                     style={{ left: `calc(${share * 100}% + 0.75rem)` }}
                     className="absolute inset-y-0 hidden items-center whitespace-nowrap text-xs font-semibold text-black/45 sm:flex"
                   >
-                    {edge.topCategory[locale]}
+                    {edge.topCategory}
                   </span>
                 )}
               </span>
 
               <span className="w-24 shrink-0 text-right text-sm font-bold tabular-nums tracking-tight text-black md:w-28">
-                {edge.times}× · {hours(edge.minutes)} h
+                {edge.times}× · {toHours(edge.minutes)} h
               </span>
             </li>
           );
@@ -495,16 +609,15 @@ function HelpFlow({ flow }: { flow: readonly HelpEdge[] }) {
       </ul>
 
       <p className="mt-6 text-xs font-medium leading-relaxed text-black/45">
-        {locale === "lv"
-          ? "Reāli PB Finanses pilota dati (06.07.-09.09.2026.). Kolēģi apzīmēti ar burtiem - nozīme ir slodzes sadalījumam, nevis konkrētiem cilvēkiem."
-          : "Real PB Finanses pilot data (06.07.-09.09.2026). Colleagues are lettered - what matters is how the load is distributed, not the individuals."}
+        {data.note[locale]}
       </p>
     </div>
   );
 }
 
-export function LandingAudience() {
+export function LandingAudience({ stats }: { stats: PilotStats }) {
   const { locale, t } = useLocale();
+  const audiences = React.useMemo(() => buildAudiences(stats), [stats]);
   const [openName, setOpenName] = React.useState<string | null>(null);
   const rowRefs = React.useRef<Record<string, HTMLDivElement | null>>({});
 
@@ -544,7 +657,7 @@ export function LandingAudience() {
         </Reveal>
 
         <Reveal className="border-t border-black/10">
-          {AUDIENCES.map((audience) => {
+          {audiences.map((audience) => {
             const key = audience.name.lv;
             const isOpen = openName === key;
             const panelId = `audience-${key}`;
@@ -723,7 +836,7 @@ export function LandingAudience() {
                     </div>
                   </motion.div>
 
-                  {audience.helpFlow && <HelpFlow flow={audience.helpFlow} />}
+                  {audience.helpFlow && <HelpFlow data={audience.helpFlow} />}
                   </div>
                 </div>
               </div>

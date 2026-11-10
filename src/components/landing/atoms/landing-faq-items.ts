@@ -12,19 +12,19 @@ export const FAQ_ITEMS: readonly {
 }[] = [
   {
     question: {
-      lv: "Kas ir neredzamais darbs?",
-      en: "What is invisible work?",
+      lv: "Kā Shadowy aprēķina klienta pašizmaksu?",
+      en: "How does Shadowy work out what a client costs?",
     },
     answer: {
-      lv: "Neredzamais darbs ir viss tas, ko darbinieks dara papildus saviem darba līgumā noteiktajiem pienākumiem - vai kas pārtrauc viņa fokusu un traucē pamatdarbam. Piemēram: palīdzība kolēģiem, jauno darbinieku ievadīšana, atkārtotu jautājumu atbildēšana, informācijas gaidīšana, koordinācija starp cilvēkiem, steidzami uzdevumi ārpus lomas. Katrs šāds gadījums atsevišķi šķiet mazs, bet kopā tie katru mēnesi izmaksā uzņēmumam reālu naudu - un neviens to neredz",
-      en: "Invisible work is everything an employee does beyond the duties set out in their contract - or anything that breaks their focus and gets in the way of their core work. For example: helping colleagues, onboarding new hires, answering repeated questions, waiting for information, coordinating between people, urgent tasks outside their role. Each case seems small on its own, but together they cost the company real money every month - and nobody sees it",
+      lv: "Darbinieki ieraksta darbu pie konkrēta klienta, AI to sakārto pa kategorijām, un vadītājs ierakstu apstiprina. Apstiprinātās stundas Shadowy reizina ar jūsu stundas likmi un salīdzina ar klientam iekļauto laiku. Tā redzams, kuri klienti prasa vairāk, nekā paredz līgums, un kāpēc: dokumentu labošana, gaidīšana, atkārtoti jautājumi vai steidzami pieprasījumi",
+      en: "Employees log work against a specific client, AI sorts it into categories, and a manager approves the entry. Shadowy multiplies the approved hours by your hourly rate and compares them with the time included for that client. That shows which clients take more than the contract covers, and why: fixing documents, waiting, repeated questions or urgent requests",
     },
   },
   {
     question: { lv: "Kas ir Shadowy?", en: "What is Shadowy?" },
     answer: {
-      lv: "Shadowy ir darba slodzes pārskatāmības rīks. Darbinieki strukturēti fiksē papildu darbu, vadītāji izvērtē un apstiprina iesniegtos ierakstus, savukārt administratori saņem organizācijas līmeņa pārskatu",
-      en: "Shadowy is a workload transparency tool. Employees log extra work in a structured way, managers review and approve the submitted entries, and administrators get an organisation-wide overview",
+      lv: "Shadowy ir rīks grāmatvedības birojiem, kas parāda, cik patiesībā izmaksā katrs klients. Darbinieki 30 sekundēs ieraksta darbu ar balsi vai tekstu, vadītāji to apstiprina, un birojs redz stundas, pašizmaksu un papildu darba iemeslus pa klientiem",
+      en: "Shadowy is a tool for accounting firms that shows what each client really costs. Employees log work in 30 seconds by voice or text, managers approve it, and the firm sees hours, cost and the reasons for extra work per client",
     },
   },
   {
@@ -43,7 +43,7 @@ export const FAQ_ITEMS: readonly {
       en: "How is the data protected?",
     },
     answer: {
-      lv: "Vadītājiem ir pieejami tikai viņu komandas apstiprinātie ieraksti, bet administratoriem - savas organizācijas dati. Citu organizāciju informācija nav pieejama. Detalizēta informācija ir norādīta privātuma politikā",
+      lv: "Vadītājiem ir pieejami tikai viņu komandas apstiprinātie ieraksti, bet administratoriem savas organizācijas dati. Citu organizāciju informācija nav pieejama. Detalizēta informācija ir norādīta privātuma politikā",
       en: "Managers can only see their own team's approved entries, and administrators only their own organisation's data. Information from other organisations is never accessible. Full details are in the privacy policy",
     },
   },

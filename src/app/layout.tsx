@@ -162,9 +162,9 @@ const fontVariables = {
 
 const siteUrl = getSiteUrl();
 const title =
-  "Shadowy - darba slodzes un neredzamā darba pārskats komandām";
+  "Shadowy: klientu pašizmaksa grāmatvedības birojiem";
 const description =
-  "Shadowy rāda komandas neredzamo darbu, slodzi un darba pašizmaksu pa klientiem: strukturēta fiksēšana, vadītāja izskatīšana un pārskats lēmumiem. 30 dienu bezmaksas pilots.";
+  "Shadowy rāda grāmatvedības birojam, cik stundu un naudas aiziet katram klientam un kāpēc. Ieraksts 30 sekundēs, bez novērošanas. 30 dienu bezmaksas pilots.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

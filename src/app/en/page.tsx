@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/landing/atoms/landing-page";
+import { getPilotStats } from "@/lib/pilot-stats";
 import {
   JsonLd,
   faqPageNode,
@@ -16,9 +17,9 @@ import {
 // Brand first so "Shadowy" has a strong English page to attach to, then the
 // descriptive keywords an English searcher would actually type.
 const title =
-  "Shadowy - invisible work & workload transparency platform";
+  "Shadowy: the true cost of every client for accounting firms";
 const description =
-  "Shadowy is a team workload transparency platform that makes invisible work visible: see lost focus and which clients cost the most - without employee surveillance. Free 30-day pilot.";
+  "Shadowy shows accounting firms how many hours each client really takes, what it costs and why. 30-second entries, no employee surveillance. Free 30-day pilot.";
 
 export const metadata: Metadata = {
   title: { absolute: title },
@@ -51,7 +52,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default function EnglishHomePage() {
+// The pilot figures in "Kam Shadowy noder" are recomputed once a day.
+export const revalidate = 86400;
+
+export default async function EnglishHomePage() {
+  const pilotStats = await getPilotStats();
   return (
     <>
       <JsonLd
@@ -62,7 +67,7 @@ export default function EnglishHomePage() {
           faqPageNode,
         ]}
       />
-      <LandingPage forcedLocale="en" />
+      <LandingPage forcedLocale="en" pilotStats={pilotStats} />
     </>
   );
 }

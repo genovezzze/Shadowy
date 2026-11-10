@@ -4,7 +4,7 @@ import { PilotContent } from "./pilot-content";
 
 const pilotTitle = "30 dienu bezmaksas pilotprojekts";
 const pilotDescription =
-  "Kādiem uzņēmumiem paredzēts Shadowy pilotprojekts, ko saņemsiet 30 dienu laikā un ko sagaidām no dalībniekiem. Bez maksas un bez kredītkartes";
+  "30 dienās uzziniet, cik patiesībā izmaksā katrs jūsu grāmatvedības biroja klients. Kam paredzēts pilotprojekts, ko saņemsiet un ko sagaidām no dalībniekiem. Bez maksas un bez kredītkartes";
 
 export const metadata: Metadata = {
   title: pilotTitle,
