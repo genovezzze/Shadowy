@@ -1,0 +1,47 @@
+# Runs on every push to main/preview and on every pull request. It only checks
+# the code; it never deploys and never touches a database (Vercel deploys as
+# before). A red run means: don't build on top of it, fix it first.
+name: CI
+
+on:
+  push:
+    branches: [main, preview]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      # Placeholders so `next build` can run without real secrets. Nothing here
+      # points at a real database; the build never connects to one.
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      SESSION_SECRET: ci-only-placeholder-secret-not-used-anywhere
+      NEXT_PUBLIC_APP_URL: https://shadowy.lv
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci --no-audit --no-fund
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
