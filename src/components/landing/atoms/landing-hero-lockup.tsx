@@ -41,11 +41,18 @@ const HERO_PIXEL_FONTS = [
   "var(--font-pixel-line)",
 ] as const;
 
-const transitionVariants: { item: Variants } = {
+// The lockup is visible in the server HTML from the first paint: no opacity
+// fade-in. Text that starts at opacity 0 cannot be the LCP until hydration has
+// run and the fade finished, which put mobile LCP at ~9 s. Only the small rise
+// is kept - a transform, so it neither delays LCP nor counts as layout shift.
+const transitionVariants: { container: Variants; item: Variants } = {
+  container: {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.1 } },
+  },
   item: {
-    hidden: { opacity: 0, y: 12 },
+    hidden: { y: 12 },
     visible: {
-      opacity: 1,
       y: 0,
       transition: { type: "spring", bounce: 0.3, duration: 1.5 },
     },
@@ -148,8 +155,8 @@ export function LandingHeroLockup() {
 
   const logoMaskStyle = React.useMemo<React.CSSProperties>(
     () => ({
-      maskImage: "url('/pixel_logo.png')",
-      WebkitMaskImage: "url('/pixel_logo.png')",
+      maskImage: "url('/pixel_logo.webp')",
+      WebkitMaskImage: "url('/pixel_logo.webp')",
       // A bitmap on black rather than a shape on transparency, so luminance is
       // the mode that reads it, and `pixelated` below keeps the cells hard
       // instead of smoothing them away at hero size.
@@ -171,19 +178,16 @@ export function LandingHeroLockup() {
     >
       {/* Desktop: an oversized layer shifted up so the parallax lag has room to
           travel. Mobile: a plain inset-0 cover with no oversize and no scroll
-          transform, so the backdrop cannot grow or drift as the page scrolls. */}
+          transform, so the backdrop cannot grow or drift as the page scrolls.
+          The geometry comes from CSS (sm: = the same 640px breakpoint as
+          isDesktop) so the server HTML already has the desktop layout; setting
+          it from JS after hydration moved the layer and caused a 0.21 CLS.
+          Only the transform is JS-driven, and transforms do not count as
+          layout shift. Keep sm:top/sm:h in step with PARALLAX_LAG. */}
       <motion.div
         aria-hidden
-        style={
-          isDesktop
-            ? {
-                y: backgroundY,
-                top: `-${PARALLAX_LAG * 100}%`,
-                height: `${layerHeight * 100}%`,
-              }
-            : { y: 0, top: 0, bottom: 0 }
-        }
-        className="pointer-events-none absolute inset-x-0 -z-10"
+        style={{ y: isDesktop ? backgroundY : 0 }}
+        className="pointer-events-none absolute inset-x-0 inset-y-0 -z-10 sm:bottom-auto sm:top-[-30%] sm:h-[130%]"
       >
         <HeroVideoBackground />
       </motion.div>

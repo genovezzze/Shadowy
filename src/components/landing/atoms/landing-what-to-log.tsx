@@ -89,7 +89,7 @@ export function LandingWhatToLog() {
             { label: t("whatToLog.extra"), items: EXTRA_WORK },
           ].map((group, groupIndex) => (
             <li key={group.label}>
-              <p className="mb-3 text-sm font-semibold text-black/45 md:mb-4 md:text-base">{group.label}</p>
+              <p className="mb-3 text-sm font-semibold text-black/60 md:mb-4 md:text-base">{group.label}</p>
               <ul className="flex flex-wrap gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6">
                 {group.items.map((item) => (
                   <motion.li
@@ -111,7 +111,7 @@ export function LandingWhatToLog() {
                       hidden: { opacity: 0 },
                       visible: { opacity: 1, transition: { duration: 0.3 } },
                     }}
-                    className="cursor-default rounded-full border border-dashed border-black/25 px-4 py-0.5 text-lg font-bold tracking-tight text-black/45 md:text-xl lg:text-2xl"
+                    className="cursor-default rounded-full border border-dashed border-black/25 px-4 py-0.5 text-lg font-bold tracking-tight text-black/60 md:text-xl lg:text-2xl"
                   >
                     {t("whatToLog.custom")}
                   </motion.li>
@@ -142,7 +142,7 @@ export function LandingWhatToLog() {
             <motion.span
               animate={{ rotate: isExampleOpen ? 180 : 0 }}
               transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="shrink-0 text-black/40"
+              className="shrink-0 text-black/60"
               aria-hidden
             >
               <ChevronDown className="size-4" />
@@ -166,7 +166,7 @@ export function LandingWhatToLog() {
               {TEAM_WORK.map((item) => (
                 <li
                   key={item.lv}
-                  className="cursor-default text-base font-bold tracking-tight text-black/45 transition-colors hover:text-black/80 md:text-lg"
+                  className="cursor-default text-base font-bold tracking-tight text-black/60 transition-colors hover:text-black/80 md:text-lg"
                 >
                   {item[locale]}
                 </li>

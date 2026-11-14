@@ -64,13 +64,13 @@ function EntryPanel() {
     <Panel title={locale === "lv" ? "Jauns ieraksts" : "New entry"}>
       <div className="space-y-2">
         <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Kategorija" : "Category"}</p>
+          <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Kategorija" : "Category"}</p>
           <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
             {locale === "lv" ? "Palīdzēju kolēģim" : "Helped a colleague"}
           </p>
         </div>
         <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Patērētais laiks" : "Time spent"}</p>
+          <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Patērētais laiks" : "Time spent"}</p>
           <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
             {locale === "lv" ? "45 minūtes" : "45 minutes"}
           </p>
@@ -133,7 +133,7 @@ function ReviewPanel() {
               <span className="block text-[15px] font-bold tracking-tight text-black">
                 {row.name}
               </span>
-              <span className="block truncate text-[11px] font-medium text-black/40">
+              <span className="block truncate text-[11px] font-medium text-black/60">
                 {row.detail}
               </span>
             </span>
@@ -205,14 +205,14 @@ function CostPanel() {
         <span className="text-[32px] font-bold leading-none tracking-tight text-black">
           186
         </span>
-        <span className="text-sm font-medium text-black/45">{locale === "lv" ? "h / mēnesī" : "h / month"}</span>
+        <span className="text-sm font-medium text-black/60">{locale === "lv" ? "h / mēnesī" : "h / month"}</span>
       </div>
 
       {/* One tile rather than two - the number row already fills the slot the
           other cards give their second data block, so a second tile here
           would push this card past the shared height instead of matching it. */}
       <div className="mt-3 rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-        <p className="text-[11px] font-medium text-black/40">{locale === "lv" ? "Aptuvenās izmaksas" : "Approximate cost"}</p>
+        <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Aptuvenās izmaksas" : "Approximate cost"}</p>
         <p className="mt-0.5 text-lg font-bold tracking-tight text-black">
           &euro; 4 650
         </p>
@@ -391,11 +391,13 @@ export function LandingApproach() {
                   src={active.bg}
                   alt=""
                   fill
-                  priority={activeIndex === 0}
                   sizes="(min-width: 1024px) 55vw, 100vw"
-                  // SVG never goes through the image optimiser: Next refuses it
-                  // unless `dangerouslyAllowSVG` is on site-wide.
-                  unoptimized
+                  // Raster backdrops go through the optimiser (a 700px-wide
+                  // slot was getting the full 1374px, 233 KB file). Only SVG is
+                  // passed through: Next refuses it unless `dangerouslyAllowSVG`
+                  // is on site-wide. No `priority`: the section is below the
+                  // fold and a preload here competed with the hero poster.
+                  unoptimized={active.bg.endsWith(".svg")}
                   className="object-cover"
                 />
                 <div className="relative z-10">{active.panel}</div>

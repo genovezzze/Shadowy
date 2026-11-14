@@ -171,7 +171,7 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
                 >
                   <Linkedin className="size-4 shrink-0" aria-hidden />
                   <HoverWaveText text="LinkedIn" />
-                  <ArrowUpRight className={cn("size-3.5 shrink-0", isDark ? "text-white/50" : "text-black/40")} aria-hidden />
+                  <ArrowUpRight className={cn("size-3.5 shrink-0", isDark ? "text-white/50" : "text-black/60")} aria-hidden />
                 </a>
               </li>
             </ul>
@@ -189,10 +189,10 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
           )}
         >
           <div className="flex flex-col gap-1">
-            <p className={cn("text-xs", isDark ? "text-white/35" : "text-black/40")}>
+            <p className={cn("text-xs", isDark ? "text-white/60" : "text-black/60")}>
               &copy; {new Date().getFullYear()} Shadowy
             </p>
-            <p className={cn("text-xs", isDark ? "text-white/35" : "text-black/40")}>
+            <p className={cn("text-xs", isDark ? "text-white/60" : "text-black/60")}>
               {locale === "lv"
                 ? "Visi dati ir aizsargāti. Dati tiek glabāti Eiropas Savienībā."
                 : "All data is protected. Data stored in the European Union."}
@@ -203,8 +203,8 @@ export function LandingFooter({ tone = "dark" }: { tone?: Tone } = {}) {
             className={cn(
               "text-xs transition-colors",
               isDark
-                ? "text-white/35 hover:text-white/70"
-                : "text-black/40 hover:text-black/70",
+                ? "text-white/60 hover:text-white/70"
+                : "text-black/60 hover:text-black/70",
             )}
           >
             {t("cta.privacy")}

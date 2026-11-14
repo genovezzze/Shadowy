@@ -94,9 +94,7 @@ export function LandingOutcomes() {
           alt=""
           width={1732}
           height={908}
-          // SVG never goes through the image optimiser: Next refuses it unless
-          // `dangerouslyAllowSVG` is on site-wide.
-          unoptimized
+          sizes="100vw"
           // The illustration carries its own sky, which never matches the
           // section gradient exactly at whatever height its top edge lands -
           // so that edge read as a hard horizontal line across the band.

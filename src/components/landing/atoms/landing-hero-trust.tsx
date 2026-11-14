@@ -33,7 +33,7 @@ export function LandingHeroTrust({ className }: { className?: string }) {
               />
             )}
             <span className="flex items-center gap-1.5">
-              <Check className="size-3 shrink-0 text-white/40" aria-hidden />
+              <Check className="size-3 shrink-0 text-white/60" aria-hidden />
               {item}
             </span>
           </li>

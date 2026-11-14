@@ -593,7 +593,7 @@ function HelpFlow({ data }: { data: NonNullable<Audience["helpFlow"]> }) {
                 {!labelInside && (
                   <span
                     style={{ left: `calc(${share * 100}% + 0.75rem)` }}
-                    className="absolute inset-y-0 hidden items-center whitespace-nowrap text-xs font-semibold text-black/45 sm:flex"
+                    className="absolute inset-y-0 hidden items-center whitespace-nowrap text-xs font-semibold text-black/60 sm:flex"
                   >
                     {edge.topCategory}
                   </span>
@@ -608,7 +608,7 @@ function HelpFlow({ data }: { data: NonNullable<Audience["helpFlow"]> }) {
         })}
       </ul>
 
-      <p className="mt-6 text-xs font-medium leading-relaxed text-black/45">
+      <p className="mt-6 text-xs font-medium leading-relaxed text-black/60">
         {data.note[locale]}
       </p>
     </div>
@@ -690,7 +690,7 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                         "max-w-xl text-sm font-normal transition-colors md:text-base",
                         isOpen
                           ? "text-black/60"
-                          : "text-black/40 group-hover:text-black/60",
+                          : "text-black/60 group-hover:text-black/60",
                       )}
                     >
                       {audience.desc[locale]}
@@ -705,7 +705,7 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                       "grid size-10 shrink-0 place-items-center rounded-full border transition-all duration-300 md:size-12",
                       isOpen
                         ? "rotate-180 border-black bg-black text-white"
-                        : "border-black/10 text-black/40 group-hover:border-black group-hover:bg-black group-hover:text-white",
+                        : "border-black/10 text-black/60 group-hover:border-black group-hover:bg-black group-hover:text-white",
                     )}
                   >
                     <ChevronDown className="size-4 md:size-5" aria-hidden />
@@ -715,7 +715,8 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                 <div
                   id={panelId}
                   aria-hidden={!isOpen}
-                  inert={!isOpen ? true : undefined}
+                  // React 18 drops a boolean `inert`; an empty string renders inert="".
+                  inert={!isOpen ? ("" as unknown as boolean) : undefined}
                   className="grid transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
@@ -809,7 +810,7 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                               asserted - these are scenarios, not pilot data. */}
                           <motion.p
                             variants={PANEL_ITEM}
-                            className="mt-3 text-xs font-medium leading-relaxed text-black/45"
+                            className="mt-3 text-xs font-medium leading-relaxed text-black/60"
                           >
                             {audience.figuresNote[locale]}
                           </motion.p>
@@ -828,7 +829,7 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                               className="h-auto w-full"
                             />
                           </div>
-                          <figcaption className="mt-2.5 text-xs font-medium leading-relaxed text-black/45">
+                          <figcaption className="mt-2.5 text-xs font-medium leading-relaxed text-black/60">
                             {audience.image.caption[locale]}
                           </figcaption>
                         </figure>

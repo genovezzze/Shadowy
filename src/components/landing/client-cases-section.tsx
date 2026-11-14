@@ -285,7 +285,7 @@ export function ClientCasesSection() {
                           <span className="size-3 bg-[#102625]" />
                           <span className="size-3 bg-[#173b3a]" />
                           <span className="size-3 bg-[#285f5d]" />
-                          <span className="font-sans text-[11px] text-white/45">
+                          <span className="font-sans text-[11px] text-white/60">
                             mazāk → vairāk stundu
                           </span>
                         </div>
@@ -303,7 +303,7 @@ export function ClientCasesSection() {
                       </div>
                     </div>
 
-                    <p className="mt-4 font-sans text-[11px] font-normal leading-5 text-white/35">
+                    <p className="mt-4 font-sans text-[11px] font-normal leading-5 text-white/60">
                       Visi klientu nosaukumi, stundas, limiti un izmaksas šajā piemērā ir izdomāti un neatspoguļo PB Finanses datus
                     </p>
                   </section>

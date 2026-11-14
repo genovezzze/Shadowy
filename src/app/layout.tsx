@@ -82,7 +82,9 @@ const neueHaasLight = localFont({
   weight: "300",
   style: "normal",
   variable: "--font-accent",
-  preload: false,
+  // Preloaded: the hero headline is set in this face, so without a preload it
+  // was found only after the CSS parsed (HTML -> CSS -> font, ~950 ms chain).
+  preload: true,
   display: "swap",
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });

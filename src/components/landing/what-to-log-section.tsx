@@ -103,12 +103,12 @@ export function WhatToLogSection() {
           >
             <HatchPattern />
             <div className="relative">
-              <p className="mb-3 font-accent text-sm font-bold tracking-[0.04em] text-white/40">
+              <p className="mb-3 font-accent text-sm font-bold tracking-[0.04em] text-white/60">
                 Nav jāfiksē
               </p>
               <ul className="space-y-2">
                 {shouldNotLog.map((item) => (
-                  <li key={item} className="flex items-center gap-2.5 font-accent text-sm font-light text-white/40">
+                  <li key={item} className="flex items-center gap-2.5 font-accent text-sm font-light text-white/60">
                     <X className="size-4 shrink-0 text-red-400/60" strokeWidth={2} aria-hidden />
                     {item}
                   </li>

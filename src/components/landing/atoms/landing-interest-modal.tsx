@@ -120,7 +120,7 @@ export function LandingInterestModal() {
                   type="button"
                   aria-label="Aizvērt"
                   onClick={() => setOpen(false)}
-                  className="cursor-pointer rounded-full bg-white/5 p-2.5 text-white/40 outline-none transition-all hover:bg-white/10 hover:text-white focus-visible:ring-1 focus-visible:ring-white/40 active:scale-95"
+                  className="cursor-pointer rounded-full bg-white/5 p-2.5 text-white/60 outline-none transition-all hover:bg-white/10 hover:text-white focus-visible:ring-1 focus-visible:ring-white/40 active:scale-95"
                 >
                   <X className="size-5" strokeWidth={1.5} />
                 </button>
@@ -134,7 +134,7 @@ export function LandingInterestModal() {
                   >
                     Ieinteresēja? Atstājiet pieteikumu
                   </h2>
-                  <p className="m-0 max-w-sm text-base font-normal leading-tight text-white/40 md:text-lg">
+                  <p className="m-0 max-w-sm text-base font-normal leading-tight text-white/60 md:text-lg">
                     Pastāstiet īsi par savu komandu, un mēs ar jums sazināsimies un
                     vienosimies par sarunu
                   </p>

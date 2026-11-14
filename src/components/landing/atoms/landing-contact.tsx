@@ -22,7 +22,7 @@ const TEAM_SIZES: readonly { value: string; label: Record<Locale, string> }[] = 
 // The card sits on white, so the fields are tinted rather than outlined - a
 // border on every input would fight the card's own edge.
 const FIELD_CLASS =
-  "w-full rounded-full border-none bg-black/5 px-4 py-3 text-base text-black outline-none transition-colors placeholder:text-black/40 focus:bg-black/[0.08] md:text-sm";
+  "w-full rounded-full border-none bg-black/5 px-4 py-3 text-base text-black outline-none transition-colors placeholder:text-black/60 focus:bg-black/[0.08] md:text-sm";
 
 const LABEL_CLASS = "mb-2 block text-xs text-black/60";
 
@@ -170,14 +170,14 @@ export function LandingContact() {
                           id="pilot-size"
                           className={cn(
                             FIELD_CLASS,
-                            "group flex min-h-11 items-center justify-between gap-3 text-left data-[placeholder]:text-black/40 focus-visible:ring-2 focus-visible:ring-black/15"
+                            "group flex min-h-11 items-center justify-between gap-3 text-left data-[placeholder]:text-black/60 focus-visible:ring-2 focus-visible:ring-black/15"
                           )}
                         >
                           <SelectPrimitive.Value placeholder={t("contact.selectPlaceholder")} />
                           <SelectPrimitive.Icon asChild>
                             <ChevronDown
                               aria-hidden
-                              className="size-4 shrink-0 text-black/45 transition-transform duration-200 group-data-[state=open]:rotate-180"
+                              className="size-4 shrink-0 text-black/60 transition-transform duration-200 group-data-[state=open]:rotate-180"
                             />
                           </SelectPrimitive.Icon>
                         </SelectPrimitive.Trigger>
@@ -244,7 +244,7 @@ export function LandingContact() {
                     )}
                   </button>
 
-                  <p className="text-xs font-medium leading-relaxed text-black/40">
+                  <p className="text-xs font-medium leading-relaxed text-black/60">
                     {t("contact.consentPre")}{" "}
                     <Link href="/privacy" className="underline hover:text-black/70">
                       {t("contact.consentLink")}

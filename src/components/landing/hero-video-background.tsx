@@ -20,8 +20,8 @@ type NetworkInformation = {
  * The poster is the only thing that renders on first paint, so the LCP is a
  * 31 KB image and never the video. The <video> element itself is mounted after
  * hydration goes idle, and only when the visitor's setup makes it a reasonable
- * thing to download at all - reduced motion, Save-Data and 2G connections keep
- * the static poster. Playback pauses whenever the hero scrolls out of view so a
+ * thing to download at all - phones (under 640px), reduced motion, Save-Data
+ * and 2G connections keep the static poster. Playback pauses whenever the hero scrolls out of view so a
  * long landing page does not decode video the whole way down.
  *
  * The blur is baked into the encoded file rather than applied as a CSS filter -
@@ -38,6 +38,9 @@ export function HeroVideoBackground() {
 
   React.useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Phones keep the static poster: a full-screen video costs mobile data and
+    // decoding for a backdrop that is mostly dimmed anyway.
+    if (!window.matchMedia("(min-width: 640px)").matches) return;
 
     const connection = (
       navigator as Navigator & { connection?: NetworkInformation }

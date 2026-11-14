@@ -240,7 +240,7 @@ export function LandingChat({ open, onClose }: { open: boolean; onClose: () => v
                 </span>
                 <div className="min-w-0 flex-1">
                   <div className="text-[15px] font-bold leading-tight">{STR.name[locale]}</div>
-                  <div className="text-[12px] text-white/45">{STR.status[locale]}</div>
+                  <div className="text-[12px] text-white/60">{STR.status[locale]}</div>
                 </div>
                 <button
                   type="button"
@@ -314,7 +314,7 @@ export function LandingChat({ open, onClose }: { open: boolean; onClose: () => v
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder={STR.emailPlaceholder[locale]}
-                      className="w-full rounded-xl bg-white/[0.08] px-3.5 py-2.5 text-[14px] text-white outline-none placeholder:text-white/40 focus:bg-white/[0.12]"
+                      className="w-full rounded-xl bg-white/[0.08] px-3.5 py-2.5 text-[14px] text-white outline-none placeholder:text-white/60 focus:bg-white/[0.12]"
                     />
                     <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-[12.5px] leading-snug text-white/70">
                       <button
@@ -370,7 +370,7 @@ export function LandingChat({ open, onClose }: { open: boolean; onClose: () => v
                       value={draft}
                       onChange={(e) => setDraft(e.target.value)}
                       placeholder={placeholder}
-                      className="min-w-0 flex-1 bg-transparent py-1.5 text-[14px] text-white outline-none placeholder:text-white/40"
+                      className="min-w-0 flex-1 bg-transparent py-1.5 text-[14px] text-white outline-none placeholder:text-white/60"
                     />
                     <button
                       type="submit"

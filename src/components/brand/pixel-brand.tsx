@@ -49,7 +49,7 @@ export function PixelBrand({
   React.useEffect(() => {
     const img = new window.Image();
     img.onload = () => setMaskReady(true);
-    img.src = "/pixel_logo.png";
+    img.src = "/pixel_logo.webp";
     if (img.complete) setMaskReady(true);
   }, []);
 
@@ -108,8 +108,8 @@ export function PixelBrand({
 
       <style jsx>{`
         .pixel-brand-logo {
-          mask: url("/pixel_logo.png") center / contain no-repeat;
-          -webkit-mask: url("/pixel_logo.png") center / contain no-repeat;
+          mask: url("/pixel_logo.webp") center / contain no-repeat;
+          -webkit-mask: url("/pixel_logo.webp") center / contain no-repeat;
           mask-mode: luminance;
           -webkit-mask-mode: luminance;
           animation: pixelBrandSpin var(--pixel-brand-spin-duration) linear

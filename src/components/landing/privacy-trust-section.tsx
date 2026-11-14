@@ -31,7 +31,7 @@ export function PrivacyTrustSection() {
             className="text-balance font-accent text-[1.6rem] font-bold leading-[1.1] tracking-[0.015em] text-white [font-synthesis:weight] sm:text-[clamp(1.9rem,2.6vw,2.4rem)]"
           >
             Nav kontroles rīks.{" "}
-            <span className="text-white/45">Tas ir par procesu uzlabošanu</span>
+            <span className="text-white/60">Tas ir par procesu uzlabošanu</span>
           </h2>
 
           <p className="mx-auto mt-3 max-w-3xl text-balance font-accent text-[0.9rem] font-light leading-6 tracking-[0.012em] text-white/60 sm:text-[0.95rem] sm:leading-[1.55]">
@@ -77,8 +77,8 @@ export function PrivacyTrustSection() {
 
           <div className="px-5 py-5 sm:px-6">
             <div className="flex items-center gap-2.5">
-              <EyeOff className="size-4 shrink-0 text-white/35" aria-hidden />
-              <h3 className="font-accent text-sm font-bold tracking-[0.02em] text-white/45">
+              <EyeOff className="size-4 shrink-0 text-white/60" aria-hidden />
+              <h3 className="font-accent text-sm font-bold tracking-[0.02em] text-white/60">
                 Ko vadītājs neredz
               </h3>
             </div>
@@ -86,7 +86,7 @@ export function PrivacyTrustSection() {
               {hiddenItems.map((item) => (
                 <li
                   key={item}
-                  className="flex items-start gap-2.5 font-accent text-sm font-light leading-6 text-white/35"
+                  className="flex items-start gap-2.5 font-accent text-sm font-light leading-6 text-white/60"
                 >
                   <span
                     aria-hidden
@@ -107,7 +107,7 @@ export function PrivacyTrustSection() {
                 Darbinieks pats kontrolē, ko iesniedz un ko apstiprina
               </p>
             </div>
-            <p className="text-[0.75rem] font-medium tracking-[0.01em] text-white/35">
+            <p className="text-[0.75rem] font-medium tracking-[0.01em] text-white/60">
               GDPR atbilstoši · Serveri Eiropas Savienībā · Datus var dzēst
               jebkurā brīdī
             </p>

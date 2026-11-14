@@ -355,7 +355,7 @@ export function ClosingSections() {
             </a>
           </div>
 
-          <p className="mt-6 text-xs text-white/35">
+          <p className="mt-6 text-xs text-white/60">
             Jautājumi?{" "}
             <a
               href="mailto:contact@shadowy.lv"
@@ -427,7 +427,7 @@ export function ClosingSections() {
             </div>
 
             <div>
-              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
                 Produkts
               </h3>
               <nav className="mt-3.5 flex flex-col gap-3">
@@ -453,7 +453,7 @@ export function ClosingSections() {
             </div>
 
             <div>
-              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/35">
+              <h3 className="font-accent text-[10px] font-bold uppercase tracking-[0.18em] text-white/60">
                 Juridiskā informācija
               </h3>
               <nav className="mt-3.5 flex flex-col gap-3">

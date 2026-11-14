@@ -74,6 +74,13 @@ export default withSentryConfig(nextConfig, {
   webpack: {
     treeshake: {
       removeDebugLogging: true,
+      // Only errors are reported; dropping performance tracing and the unused
+      // Session Replay internals takes the bulk of the SDK out of the bundle
+      // every page loads (Lighthouse "reduce JavaScript execution time").
+      removeTracing: true,
+      excludeReplayIframe: true,
+      excludeReplayShadowDOM: true,
+      excludeReplayCompressionWorker: true,
     },
     automaticVercelMonitors: false,
   },

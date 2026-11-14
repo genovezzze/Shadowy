@@ -15,7 +15,7 @@ const formatEuro = (value: number) =>
 
 const lostMoney = [
   { left: "3%", size: "1.6rem", delay: "0s", dur: "3.6s", tone: "text-emerald-300/70" },
-  { left: "17%", size: "1.1rem", delay: "1.3s", dur: "4.3s", tone: "text-white/35" },
+  { left: "17%", size: "1.1rem", delay: "1.3s", dur: "4.3s", tone: "text-white/60" },
   { left: "31%", size: "1.9rem", delay: "0.5s", dur: "3.9s", tone: "text-emerald-400/65" },
   { left: "45%", size: "1.2rem", delay: "2.1s", dur: "4.6s", tone: "text-rose-300/55" },
   { left: "58%", size: "1.5rem", delay: "0.9s", dur: "3.4s", tone: "text-emerald-300/60" },
@@ -73,7 +73,7 @@ function CostInput({
         </span>
         <span className="flex shrink-0 items-baseline gap-1 whitespace-nowrap font-display text-sm font-bold leading-5 text-white/88">
           {value.toLocaleString("lv-LV")}{" "}
-          <span className="text-[10px] font-normal text-white/40">{suffix}</span>
+          <span className="text-[10px] font-normal text-white/60">{suffix}</span>
         </span>
       </span>
 
