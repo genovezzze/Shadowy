@@ -5,7 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { smartLogDraftSchema } from "@/lib/smart-log";
-import { normalizeClientName } from "@/lib/client-name";
+import { resolveClientSelection } from "@/lib/client-name";
 import { normalizePersonName } from "@/lib/work-nature";
 
 const confirmedTicketSchema = smartLogDraftSchema.extend({
@@ -39,7 +39,7 @@ export async function saveConfirmedSmartLogTickets(input: {
     };
   }
 
-  const [employee, orgClients, orgAliases, colleagues] = await Promise.all([
+  const [employee, orgClients, colleagues] = await Promise.all([
     prisma.user.findFirst({
       where: { id: session.userId, organizationId: session.organizationId },
       select: { managerId: true, name: true },
@@ -49,11 +49,7 @@ export async function saveConfirmedSmartLogTickets(input: {
         organizationId: session.organizationId,
         status: "active",
       },
-      select: { id: true, name: true },
-    }),
-    prisma.clientAlias.findMany({
-      where: { organizationId: session.organizationId },
-      select: { normalized: true, clientId: true },
+      select: { id: true, name: true, aliases: { select: { normalized: true } } },
     }),
     prisma.user.findMany({
       where: {
@@ -72,6 +68,25 @@ export async function saveConfirmedSmartLogTickets(input: {
     };
   }
   const managerId = employee.managerId;
+
+  // Every entry must name a client from the firm's list (or none): a name the
+  // AI misheard is not a client, and a client id from outside the firm is not
+  // allowed to attach hours to it.
+  const clientSelections = parsed.data.tickets.map((ticket) =>
+    resolveClientSelection(
+      { clientId: ticket.client_id, clientName: ticket.client_name },
+      orgClients,
+    ),
+  );
+  const unknownClient = clientSelections.find((selection) => !selection.ok);
+  if (unknownClient && !unknownClient.ok) {
+    return {
+      ok: false as const,
+      error: unknownClient.unknownName
+        ? `Klients "${unknownClient.unknownName}" nav jūsu klientu sarakstā. Izvēlies klientu no saraksta vai "Nav klienta".`
+        : 'Izvēlētais klients nav atrasts. Izvēlies klientu no saraksta vai "Nav klienta".',
+    };
+  }
 
   // Allow UTC+14 offset: "today" for any timezone is at most UTC+1 day
   const maxDate = new Date();
@@ -96,21 +111,10 @@ export async function saveConfirmedSmartLogTickets(input: {
         colleagueNameMap.set(key, colleagueNameMap.has(key) ? null : colleague.id);
       }
 
-      const clientNameMap = new Map(orgClients.map((c) => [normalizeClientName(c.name), c.id]));
-      // Alias spellings resolve to their target client (aliases win only where
-      // no registered client name already occupies the key).
-      for (const a of orgAliases) {
-        if (!clientNameMap.has(a.normalized)) clientNameMap.set(a.normalized, a.clientId);
-      }
-
       await tx.invisibleWorkEntry.createMany({
-        data: parsed.data.tickets.map((ticket) => {
-          // Use explicitly set clientId, or auto-match by name from AI
-          const resolvedClientId =
-            ticket.client_id ||
-            (ticket.client_name
-              ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
-              : null);
+        data: parsed.data.tickets.map((ticket, index) => {
+          const client = clientSelections[index];
+          const resolved = client.ok ? client : { clientId: null, clientName: null };
 
           // The recipient is only recorded when the help flag is set: an
           // explicit pick from the review UI wins, otherwise the name the AI
@@ -132,8 +136,8 @@ export async function saveConfirmedSmartLogTickets(input: {
             title: ticket.title,
             category: ticket.category,
             description: ticket.description,
-            clientName: ticket.client_name || null,
-            clientId: resolvedClientId,
+            clientName: resolved.clientName,
+            clientId: resolved.clientId,
             workDate: new Date(`${ticket.workDate}T12:00:00.000Z`),
             durationMinutes: ticket.estimated_time_minutes,
             status: "APPROVED" as const,

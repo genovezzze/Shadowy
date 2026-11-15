@@ -51,3 +51,37 @@ export function buildClientLookup<T extends ClientLookupEntry>(clients: T[]): Ma
   }
   return byNorm;
 }
+
+export type ClientSelection =
+  | { ok: true; clientId: string | null; clientName: string | null }
+  | { ok: false; unknownName: string };
+
+/**
+ * Decides which client a saved entry is attached to. The AI writes the client
+ * the way it heard it ("SIA Balta" for "SIA Baltija"), so a name that is not
+ * on the firm's client list must never be saved as if it were a client: the
+ * employee has to pick one from the list or choose no client.
+ *
+ * - An explicit pick (clientId) counts only if it belongs to this firm's
+ *   clients, so a crafted request cannot attach hours to another tenant.
+ * - A name resolves through the name/alias lookup to the registered client.
+ * - A firm with no client list yet keeps free-typed names (nothing to match).
+ */
+export function resolveClientSelection<T extends ClientLookupEntry & { id: string }>(
+  input: { clientId?: string | null; clientName?: string | null },
+  orgClients: T[],
+  lookup: Map<string, T> = buildClientLookup(orgClients),
+): ClientSelection {
+  if (input.clientId) {
+    const picked = orgClients.find((c) => c.id === input.clientId);
+    return picked
+      ? { ok: true, clientId: picked.id, clientName: picked.name }
+      : { ok: false, unknownName: input.clientName ?? "" };
+  }
+  const name = input.clientName?.trim();
+  if (!name) return { ok: true, clientId: null, clientName: null };
+  const match = lookup.get(normalizeClientName(name));
+  if (match) return { ok: true, clientId: match.id, clientName: match.name };
+  if (orgClients.length === 0) return { ok: true, clientId: null, clientName: name };
+  return { ok: false, unknownName: name };
+}

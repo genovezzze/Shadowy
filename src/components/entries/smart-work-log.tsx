@@ -33,7 +33,7 @@ import {
   saveConfirmedSmartLogTickets,
   type ConfirmedSmartLogTicket,
 } from "@/app/employee/smart-log/actions";
-import { normalizeClientName } from "@/lib/client-name";
+import { buildClientLookup, normalizeClientName } from "@/lib/client-name";
 import { normalizePersonName } from "@/lib/work-nature";
 import { NoClientsNotice } from "@/components/entries/no-clients-notice";
 import { DateInput, localToday } from "@/components/ui/date-input";
@@ -41,6 +41,8 @@ import { DateInput, localToday } from "@/components/ui/date-input";
 interface ClientOption {
   id: string;
   name: string;
+  /** Registered shorthands ("VKK"), already normalized. */
+  aliases?: { normalized: string }[];
 }
 
 type ReviewTicket = SmartLogDraft & {
@@ -93,6 +95,13 @@ export function SmartWorkLog({
   const recordingTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const confirmedCount = tickets.filter((ticket) => ticket.confirmed).length;
+
+  // A client the AI heard but the firm does not have (e.g. "SIA Balta" for
+  // "SIA Baltija"). Such a draft cannot be included until the employee picks a
+  // client from the list or "Nav klienta".
+  function hasUnknownClient(ticket: ReviewTicket) {
+    return clients.length > 0 && !!ticket.client_name && !ticket.client_id;
+  }
   const hasResults = tickets.length > 0 || hasParsed;
 
   useEffect(() => {
@@ -329,28 +338,32 @@ export function SmartWorkLog({
         return;
       }
 
-      const clientNameMap = new Map(
-        clients.map((c) => [normalizeClientName(c.name), c.id])
-      );
+      const clientLookup = buildClientLookup(clients);
       const colleagueNameMap = new Map(
         colleagues.map((c) => [normalizePersonName(c.name), c.id])
       );
       setTickets(
-        parsed.data.tickets.map((ticket, index) => ({
+        parsed.data.tickets.map((ticket, index) => {
+          const matchedClient = ticket.client_name
+            ? clientLookup.get(normalizeClientName(ticket.client_name))
+            : undefined;
+          const unknownClient = clients.length > 0 && !!ticket.client_name && !matchedClient;
+          return {
           ...ticket,
+          // Show the client as the firm registered it, not as it was heard.
+          client_name: matchedClient?.name ?? ticket.client_name,
           id: `${Date.now()}-${index}`,
           workDate: ticket.work_date ?? today,
-          confirmed: ticket.estimated_time_minutes !== null,
+          confirmed: ticket.estimated_time_minutes !== null && !unknownClient,
           editing: false,
-          client_id: ticket.client_name
-            ? (clientNameMap.get(normalizeClientName(ticket.client_name)) ?? null)
-            : null,
+          client_id: matchedClient?.id ?? null,
           helped_user_id: ticket.is_helping_colleague
             ? (colleagueNameMap.get(
                 normalizePersonName(ticket.helped_colleague_name ?? "")
               ) ?? null)
             : null,
-        }))
+          };
+        })
       );
       setParsedInput(cleanDescription);
       setParsedSource(inputSource);
@@ -370,6 +383,13 @@ export function SmartWorkLog({
       return;
     }
     const newConfirmed = !ticket.confirmed;
+    if (newConfirmed && hasUnknownClient(ticket)) {
+      updateTicket(ticket.id, { editing: true });
+      setError(
+        `Klients "${ticket.client_name}" nav jūsu klientu sarakstā. Izvēlies klientu no saraksta vai "Nav klienta".`
+      );
+      return;
+    }
     if (newConfirmed && ticket.client_name === null) {
       setError(
         "Ieteicams norādīt klientu/uzņēmumu - tas ļauj analizēt laiku pa klientiem. Vari iekļaut arī bez klienta."
@@ -409,6 +429,15 @@ export function SmartWorkLog({
         workDate: ticket.workDate,
         confirmed: true,
       }));
+
+    const unknown = tickets.find((ticket) => ticket.confirmed && hasUnknownClient(ticket));
+    if (unknown) {
+      updateTicket(unknown.id, { confirmed: false, editing: true });
+      setError(
+        `Klients "${unknown.client_name}" nav jūsu klientu sarakstā. Izvēlies klientu no saraksta vai "Nav klienta".`
+      );
+      return;
+    }
 
     if (confirmedTickets.length === 0) {
       setError("Iekļauj vismaz vienu ierakstu.");
@@ -550,6 +579,12 @@ export function SmartWorkLog({
                         Nepieciešama pārbaude
                       </Badge>
                     ) : null}
+                    {hasUnknownClient(ticket) ? (
+                      <Badge variant="warning">
+                        <AlertTriangle className="mr-1 h-3 w-3" />
+                        Klients nav sarakstā - izvēlies klientu
+                      </Badge>
+                    ) : null}
                     {!ticket.client_name ? (
                       <Badge variant="outline" className="border-amber-500/30 bg-amber-500/5 text-amber-600 dark:text-amber-400">
                         Norādīt klientu
@@ -638,9 +673,13 @@ export function SmartWorkLog({
                           <>
                             <select
                               id={`client-${ticket.id}`}
-                              value={ticket.client_id ?? "__none__"}
+                              value={
+                                ticket.client_id ??
+                                (hasUnknownClient(ticket) ? "__unknown__" : "__none__")
+                              }
                               onChange={(e) => {
                                 const val = e.target.value;
+                                if (val === "__unknown__") return;
                                 if (val === "__none__") {
                                   updateTicket(ticket.id, { client_id: null, client_name: null });
                                 } else {
@@ -653,6 +692,11 @@ export function SmartWorkLog({
                               }}
                               className="h-10 rounded-md border border-input bg-background px-3 text-sm"
                             >
+                              {hasUnknownClient(ticket) ? (
+                                <option value="__unknown__" disabled>
+                                  Izvēlies klientu...
+                                </option>
+                              ) : null}
                               <option value="__none__">Nav klienta</option>
                               {clients.map((c) => (
                                 <option key={c.id} value={c.id}>{c.name}</option>
@@ -806,7 +850,13 @@ export function SmartWorkLog({
                         </span>
                         <span>{roleLabel(ticket.is_outside_role)}</span>
                         {ticket.client_name ? (
-                          <span>Klients: {ticket.client_name}</span>
+                          hasUnknownClient(ticket) ? (
+                            <span className="text-amber-600 dark:text-amber-400">
+                              Atpazīts: &ldquo;{ticket.client_name}&rdquo; - nav sarakstā
+                            </span>
+                          ) : (
+                            <span>Klients: {ticket.client_name}</span>
+                          )
                         ) : null}
                         {ticket.is_helping_colleague ? (
                           <span className="text-[#248A3D] dark:text-[#30D158]">

@@ -21,7 +21,29 @@ const requestSchema = z.object({
   text: z.string().trim().min(10).max(4000),
 });
 
-function systemPrompt(currentDate: string, categoryGuidance: string) {
+// The firm's client list (with the shorthands registered as aliases), so the
+// AI can map what it heard or read - "Balta", "VKK" - to a real client.
+function clientListGuidance(clients: { name: string; aliases: { name: string }[] }[]) {
+  if (clients.length === 0) return "";
+  const lines = clients
+    .slice(0, 400)
+    .map((c) =>
+      c.aliases.length > 0
+        ? `- ${c.name} (saīsinājumi: ${c.aliases.map((a) => a.name).join(", ")})`
+        : `- ${c.name}`,
+    )
+    .join("\n");
+  return `
+Biroja klientu saraksts:
+${lines}
+- Ja tekstā minētais klients atbilst kādam no saraksta, arī ar drukas vai
+  runas atpazīšanas kļūdām, saīsinājumu vai bez "SIA", client_name ir precīzi
+  nosaukums no saraksta.
+- Ja minētais klients neatbilst nevienam saraksta klientam, client_name ir tieši
+  tas, kas minēts tekstā. Neizvēlies saraksta klientu, ja neesi pārliecināts.`;
+}
+
+function systemPrompt(currentDate: string, categoryGuidance: string, clientGuidance: string) {
   return `
 Tu esi Shadowy darba žurnāla palīgs. Pārvērt darbinieka brīvā teksta aprakstu
 atsevišķos neredzamā darba melnraksta ierakstos latviešu valodā.
@@ -60,6 +82,7 @@ Klienti:
 - Ja tekstā ir minēts klients vai uzņēmums (piemēram, "klientam Ventspils Balss", "SIA Piemērs"), ieraksti precīzi to client_name.
 - Ja viens klients ir pieminēts vairākās aktivitātēs, katram attiecīgajam ierakstam norādi to pašu client_name.
 - Neizdomā klientu. Ja klients nav minēts, client_name ir null.
+${clientGuidance}
 
 Laiks:
 - Ja tekstā ir minēts konkrēts laiks (piemēram, "30 minūtes", "pusstunda", "aptuveni stundu"), izmanto to kā estimated_time_minutes.
@@ -101,7 +124,19 @@ export async function POST(request: Request) {
   // only offered the categories that role actually logs.
   const userRecord = await prisma.user.findUnique({
     where: { id: session.userId },
-    select: { workRole: { select: { name: true } } },
+    select: { canSeeAllClients: true, workRole: { select: { name: true } } },
+  });
+  // Same clients the review screen offers this employee.
+  const clients = await prisma.client.findMany({
+    where: {
+      organizationId: session.organizationId,
+      status: "active",
+      ...(userRecord?.canSeeAllClients
+        ? {}
+        : { assignments: { some: { employeeId: session.userId } } }),
+    },
+    orderBy: { name: "asc" },
+    select: { name: true, aliases: { select: { name: true } } },
   });
   const categorySet = categoriesForWorkRole(userRecord?.workRole?.name);
   const categoryGuidance = buildCategoryGuidance(categorySet);
@@ -168,7 +203,7 @@ export async function POST(request: Request) {
         store: false,
         max_output_tokens: 2500,
         input: [
-          { role: "system", content: systemPrompt(currentDate, categoryGuidance) },
+          { role: "system", content: systemPrompt(currentDate, categoryGuidance, clientListGuidance(clients)) },
           { role: "user", content: parsedRequest.data.text },
         ],
         text: {

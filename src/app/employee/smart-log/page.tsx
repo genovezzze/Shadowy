@@ -22,7 +22,7 @@ export default async function SmartLogPage() {
         : { assignments: { some: { employeeId: session.userId } } }),
     },
     orderBy: { name: "asc" },
-    select: { id: true, name: true },
+    select: { id: true, name: true, aliases: { select: { normalized: true } } },
   });
 
   // Colleagues to name as the recipient of help - same org, excluding self.
