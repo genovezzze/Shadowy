@@ -6,6 +6,7 @@ import {
   isActionRateLimited,
   recordActionHit,
 } from "@/lib/rate-limit";
+import { transcriptionTarget } from "@/lib/ai-provider";
 
 export const runtime = "nodejs";
 
@@ -82,8 +83,8 @@ export async function POST(request: Request) {
     );
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const target = transcriptionTarget();
+  if (!target) {
     return NextResponse.json(
       {
         error:
@@ -101,23 +102,17 @@ export async function POST(request: Request) {
     audio,
     `shadowy-voice.${extensionForType(normalizedType)}`
   );
-  upstreamForm.append(
-    "model",
-    process.env.OPENAI_TRANSCRIBE_MODEL ?? "gpt-4o-transcribe"
-  );
+  if (target.sendModel) upstreamForm.append("model", target.model);
   upstreamForm.append("language", "lv");
   upstreamForm.append("response_format", "json");
-  upstreamForm.append(
-    "prompt",
-    "Audio is in Latvian. It is an employee describing their work for Shadowy: bookkeeping and posting entries, scanning and archiving documents, invoicing, payments, payroll, checks and reconciliation, client communication, and also extra work such as helping colleagues, urgent tasks or work outside their role. Transcribe clearly in Latvian. Do not translate."
-  );
+  upstreamForm.append("prompt", target.prompt);
 
   try {
     const response = await fetch(
-      "https://api.openai.com/v1/audio/transcriptions",
+      target.url,
       {
         method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}` },
+        headers: target.headers,
         body: upstreamForm,
         signal: AbortSignal.timeout(45_000),
       }
@@ -134,7 +129,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             error:
-              "OpenAI API kontam nav pieejamas kvotas. Lūdzu, pārbaudi API norēķinu iestatījumus.",
+              "AI pakalpojumam šobrīd nav pieejamas kvotas. Lūdzu, mēģini vēlreiz pēc brīža.",
           },
           { status: 503 }
         );

@@ -13,6 +13,7 @@ import {
   smartLogResponseSchema,
 } from "@/lib/smart-log";
 import { prisma } from "@/lib/db";
+import { responsesTarget } from "@/lib/ai-provider";
 
 export const runtime = "nodejs";
 
@@ -137,8 +138,8 @@ export async function POST(request: Request) {
   }
   await recordActionHit(rateLimitKey, ip, 15);
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  const target = responsesTarget();
+  if (!target) {
     return NextResponse.json(
       {
         error:
@@ -156,14 +157,14 @@ export async function POST(request: Request) {
       day: "2-digit",
     }).format(new Date());
 
-    const aiResponse = await fetch("https://api.openai.com/v1/responses", {
+    const aiResponse = await fetch(target.url, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        ...target.headers,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL ?? "gpt-5.4-mini",
+        model: target.model,
         store: false,
         max_output_tokens: 2500,
         input: [
@@ -192,7 +193,7 @@ export async function POST(request: Request) {
         return NextResponse.json(
           {
             error:
-              "OpenAI API kontam nav pieejamas kvotas. Lūdzu, pārbaudi API norēķinu iestatījumus.",
+              "AI pakalpojumam šobrīd nav pieejamas kvotas. Lūdzu, mēģini vēlreiz pēc brīža.",
           },
           { status: 503 }
         );
