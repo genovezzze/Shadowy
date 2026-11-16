@@ -130,6 +130,8 @@ export function HeroVideoBackground() {
           shot stays visible instead of being crushed to black. */}
       <div className="absolute inset-0 bg-[#05070a]/55" />
       <div className="absolute inset-0 bg-[radial-gradient(85%_65%_at_50%_45%,rgba(5,7,10,0.33)_0%,rgba(5,7,10,0.55)_60%,rgba(5,7,10,0.73)_100%)]" />
+      {/* Liquid glass: an iridescent film over the dimmed footage. */}
+      <div className="hero-glass-film absolute -inset-[10%] opacity-80" />
       <div className="absolute inset-x-0 bottom-0 h-56 bg-[linear-gradient(to_bottom,transparent_0%,rgba(7,8,9,0.72)_58%,#070809_100%)]" />
     </div>
   );

@@ -1,20 +1,20 @@
 "use client";
 
-import Image from "next/image";
+import * as React from "react";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { Reveal } from "@/components/landing/atoms/landing-primitives";
-import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
+import { cn } from "@/lib/utils";
 
-type Outcome = {
-  tag: Record<Locale, string>;
-  title: Record<Locale, string>;
-  text: Record<Locale, string>;
-};
+type L = Record<Locale, string>;
+type Outcome = { title: L; text: L; cta?: boolean };
 
+// What the firm has in hand after the pilot, as the atoms.technology grey
+// panel: a light title and line drawing on the left, white cards with a corner
+// marker on the right. The last card is the answer (blue marker, button).
 const OUTCOMES: Outcome[] = [
   {
-    tag: { lv: "Klienti", en: "Clients" },
     title: { lv: "Katra klienta pašizmaksa", en: "The cost of each client" },
     text: {
       lv: "Cik stundu un naudas katrs klients prasa mēnesī un vai tas iekļaujas līgumā paredzētajā laikā",
@@ -22,23 +22,13 @@ const OUTCOMES: Outcome[] = [
     },
   },
   {
-    tag: { lv: "Cena", en: "Pricing" },
     title: { lv: "Kam pārskatīt cenu", en: "Who to reprice" },
     text: {
       lv: "Kuri klienti prasa vairāk, nekā maksā, ar stundām un iemesliem, ko var parādīt sarunā ar klientu",
-      en: "Which clients take more than they pay for, with hours and reasons you can show in the conversation with the client",
+      en: "Which clients take more than they pay for, with hours and reasons you can show the client",
     },
   },
   {
-    tag: { lv: "Tendences", en: "Trends" },
-    title: { lv: "Atkārtotās problēmas", en: "Recurring problems" },
-    text: {
-      lv: "Kas visbiežāk traucē pamatdarbam un atkārtojas komandā",
-      en: "What most often gets in the way of core work and repeats across the team",
-    },
-  },
-  {
-    tag: { lv: "Stundas", en: "Hours" },
     title: { lv: "Papildu darba stundas", en: "Extra work hours" },
     text: {
       lv: "Cik laika aizgāja klienta dokumentu labošanā, gaidīšanā un atkārtotos jautājumos",
@@ -46,7 +36,13 @@ const OUTCOMES: Outcome[] = [
     },
   },
   {
-    tag: { lv: "Slodze", en: "Load" },
+    title: { lv: "Atkārtotās problēmas", en: "Recurring problems" },
+    text: {
+      lv: "Kas visbiežāk traucē pamatdarbam un atkārtojas komandā",
+      en: "What most often gets in the way of core work and repeats across the team",
+    },
+  },
+  {
     title: { lv: "Nevienmērīga slodze", en: "Uneven workload" },
     text: {
       lv: "Kur darbs sadalās nevienlīdzīgi starp cilvēkiem un lomām",
@@ -54,122 +50,170 @@ const OUTCOMES: Outcome[] = [
     },
   },
   {
-    tag: { lv: "Rīcība", en: "Action" },
     title: { lv: "Procesu ieteikumi", en: "Process suggestions" },
     text: {
       lv: "2-3 konkrēti uzlabojumi, ko var ieviest komandā uzreiz pēc pilota",
       en: "2-3 concrete improvements you can roll out in the team right after the pilot",
     },
+    cta: true,
   },
 ];
+
+// An isometric slab whose top ripples: the flat fixed fee with the real
+// workload moving under it. Drawn from a height function, so it is our own
+// line art and stays crisp at any size.
+const ART_W = 420;
+const COS = Math.cos(Math.PI / 6);
+function iso(u: number, v: number, h: number) {
+  const S = 300;
+  return [ART_W / 2 + (u - v) * COS * S * 0.5, 70 + (u + v) * 0.5 * S * 0.5 - h] as const;
+}
+function pathOf(points: (readonly [number, number])[]) {
+  return points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+}
+// The surface keeps rolling slowly: `phase` shifts the wave along the slab.
+const height = (u: number, v: number, phase = 0) =>
+  34 + 26 * Math.sin(u * Math.PI * 1.6 + v * 1.4 - phase) * Math.sin(v * Math.PI * 0.9 + 0.4 + phase * 0.35);
+const ROWS = 34;
+const STEPS = 48;
+
+function slabPaths(phase: number) {
+  const surface = Array.from({ length: ROWS }, (_, r) => {
+    const v = r / (ROWS - 1);
+    return pathOf(Array.from({ length: STEPS + 1 }, (_, i) => iso(i / STEPS, v, height(i / STEPS, v, phase))));
+  });
+  const front = Array.from({ length: STEPS + 1 }, (_, i) => iso(i / STEPS, 1, height(i / STEPS, 1, phase)));
+  const right = Array.from({ length: STEPS + 1 }, (_, i) => iso(1, i / STEPS, height(1, i / STEPS, phase)));
+  return {
+    surface,
+    front: pathOf(front) + `L${iso(1, 1, 0).join(" ")}L${iso(0, 1, 0).join(" ")}Z`,
+    right: pathOf(right) + `L${iso(1, 1, 0).join(" ")}L${iso(1, 0, 0).join(" ")}Z`,
+  };
+}
+const STILL = slabPaths(0);
+
+export function SlabArt({ className, fill = "#f1f1f1" }: { className?: string; fill?: string } = {}) {
+  const svgRef = React.useRef<SVGSVGElement | null>(null);
+
+  // Paths are rewritten straight on the DOM each frame (no React re-render),
+  // only while the drawing is on screen, and never for reduced motion.
+  React.useEffect(() => {
+    const svg = svgRef.current;
+    // Phones keep the drawing still: the per-frame path rewrite costs too much
+    // main-thread time there.
+    if (
+      !svg ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      !window.matchMedia("(min-width: 768px)").matches
+    )
+      return;
+    const lines = Array.from(svg.querySelectorAll<SVGPathElement>("[data-line]"));
+    const front = svg.querySelector<SVGPathElement>("[data-front]");
+    const right = svg.querySelector<SVGPathElement>("[data-right]");
+    let frame = 0;
+    let visible = false;
+    const start = performance.now();
+    const tick = (now: number) => {
+      const p = slabPaths(((now - start) / 1000) * 0.6);
+      p.surface.forEach((d, i) => lines[i]?.setAttribute("d", d));
+      front?.setAttribute("d", p.front);
+      right?.setAttribute("d", p.right);
+      frame = requestAnimationFrame(tick);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && !visible) {
+        visible = true;
+        frame = requestAnimationFrame(tick);
+      } else if (!entry.isIntersecting && visible) {
+        visible = false;
+        cancelAnimationFrame(frame);
+      }
+    });
+    observer.observe(svg);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
+  return (
+    <svg
+      ref={svgRef}
+      viewBox={`0 0 ${ART_W} 330`}
+      className={className ?? "h-auto w-full max-w-[460px] text-black lg:max-w-[520px] 2xl:max-w-[640px]"}
+      aria-hidden
+    >
+      <g fill="none" stroke="currentColor" strokeWidth={0.8} strokeOpacity={0.55}>
+        {STILL.surface.map((d, i) => (
+          <path key={i} data-line d={d} />
+        ))}
+      </g>
+      <g fill={fill} stroke="currentColor" strokeWidth={0.9} strokeOpacity={0.7}>
+        <path data-right d={STILL.right} />
+        <path data-front d={STILL.front} />
+      </g>
+    </svg>
+  );
+}
 
 export function LandingOutcomes() {
   const { locale, t } = useLocale();
   return (
-    <section
-      id="ieguvumi"
-      // Less top padding than the reference's 128px so the badge and heading
-      // sit higher in the band rather than floating in empty sky.
-      className="relative scroll-mt-20 overflow-hidden pb-[360px] pt-16 sm:pb-32 sm:pt-20"
-      style={{
-        // The reference's own stops, except the last: it ends on #E8F0F7, a
-        // blue-white that would leave a visible seam against the neutral
-        // #FAFAFA of the section below, so the fade lands on that instead.
-        background:
-          "linear-gradient(180deg, #5B82AB 0%, #B6CCDF 45%, #FAFAFA 100%)",
-      }}
-    >
-      {/* Sized as a share of the section itself, not a fixed box - explicit
-          width/height rather than `fill` so the className below controls the
-          rendered size directly instead of fighting next/image's own inset-0
-          sizing. Bleeds off both the left and bottom edges of the section
-          (negative left and bottom) rather than sitting flush in the corner,
-          which is what makes it read as scenery continuing past the frame
-          instead of a sticker pinned inside it. The white cards sit above it
-          (z-10 on the content wrapper below), so any overlap under their
-          edges is simply hidden, not clipped. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
-        <Image
-          src="/images/Blue-Tree-Enhanced.webp"
-          alt=""
-          width={1732}
-          height={908}
-          sizes="100vw"
-          // The illustration carries its own sky, which never matches the
-          // section gradient exactly at whatever height its top edge lands -
-          // so that edge read as a hard horizontal line across the band.
-          // Fading the top third of the image into transparency dissolves the
-          // seam and lets the painted sky hand over to the gradient.
-          style={{
-            maskImage:
-              "linear-gradient(to bottom, transparent 0%, #000 32%, #000 100%)",
-            WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0%, #000 32%, #000 100%)",
-          }}
-          // Pulled further left on wide screens than the old scenery needed:
-          // this illustration carries its subject - the tree - in the left third
-          // rather than spread across the frame, so at -5% the crown reached
-          // under the outcome cards. -12% is the window between that and -20%,
-          // where the crown started being clipped by the left edge instead.
-          className="absolute bottom-0 left-0 h-auto w-[170%] max-w-none translate-x-0 object-contain object-left-bottom sm:left-1/2 sm:-translate-x-1/2 sm:bottom-auto sm:top-[10%] sm:w-[120%] lg:left-[-12%] lg:top-auto lg:bottom-0 lg:w-[120%] lg:translate-x-0"
-        />
-      </div>
-
-      <div className="relative z-10 w-full px-4 md:px-8">
-        <div className="flex flex-col items-start gap-12 lg:flex-row lg:gap-24">
-          <Reveal className="lg:w-1/3">
-            <div className="mb-4 inline-block">
-              <span className="inline-flex items-center rounded-full bg-white/20 px-4 py-1 text-sm font-medium text-white">
-                {t("outcomes.badge")}
-              </span>
-            </div>
-            <h2 className="text-landing-h2 text-white">
-              <WaveHeading tone="light">{t("outcomes.heading")}</WaveHeading>
+    <section id="ieguvumi" className="relative scroll-mt-20 bg-[var(--landing-paper)] px-3 py-8 md:px-6 md:py-12">
+      <div className="rounded-[28px] bg-[#f1f1f1] p-6 md:p-10 xl:p-14">
+        <div className="grid gap-10 lg:grid-cols-2 lg:gap-12">
+          <Reveal className="flex flex-col">
+            <h2 className="text-[clamp(2.2rem,4.4vw,3.6rem)] font-light leading-[1.05] tracking-tight text-black">
+              {locale === "lv" ? (
+                <>
+                  Ko jūs redzēsiet
+                  <br />
+                  pēc pilota
+                </>
+              ) : (
+                <>
+                  What you&apos;ll see
+                  <br />
+                  after the pilot
+                </>
+              )}
             </h2>
-            <Link
-              href="#pilots"
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-all hover:bg-white/90 active:scale-[0.98]"
-            >
-              {t("outcomes.cta")}
-            </Link>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-black/55">
+              {locale === "lv"
+                ? "Pēc 30 dienām birojs redz skaitļos to, ko līdz šim zināja tikai pēc sajūtas"
+                : "After 30 days the firm sees in numbers what it used to know only by feel"}
+            </p>
+            <div className="mt-6 flex flex-1 items-center justify-center lg:mt-6">
+              <SlabArt />
+            </div>
           </Reveal>
 
-          <div className="grid w-full gap-6 sm:grid-cols-2 lg:w-2/3">
-            {OUTCOMES.map((outcome, index) => (
-              <Reveal key={outcome.title.lv} delay={0.05 * index}>
-                {/* Title leads, tag sits at the foot behind a hairline rule -
-                    the icon that used to head the card is gone, so nothing
-                    competes with the heading for the top of the card
-                    justify-between pins the tag to the bottom edge, keeping
-                    tags aligned across a row whose descriptions differ in
-                    length. Sizes are the reference's own: 32px padding, 16px
-                    radius, 24px title, 16px body, and a 290px floor so the
-                    cards carry the same presence as there despite having no
-                    button to fill the last row. */}
-                <article className="flex h-full min-h-[290px] flex-col justify-between rounded-2xl bg-white p-8 shadow-[0_4px_20px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_8px_28px_rgba(0,0,0,0.10)]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {OUTCOMES.map((item, index) => (
+              <Reveal key={item.title.lv} delay={0.04 * index}>
+                <article className="relative flex h-full flex-col justify-between gap-5 rounded-2xl bg-white p-6 sm:min-h-[210px] sm:gap-8 md:min-h-[240px] md:p-7">
+                  {/* Corner marker: grey on the findings, blue on the answer. */}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "absolute right-6 top-6 size-3 [clip-path:polygon(0_0,100%_0,100%_100%)] md:right-7 md:top-7",
+                      item.cta ? "bg-[#2563eb]" : "bg-black/40",
+                    )}
+                  />
+                  <h3 className="max-w-[85%] text-[1.6rem] font-light leading-[1.15] tracking-tight text-black">
+                    {item.title[locale]}
+                  </h3>
                   <div>
-                    <h3 className="text-xl font-bold leading-tight tracking-tight text-black md:text-2xl">
-                      {outcome.title[locale]}
-                    </h3>
-                    <p className="mt-3 text-sm font-semibold leading-relaxed text-black/60 md:text-base">
-                      {outcome.text[locale]}
-                    </p>
-                  </div>
-
-                  <div className="mt-8">
-                    <div className="flex items-center gap-2">
-                      <span className="h-4 w-px shrink-0 bg-black/15" aria-hidden />
-                      <span className="rounded-[4px] bg-black/5 px-3 py-1 text-[13px] font-bold leading-tight tracking-tight text-black/70 md:text-sm">
-                        {outcome.tag[locale]}
-                      </span>
-                    </div>
-
-                    <Link
-                      href="#pilots"
-                      className="mt-5 inline-flex w-fit items-center gap-2 rounded-full bg-black px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-black/85"
-                    >
-                      {t("outcomes.learnMore")}
-                    </Link>
+                    <p className="text-[15px] leading-relaxed text-black/55">{item.text[locale]}</p>
+                    {item.cta ? (
+                      <Link
+                        href="#pilots"
+                        className="mt-5 inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-black/85"
+                      >
+                        {t("outcomes.cta")}
+                        <ArrowRight className="size-4" aria-hidden />
+                      </Link>
+                    ) : null}
                   </div>
                 </article>
               </Reveal>

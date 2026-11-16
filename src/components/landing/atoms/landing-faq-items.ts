@@ -39,6 +39,16 @@ export const FAQ_ITEMS: readonly {
   },
   {
     question: {
+      lv: "Cik maksā Shadowy pēc pilota?",
+      en: "How much does Shadowy cost after the pilot?",
+    },
+    answer: {
+      lv: "Standarta plāns maksā 49 € mēnesī par visu biroju, neatkarīgi no darbinieku skaita. Premium plānā ir paplašinātās funkcijas un ikmēneša pielāgošana jūsu birojam, cena pēc vienošanās. Pakalpojumu var pārtraukt jebkurā mēnesī",
+      en: "The Standard plan is €49 a month for the whole firm, whatever the number of employees. Premium adds extended features and monthly tailoring to your firm, priced by agreement. You can cancel in any month",
+    },
+  },
+  {
+    question: {
       lv: "Kā tiek aizsargāti dati?",
       en: "How is the data protected?",
     },

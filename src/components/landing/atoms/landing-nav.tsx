@@ -16,6 +16,7 @@ import {
   Gauge,
   HelpCircle,
   Newspaper,
+  Euro,
   Eye,
   LogIn,
   AlignLeft,
@@ -159,6 +160,7 @@ const MENU_CARDS: { tkey: StringKey; href: string; icon: LucideIcon }[] = [
   { tkey: "menu.forWhom", href: "#kam-noder", icon: Users },
   { tkey: "menu.clients", href: "#klienti", icon: Building2 },
   { tkey: "menu.blog", href: "/blog", icon: Newspaper },
+  { tkey: "menu.pricing", href: "#cenas", icon: Euro },
   { tkey: "menu.faq", href: "#faq", icon: HelpCircle },
 ];
 
@@ -407,7 +409,7 @@ export function LandingNav({
           the radius the cards and panels below use. */}
       <div
         className={cn(
-          "relative mx-auto max-w-6xl overflow-hidden rounded-[4px] backdrop-blur-xl transition-colors duration-500 ease-out lg:overflow-visible",
+          "relative mx-auto max-w-6xl overflow-hidden rounded-[4px] backdrop-blur-xl xl:max-w-7xl 2xl:max-w-none min-[1800px]:[zoom:1.12] min-[2300px]:[zoom:1.3] transition-colors duration-500 ease-out lg:overflow-visible",
           // The drop shadow is what lifts the bar off the page now that it has
           // no outline. Deeper over the dark hero, where a soft grey halo would
           // otherwise be invisible against near-black.
@@ -416,7 +418,7 @@ export function LandingNav({
             : "bg-white/[0.08] shadow-[0_8px_30px_rgba(0,0,0,0.30)]",
         )}
       >
-      <div className="relative flex w-full items-center justify-between gap-6 px-4 py-2 md:px-6">
+      <div className="relative flex w-full items-center justify-between gap-6 px-4 py-2 md:px-6 2xl:px-8 2xl:py-3">
         {/* Left: logo + a single menu trigger, like the reference */}
         <div className="flex items-center gap-3 lg:gap-6">
         <Link
@@ -543,14 +545,17 @@ export function LandingNav({
         </Link>
         </div>
 
-        {/* Centre: pill → opens the concierge chat */}
+        {/* Centre: pill → opens the concierge chat. It sits in the row's flow
+            (not absolutely centred), so it can never run over "Raksti" or
+            "Cenas" and keeps an equal gap to both; it grows up to its cap and
+            the rest of the width is shared out evenly. From xl only. */}
         <button
           type="button"
           onClick={() => setChatOpen(true)}
           onMouseEnter={() => setActiveMegaMenu(null)}
           aria-haspopup="dialog"
           className={cn(
-            "absolute left-1/2 top-1/2 hidden w-[clamp(320px,34vw,540px)] -translate-x-1/2 -translate-y-1/2 items-center justify-between gap-3 rounded-full py-2.5 pl-4 pr-2 text-sm transition-colors lg:flex",
+            "relative hidden min-w-0 max-w-[540px] flex-1 items-center justify-between gap-3 rounded-full py-2.5 pl-4 pr-2 text-sm transition-colors xl:flex 2xl:max-w-[640px]",
             navIsLight
               ? "bg-black/[0.05] text-black/55 hover:bg-black/[0.08]"
               : "bg-white/[0.08] text-white/60 hover:bg-white/[0.12]",
@@ -574,6 +579,19 @@ export function LandingNav({
           className="flex shrink-0 items-center gap-2 sm:gap-2.5"
           onMouseEnter={() => setActiveMegaMenu(null)}
         >
+          {/* Right group, left of the mail icon: next to Izpēti/Raksti it ran
+              into the centre pill at laptop widths. */}
+          <Link
+            href={resolveHref("#cenas")}
+            className={cn(
+              "hidden rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out lg:block",
+              navIsLight
+                ? "text-black/80 hover:bg-black/[0.035] hover:text-black"
+                : "text-white/85 hover:bg-white/[0.08] hover:text-white",
+            )}
+          >
+            {t("menu.pricing")}
+          </Link>
           <div className="group relative hidden sm:block">
             <a
               href="mailto:contact@shadowy.lv"

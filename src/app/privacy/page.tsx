@@ -6,11 +6,50 @@ import { Button } from "@/components/ui/button";
 export const metadata: Metadata = {
   title: "Privātuma politika",
   description:
-    "Kā Shadowy apstrādā un glabā jūsu organizācijas datus, kam tie ir pieejami un kā tos eksportēt vai dzēst.",
+    "Kā Shadowy apstrādā grāmatvedības biroju un to darbinieku datus: kādi dati, kur tie glabājas (ES), kas tos redz, apakšapstrādātāji un jūsu tiesības.",
   alternates: { canonical: "/privacy" },
 };
 
 const CONTACT_EMAIL = "contact@shadowy.lv";
+const UPDATED = "16.11.2026.";
+
+// Keep in step with the subprocessor annex of the data processing agreement.
+const SUBPROCESSORS = [
+  {
+    name: "Vercel Inc. (ASV)",
+    role: "Lietotnes mitināšana un servera funkcijas; anonīma apmeklējumu statistika bez sīkdatnēm",
+    where: "ES, Frankfurte",
+  },
+  { name: "Neon Inc. (ASV)", role: "Datubāze", where: "ES, Frankfurte" },
+  {
+    name: "Microsoft Ireland Operations Ltd.",
+    role: "Azure OpenAI: ierakstu strukturēšana un runas atpazīšana",
+    where: "ES, Zviedrija",
+  },
+  { name: "Resend (ASV)", role: "E-pasta paziņojumi", where: "ASV uzņēmums" },
+  { name: "Functional Software, Inc. / Sentry (ASV)", role: "Tehnisku kļūdu uzraudzība", where: "ASV uzņēmums" },
+];
+
+function Section({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
+  return (
+    <section>
+      <h2 className="text-lg font-semibold tracking-tight">
+        {n}. {title}
+      </h2>
+      <div className="mt-3 space-y-3 text-muted-foreground">{children}</div>
+    </section>
+  );
+}
+
+function List({ items }: { items: React.ReactNode[] }) {
+  return (
+    <ul className="list-disc space-y-1.5 pl-5">
+      {items.map((item, i) => (
+        <li key={i}>{item}</li>
+      ))}
+    </ul>
+  );
+}
 
 export default function PrivacyPage() {
   return (
@@ -23,131 +62,154 @@ export default function PrivacyPage() {
           </Link>
         </div>
 
-        <h1 className="font-display font-black text-3xl tracking-tight sm:text-4xl">
-          Privātuma politika un lietošanas noteikumi
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Spēkā no pilota uzsākšanas. Šī ir vienkāršota politika, kas atbilst Shadowy 30 dienu pilota apjomam.
-        </p>
+        <h1 className="font-display text-3xl font-black tracking-tight sm:text-4xl">Privātuma politika</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Atjaunināta {UPDATED}</p>
 
         <div className="mt-10 space-y-8 text-sm leading-relaxed">
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">1. Kādi dati tiek apkopoti</h2>
-            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
-              <li>Konta dati: vārds, e-pasta adrese, loma (administrators / vadītājs / darbinieks), amats</li>
-              <li>Organizācijas dati: nosaukums, komandas struktūra (kurš ir kura vadītājs)</li>
-              <li>Darba ieraksti: nosaukums, apraksts, ilgums, datums un kategorija</li>
-              <li>Apstiprinājumu un bonusu pieprasījumu statusi un komentāri</li>
-              <li>Pilota pieteikuma forma (publiska): vārds, uzņēmums, e-pasts, komandas lielums, komentārs</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">2. Kas redz kādus datus</h2>
-            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
-              <li><strong className="text-foreground">Darbinieks</strong> redz tikai savus ierakstus un to statusu.</li>
-              <li><strong className="text-foreground">Vadītājs</strong> redz savas komandas (sev piešķirto darbinieku) ierakstus, apstiprinājumus un bonusu pieprasījumus.</li>
-              <li><strong className="text-foreground">Administrators</strong> redz visus savas organizācijas datus - darbiniekus, vadītājus, ierakstus un pārskatus.</li>
-              <li><strong className="text-foreground">Shadowy komanda</strong> pilota laikā var piekļūt organizāciju sarakstam un pamatstatistikai (lai nodrošinātu pilota darbību), bet ikdienā nepiekļūst ierakstu saturam.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">3. Ko vadītājs NEREDZ</h2>
-            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
-              <li>Citu organizāciju datus.</li>
-              <li>Citu vadītāju komandu ierakstus un pārskatus.</li>
-              <li>Ekrāna aktivitāti, privātas sarunas vai citus ar Shadowy nesaistītus datus - platforma šādus datus nemaz nevāc.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">4. Datu glabāšana, eksports un dzēšana</h2>
-            <p className="mt-3 text-muted-foreground">
-              Dati tiek glabāti, kamēr organizācijas konts ir aktīvs. Lai pieprasītu sava konta vai organizācijas
-              datu eksportu (CSV) vai dzēšanu, rakstiet uz kontaktadresi zemāk - pilota laikā šos pieprasījumus
-              apstrādājam manuāli, parasti 1-2 darba dienu laikā.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">5. Datu glabāšanas vieta un drošība</h2>
-            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
-              <li>Visi dati tiek glabāti datubāzē Eiropas Savienības teritorijā (Frankfurtē, Vācijā), atbilstoši GDPR prasībām.</li>
-              <li>Savienojumi ar serveriem ir šifrēti (SSL/TLS).</li>
-              <li>Paroles tiek glabātas tikai vienvirziena šifrētā (hash) veidā - Shadowy komanda tās neredz.</li>
-              <li>Katras organizācijas dati ir stingri nodalīti un nav pieejami citām organizācijām.</li>
-            </ul>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">6. Sīkdatnes</h2>
-            <p className="mt-3 text-muted-foreground">
-              Shadowy izmanto vienu funkcionālu sesijas sīkdatni (httpOnly), lai noturētu jūsu pieslēgšanos.
-              Netiek izmantotas reklāmu vai trešo pušu analītikas sīkdatnes.
-            </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">7. Kontakti</h2>
-            <p className="mt-3 text-muted-foreground">
-              Par jautājumiem par datiem, privātumu vai šo politiku rakstiet uz{" "}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 text-foreground">
+          <Section n={1} title="Kas mēs esam">
+            <p>
+              Shadowy ir rīks grāmatvedības birojiem, kas parāda, cik laika un naudas patiesībā aiziet uz katru
+              klientu. Pakalpojumu sniedz Shadowy (Artemijs Mihails Lučins), e-pasts{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline underline-offset-2">
                 {CONTACT_EMAIL}
-              </a>.
+              </a>
+              .
             </p>
-          </section>
-        </div>
-
-        <h2 id="lietosanas-noteikumi" className="mt-14 font-display font-black text-2xl tracking-tight sm:text-3xl">
-          Lietošanas noteikumi
-        </h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Spēkā pilota perioda laikā. Lietojot Shadowy, jūsu organizācija piekrīt šiem noteikumiem.
-        </p>
-
-        <div className="mt-10 space-y-8 text-sm leading-relaxed">
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">8. Pakalpojuma apraksts</h2>
-            <p className="mt-3 text-muted-foreground">
-              Shadowy ir rīks darba ierakstu apkopošanai, apstiprināšanai un bonusu pārvaldībai. Pilota
-              perioda laikā pakalpojums tiek nodrošināts bez maksas un var tikt mainīts vai pārtraukts
-              jebkurā brīdī, par to iepriekš informējot.
+            <p>
+              Birojs, kas lieto Shadowy, ir savu darbinieku un klientu datu <strong className="text-foreground">pārzinis</strong>.
+              Shadowy šos datus apstrādā biroja uzdevumā kā <strong className="text-foreground">apstrādātājs</strong> saskaņā
+              ar datu apstrādes līgumu (VDAR 28. pants). Par pilota pieteikuma formas un vietnes datiem pārzinis ir
+              Shadowy.
             </p>
-          </section>
+          </Section>
 
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">9. Lietotāju pienākumi</h2>
-            <ul className="mt-3 space-y-1.5 list-disc pl-5 text-muted-foreground">
-              <li>Organizācijas administrators ir atbildīgs par lietotāju kontu pārvaldību savā organizācijā.</li>
-              <li>Konta piekļuves dati nav jānodod trešajām personām.</li>
-              <li>Platforma jāizmanto tikai likumīgiem, ar darba uzskaiti saistītiem mērķiem.</li>
-            </ul>
-          </section>
+          <Section n={2} title="Kādi dati tiek apstrādāti">
+            <List
+              items={[
+                "Lietotāju konti: vārds, uzvārds, e-pasts, loma (administrators, vadītājs, darbinieks), amats un, ja to norāda birojs, stundas likme.",
+                "Darba ieraksti: datums, ilgums, īss apraksts, darba veids, klients, atzīme par palīdzību kolēģim.",
+                "Biroja klientu saraksts: nosaukums vai vārds, saīsinājumi un, ja to norāda birojs, mēneša maksa.",
+                "Balss ievade: audio tiek nosūtīts runas atpazīšanai un pārvērsts tekstā. Audio netiek saglabāts; saglabāts tiek tikai darbinieka apstiprinātais teksts.",
+                "Pilota pieteikuma forma: vārds, uzņēmums, e-pasts, komandas lielums, komentārs.",
+                "Tehniskie dati: pieteikšanās laiks, IP adrese drošības nolūkos, kļūdu žurnāli.",
+              ]}
+            />
+            <p>Lūdzam neievadīt personas kodus, veselības datus un citu sensitīvu informāciju.</p>
+          </Section>
 
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">10. Pieejamība un atbildība</h2>
-            <p className="mt-3 text-muted-foreground">
-              Pilota laikā pakalpojums tiek nodrošināts &quot;kā ir&quot;, bez garantijām par nepārtrauktu pieejamību.
-              Shadowy nav atbildīgs par neiegūto peļņu vai netiešiem zaudējumiem, kas radušies pakalpojuma
-              lietošanas vai tā pārtraukumu rezultātā.
+          <Section n={3} title="Kāpēc un uz kāda pamata">
+            <List
+              items={[
+                "Lai birojs redzētu darba laiku un izmaksas pa klientiem un taisnīgi sadalītu slodzi (biroja kā pārziņa leģitīmās intereses vai līguma izpilde).",
+                "Lai sniegtu pakalpojumu, nodrošinātu drošību un atbalstu (līgums ar biroju).",
+                "Lai atbildētu uz pilota pieteikumu (jūsu pieprasījums pirms līguma noslēgšanas).",
+              ]}
+            />
+          </Section>
+
+          <Section n={4} title="Ko Shadowy nedara">
+            <List
+              items={[
+                "Neseko ekrānam, taustiņiem, programmām, interneta lietošanai vai atrašanās vietai.",
+                "Nesaglabā ierakstu bez darbinieka apstiprinājuma.",
+                "Nesarindo darbiniekus un nepārdod datus. Dati netiek izmantoti mākslīgā intelekta apmācībai.",
+              ]}
+            />
+          </Section>
+
+          <Section n={5} title="Kas redz datus">
+            <List
+              items={[
+                <><strong className="text-foreground">Darbinieks</strong> redz savus ierakstus.</>,
+                <><strong className="text-foreground">Vadītājs</strong> redz savas komandas ierakstus un pārskatus.</>,
+                <><strong className="text-foreground">Administrators</strong> redz savas organizācijas datus.</>,
+                <><strong className="text-foreground">Citu biroju lietotāji</strong> jūsu datus neredz: katras organizācijas dati ir nodalīti, un tas tiek pārbaudīts ar automātiskiem testiem.</>,
+                <><strong className="text-foreground">Shadowy</strong> piekļūst ierakstu saturam tikai atbalsta vai kļūdu novēršanas nolūkā pēc biroja pieprasījuma.</>,
+              ]}
+            />
+          </Section>
+
+          <Section n={6} title="Kur dati glabājas un apakšapstrādātāji">
+            <p>
+              Datubāze, serveri un mākslīgā intelekta apstrāde atrodas Eiropas Savienībā. Ja apakšapstrādātājs ir
+              reģistrēts ASV, datu nosūtīšana notiek, pamatojoties uz ES-ASV Datu privātuma regulējumu vai standarta
+              līguma klauzulām.
             </p>
-          </section>
-
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">11. Pilota pārtraukšana un dati</h2>
-            <p className="mt-3 text-muted-foreground">
-              Jūs vai Shadowy var pārtraukt pilota dalību jebkurā brīdī. Pēc pārtraukšanas jūsu organizācijas
-              dati tiks glabāti līdz 30 dienām, lai jūs varētu pieprasīt eksportu, pēc tam tie tiek dzēsti.
+            <div className="overflow-x-auto rounded-lg border border-border">
+              <table className="w-full text-left text-xs sm:text-sm">
+                <thead className="bg-muted/50 text-foreground">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold">Uzņēmums</th>
+                    <th className="px-3 py-2 font-semibold">Funkcija</th>
+                    <th className="px-3 py-2 font-semibold">Atrašanās vieta</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {SUBPROCESSORS.map((s) => (
+                    <tr key={s.name} className="border-t border-border align-top">
+                      <td className="px-3 py-2 text-foreground">{s.name}</td>
+                      <td className="px-3 py-2">{s.role}</td>
+                      <td className="px-3 py-2">{s.where}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Microsoft Azure OpenAI nosūtītos tekstus un audio neizmanto modeļu apmācībai; ļaunprātīgas izmantošanas
+              uzraudzībai tie var tikt glabāti līdz 30 dienām tajā pašā reģionā.
             </p>
-          </section>
+          </Section>
 
-          <section>
-            <h2 className="text-lg font-semibold tracking-tight">12. Piemērojamie tiesību akti</h2>
-            <p className="mt-3 text-muted-foreground">
-              Šiem noteikumiem piemēro Latvijas Republikas tiesību aktus.
+          <Section n={7} title="Drošība">
+            <List
+              items={[
+                "Visi savienojumi ir šifrēti (HTTPS/TLS).",
+                "Paroles tiek glabātas tikai neatgriezeniski šifrētā (hash) veidā; pieteikšanās mēģinājumu skaits ir ierobežots.",
+                "Piekļuve pēc lomām un organizāciju datu nodalīšana katrā datubāzes pieprasījumā.",
+                "Datubāzes rezerves kopijas un automātiskas pārbaudes pirms katras izmaiņu publicēšanas.",
+              ]}
+            />
+          </Section>
+
+          <Section n={8} title="Cik ilgi dati tiek glabāti">
+            <p>
+              Kamēr biroja konts ir aktīvs. Pēc līguma izbeigšanas birojs 30 dienu laikā var pieprasīt datu eksportu
+              (CSV), pēc tam dati tiek dzēsti. Pilota pieteikumi, kas nekļūst par līgumu, tiek dzēsti 12 mēnešu laikā.
             </p>
-          </section>
+          </Section>
+
+          <Section n={9} title="Sīkdatnes">
+            <p>
+              Shadowy izmanto vienu nepieciešamo sesijas sīkdatni (httpOnly), lai noturētu jūsu pieslēgšanos. Vietnes
+              valodas izvēle tiek saglabāta tikai jūsu pārlūkā. Apmeklējumu statistika ir anonīma un darbojas bez
+              sīkdatnēm. Reklāmas sīkdatnes netiek izmantotas.
+            </p>
+          </Section>
+
+          <Section n={10} title="Jūsu tiesības">
+            <p>
+              Jums ir tiesības piekļūt saviem datiem, labot tos, prasīt dzēšanu vai apstrādes ierobežošanu, iebilst pret
+              apstrādi un saņemt savus datus pārnesamā formātā. Ja esat biroja darbinieks, vispirms vērsieties pie sava
+              biroja kā pārziņa; mēs palīdzēsim izpildīt pieprasījumu. Jums ir arī tiesības iesniegt sūdzību Datu
+              valsts inspekcijā (
+              <a href="https://www.dvi.gov.lv" className="text-foreground underline underline-offset-2">
+                www.dvi.gov.lv
+              </a>
+              ).
+            </p>
+          </Section>
+
+          <Section n={11} title="Lietošanas noteikumi un līgumi">
+            <p>
+              Biroji ar Shadowy slēdz pakalpojuma noteikumus un datu apstrādes līgumu (VDAR 28. pants), kuros noteikti
+              cenas, termiņi, atbildība un datu aizsardzības pienākumi. Līgumu paraugus nosūtām pēc pieprasījuma uz{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-foreground underline underline-offset-2">
+                {CONTACT_EMAIL}
+              </a>
+              . Par būtiskām izmaiņām šajā politikā biroji tiek informēti iepriekš.
+            </p>
+          </Section>
         </div>
 
         <div className="mt-12">

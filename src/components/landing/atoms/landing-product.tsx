@@ -40,9 +40,10 @@ const VIEWS: readonly ProductView[] = [
       lv: "Darbinieks pastāsta vai ieraksta situāciju tā, kā tā bija. Shadowy sagatavo melnrakstu, ko viņš pats pārskata un apstiprina. Bez viņa nekas netiek saglabāts",
       en: "The employee tells or types the situation as it was. Shadowy prepares a draft they review and approve themselves. Nothing is saved without them",
     },
-    src: "/images/Shadowy-Beige-Laptop.webp",
-    width: 1920,
-    height: 1080,
+    // ?v= because /images is cached as immutable for a year.
+    src: "/images/Shadowy-Beige-Laptop.webp?v=2",
+    width: 1615,
+    height: 891,
     alt: "Shadowy AI ieraksta ekrāns klēpjdatorā: lauks, kurā darbinieks apraksta, kas aizņēma papildu laiku",
   },
   {
@@ -73,9 +74,10 @@ const VIEWS: readonly ProductView[] = [
       lv: "Atkārtotais darbs pats sakārtojas procesos: redzat, uz kurām kategorijām tas attiecas, cik stundu labojums var atbrīvot un kuri klienti prasa visvairāk laika",
       en: "Repeated work organises itself into processes: you see which categories it touches, how many hours a fix could free up and which clients take the most time",
     },
-    src: "/images/Shadowy-Orange-Laptop.webp",
-    width: 1920,
-    height: 1080,
+    // ?v= because /images is cached as immutable for a year.
+    src: "/images/Shadowy-Orange-Laptop.webp?v=2",
+    width: 1605,
+    height: 907,
     alt: "Shadowy procesu analīze: ieteikums samazināt atkārtotu saskaņošanu, iespējamais laika ietaupījums un klientu slodze",
   },
 ];

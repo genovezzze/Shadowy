@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 /**
- * The small pill that labels every section. Two tones only, because the page
+ * The small label above every section heading. Two tones only, because the page
  * alternates between white and near-black sections and nothing else sits
  * between them.
  */
@@ -21,10 +21,9 @@ export function SectionBadge({
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full border px-4 py-1 text-sm font-semibold",
-        tone === "light"
-          ? "border-black/5 bg-black/5 text-black"
-          : "border-white/5 bg-white/10 text-white",
+        // A quiet eyebrow above the heading (atoms.technology style), not a pill.
+        "inline-flex items-center text-xs font-semibold tracking-wide",
+        tone === "light" ? "text-black/50" : "text-white/50",
         className,
       )}
     >

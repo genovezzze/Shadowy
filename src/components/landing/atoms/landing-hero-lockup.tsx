@@ -395,7 +395,7 @@ export function LandingHeroLockup() {
 
           <Link
             href="#pilots"
-            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-colors hover:bg-white/90 sm:mt-8 sm:px-7 sm:py-3 sm:text-base"
+            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white/[0.14] px-6 py-2.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.08),0_10px_30px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/30 backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-white/[0.22] sm:mt-8 sm:px-7 sm:py-3 sm:text-base"
           >
             {t("hero.cta")}
           </Link>

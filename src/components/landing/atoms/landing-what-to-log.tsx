@@ -4,8 +4,8 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { ChevronDown } from "lucide-react";
 import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
-import { WaveHeading } from "@/components/landing/atoms/wave-heading";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
+import { cn } from "@/lib/utils";
 
 type L = Record<Locale, string>;
 
@@ -55,144 +55,107 @@ const SHOULD_NOT_LOG: readonly L[] = [
   { lv: "Ekrāna aktivitāte", en: "Screen activity" },
 ];
 
+function Chips({ items, locale, tone = "default" }: { items: readonly L[]; locale: Locale; tone?: "default" | "muted" | "struck" }) {
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <li
+          key={item.lv}
+          className={cn(
+            "rounded-full px-3.5 py-1.5 text-[15px] leading-snug",
+            tone === "default" && "bg-[#f1f1f1] text-black/80",
+            tone === "muted" && "bg-[#f1f1f1] text-black/55",
+            tone === "struck" && "bg-[#f1f1f1] text-black/35 line-through decoration-black/25",
+          )}
+        >
+          {item[locale]}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Card({ title, marker = "grey", children }: { title: string; marker?: "grey" | "blue"; children: React.ReactNode }) {
+  return (
+    <article className="relative flex h-full flex-col gap-6 rounded-2xl bg-white p-6 md:p-8">
+      <span
+        aria-hidden
+        className={cn(
+          "absolute right-6 top-6 size-3 [clip-path:polygon(0_0,100%_0,100%_100%)] md:right-8 md:top-8",
+          marker === "blue" ? "bg-[#2563eb]" : "bg-black/40",
+        )}
+      />
+      <h3 className="max-w-[85%] text-[1.6rem] leading-[1.15] text-black">{title}</h3>
+      {children}
+    </article>
+  );
+}
+
+/**
+ * What a firm logs, as the atoms.technology card grid: one white card per
+ * group of work inside the grey panel, the work types as soft chips, and the
+ * "your own categories" card marked blue as the answer.
+ */
 export function LandingWhatToLog() {
   const { locale, t } = useLocale();
-  const [isExampleOpen, setExampleOpen] = React.useState(false);
+  const [teamOpen, setTeamOpen] = React.useState(false);
 
   return (
-    <section
-      id="ko-fikset"
-      className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] py-16 md:py-32"
-    >
-      <div className="w-full px-4 md:px-8">
+    <section id="ko-fikset" className="relative scroll-mt-20 bg-[var(--landing-paper)] px-3 py-8 md:px-6 md:py-12">
+      <div className="rounded-[28px] bg-[#f1f1f1] p-6 md:p-10 xl:p-14">
         <Reveal className="mb-8 max-w-3xl md:mb-12">
           <div className="mb-3 inline-block">
             <SectionBadge>{t("whatToLog.badge")}</SectionBadge>
           </div>
-          <h2 className="text-landing-h2 text-black">
-            <WaveHeading tone="dark">{t("whatToLog.heading")}</WaveHeading>
-          </h2>
+          <h2 className="text-landing-h2 text-black">{t("whatToLog.heading")}</h2>
         </Reveal>
 
-        <motion.ul
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{
-            hidden: { opacity: 0 },
-            visible: { opacity: 1, transition: { staggerChildren: 0.04 } },
-          }}
-          className="flex flex-col gap-8 md:gap-10"
-        >
-          {[
-            { label: t("whatToLog.routine"), items: ROUTINE_WORK },
-            { label: t("whatToLog.extra"), items: EXTRA_WORK },
-          ].map((group, groupIndex) => (
-            <li key={group.label}>
-              <p className="mb-3 text-sm font-semibold text-black/60 md:mb-4 md:text-base">{group.label}</p>
-              <ul className="flex flex-wrap gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6">
-                {group.items.map((item) => (
-                  <motion.li
-                    key={item.lv}
-                    variants={{
-                      hidden: { opacity: 0 },
-                      visible: { opacity: 1, transition: { duration: 0.3 } },
-                    }}
-                    className="cursor-default text-lg font-bold tracking-tight text-black/60 transition-colors hover:text-black md:text-xl lg:text-2xl"
-                  >
-                    {item[locale]}
-                  </motion.li>
-                ))}
-                {/* Closes the last group: the lists are a starting point, and
-                    each firm's categories are set up with it during the pilot. */}
-                {groupIndex === 1 ? (
-                  <motion.li
-                    variants={{
-                      hidden: { opacity: 0 },
-                      visible: { opacity: 1, transition: { duration: 0.3 } },
-                    }}
-                    className="cursor-default rounded-full border border-dashed border-black/25 px-4 py-0.5 text-lg font-bold tracking-tight text-black/60 md:text-xl lg:text-2xl"
-                  >
-                    {t("whatToLog.custom")}
-                  </motion.li>
-                ) : null}
-              </ul>
-            </li>
-          ))}
-        </motion.ul>
-
-        <p className="mt-6 max-w-2xl text-sm font-semibold leading-relaxed text-black/60 md:mt-8 md:text-base">
-          {t("whatToLog.exampleNote")}
-        </p>
-
-        <Reveal className="mt-10 md:mt-16">
-          {/* Folded away behind its own label: the example is here to be opened
-              by someone who wants it, and left alone it would read as a second
-              list competing with the one above rather than an illustration of
-              it. The badge is the control, so the closed state adds one line
-              rather than a block. */}
-          <button
-            type="button"
-            onClick={() => setExampleOpen((open) => !open)}
-            aria-expanded={isExampleOpen}
-            aria-controls="accounting-example"
-            className="group inline-flex items-center gap-2 rounded-full border border-black/5 bg-black/5 py-1 pl-4 pr-3 text-sm font-semibold text-black transition-colors hover:bg-black/10"
-          >
-            {t("whatToLog.example")}
-            <motion.span
-              animate={{ rotate: isExampleOpen ? 180 : 0 }}
-              transition={{ duration: 0.4, ease: "easeInOut" }}
-              className="shrink-0 text-black/60"
-              aria-hidden
-            >
-              <ChevronDown className="size-4" />
-            </motion.span>
-          </button>
-
-          <motion.div
-            id="accounting-example"
-            initial={false}
-            animate={{
-              height: isExampleOpen ? "auto" : 0,
-              opacity: isExampleOpen ? 1 : 0,
-            }}
-            transition={{ duration: 0.5, ease: [0.04, 0.62, 0.23, 0.98] }}
-            className="overflow-hidden"
-            aria-hidden={!isExampleOpen}
-          >
-            {/* Set a step below the general list - it is an illustration of that
-                list, not a second one competing with it. */}
-            <ul className="flex flex-wrap gap-x-6 gap-y-3 pt-6 md:gap-x-8">
-              {TEAM_WORK.map((item) => (
-                <li
-                  key={item.lv}
-                  className="cursor-default text-base font-bold tracking-tight text-black/60 transition-colors hover:text-black/80 md:text-lg"
+        <div className="grid gap-4 lg:grid-cols-2">
+          <Reveal>
+            <Card title={t("whatToLog.routine")}>
+              <Chips items={ROUTINE_WORK} locale={locale} />
+            </Card>
+          </Reveal>
+          <Reveal delay={0.05}>
+            <Card title={t("whatToLog.extra")}>
+              <Chips items={EXTRA_WORK} locale={locale} />
+            </Card>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <Card title={t("whatToLog.custom")} marker="blue">
+              <p className="text-[15px] leading-relaxed text-black/55">{t("whatToLog.exampleNote")}</p>
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setTeamOpen((open) => !open)}
+                  aria-expanded={teamOpen}
+                  aria-controls="team-work"
+                  className="inline-flex items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-black/85"
                 >
-                  {item[locale]}
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </Reveal>
-
-        <Reveal className="mt-10 md:mt-16">
-          {/* The same pill the section itself is labelled with, rather than a
-              bare uppercase caption - both are section-level labels, so they
-              should not be two different shapes. */}
-          <div className="mb-4 inline-block">
-            <SectionBadge>{t("whatToLog.notNeeded")}</SectionBadge>
-          </div>
-          <ul className="flex flex-wrap gap-x-6 gap-y-3">
-            {SHOULD_NOT_LOG.map((item) => (
-              <li
-                key={item.lv}
-                className="text-base font-medium text-black/30 line-through decoration-black/20 md:text-lg"
-              >
-                {item[locale]}
-              </li>
-            ))}
-          </ul>
-        </Reveal>
+                  {t("whatToLog.example")}
+                  <ChevronDown className={cn("size-4 transition-transform duration-300", teamOpen && "rotate-180")} aria-hidden />
+                </button>
+                <motion.div
+                  id="team-work"
+                  initial={false}
+                  animate={{ height: teamOpen ? "auto" : 0, opacity: teamOpen ? 1 : 0 }}
+                  transition={{ duration: 0.45, ease: [0.04, 0.62, 0.23, 0.98] }}
+                  className="overflow-hidden"
+                  aria-hidden={!teamOpen}
+                >
+                  <div className="pt-5">
+                    <Chips items={TEAM_WORK} locale={locale} tone="muted" />
+                  </div>
+                </motion.div>
+              </div>
+            </Card>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <Card title={t("whatToLog.notNeeded")}>
+              <Chips items={SHOULD_NOT_LOG} locale={locale} tone="struck" />
+            </Card>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

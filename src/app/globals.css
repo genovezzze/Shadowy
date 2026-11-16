@@ -1885,10 +1885,13 @@ input[type="checkbox"]:focus-visible {
   letter-spacing: -0.03em;
 }
 
+/* Section headings in the atoms.technology manner: the light display face,
+   large and tight, instead of a bold sans. */
 .atoms-landing .text-landing-h2 {
-  font-size: clamp(1.5rem, 4vw, 2.25rem);
-  font-weight: 700;
-  line-height: 1.15;
+  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.1rem, 4.2vw, 3.5rem);
+  font-weight: 300;
+  line-height: 1.08;
   letter-spacing: -0.03em;
 }
 @keyframes atomsGradientTextReveal {
@@ -2105,4 +2108,41 @@ html:is(.dark, .slate).ui-new [data-slot="segmented"] {
 :is(.dark, .slate) .ui-new [data-slot="segmented"] > button[data-state="active"],
 html:is(.dark, .slate).ui-new [data-slot="segmented"] > button[data-state="active"] {
   background: rgba(255, 255, 255, 0.14) !important;
+}
+
+/* Card and row titles across the landing in the same light display face as
+   the section headings (atoms.technology style). Beats Tailwind's single-class
+   font-bold/semibold on purpose. */
+.atoms-landing main h3 {
+  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Body text of the landing sections in the same family, so headings and text
+   read as one voice. The hero keeps its own pixel/display faces. */
+.atoms-landing main section:not(:first-of-type) {
+  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Hero "liquid glass": an iridescent film drifting over the dimmed footage, as if the hero were a sheet of glass. */
+.hero-glass-film {
+  background:
+    radial-gradient(38% 48% at 18% 28%, rgba(255, 140, 200, 0.55), transparent 70%),
+    radial-gradient(42% 52% at 78% 22%, rgba(110, 180, 255, 0.6), transparent 70%),
+    radial-gradient(48% 50% at 62% 82%, rgba(120, 255, 210, 0.45), transparent 70%),
+    radial-gradient(38% 44% at 28% 86%, rgba(185, 150, 255, 0.55), transparent 70%);
+  background-size: 170% 170%;
+  mix-blend-mode: soft-light;
+  animation: heroGlassFilm 18s ease-in-out infinite alternate;
+}
+@keyframes heroGlassFilm {
+  0% { background-position: 0% 0%; filter: hue-rotate(0deg); }
+  50% { background-position: 100% 40%; filter: hue-rotate(45deg); }
+  100% { background-position: 30% 100%; filter: hue-rotate(-30deg); }
+}
+
+/* Phones: no glass film at all (it costs paint time on every frame). */
+@media (prefers-reduced-motion: reduce), (max-width: 767px) {
+  .hero-glass-film { animation: none; display: none; }
 }

@@ -27,6 +27,8 @@ Accounting firms know what each client pays but not what each client costs. Extr
 - Languages: Latvian (primary), English.
 - Data storage: European Union (Frankfurt).
 - Status: live with a pilot accounting firm (PB Finanses); new firms start with a free 30-day pilot.
+- Pricing: free 30-day pilot, then Standard at EUR 49 per month for the whole firm (no per-seat fee, cancel any month). Premium adds extended features and monthly tailoring to the firm, priced by agreement.
+- Data: stored and processed in the EU (database and servers in Frankfurt, AI processing via Azure OpenAI in Sweden); not used to train AI models.
 
 ## Main pages
 - [Home (Latvian)](https://www.shadowy.lv): what Shadowy does for accounting firms and the free pilot offer.

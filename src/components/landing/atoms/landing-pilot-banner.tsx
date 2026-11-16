@@ -10,8 +10,8 @@ import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 
 const PILOT_BENEFITS: readonly Record<Locale, string>[] = [
   {
-    lv: "2 nedēļas, 5-8 darbinieki, 30 sekundes dienā",
-    en: "2 weeks, 5-8 employees, 30 seconds a day",
+    lv: "30 dienas bez maksas, visa komanda, 30 sekundes uz ierakstu",
+    en: "30 days free, the whole team, 30 seconds per entry",
   },
   { lv: "Bez kredītkartes un bez saistībām", en: "No credit card, no commitment" },
   { lv: "Iestatīšana līdz 10 minūtēm", en: "Setup in under 10 minutes" },

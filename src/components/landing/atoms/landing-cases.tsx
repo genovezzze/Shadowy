@@ -73,7 +73,7 @@ export function LandingCases() {
               </div>
 
               <div className="flex flex-1 flex-col p-5">
-                <h3 className="text-lg font-bold tracking-tight text-black">
+                <h3 className="text-2xl leading-tight text-black">
                   PB Finanses
                 </h3>
                 <p className="mt-1.5 text-sm font-semibold leading-relaxed text-black/70">
@@ -108,7 +108,7 @@ export function LandingCases() {
               <div
                 className="group flex h-full flex-col rounded-2xl bg-white p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_12px_32px_rgba(0,0,0,0.1)]"
               >
-                <h3 className="text-lg font-bold tracking-tight text-black">
+                <h3 className="text-2xl leading-tight text-black">
                   {slot.title[locale]}
                 </h3>
                 <p className="mt-1.5 text-sm font-semibold leading-relaxed text-black/70">

@@ -7,6 +7,7 @@ import { LandingProduct } from "@/components/landing/atoms/landing-product";
 import { LandingWhatToLog } from "@/components/landing/atoms/landing-what-to-log";
 import { LandingAudience } from "@/components/landing/atoms/landing-audience";
 import { LandingPilotBanner } from "@/components/landing/atoms/landing-pilot-banner";
+import { LandingPricing } from "@/components/landing/atoms/landing-pricing";
 import { LandingFaq } from "@/components/landing/atoms/landing-faq";
 import { LandingContact } from "@/components/landing/atoms/landing-contact";
 import { LandingClosing } from "@/components/landing/atoms/landing-closing";
@@ -38,6 +39,7 @@ export function LandingPage({ forcedLocale, pilotStats }: { forcedLocale?: Local
         <LandingOutcomes />
         <LandingWhatToLog />
         <LandingAudience stats={pilotStats} />
+        <LandingPricing />
         <LandingPilotBanner />
         <LandingFaq />
         <LandingContact />

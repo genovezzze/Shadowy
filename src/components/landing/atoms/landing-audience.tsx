@@ -682,7 +682,7 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                   className="group relative flex w-full flex-row items-center justify-between py-6 text-left md:py-8"
                 >
                   <div className="flex flex-col gap-0.5 pr-8">
-                    <span className="text-2xl font-bold leading-tight tracking-tight text-black md:text-3xl">
+                    <span className="text-2xl font-normal leading-tight tracking-tight text-black md:text-3xl">
                       <HoverWaveText text={audience.name[locale]} />
                     </span>
                     <p

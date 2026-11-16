@@ -1,409 +1,243 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  BrainCircuit,
-  Check,
-  ClipboardList,
-  Coins,
-  Layers,
-  type LucideIcon,
-} from "lucide-react";
-import { Reveal, SectionBadge } from "@/components/landing/atoms/landing-primitives";
-import { cn } from "@/lib/utils";
-import { WaveHeading } from "@/components/landing/atoms/wave-heading";
+import { BarChart3, BrainCircuit, Check, Layers, Mic, type LucideIcon } from "lucide-react";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
+import { cn } from "@/lib/utils";
 
 type L = Record<Locale, string>;
 
-type Stage = {
-  id: string;
-  icon: LucideIcon;
-  title: L;
-  desc: L;
-  /** Backdrop behind the floating panel - a different shot per stage. */
-  bg: string;
-  panel: React.ReactNode;
-};
+type Step = { icon: LucideIcon; tint: string; title: L; text: L };
+
+// Muted tints for the icon tiles, one per step, so the list reads as a set
+// rather than a row of identical bullets.
+const STEPS: Step[] = [
+  {
+    icon: Mic,
+    tint: "#d6cec4",
+    title: { lv: "Darbinieks fiksē", en: "The employee logs it" },
+    text: {
+      lv: "30 sekundēs ar balsi vai tekstu ieraksta, pie kura klienta strādāja un ko darīja",
+      en: "In 30 seconds, by voice or text, they note which client they worked on and what they did",
+    },
+  },
+  {
+    icon: BrainCircuit,
+    tint: "#8fa1b6",
+    title: { lv: "AI sagatavo melnrakstu", en: "AI prepares a draft" },
+    text: {
+      lv: "No brīva teikuma top ieraksts ar klientu, kategoriju un laiku. Bez darbinieka apstiprinājuma nekas netiek saglabāts",
+      en: "A free sentence becomes an entry with client, category and time. Nothing is saved without the employee's approval",
+    },
+  },
+  {
+    icon: Check,
+    tint: "#a5b3a6",
+    title: { lv: "Vadītājs izvērtē", en: "The manager reviews" },
+    text: {
+      lv: "Vadītājs redz komandas ierakstus, apstiprina tos vai atgriež precizēšanai",
+      en: "The manager sees the team's entries and approves them or returns them for clarification",
+    },
+  },
+  {
+    icon: Layers,
+    tint: "#c4b6c6",
+    title: { lv: "Dati sakārtojas", en: "The data falls into place" },
+    text: {
+      lv: "Ieraksti sakārtojas pa klientiem un darba veidiem, un atkārtotie iemesli kļūst redzami",
+      en: "Entries fall into place by client and type of work, and recurring reasons become visible",
+    },
+  },
+  {
+    icon: BarChart3,
+    tint: "#b3c0cc",
+    title: { lv: "Birojs redz pašizmaksu", en: "The firm sees the cost" },
+    text: {
+      lv: "Stundas, izmaksas un iemesli pa klientiem vienā pārskatā, ko var likt uz galda sarunā par cenu",
+      en: "Hours, cost and reasons by client in one overview you can bring to the pricing conversation",
+    },
+  },
+];
+
+// Geometry of the art box (px). The stack and the circles share one box so a
+// sheet can morph into its circle in place.
+const BOX_W = 360;
+const BOX_H = 440;
+const SHEET_W = 250;
+const SHEET_H = 172;
+const CIRCLE_D = 190;
+const RING_R = 80;
+
+function circleCentre(index: number) {
+  // Five circles on a pentagon, first one at the top, overlapping like a Venn.
+  const angle = -Math.PI / 2 + (index * 2 * Math.PI) / STEPS.length;
+  return { x: BOX_W / 2 + RING_R * Math.cos(angle), y: BOX_H / 2 + 10 + RING_R * Math.sin(angle) };
+}
 
 /**
- * Shared shell for the five preview cards. Fixed at 256px wide, matching the
- * reference's own w-64, and now fixed in height too - the five variants carry
- * different content (a chart, a quote, a stat row) and letting each size to
- * its own content is what made them drift apart earlier. A shared height
- * guarantees they read as one consistent card shape as the stage changes,
- * not five differently-sized ones.
+ * One shape per step. On the first step they lie as an exploded stack of
+ * sheets; from the second step on each sheet morphs into an overlapping
+ * circle, and the circle of the step being read fills and gets an outline.
  */
-function Panel({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function StepArt({ active }: { active: number }) {
+  const circles = active > 0;
   return (
-    <div className="flex h-[210px] w-64 max-w-full flex-col rounded-[4px] border border-black/5 bg-white/95 p-5 shadow-[0_10px_40px_rgba(0,0,0,0.06)] backdrop-blur-sm">
-      <p className="mb-2.5 text-base font-bold tracking-tight text-black">
-        {title}
-      </p>
-      {children}
+    <div
+      className="relative origin-top [perspective:1100px]"
+      style={{ width: BOX_W, height: BOX_H }}
+      aria-hidden
+    >
+      {STEPS.map((step, index) => {
+        const Icon = step.icon;
+        const isActive = index === active;
+        const c = circleCentre(index);
+        const shape: React.CSSProperties = circles
+          ? {
+              left: c.x - CIRCLE_D / 2,
+              top: c.y - CIRCLE_D / 2,
+              width: CIRCLE_D,
+              height: CIRCLE_D,
+              borderRadius: 9999,
+              transform: "none",
+              zIndex: isActive ? 10 : 1,
+            }
+          : {
+              left: BOX_W / 2 - SHEET_W / 2,
+              top: 40 + index * 62 + (isActive ? -10 : 0),
+              width: SHEET_W,
+              height: SHEET_H,
+              borderRadius: 16,
+              transform: "rotateX(58deg) rotateZ(-38deg)",
+              zIndex: STEPS.length - index,
+            };
+        return (
+          <div
+            key={step.title.lv}
+            className={cn(
+              "absolute grid place-items-center border",
+              isActive
+                ? circles
+                  ? "border-black/70 bg-[#eef1f4]/55"
+                  : "border-black/70 bg-[#eef1f4]/90 shadow-[0_24px_40px_-28px_rgba(0,0,0,0.45)]"
+                : circles
+                  ? "border-black/15 bg-transparent"
+                  : "border-black/15 bg-white/55",
+            )}
+            style={{
+              ...shape,
+              transition:
+                "left 700ms cubic-bezier(0.22,1,0.36,1), top 700ms cubic-bezier(0.22,1,0.36,1), width 700ms cubic-bezier(0.22,1,0.36,1), height 700ms cubic-bezier(0.22,1,0.36,1), border-radius 700ms cubic-bezier(0.22,1,0.36,1), transform 700ms cubic-bezier(0.22,1,0.36,1), background-color 500ms, border-color 500ms",
+            }}
+          >
+            <span
+              className={cn(
+                "grid size-10 place-items-center rounded-lg border transition-colors duration-500",
+                isActive ? "border-black/60 text-white" : "border-black/70 bg-white text-black",
+                !circles && !isActive && "border-dashed",
+              )}
+              style={isActive ? { backgroundColor: step.tint } : undefined}
+            >
+              <Icon className="size-4" strokeWidth={2.2} />
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
 
-// Every panel below stops at its data - no trailing "here's what this means"
-// line. The reference card is two stat rows and nothing else; a footnote
-// under each of ours was what made them read as tall explainer panels rather
-// than the compact glance-and-move-on cards this section is built around.
-
-function EntryPanel() {
-  const { locale } = useLocale();
-  return (
-    <Panel title={locale === "lv" ? "Jauns ieraksts" : "New entry"}>
-      <div className="space-y-2">
-        <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Kategorija" : "Category"}</p>
-          <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
-            {locale === "lv" ? "Palīdzēju kolēģim" : "Helped a colleague"}
-          </p>
-        </div>
-        <div className="rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-          <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Patērētais laiks" : "Time spent"}</p>
-          <p className="mt-0.5 text-[15px] font-bold tracking-tight text-black">
-            {locale === "lv" ? "45 minūtes" : "45 minutes"}
-          </p>
-        </div>
-      </div>
-    </Panel>
-  );
-}
-
-function DraftPanel() {
-  const { locale } = useLocale();
-  return (
-    <Panel title={locale === "lv" ? "AI melnraksts" : "AI draft"}>
-      <div className="rounded-[4px] border border-black/10 bg-black/[0.02] p-3.5">
-        <p className="text-sm font-medium leading-relaxed text-black/70">
-          {locale === "lv"
-            ? "„Skaidroju kolēģim VID atskaites sagatavošanu.“"
-            : "“Explained to a colleague how to prepare the tax report.”"}
-        </p>
-      </div>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {(locale === "lv"
-          ? ["Saziņa ar VID", "Palīdzība kolēģim"]
-          : ["Tax authority", "Helping a colleague"]
-        ).map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full bg-black/[0.05] px-3 py-1 text-xs font-medium text-black/60"
-          >
-            {tag}
-          </span>
-        ))}
-      </div>
-    </Panel>
-  );
-}
-
-function ReviewPanel() {
-  const { locale } = useLocale();
-  const rows =
-    locale === "lv"
-      ? [
-          { name: "Anna", detail: "Palīdzība kolēģim · 45 min", approved: true },
-          { name: "Jānis", detail: "Informācijas gaidīšana · 1 h 20 min", approved: true },
-        ]
-      : [
-          { name: "Anna", detail: "Helping a colleague · 45 min", approved: true },
-          { name: "Jānis", detail: "Waiting for information · 1 h 20 min", approved: true },
-        ];
-
-  return (
-    <Panel title={locale === "lv" ? "Vadītāja skats" : "Manager view"}>
-      <ul className="space-y-2">
-        {rows.map((row) => (
-          <li
-            key={row.name}
-            className="flex items-center justify-between gap-4 rounded-[4px] bg-black/[0.04] px-3.5 py-2.5"
-          >
-            <span className="min-w-0">
-              <span className="block text-[15px] font-bold tracking-tight text-black">
-                {row.name}
-              </span>
-              <span className="block truncate text-[11px] font-medium text-black/60">
-                {row.detail}
-              </span>
-            </span>
-            <span
-              className={cn(
-                "grid size-7 shrink-0 place-items-center rounded-full",
-                row.approved
-                  ? "bg-[#2563eb] text-white"
-                  : "border border-black/15 text-black/30",
-              )}
-            >
-              <Check className="size-3.5" strokeWidth={3} aria-hidden />
-            </span>
-          </li>
-        ))}
-      </ul>
-    </Panel>
-  );
-}
-
-function CategoriesPanel() {
-  const { locale } = useLocale();
-  const bars =
-    locale === "lv"
-      ? [
-          { label: "Palīdzība kolēģiem", value: 34 },
-          { label: "Informācijas gaidīšana", value: 26 },
-          { label: "Atkārtoti jautājumi", value: 19 },
-        ]
-      : [
-          { label: "Helping colleagues", value: 34 },
-          { label: "Waiting for information", value: 26 },
-          { label: "Repeated questions", value: 19 },
-        ];
-
-  return (
-    <Panel title={locale === "lv" ? "Kategoriju sadalījums" : "Category breakdown"}>
-      <ul className="space-y-3">
-        {bars.map((bar) => (
-          <li key={bar.label}>
-            <div className="mb-1.5 flex items-baseline justify-between gap-4">
-              <span className="text-[13px] font-medium text-black/70">
-                {bar.label}
-              </span>
-              <span className="text-[13px] font-bold tabular-nums text-black">
-                {bar.value}%
-              </span>
-            </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-black/[0.07]">
-              <motion.div
-                className="h-full rounded-full bg-black"
-                initial={{ width: 0 }}
-                animate={{ width: `${bar.value}%` }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              />
-            </div>
-          </li>
-        ))}
-      </ul>
-    </Panel>
-  );
-}
-
-function CostPanel() {
-  const { locale } = useLocale();
-  return (
-    <Panel title={locale === "lv" ? "Organizācijas pārskats" : "Organisation overview"}>
-      <div className="flex items-baseline gap-2">
-        <span className="text-[32px] font-bold leading-none tracking-tight text-black">
-          186
-        </span>
-        <span className="text-sm font-medium text-black/60">{locale === "lv" ? "h / mēnesī" : "h / month"}</span>
-      </div>
-
-      {/* One tile rather than two - the number row already fills the slot the
-          other cards give their second data block, so a second tile here
-          would push this card past the shared height instead of matching it. */}
-      <div className="mt-3 rounded-[4px] bg-black/[0.04] px-3.5 py-2.5">
-        <p className="text-[11px] font-medium text-black/60">{locale === "lv" ? "Aptuvenās izmaksas" : "Approximate cost"}</p>
-        <p className="mt-0.5 text-lg font-bold tracking-tight text-black">
-          &euro; 4 650
-        </p>
-      </div>
-    </Panel>
-  );
-}
-
-const STAGES: Stage[] = [
-  {
-    id: "fiksesana",
-    icon: ClipboardList,
-    title: { lv: "Darbinieks fiksē", en: "The employee logs it" },
-    desc: {
-      lv: "30 sekundēs ar balsi vai tekstu ieraksta, pie kura klienta strādāja un ko darīja",
-      en: "In 30 seconds, by voice or text, they note which client they worked on and what they did",
-    },
-    bg: "/images/01-Golden-Valley.webp",
-    panel: <EntryPanel />,
-  },
-  {
-    id: "melnraksts",
-    icon: BrainCircuit,
-    title: { lv: "AI sagatavo melnrakstu", en: "AI prepares a draft" },
-    desc: {
-      lv: "No brīvi uzrakstīta teikuma top strukturēts ieraksts ar kategoriju un laiku. Darbinieks to pārskata un apstiprina",
-      en: "A free-written sentence becomes a structured entry with a category and time. The employee reviews and approves it",
-    },
-    bg: "/images/02-Mountain-Lake.webp",
-    panel: <DraftPanel />,
-  },
-  {
-    id: "izvertesana",
-    icon: Check,
-    title: { lv: "Vadītājs izvērtē", en: "The manager reviews" },
-    desc: {
-      lv: "Vadītājs redz savas komandas iesniegtos ierakstus, apstiprina tos vai atgriež precizēšanai",
-      en: "The manager sees their team's submitted entries and approves them or returns them for clarification",
-    },
-    bg: "/images/03-Autumn-Bridge.webp",
-    panel: <ReviewPanel />,
-  },
-  {
-    id: "strukturesana",
-    icon: Layers,
-    title: { lv: "Dati sakārtojas", en: "The data organises itself" },
-    desc: {
-      lv: "Apstiprinātie ieraksti sakārtojas pa klientiem un kategorijām, un atkārtotie iemesli kļūst redzami, nevis atsevišķi stāsti",
-      en: "Approved entries are organised by client and category, and recurring reasons become visible, not isolated stories",
-    },
-    bg: "/images/04-Hillside-Windmill.webp",
-    panel: <CategoriesPanel />,
-  },
-  {
-    id: "parskats",
-    icon: Coins,
-    title: { lv: "Birojs redz klientu pašizmaksu", en: "The firm sees each client's cost" },
-    desc: {
-      lv: "Stundas un izmaksas pa klientiem, klienti, kas pārsniedz iekļauto laiku, un iemesli vienā pārskatā, ko var likt uz galda sarunā par cenu",
-      en: "Hours and cost per client, clients that exceed their included time, and the reasons in one overview you can bring to a pricing conversation",
-    },
-    bg: "/images/05-Forest-Waterfall.webp",
-    panel: <CostPanel />,
-  },
-];
-
-/**
- * The stage list drives the panel beside it and advances on its own, so a
- * visitor who never clicks still sees the whole flow. Hovering the list stops
- * the timer - reading a stage should not be interrupted by it moving on.
- */
 export function LandingApproach() {
-  // Defaults to the first stage ("Darbinieks fiksē") and stays there until the
-  // visitor opens another — no auto-advance, so the first is always open.
-  const [activeIndex, setActiveIndex] = React.useState(0);
-  const { locale, t } = useLocale();
+  const { locale } = useLocale();
+  const [active, setActive] = React.useState(0);
+  const itemRefs = React.useRef<(HTMLLIElement | null)[]>([]);
 
-  const active = STAGES[activeIndex];
+  // The step crossing the middle band of the screen is the one being read.
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            const index = Number((entry.target as HTMLElement).dataset.index);
+            if (!Number.isNaN(index)) setActive(index);
+          }
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px" },
+    );
+    itemRefs.current.forEach((el) => el && observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
 
   return (
-    <section
-      id="process"
-      // No top padding: "Pilotprojekti un klienti" above is the same paper
-      // colour and already ends on its own py-24/py-32, so a second one stacked
-      // a band of empty white with no colour change to justify it.
-      className="relative scroll-mt-20 bg-[var(--landing-paper)] pb-16 pt-0 md:pb-32"
-    >
-      <div className="w-full px-4 md:px-8">
-        <Reveal className="mb-8 max-w-3xl md:mb-16">
-          <div className="mb-3 inline-block">
-            <SectionBadge>{t("approach.badge")}</SectionBadge>
-          </div>
-          <h2 className="text-landing-h2 text-black">
-            <WaveHeading tone="dark">{t("approach.heading")}</WaveHeading>
+    <section id="process" className="relative scroll-mt-20 bg-[var(--landing-paper)] px-4 py-16 md:px-8 md:py-28 xl:px-24">
+      <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
+        <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:self-start">
+          <p className="text-xs font-semibold text-black/50">{locale === "lv" ? "Kā tas notiek" : "How it works"}</p>
+          <h2 className="mt-4 text-[clamp(2.2rem,4.4vw,3.6rem)] font-light leading-[1.08] tracking-tight text-black">
+            {locale === "lv" ? (
+              <>
+                Pieci soļi.
+                <br />
+                Viena pašizmaksa.
+              </>
+            ) : (
+              <>
+                Five steps.
+                <br />
+                One true cost.
+              </>
+            )}
           </h2>
-        </Reveal>
-
-        <div className="flex flex-col-reverse items-start gap-6 lg:min-h-[560px] lg:flex-row lg:gap-8">
-          <div className="flex w-full flex-col items-start gap-3 lg:w-[45%]">
-            {STAGES.map((stage, index) => {
-              const isActive = index === activeIndex;
-              const Icon = stage.icon;
-
-              return (
-                <button
-                  key={stage.id}
-                  type="button"
-                  onClick={() => setActiveIndex(index)}
-                  aria-current={isActive}
-                  className={cn(
-                    "group w-full overflow-hidden rounded-[4px] text-left transition-colors duration-300",
-                    isActive
-                      ? "bg-white shadow-[0_8px_30px_rgba(0,0,0,0.05)] ring-1 ring-black/5"
-                      : "bg-black/[0.04] hover:bg-black/[0.07]",
-                  )}
-                >
-                  <div className="flex items-center gap-4 p-5">
-                    <span
-                      className={cn(
-                        "grid size-10 shrink-0 place-items-center rounded-[4px] transition-colors",
-                        isActive
-                          ? "bg-black text-white"
-                          : "bg-black/5 text-black group-hover:bg-black/10",
-                      )}
-                    >
-                      <Icon className="size-[18px]" strokeWidth={2} aria-hidden />
-                    </span>
-                    <h3 className="text-[17px] font-bold tracking-tight text-black">
-                      {stage.title[locale]}
-                    </h3>
-                  </div>
-
-                  <AnimatePresence initial={false}>
-                    {isActive && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
-                        className="overflow-hidden"
-                      >
-                        <p className="px-5 pb-5 text-sm font-semibold leading-relaxed text-black/70 md:text-base">
-                          {stage.desc[locale]}
-                        </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </button>
-              );
-            })}
+          <p className="mt-4 text-sm text-black/55 md:text-base">
+            {locale === "lv"
+              ? "No 30 sekunžu ieraksta līdz katra klienta pašizmaksai"
+              : "From a 30-second entry to the true cost of every client"}
+          </p>
+          {/* Phones read the steps as a plain list: the art only works beside it. */}
+          <div className="mt-10 hidden items-center justify-center lg:mt-4 lg:flex lg:h-[calc(100%-11rem)]">
+            <StepArt active={active} />
           </div>
+        </div>
 
-          {/* The card floats over a full-bleed photo rather than filling the
-              column itself - the photo carries the height (aspect-ratio on
-              phones, self-stretch to match the stage list on desktop) and the
-              card just sits centred on top of it, sized to its own content
-              16:10 rather than the taller 4:3 - the fixed 210px card doesn't
-              need the extra headroom, and on tablet widths 4:3 was turning the
-              whole panel into a slab far taller than the list beside it. */}
-          {/* Capped at the row's own minimum height. `self-stretch` alone let the
-              photo grow with the stage list, and since the list gets taller
-              whenever a stage expands, the photo ended up overshooting it. The
-              cap holds it to the height the row is built around, so it reads as
-              the same block as the list beside it. */}
-          <div className="w-full overflow-hidden rounded-2xl lg:max-h-[560px] lg:w-[55%] lg:self-stretch">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.4 }}
-                className="relative flex aspect-[16/10] w-full items-center justify-center p-5 sm:p-8 lg:aspect-auto lg:h-full"
+        <div>
+        {/* Phones: the art sits above the steps and stays in place (it does
+            not follow the scroll). */}
+        <div className="flex h-[250px] items-start justify-center overflow-hidden lg:hidden">
+          <div className="origin-top scale-[0.55]">
+            <StepArt active={active} />
+          </div>
+        </div>
+        <ol className="lg:pt-[18vh]">
+          {STEPS.map((step, index) => {
+            const Icon = step.icon;
+            const isActive = index === active;
+            return (
+              <li
+                key={step.title.lv}
+                ref={(el) => {
+                  itemRefs.current[index] = el;
+                }}
+                data-index={index}
+                className={cn(
+                  "border-b border-black/10 py-7 transition-opacity duration-500 last:border-b-0 md:py-16",
+                  isActive ? "opacity-100" : "opacity-35",
+                )}
               >
-                <Image
-                  src={active.bg}
-                  alt=""
-                  fill
-                  sizes="(min-width: 1024px) 55vw, 100vw"
-                  // Raster backdrops go through the optimiser (a 700px-wide
-                  // slot was getting the full 1374px, 233 KB file). Only SVG is
-                  // passed through: Next refuses it unless `dangerouslyAllowSVG`
-                  // is on site-wide. No `priority`: the section is below the
-                  // fold and a preload here competed with the hero poster.
-                  unoptimized={active.bg.endsWith(".svg")}
-                  className="object-cover"
-                />
-                <div className="relative z-10">{active.panel}</div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
+                <span
+                  className="grid size-9 place-items-center rounded-lg text-white"
+                  style={{ backgroundColor: step.tint }}
+                  aria-hidden
+                >
+                  <Icon className="size-4" strokeWidth={2.2} />
+                </span>
+                <h3 className="mt-6 text-[1.7rem] font-light leading-tight tracking-tight text-black md:text-[2rem]">
+                  {step.title[locale]}
+                </h3>
+                <p className="mt-3 max-w-md text-[15px] leading-relaxed text-black/60">{step.text[locale]}</p>
+              </li>
+            );
+          })}
+        </ol>
         </div>
       </div>
     </section>

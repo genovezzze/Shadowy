@@ -23,6 +23,7 @@ const STRINGS = {
   "menu.clients": { lv: "Klienti", en: "Clients" },
   "menu.faq": { lv: "FAQ", en: "FAQ" },
   "menu.blog": { lv: "Raksti", en: "Blog" },
+  "menu.pricing": { lv: "Cenas", en: "Pricing" },
 
   // CTA dropdown
   "cta.title": { lv: "Sāksim ar pilotu", en: "Start a pilot" },
