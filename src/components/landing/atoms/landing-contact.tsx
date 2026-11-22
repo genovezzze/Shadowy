@@ -73,7 +73,7 @@ export function LandingContact() {
       />
 
       <div className="relative z-10 w-full px-4 md:px-8">
-        <div className="flex w-full flex-col items-start gap-10 lg:flex-row lg:justify-between">
+        <div className="flex w-full flex-col items-start gap-10 lg:flex-row lg:justify-start lg:gap-16 xl:gap-24">
           {/* Swapped with `order` rather than by moving the markup: on phones
               the column stacks, and the heading has to come first there so the
               form is introduced before it appears - and so screen readers meet
@@ -86,13 +86,13 @@ export function LandingContact() {
               <WaveHeading tone="light">{t("contact.heading")}</WaveHeading>
             </h2>
             <p className="mt-4 max-w-md text-sm font-medium leading-relaxed md:text-base">
-              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.65)">
+              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.65)" sweep={0.9} letterDuration={0.35}>
                 {t("contact.subtitle")}
               </WaveHeading>
             </p>
           </Reveal>
 
-          <div className="flex w-full lg:order-1 lg:w-[50%] lg:justify-start xl:w-[45%]">
+          <div className="flex w-full lg:order-1 lg:w-auto lg:shrink-0 lg:justify-start">
             {/* Shadow instead of the old border: over a photograph a hairline
                 outline reads as a cutout edge, while the shadow lifts the card
                 off the scene. 4px radius and 48px padding are the reference's

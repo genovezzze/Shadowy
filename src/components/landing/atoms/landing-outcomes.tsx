@@ -191,7 +191,7 @@ export function LandingOutcomes() {
           <div className="grid gap-4 sm:grid-cols-2">
             {OUTCOMES.map((item, index) => (
               <Reveal key={item.title.lv} delay={0.04 * index}>
-                <article className="relative flex h-full flex-col justify-between gap-5 rounded-2xl bg-white p-6 sm:min-h-[210px] sm:gap-8 md:min-h-[240px] md:p-7">
+                <article className="relative flex h-full flex-col gap-4 rounded-2xl bg-white p-6 md:p-7">
                   {/* Corner marker: grey on the findings, blue on the answer. */}
                   <span
                     aria-hidden

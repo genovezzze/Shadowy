@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import localFont from "next/font/local";
-import { Albert_Sans, Manrope } from "next/font/google";
+import { Albert_Sans, Manrope, Poppins } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
@@ -151,6 +151,17 @@ const landingFont = Manrope({
   fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
 });
 
+// The landing's single text face. Applied by redefining the sans, display,
+// accent and mono variables on `.atoms-landing` (see globals.css), so every
+// landing text switches at once; the app keeps its own faces.
+const landingPoppins = Poppins({
+  subsets: ["latin", "latin-ext"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-poppins",
+  display: "swap",
+  fallback: ["ui-sans-serif", "system-ui", "sans-serif"],
+});
+
 const appFont = Albert_Sans({
   subsets: ["latin", "latin-ext"],
   variable: "--font-app",
@@ -246,7 +257,7 @@ export default function RootLayout({
   return (
     <html
       lang="lv"
-      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable} ${appFont.variable} ${landingFont.variable} ${geistPixelSquare.variable} ${geistPixelCircle.variable} ${geistPixelGrid.variable} ${geistPixelTriangle.variable} ${geistPixelLine.variable}`}
+      className={`${inter.variable} ${neueHaas.variable} ${neueHaasLight.variable} ${jetBrainsMono.variable} ${appFont.variable} ${landingFont.variable} ${landingPoppins.variable} ${geistPixelSquare.variable} ${geistPixelCircle.variable} ${geistPixelGrid.variable} ${geistPixelTriangle.variable} ${geistPixelLine.variable}`}
       style={fontVariables}
       suppressHydrationWarning
     >

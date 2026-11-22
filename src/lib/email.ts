@@ -902,3 +902,98 @@ export async function sendPasswordResetEmail(to: string, resetLink: string): Pro
   `;
   await sendEmail(to, subject, html);
 }
+
+// ── Komandas vadība ────────────────────────────────────────────────────────
+
+export interface TaskDigestItem {
+  clientName: string;
+  reportName: string;
+  /** "09.11" */
+  due: string;
+  /** Who it belongs to; only shown in the team summary. */
+  assigneeName?: string | null;
+  daysLate?: number;
+}
+
+function taskDigestList(items: TaskDigestItem[], opts: { showAssignee?: boolean; late?: boolean } = {}): string {
+  const rows = items
+    .slice(0, 30)
+    .map((item) => {
+      const who = opts.showAssignee ? ` <span style="color:#888">· ${escapeHtml(item.assigneeName ?? "nav atbildīgā")}</span>` : "";
+      const when = opts.late && item.daysLate ? `${item.due} (${item.daysLate} d.)` : item.due;
+      return `<tr>
+        <td style="padding:6px 0;border-bottom:1px solid #eee;font-size:14px">
+          <strong>${escapeHtml(item.clientName)}</strong> · ${escapeHtml(item.reportName)}${who}
+        </td>
+        <td style="padding:6px 0 6px 12px;border-bottom:1px solid #eee;font-size:13px;color:${opts.late ? "#D70015" : "#666"};text-align:right;white-space:nowrap">${when}</td>
+      </tr>`;
+    })
+    .join("");
+  const more = items.length > 30 ? `<p style="color:#888;font-size:13px;margin:6px 0 0">un vēl ${items.length - 30}</p>` : "";
+  return `<table style="width:100%;border-collapse:collapse">${rows}</table>${more}`;
+}
+
+/** Morning list for one person: late, due today, due in the next days. */
+export async function sendTaskDigest(opts: {
+  to: string;
+  name: string;
+  orgName: string;
+  overdue: TaskDigestItem[];
+  today: TaskDigestItem[];
+  soon: TaskDigestItem[];
+  link: string;
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const parts: string[] = [];
+  if (opts.overdue.length) parts.push(`${opts.overdue.length} nokavēti`);
+  if (opts.today.length) parts.push(`${opts.today.length} šodien`);
+  if (opts.soon.length) parts.push(`${opts.soon.length} tuvākajās dienās`);
+  const subject = `Shadowy - tavi uzdevumi: ${parts.join(", ")}`;
+
+  const section = (title: string, items: TaskDigestItem[], late = false) =>
+    items.length
+      ? `<h3 style="margin:20px 0 6px;font-size:15px">${title}</h3>${taskDigestList(items, { late })}`
+      : "";
+
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:560px">
+      <h2 style="margin:0 0 4px">Labrīt, ${escapeHtml(opts.name)}!</h2>
+      <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)}</p>
+      ${section("Nokavēti", opts.overdue, true)}
+      ${section("Termiņš šodien", opts.today)}
+      ${section("Termiņš tuvākajās dienās", opts.soon)}
+      <p style="margin-top:24px">
+        <a href="${appUrl}${opts.link}" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Atvērt uzdevumus →
+        </a>
+      </p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">Shadowy · Komandas vadība. Sūtām tikai darba dienās, kad ir ko atgādināt.</p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}
+
+/** Daily overview of late tasks for a manager - who may need a hand. */
+export async function sendTeamOverdueDigest(opts: {
+  to: string;
+  name: string;
+  orgName: string;
+  overdue: TaskDigestItem[];
+}): Promise<void> {
+  const appUrl = getSiteUrl("http://localhost:3000");
+  const subject = `Shadowy - komandā ${opts.overdue.length} nokavēti uzdevumi`;
+  const html = `
+    <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:560px">
+      <h2 style="margin:0 0 4px">Labrīt, ${escapeHtml(opts.name)}!</h2>
+      <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)}</p>
+      <p style="color:#333;font-size:14px">Šīs atskaites ir pāri termiņam. Varbūt kādam vajag palīdzību vai darbu var pārdalīt.</p>
+      ${taskDigestList(opts.overdue, { showAssignee: true, late: true })}
+      <p style="margin-top:24px">
+        <a href="${appUrl}/manager/uzdevumi" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
+          Atvērt komandas skatu →
+        </a>
+      </p>
+    </div>
+  `;
+  await sendEmail(opts.to, subject, html);
+}

@@ -30,6 +30,7 @@ export default async function AdminLayout({
       organizationName={org?.name ?? "Organizācija"}
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}
       unreadNotificationCount={unreadNotificationCount}
+      teamTasksEnabled={org?.teamTasksEnabled ?? false}
     >
       <NewDesignScope>{children}</NewDesignScope>
     </AppShell>

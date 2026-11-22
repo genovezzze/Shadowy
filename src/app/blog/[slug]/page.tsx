@@ -67,7 +67,7 @@ export default function ArticlePage({ params }: { params: { slug: string } }) {
   } as const;
 
   return (
-    <div className="min-h-screen bg-white font-sans text-black antialiased">
+    <div className="landing-type min-h-screen bg-white font-sans text-black antialiased">
       <JsonLd
         nodes={[
           organizationNode,

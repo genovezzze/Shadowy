@@ -18,6 +18,7 @@ interface MobileShellProps {
   trialDaysLeft?: number | null;
   pendingCount?: number;
   unreadNotificationCount?: number;
+  teamTasksEnabled?: boolean;
   children: React.ReactNode;
 }
 
@@ -28,6 +29,7 @@ export function MobileShell({
   trialDaysLeft,
   pendingCount,
   unreadNotificationCount,
+  teamTasksEnabled,
   children,
 }: MobileShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -108,6 +110,7 @@ export function MobileShell({
           organizationName={organizationName}
           pendingCount={pendingCount}
           unreadNotificationCount={unreadNotificationCount}
+          teamTasksEnabled={teamTasksEnabled}
           onClose={() => setSidebarOpen(false)}
           // The mobile drawer always opens with labels.
           collapsed={collapsed && !sidebarOpen}

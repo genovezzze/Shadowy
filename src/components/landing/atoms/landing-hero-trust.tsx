@@ -21,7 +21,7 @@ export function LandingHeroTrust({ className }: { className?: string }) {
   const { t } = useLocale();
   return (
     <div className={cn("flex flex-col items-center gap-2.5", className)}>
-      <ul className="flex flex-wrap items-center justify-center gap-x-1.5 gap-y-0.5 text-[10.5px] font-medium leading-tight text-white/70 sm:rounded-full sm:bg-white/[0.06] sm:px-4 sm:py-2 sm:shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] sm:ring-1 sm:ring-white/15 sm:backdrop-blur-md sm:gap-x-2.5 sm:text-[13px]">
+      <ul className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-[12px] font-medium leading-tight text-white/55 sm:gap-x-2.5 sm:text-[13px]">
         {[t("hero.trust1"), t("hero.trust2"), t("hero.trust3")].map((item, index) => (
           <li key={item} className="flex items-center gap-2 sm:gap-2.5">
             {/* The separator belongs to the item that follows it, so it never

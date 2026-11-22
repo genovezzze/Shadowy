@@ -1885,14 +1885,12 @@ input[type="checkbox"]:focus-visible {
   letter-spacing: -0.03em;
 }
 
-/* Section headings in the atoms.technology manner: the light display face,
-   large and tight, instead of a bold sans. */
+/* Section headings: large and light, matching "Ko jūs redzēsiet pēc pilota". */
 .atoms-landing .text-landing-h2 {
-  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2.1rem, 4.2vw, 3.5rem);
+  font-size: clamp(2.2rem, 4.4vw, 3.6rem);
   font-weight: 300;
   line-height: 1.08;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.025em;
 }
 @keyframes atomsGradientTextReveal {
   from {
@@ -2110,39 +2108,63 @@ html:is(.dark, .slate).ui-new [data-slot="segmented"] > button[data-state="activ
   background: rgba(255, 255, 255, 0.14) !important;
 }
 
-/* Card and row titles across the landing in the same light display face as
-   the section headings (atoms.technology style). Beats Tailwind's single-class
-   font-bold/semibold on purpose. */
+
+/* Landing: Poppins for all text. Redefining the font variables on the wrapper
+   switches every font-sans / font-display / font-accent / font-mono text at
+   once. The pixel faces of the animated "Shadowy" wordmark stay as they are. */
+.atoms-landing {
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-poppins);
+  --font-accent: var(--font-poppins);
+  --font-mono: var(--font-poppins);
+  --font-landing: var(--font-poppins);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Card and row titles in the same light weight as the section headings.
+   Beats Tailwind's single-class font-bold / font-semibold on purpose. */
 .atoms-landing main h3 {
-  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  font-weight: 400;
+  font-weight: 300;
   letter-spacing: -0.02em;
 }
 
-/* Body text of the landing sections in the same family, so headings and text
-   read as one voice. The hero keeps its own pixel/display faces. */
-.atoms-landing main section:not(:first-of-type) {
-  font-family: var(--font-landing), var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+/* Description text in the regular weight, like the outcome cards. Prices,
+   eyebrows and the "sent" title keep their own weights. */
+.atoms-landing main p:is(.leading-relaxed, .leading-snug) {
+  font-weight: 400;
 }
 
-/* Hero "liquid glass": an iridescent film drifting over the dimmed footage, as if the hero were a sheet of glass. */
-.hero-glass-film {
-  background:
-    radial-gradient(38% 48% at 18% 28%, rgba(255, 140, 200, 0.55), transparent 70%),
-    radial-gradient(42% 52% at 78% 22%, rgba(110, 180, 255, 0.6), transparent 70%),
-    radial-gradient(48% 50% at 62% 82%, rgba(120, 255, 210, 0.45), transparent 70%),
-    radial-gradient(38% 44% at 28% 86%, rgba(185, 150, 255, 0.55), transparent 70%);
-  background-size: 170% 170%;
-  mix-blend-mode: soft-light;
-  animation: heroGlassFilm 18s ease-in-out infinite alternate;
-}
-@keyframes heroGlassFilm {
-  0% { background-position: 0% 0%; filter: hue-rotate(0deg); }
-  50% { background-position: 100% 40%; filter: hue-rotate(45deg); }
-  100% { background-position: 30% 100%; filter: hue-rotate(-30deg); }
+/* No scroll anchoring on the landing: when an accordion row opens, Chrome
+   would otherwise keep a section further down ("Cenas") fixed in view and
+   scroll the page to it. */
+.atoms-landing {
+  overflow-anchor: none;
 }
 
-/* Phones: no glass film at all (it costs paint time on every frame). */
-@media (prefers-reduced-motion: reduce), (max-width: 767px) {
-  .hero-glass-film { animation: none; display: none; }
+/* Native <select> lists: Chrome on Windows can't paint the open list with a
+   translucent control background and falls back to white, while the options
+   inherit the dark theme's light text - white on white. Theme colours on the
+   options keep them readable in every theme. */
+select option,
+select optgroup {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+/* The other marketing pages (PB Finanses case, pilot, blog) in the landing's
+   type: Poppins for all text, light headings, regular-weight descriptions. */
+.landing-type {
+  --font-sans: var(--font-poppins);
+  --font-display: var(--font-poppins);
+  --font-accent: var(--font-poppins);
+  --font-mono: var(--font-poppins);
+  --font-landing: var(--font-poppins);
+  font-family: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+.landing-type main :is(h1, h2, h3) {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+.landing-type main p:is(.leading-relaxed, .leading-snug) {
+  font-weight: 400;
 }

@@ -94,6 +94,7 @@ export default async function SuperAdminPage() {
                     managers={managers}
                     employees={employees}
                     entryCount={org._count.entries}
+                    teamTasksEnabled={org.teamTasksEnabled}
                   />
                 );
               })}

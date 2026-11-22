@@ -473,7 +473,7 @@ export function LandingNav({
             onMouseEnter={() => openMegaMenu("product")}
             onFocus={() => openMegaMenu("product")}
             className={cn(
-              "flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out",
+              "flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-medium tracking-tight transition-all duration-300 ease-out",
               activeMegaMenu !== null
                 ? navIsLight
                   ? "bg-black/[0.06] text-black"
@@ -518,7 +518,7 @@ export function LandingNav({
                           className="group/link flex w-[124px] flex-col items-center justify-center gap-2.5 rounded-xl bg-black/[0.035] px-3 py-6 text-center text-black/80 transition-all duration-200 hover:-translate-y-0.5 hover:bg-black/[0.06]"
                         >
                           <Icon className="size-6 text-black/70" aria-hidden />
-                          <span className="text-sm font-semibold leading-tight">
+                          <span className="text-sm font-medium leading-tight">
                             <MegaMenuWaveText text={t(card.tkey)} />
                           </span>
                         </Link>
@@ -535,7 +535,7 @@ export function LandingNav({
           href="/blog"
           className={cn(
             // Pulled in against the row's gap so it reads as Izpēti's neighbour.
-            "hidden rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out lg:-ml-5 lg:block",
+            "hidden rounded-full px-4 py-2.5 text-sm font-medium tracking-tight transition-all duration-300 ease-out lg:-ml-5 lg:block",
             navIsLight
               ? "text-black/80 hover:bg-black/[0.035] hover:text-black"
               : "text-white/85 hover:bg-white/[0.08] hover:text-white",
@@ -567,7 +567,7 @@ export function LandingNav({
           </span>
           <span
             className={cn(
-              "shrink-0 rounded-full px-3 py-1 text-xs font-semibold",
+              "shrink-0 rounded-full px-3 py-1 text-xs font-medium",
               navIsLight ? "bg-black/[0.07] text-black/70" : "bg-white/15 text-white/85",
             )}
           >
@@ -584,7 +584,7 @@ export function LandingNav({
           <Link
             href={resolveHref("#cenas")}
             className={cn(
-              "hidden rounded-full px-4 py-2.5 text-sm font-extrabold tracking-tight transition-all duration-300 ease-out lg:block",
+              "hidden rounded-full px-4 py-2.5 text-sm font-medium tracking-tight transition-all duration-300 ease-out lg:block",
               navIsLight
                 ? "text-black/80 hover:bg-black/[0.035] hover:text-black"
                 : "text-white/85 hover:bg-white/[0.08] hover:text-white",
@@ -609,7 +609,7 @@ export function LandingNav({
             <span
               role="tooltip"
               className={cn(
-                "pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold opacity-0 shadow-lg transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100",
+                "pointer-events-none absolute left-1/2 top-full z-50 mt-2 -translate-x-1/2 translate-y-1 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-medium opacity-0 shadow-lg transition-all duration-150 group-hover:translate-y-0 group-hover:opacity-100",
                 navIsLight ? "bg-black text-white" : "bg-white text-black",
               )}
             >
@@ -620,7 +620,7 @@ export function LandingNav({
           <Link
             href="/login"
             className={cn(
-              "hidden rounded-full px-5 py-2 text-sm font-bold transition-colors sm:block",
+              "hidden rounded-full px-5 py-2 text-sm font-medium transition-colors sm:block",
               navIsLight
                 ? "bg-black/[0.06] text-black hover:bg-black/[0.1]"
                 : "bg-white/15 text-white hover:bg-white/25",
@@ -666,7 +666,7 @@ export function LandingNav({
                       <Rocket className="size-4" aria-hidden />
                     </span>
                     <div className="min-w-0">
-                      <div className="text-sm font-bold">{t("cta.title")}</div>
+                      <div className="text-sm font-medium">{t("cta.title")}</div>
                       <div className="text-xs text-black/50">{t("cta.subtitle")}</div>
                     </div>
                   </div>
@@ -674,7 +674,7 @@ export function LandingNav({
                   <Link
                     href={resolveHref("#pilots")}
                     onClick={() => setCtaOpen(false)}
-                    className="mt-1 block rounded-xl bg-black py-2.5 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
+                    className="mt-1 block rounded-xl bg-black py-2.5 text-center text-sm font-medium text-white transition-colors hover:bg-black/85"
                   >
                     {t("nav.cta")}
                   </Link>
@@ -690,7 +690,7 @@ export function LandingNav({
                   <div className="my-1.5 h-px bg-black/[0.07]" />
 
                   <div className="flex items-center justify-between px-2 py-1.5">
-                    <span className="text-sm font-semibold">{t("cta.language")}</span>
+                    <span className="text-sm font-medium">{t("cta.language")}</span>
                     <LocaleToggle light />
                   </div>
 
@@ -758,7 +758,7 @@ export function LandingNav({
               <Link
                 href={resolveHref("#pilots")}
                 onClick={() => setMenuOpen(false)}
-                className="block rounded-xl bg-black py-3 text-center text-sm font-bold text-white transition-colors hover:bg-black/85"
+                className="block rounded-xl bg-black py-3 text-center text-sm font-medium text-white transition-colors hover:bg-black/85"
               >
                 {t("nav.cta")}
               </Link>
@@ -772,7 +772,7 @@ export function LandingNav({
                       key={card.tkey}
                       href={resolveHref(card.href)}
                       onClick={() => setMenuOpen(false)}
-                      className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
+                      className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-medium text-black/85 transition-colors hover:bg-black/[0.04]"
                     >
                       <Icon className="size-[18px] shrink-0 text-black/55" aria-hidden />
                       {t(card.tkey)}
@@ -782,7 +782,7 @@ export function LandingNav({
                 <Link
                   href="/login"
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-semibold text-black/85 transition-colors hover:bg-black/[0.04]"
+                  className="flex items-center gap-3 rounded-lg px-2 py-2.5 text-[15px] font-medium text-black/85 transition-colors hover:bg-black/[0.04]"
                 >
                   <LogIn className="size-[18px] shrink-0 text-black/55" aria-hidden />
                   {t("nav.login")}
@@ -792,7 +792,7 @@ export function LandingNav({
               <div className="my-1.5 h-px bg-black/[0.07]" />
 
               <div className="flex items-center justify-between px-2 py-1.5">
-                <span className="text-sm font-semibold">{t("cta.language")}</span>
+                <span className="text-sm font-medium">{t("cta.language")}</span>
                 <LocaleToggle light />
               </div>
 

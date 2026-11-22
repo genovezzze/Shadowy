@@ -82,7 +82,7 @@ export default function BlogIndexPage() {
   const featuredHasMedia = Boolean(featured?.cover || featured?.video);
 
   return (
-    <div className="min-h-screen bg-white font-sans text-black antialiased">
+    <div className="landing-type min-h-screen bg-white font-sans text-black antialiased">
       <JsonLd nodes={[organizationNode, breadcrumbNode([{ name: "Raksti", path: "/blog" }])]} />
       <LandingNav alwaysLight />
 

@@ -27,6 +27,8 @@ import {
   PlusCircle,
   PanelLeftOpen,
   Pin,
+  ListChecks,
+  Lock,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -49,7 +51,14 @@ type NavMotion =
   | "plus"
   | "badge";
 
-type NavItem = { href: string; label: string; icon: any; motion: NavMotion };
+type NavItem = {
+  href: string;
+  label: string;
+  icon: any;
+  motion: NavMotion;
+  /** Shown muted and not clickable: the section is still being built. */
+  soon?: boolean;
+};
 
 function ShadowyNavIcon({ className, ...props }: HTMLAttributes<HTMLSpanElement>) {
   return (
@@ -163,6 +172,39 @@ function NavLink({
     hoverTimer.current = null;
   };
 
+  if (item.soon) {
+    // A section that is still being built: visible so people know it is
+    // coming, muted and inert, and hovering says why.
+    return (
+      <div
+        role="link"
+        aria-disabled="true"
+        tabIndex={0}
+        title={SOON_HINT}
+        aria-label={`${item.label}: ${SOON_HINT}`}
+        className={cn(
+          "group relative flex h-9 cursor-not-allowed select-none items-center rounded-lg text-[15px] text-muted-foreground/50 outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          rail ? (showLabel ? "w-full" : "w-10") : "gap-2.5 px-3",
+        )}
+      >
+        <span className={cn("relative flex shrink-0 items-center justify-center", rail ? "h-9 w-10" : "h-[18px] w-[18px]")}>
+          <Icon className="h-[18px] w-[18px]" />
+        </span>
+        {(!rail || showLabel) && (
+          <>
+            <span className={cn("flex-1 truncate group-hover:hidden group-focus-visible:hidden", rail && "whitespace-nowrap pr-3")}>
+              {item.label}
+            </span>
+            <span className={cn("hidden flex-1 truncate text-[13px] group-hover:block group-focus-visible:block", rail && "whitespace-nowrap pr-3")}>
+              Tiek izstrādāts
+            </span>
+            <Lock className={cn("h-3.5 w-3.5 shrink-0", rail && "mr-3")} aria-hidden />
+          </>
+        )}
+      </div>
+    );
+  }
+
   return (
     <Link
       href={item.href}
@@ -205,6 +247,20 @@ function NavLink({
   );
 }
 
+// "Komandas vadība": a working link for organisations the module is switched
+// on for; everyone else sees it muted as "being built".
+const TEAM_TASKS_NAV: NavItem = { href: "/manager/uzdevumi", label: "Komandas vadība", icon: ListChecks, motion: "document" };
+const MY_TASKS_NAV: NavItem = { href: "/employee/uzdevumi", label: "Mani uzdevumi", icon: ListChecks, motion: "document" };
+
+const SOON_HINT = "Šī sadaļa tiek izstrādāta un drīzumā būs pieejama";
+
+/** Insert the module's entry right after "Pārskats". */
+function withTeamTasks(items: NavItem[], role: Role, enabled: boolean): NavItem[] {
+  const base = role === "EMPLOYEE" ? MY_TASKS_NAV : TEAM_TASKS_NAV;
+  const entry = enabled ? base : { ...base, soon: true };
+  return [items[0], entry, ...items.slice(1)];
+}
+
 // Pages that are not in the menu but still deserve a name in the top bar.
 const EXTRA_TITLES: { href: string; label: string }[] = [
   { href: "/employee/clients", label: "Klients" },
@@ -216,6 +272,9 @@ const EXTRA_TITLES: { href: string; label: string }[] = [
   { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi" },
   { href: "/manager/report", label: "Pilota atskaite" },
   { href: "/notifications", label: "Paziņojumi" },
+  { href: "/manager/uzdevumi/registrs", label: "Klientu reģistrs" },
+  { href: "/employee/uzdevumi/tabula", label: "Mana tabula" },
+  { href: "/manager/uzdevumi/imports", label: "Importēt no Excel" },
   { href: "/account", label: "Konts" },
 ];
 
@@ -227,6 +286,8 @@ export function pageTitleFor(pathname: string): string {
     ...ADMIN_MANAGER_NAV,
     ...MANAGER_NAV,
     ...EMPLOYEE_NAV,
+    TEAM_TASKS_NAV,
+    MY_TASKS_NAV,
     ...EXTRA_TITLES,
   ];
   let best: { href: string; label: string } | undefined;
@@ -261,6 +322,7 @@ interface SidebarProps {
   organizationName: string;
   pendingCount?: number;
   unreadNotificationCount?: number;
+  teamTasksEnabled?: boolean;
   onClose?: () => void;
   /** Desktop icon rail: labels hidden, expands with the toggle. */
   collapsed?: boolean;
@@ -275,6 +337,7 @@ export function Sidebar({
   organizationName,
   pendingCount,
   unreadNotificationCount,
+  teamTasksEnabled = false,
   onClose,
   collapsed = false,
   peeking = false,
@@ -282,7 +345,7 @@ export function Sidebar({
 }: SidebarProps) {
   const pathname = usePathname();
   const isAdmin = role === "ADMIN";
-  const mainItems = isAdmin ? ADMIN_ONLY_NAV : navFor(role);
+  const mainItems = withTeamTasks(isAdmin ? ADMIN_ONLY_NAV : navFor(role), role, teamTasksEnabled);
   const managerItems = isAdmin ? ADMIN_MANAGER_NAV : [];
   const [unreadNotifications, setUnreadNotifications] = useState(unreadNotificationCount ?? 0);
   const rail = collapsed;

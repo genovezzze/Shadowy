@@ -30,6 +30,7 @@ export default async function ManagerLayout({
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}
       pendingCount={pendingCount}
       unreadNotificationCount={unreadNotificationCount}
+      teamTasksEnabled={org?.teamTasksEnabled ?? false}
     >
       <NewDesignScope>{children}</NewDesignScope>
     </AppShell>

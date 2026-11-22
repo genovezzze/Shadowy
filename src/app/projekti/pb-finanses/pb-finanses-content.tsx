@@ -145,7 +145,10 @@ const T = {
   audiencesTitle: { lv: "Kam šis risinājums ir piemērots", en: "Who this solution is for" },
   featuresTitle: { lv: "Galvenās iespējas", en: "Key capabilities" },
   projectTitle: { lv: "Par projektu", en: "About the project" },
-  dashboardAlt: { lv: "Shadowy darba pārskata saskarne", en: "Shadowy work overview interface" },
+  dashboardAlt: {
+    lv: "Shadowy AI ieraksts: darbinieks pastāsta paveikto savā valodā, un Shadowy sagatavo ierakstu",
+    en: "Shadowy AI entry: an employee describes the work in their own words and Shadowy drafts the entry",
+  },
   solutionTitle: { lv: "Kā risinājums darbojas", en: "How the solution works" },
   fitTitle: { lv: "Pielāgojams tieši jūsu grāmatvedības uzņēmumam", en: "Adaptable to your accounting firm" },
   matrixTitle: { lv: "Klientu un komandas noslodzes matrica", en: "Client and team workload matrix" },
@@ -293,7 +296,7 @@ function ReferenceListSection({
 function PageBody() {
   const { locale } = useLocale();
   return (
-    <div className="min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
+    <div className="landing-type min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
       <LandingNav alwaysLight />
 
       <main className="overflow-x-hidden pt-28 md:pt-48">
@@ -343,13 +346,14 @@ function PageBody() {
 
         <section className="bg-white px-4 py-8 md:px-8 md:py-12">
           <ScrollReveal effect="fade" duration={1.2} delay={0.2}>
-            <div className="relative min-h-[300px] w-full overflow-hidden bg-[#07090a] md:min-h-[560px]">
+            <div className="relative aspect-[1615/891] w-full overflow-hidden rounded-[4px]">
               <Image
-                src="/images/shadowy-dashboard-wide.png"
+                // ?v= because /images is cached as immutable for a year.
+                src="/images/Shadowy-Beige-Laptop.webp?v=2"
                 alt={T.dashboardAlt[locale]}
                 fill
                 sizes="100vw"
-                className="object-contain"
+                className="object-cover"
               />
             </div>
           </ScrollReveal>
@@ -490,10 +494,7 @@ function PageBody() {
         <section className="bg-black px-4 pb-32 md:px-8">
           <div className="w-full">
             <div className="flex flex-col items-center border-t border-white/10 py-20 text-center md:p-24">
-              <div className="mb-6 inline-flex size-14 items-center justify-center rounded-2xl bg-white/10">
-                <Image src="/shadowy.svg" alt="" width={24} height={24} className="size-6 opacity-70" />
-              </div>
-              <h2 className="mx-auto mb-8 max-w-[560px] text-2xl font-bold leading-[1.1] tracking-tighter text-white md:text-[36px]">
+              <h2 className="mx-auto mb-8 max-w-[900px] text-balance text-2xl font-bold leading-[1.1] tracking-tighter text-white md:text-[36px]">
                 {T.finalHeading[locale]}
               </h2>
               <p className="mx-auto mb-12 max-w-[760px] text-sm font-semibold leading-relaxed text-white/70 md:text-base">

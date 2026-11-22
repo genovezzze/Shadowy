@@ -27,6 +27,8 @@ export function WaveHeading({
   className,
   tone = "dark",
   settledColor,
+  sweep = Infinity,
+  letterDuration = 0.5,
 }: {
   children: string;
   className?: string;
@@ -34,8 +36,16 @@ export function WaveHeading({
   tone?: "dark" | "light";
   /** Overrides the tone default — e.g. a muted body colour for a paragraph. */
   settledColor?: string;
+  /** Longest the whole sweep may take, in seconds. Unlimited by default. */
+  sweep?: number;
+  /** How long each letter takes to settle, in seconds. */
+  letterDuration?: number;
 }) {
   const words = React.useMemo(() => children.split(" "), [children]);
+  // Headings keep the original rhythm (0.035s per letter). Body paragraphs pass
+  // a `sweep` cap so a long text doesn't crawl for seconds.
+  const letterCount = children.replace(/\s/g, "").length || 1;
+  const stagger = Math.max(0.004, Math.min(0.035, sweep / letterCount));
   const settled = settledColor ?? (tone === "light" ? "#ffffff" : "#0a0a0a");
   let index = -1;
 
@@ -50,7 +60,7 @@ export function WaveHeading({
         viewport={{ once: true, margin: "-80px" }}
         variants={{
           hidden: {},
-          visible: { transition: { staggerChildren: 0.035 } },
+          visible: { transition: { staggerChildren: stagger } },
         }}
         // Words stay whole so the heading still wraps between words rather than
         // mid-word once every letter is its own inline box.
@@ -75,7 +85,7 @@ export function WaveHeading({
                     visible: {
                       opacity: 1,
                       color: settled,
-                      transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+                      transition: { duration: letterDuration, ease: [0.22, 1, 0.36, 1] },
                     },
                   }}
                 >

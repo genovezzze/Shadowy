@@ -40,11 +40,14 @@ export function EntryForm({
   clients = [],
   colleagues = [],
   initialValues,
+  prefillNotice,
   categories = SMART_LOG_CATEGORIES,
 }: {
   clients?: ClientOption[];
   colleagues?: ColleagueOption[];
   initialValues?: EntryFormInitialValues;
+  /** Replaces the "copied from a previous entry" note when fields come from elsewhere. */
+  prefillNotice?: string;
   categories?: readonly SmartLogCategoryDef[];
 }) {
   // Group labels in the order they first appear in the given set.
@@ -106,7 +109,7 @@ export function EntryForm({
           <div className="grid grid-cols-1 gap-x-5 gap-y-3 sm:grid-cols-2 [@media(min-height:1000px)]:gap-y-5">
           {initialValues ? (
             <div className={cn(APPLE_FILL, "rounded-xl px-4 py-2.5 text-[13px] text-muted-foreground sm:col-span-2")}>
-              Lauki aizpildīti no iepriekšējā ieraksta - pārbaudiet un pielāgojiet pirms iesniegšanas.
+              {prefillNotice ?? "Lauki aizpildīti no iepriekšējā ieraksta - pārbaudiet un pielāgojiet pirms iesniegšanas."}
             </div>
           ) : null}
 

@@ -93,7 +93,7 @@ export function LandingProduct() {
       className="relative scroll-mt-20 overflow-hidden bg-[var(--landing-paper)] pb-16 pt-16 md:pb-32 md:pt-32"
     >
       <div className="relative z-10 w-full px-4 md:px-8">
-        <Reveal as="header" className="mb-8 max-w-3xl md:mb-14">
+        <Reveal as="header" className="mb-8 max-w-3xl md:mb-14 lg:max-w-5xl">
           <div className="mb-3 inline-block">
             <SectionBadge>{t("product.badge")}</SectionBadge>
           </div>
@@ -138,7 +138,7 @@ export function LandingProduct() {
                     <WaveHeading tone="dark">{view.title[locale]}</WaveHeading>
                   </h3>
                   <p className="mt-2.5 max-w-xl text-sm font-semibold leading-relaxed md:text-base">
-                    <WaveHeading tone="dark" settledColor="rgba(0,0,0,0.5)">{view.text[locale]}</WaveHeading>
+                    <WaveHeading tone="dark" settledColor="rgba(0,0,0,0.5)" sweep={2.4} letterDuration={0.6}>{view.text[locale]}</WaveHeading>
                   </p>
                 </figcaption>
               </figure>

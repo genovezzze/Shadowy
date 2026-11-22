@@ -29,6 +29,7 @@ export default async function EmployeeLayout({
       organizationName={org?.name ?? "Organizācija"}
       trialDaysLeft={getTrialDaysLeft(org?.trialEndsAt)}
       unreadNotificationCount={unreadNotificationCount}
+      teamTasksEnabled={org?.teamTasksEnabled ?? false}
     >
       <NewDesignScope>
         <AnnouncementModal announcement={unreadAnnouncement} />

@@ -35,7 +35,7 @@ export function LandingPilotBanner() {
               <WaveHeading tone="light">{t("pilotBanner.heading")}</WaveHeading>
             </h2>
             <p className="mt-6 max-w-xl text-sm font-semibold leading-relaxed md:text-base">
-              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.6)">
+              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.6)" sweep={0.9} letterDuration={0.35}>
                 {t("pilotBanner.subtitle")}
               </WaveHeading>
             </p>

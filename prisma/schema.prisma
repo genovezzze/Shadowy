@@ -55,10 +55,14 @@ model Organization {
   updatedAt   DateTime  @updatedAt
 
   // Email notification settings
-  emailOnNewEntry      Boolean  @default(true)
-  emailOnEntryApproved Boolean  @default(false)
-  emailWeeklySummary   Boolean  @default(true)
-  emailDailyReminder   Boolean  @default(true)
+  emailOnNewEntry      Boolean @default(true)
+  emailOnEntryApproved Boolean @default(false)
+  emailWeeklySummary   Boolean @default(true)
+  emailDailyReminder   Boolean @default(true)
+
+  // "Komandas vadība" module (recurring client report tasks). Off until the
+  // module is switched on for the organisation from the superadmin panel.
+  teamTasksEnabled Boolean @default(false)
 
   // Default hourly rate for cost calculations (EUR)
   defaultHourlyRate Decimal? @db.Decimal(10, 2)
@@ -72,6 +76,10 @@ model Organization {
   bonusRequests    BonusRequest[]
   notifications    Notification[]
   announcements    Announcement[]
+  reportTypes      ReportType[]
+  clientReports    ClientReport[]
+  clientTasks      ClientTask[]
+  clientMonthNotes ClientMonthNote[]
 }
 
 model User {
@@ -119,6 +127,13 @@ model User {
   notifications           Notification[]
   createdAnnouncements    Announcement[]       @relation("AnnouncementAuthor")
   announcementReads       AnnouncementRead[]
+
+  responsibleClients      Client[]          @relation("ClientResponsible")
+  responsibleReports      ClientReport[]    @relation("ClientReportResponsible")
+  assignedTasks           ClientTask[]      @relation("TaskAssignee")
+  completedTasks          ClientTask[]      @relation("TaskCompletedBy")
+  updatedClientMonthNotes ClientMonthNote[] @relation("ClientMonthNoteAuthor")
+  ownReportTypes          ReportType[]      @relation("ReportTypeOwner")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -175,19 +190,19 @@ model InvisibleWorkEntry {
   title           String
   category        String
   description     String
-  clientName      String?      @db.VarChar(120)
+  clientName      String?  @db.VarChar(120)
   clientId        String?
-  client          Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  client          Client?  @relation(fields: [clientId], references: [id], onDelete: SetNull)
   workDate        DateTime
   durationMinutes Int
 
   status         EntryStatus @default(PENDING)
   managerComment String?
 
-  source          String   @default("manual") @db.VarChar(30)
-  originalInput   String?  @db.Text
-  roleRelation    String?  @db.VarChar(300)
-  businessImpact  String?  @db.VarChar(500)
+  source          String  @default("manual") @db.VarChar(30)
+  originalInput   String? @db.Text
+  roleRelation    String? @db.VarChar(300)
+  businessImpact  String? @db.VarChar(500)
   confidenceScore Float?
 
   isOutsideRole Boolean?
@@ -257,13 +272,21 @@ model Client {
   organizationId String
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
 
-  name                String  @db.VarChar(120)
+  name                String @db.VarChar(120)
   freeMinutesPerMonth Int?
-  status              String  @default("active") @db.VarChar(20)
+  status              String @default("active") @db.VarChar(20)
+
+  // Main responsible person for the client's recurring reports (Komandas vadība).
+  // A single report can override it via ClientReport.responsibleUserId.
+  responsibleUserId String?
+  responsibleUser   User?   @relation("ClientResponsible", fields: [responsibleUserId], references: [id], onDelete: SetNull)
 
   entries     InvisibleWorkEntry[]
   assignments ClientEmployee[]
   aliases     ClientAlias[]
+  reports     ClientReport[]
+  tasks       ClientTask[]
+  monthNotes  ClientMonthNote[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -418,7 +441,7 @@ model Announcement {
   title String @db.VarChar(150)
   body  String @db.Text
 
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
   reads     AnnouncementRead[]
 
   @@index([organizationId, createdAt])
@@ -434,4 +457,117 @@ model AnnouncementRead {
 
   @@unique([announcementId, userId])
   @@index([userId])
+}
+
+// ── Komandas vadība: recurring client report tasks ─────────────────────────
+
+enum TaskStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  DONE
+}
+
+/// A column of the firm's monthly report sheet ("PVN", "Alga", "KASE"...).
+model ReportType {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  name        String  @db.VarChar(40)
+  /// Null: a firm-wide column set up by a manager. Set: an employee's own
+  /// column, part of their personal sheet.
+  ownerUserId String?
+  owner       User?   @relation("ReportTypeOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  /// Day of the month the report is due; the deadline moves to the next
+  /// working day when it falls on a weekend or a Latvian public holiday.
+  dueDay      Int     @default(7)
+  sortOrder   Int     @default(0)
+  active      Boolean @default(true)
+
+  clientReports ClientReport[]
+  tasks         ClientTask[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([organizationId, ownerUserId, name])
+  @@index([organizationId])
+  @@index([ownerUserId])
+}
+
+/// "This client needs this report" - a white cell of the sheet. No row means
+/// the report does not apply to the client (a grey cell).
+model ClientReport {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  reportTypeId   String
+  reportType     ReportType   @relation(fields: [reportTypeId], references: [id], onDelete: Cascade)
+
+  /// Overrides Client.responsibleUserId for this one report.
+  responsibleUserId String?
+  responsibleUser   User?   @relation("ClientReportResponsible", fields: [responsibleUserId], references: [id], onDelete: SetNull)
+  /// "monthly" | "quarterly"
+  frequency         String  @default("monthly") @db.VarChar(20)
+  /// Overrides ReportType.dueDay for this one report.
+  dueDay            Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, reportTypeId])
+  @@index([organizationId])
+  @@index([reportTypeId])
+}
+
+/// One cell of one month: client + report + period.
+model ClientTask {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  reportTypeId   String
+  reportType     ReportType   @relation(fields: [reportTypeId], references: [id], onDelete: Cascade)
+
+  assigneeId String?
+  assignee   User?   @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  /// "YYYY-MM"
+  period          String     @db.VarChar(7)
+  dueDate         DateTime   @db.Date
+  /// The deadline as first planned; kept so a late task stays visible as late.
+  originalDueDate DateTime   @db.Date
+  status          TaskStatus @default(NOT_STARTED)
+  completedAt     DateTime?
+  completedById   String?
+  completedBy     User?      @relation("TaskCompletedBy", fields: [completedById], references: [id], onDelete: SetNull)
+  comment         String?    @db.VarChar(500)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, reportTypeId, period])
+  @@index([organizationId, period])
+  @@index([assigneeId, status])
+}
+
+/// The "Info" column: a free note per client per month.
+model ClientMonthNote {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  clientId       String
+  client         Client       @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  period         String       @db.VarChar(7)
+  text           String       @db.VarChar(500)
+  updatedById    String?
+  updatedBy      User?        @relation("ClientMonthNoteAuthor", fields: [updatedById], references: [id], onDelete: SetNull)
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([clientId, period])
+  @@index([organizationId, period])
 }

@@ -4,11 +4,12 @@ import { categoriesForUser } from "@/lib/smart-log-server";
 import { EntryForm } from "@/components/entries/entry-form";
 import { cn } from "@/lib/utils";
 import { METRIC_SURFACE } from "@/components/dashboard/apple";
+import { periodLabel, scopedTaskWhere } from "@/lib/team-tasks";
 
 export default async function NewEntryPage({
   searchParams,
 }: {
-  searchParams: { copyFrom?: string };
+  searchParams: { copyFrom?: string; task?: string };
 }) {
   const session = await requireUser(["EMPLOYEE"]);
   const categories = await categoriesForUser(session.userId);
@@ -42,6 +43,26 @@ export default async function NewEntryPage({
   });
 
   let initialValues;
+  let prefillNotice: string | undefined;
+  if (searchParams.task && !searchParams.copyFrom) {
+    // "Pierakstīt laiku" from a report task: only the viewer's own task counts.
+    const task = await prisma.clientTask.findFirst({
+      where: scopedTaskWhere({ id: searchParams.task }, session),
+      select: {
+        period: true,
+        client: { select: { id: true, name: true } },
+        reportType: { select: { name: true } },
+      },
+    });
+    if (task) {
+      initialValues = {
+        title: `${task.reportType.name} - ${periodLabel(task.period).toLowerCase()}`,
+        clientId: task.client.id,
+        clientName: task.client.name,
+      };
+      prefillNotice = "Klients un nosaukums ņemti no uzdevuma - atliek norādīt laiku un kategoriju.";
+    }
+  }
   if (searchParams.copyFrom) {
     const source = await prisma.invisibleWorkEntry.findFirst({
       where: {
@@ -88,6 +109,7 @@ export default async function NewEntryPage({
               c.name ? [{ id: c.id, name: c.name }] : []
             )}
             initialValues={initialValues}
+            prefillNotice={prefillNotice}
             categories={categories}
           />
         </div>

@@ -205,11 +205,11 @@ export function LandingHeroLockup() {
           fades on scroll via the parallax transforms above. */}
       <motion.div
         style={{ y: isDesktop ? contentY : 0, opacity: isDesktop ? contentOpacity : 1 }}
-        className="relative z-10 mx-auto w-full min-w-0 max-w-3xl motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
+        className="relative z-10 mx-auto w-full min-w-0 max-w-3xl lg:max-w-5xl motion-reduce:!translate-y-0 motion-reduce:!opacity-100"
       >
         <AnimatedGroup
           variants={transitionVariants}
-          className="mx-auto flex w-full min-w-0 max-w-4xl flex-col items-center text-center font-accent font-light"
+          className="mx-auto flex w-full min-w-0 max-w-4xl lg:max-w-5xl flex-col items-center text-center font-accent font-light"
         >
           {/* The whole lockup is the target - mark and wordmark alike - and it
               is sized to its content rather than to the column, so a click far
@@ -378,7 +378,7 @@ export function LandingHeroLockup() {
               something to match the queries a buyer types. `text-balance` evens
               out the two lines; the key phrases carry the intro's pixel wave so
               they read as the emphasis of the sentence. */}
-          <h1 className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-2xl sm:text-2xl lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
+          <h1 className="mx-auto mt-4 max-w-[350px] text-balance text-center text-[clamp(0.95rem,4.2vw,1.1rem)] font-light leading-[1.5] tracking-[0.005em] text-white/[0.63] sm:max-w-3xl sm:text-2xl lg:max-w-[56rem] lg:mt-5 lg:text-[1.75rem] lg:leading-[1.5]">
             {locale === "lv" ? (
               <>
                 Rīks grāmatvedības birojiem: redziet katra klienta{" "}
@@ -395,7 +395,7 @@ export function LandingHeroLockup() {
 
           <Link
             href="#pilots"
-            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white/[0.14] px-6 py-2.5 text-sm font-bold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.45),inset_0_-1px_0_rgba(255,255,255,0.08),0_10px_30px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/30 backdrop-blur-xl backdrop-saturate-150 transition-colors hover:bg-white/[0.22] sm:mt-8 sm:px-7 sm:py-3 sm:text-base"
+            className="mx-auto mt-7 inline-flex w-fit items-center gap-2 rounded-full bg-white px-6 py-2.5 text-sm font-bold text-black transition-colors hover:bg-white/90 sm:mt-8 sm:px-7 sm:py-3 sm:text-base"
           >
             {t("hero.cta")}
           </Link>

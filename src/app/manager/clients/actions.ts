@@ -5,6 +5,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
 import { normalizeClientName } from "@/lib/client-name";
+import { syncTeamTasksAfterClientChange } from "@/lib/team-tasks-server";
 
 const clientSchema = z.object({
   name: z.string().trim().min(1).max(120),
@@ -153,6 +154,7 @@ export async function toggleClientStatus(id: string) {
     where: { id },
     data: { status: client.status === "active" ? "inactive" : "active" },
   });
+  await syncTeamTasksAfterClientChange(session.organizationId);
 
   revalidatePath("/manager/clients");
   return { ok: true as const };
@@ -182,6 +184,7 @@ export async function setClientEmployees(clientId: string, employeeIds: string[]
         })]
       : []),
   ]);
+  await syncTeamTasksAfterClientChange(session.organizationId);
 
   revalidatePath("/manager/clients");
   revalidatePath("/admin/clients");

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { extendTrial, setTrialExpired, updateOrg, deleteOrg } from "./actions";
+import { extendTrial, setTrialExpired, updateOrg, deleteOrg, setTeamTasksEnabled } from "./actions";
 import { DateInput } from "@/components/ui/date-input";
 
 interface OrgRowProps {
@@ -16,6 +16,7 @@ interface OrgRowProps {
   managers: number;
   employees: number;
   entryCount: number;
+  teamTasksEnabled: boolean;
 }
 
 export function OrgRow(props: OrgRowProps) {
@@ -28,7 +29,7 @@ export function OrgRow(props: OrgRowProps) {
     props.trialEndsAt ? props.trialEndsAt.toISOString().slice(0, 10) : ""
   );
 
-  const { id, name, slug, createdAt, trialEndsAt, daysLeft, expired, admins, managers, employees, entryCount } = props;
+  const { id, name, slug, createdAt, trialEndsAt, daysLeft, expired, admins, managers, employees, entryCount, teamTasksEnabled } = props;
 
   function handleExtend() {
     startTransition(async () => { await extendTrial(id, 30); });
@@ -41,6 +42,9 @@ export function OrgRow(props: OrgRowProps) {
       await updateOrg(id, { name: editName, trialEndsAt: editTrial || null });
       setMode("view");
     });
+  }
+  function handleTeamTasks() {
+    startTransition(async () => { await setTeamTasksEnabled(id, !teamTasksEnabled); });
   }
   function handleDelete() {
     startTransition(async () => { await deleteOrg(id); });
@@ -150,6 +154,14 @@ export function OrgRow(props: OrgRowProps) {
                 Beigt
               </button>
             )}
+            <button
+              onClick={handleTeamTasks}
+              disabled={pending}
+              title="Komandas vadība (uzdevumu modulis)"
+              className="text-xs text-muted-foreground underline-offset-4 hover:underline hover:text-foreground disabled:opacity-50"
+            >
+              {teamTasksEnabled ? "Uzdevumi: ieslēgti" : "Uzdevumi: izslēgti"}
+            </button>
             <button
               onClick={() => setMode("edit")}
               className="text-xs text-muted-foreground underline-offset-4 hover:underline hover:text-foreground"

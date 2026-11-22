@@ -62,6 +62,19 @@ export async function updateOrg(orgId: string, data: { name: string; trialEndsAt
   return { ok: true as const };
 }
 
+/** Switch the "Komandas vadība" module on or off for one organisation. */
+export async function setTeamTasksEnabled(orgId: string, enabled: boolean) {
+  await requireSuperAdmin();
+
+  await prisma.organization.update({
+    where: { id: orgId },
+    data: { teamTasksEnabled: enabled === true },
+  });
+
+  revalidatePath("/superadmin");
+  return { ok: true as const };
+}
+
 export async function deleteOrg(orgId: string) {
   await requireSuperAdmin();
 

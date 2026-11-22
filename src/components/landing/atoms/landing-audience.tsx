@@ -634,9 +634,41 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
   // Opens like the FAQ: a plain toggle, with the panel height handled purely in
   // CSS (grid-template-rows 0fr → 1fr below). No scroll correction — that hack
   // is what made the page lurch on open/close.
-  const openRow = React.useCallback((name: string, isOpen: boolean) => {
-    setOpenName(isOpen ? null : name);
-  }, []);
+  // The landing has scroll anchoring off (see globals.css), so an opening panel
+  // no longer drags the page down to "Cenas". The one case left: a taller row
+  // open ABOVE the clicked one. That row closes instantly and the scroll moves
+  // up by its height in the same frame, so the clicked row stays put.
+  const [instantClose, setInstantClose] = React.useState<string | null>(null);
+  const pendingShift = React.useRef(0);
+
+  const openRow = React.useCallback(
+    (name: string, isOpen: boolean) => {
+      if (isOpen) {
+        setInstantClose(null);
+        setOpenName(null);
+        return;
+      }
+      const keys = audiences.map((a) => a.name.lv);
+      if (openName && keys.indexOf(openName) < keys.indexOf(name)) {
+        const panel = document.getElementById(`audience-${openName}`);
+        pendingShift.current = panel?.offsetHeight ?? 0;
+        setInstantClose(openName);
+      } else {
+        setInstantClose(null);
+      }
+      setOpenName(name);
+    },
+    [audiences, openName],
+  );
+
+  React.useLayoutEffect(() => {
+    if (pendingShift.current) {
+      // "instant": the page has `scroll-behavior: smooth`, which would turn this
+      // correction into a visible slide - down to "Cenas", then back up.
+      window.scrollBy({ top: -pendingShift.current, behavior: "instant" });
+      pendingShift.current = 0;
+    }
+  }, [openName]);
 
   return (
     <section
@@ -717,7 +749,10 @@ export function LandingAudience({ stats }: { stats: PilotStats }) {
                   aria-hidden={!isOpen}
                   // React 18 drops a boolean `inert`; an empty string renders inert="".
                   inert={!isOpen ? ("" as unknown as boolean) : undefined}
-                  className="grid transition-[grid-template-rows] duration-500 ease-out motion-reduce:transition-none"
+                  className={cn(
+                    "grid ease-out motion-reduce:transition-none",
+                    instantClose === key ? "transition-none" : "transition-[grid-template-rows] duration-500",
+                  )}
                   style={{ gridTemplateRows: isOpen ? "1fr" : "0fr" }}
                 >
                   <div className="overflow-hidden">

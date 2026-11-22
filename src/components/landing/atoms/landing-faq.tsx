@@ -29,7 +29,7 @@ export function LandingFaq() {
               <WaveHeading tone="light">{t("faq.heading")}</WaveHeading>
             </h2>
             <p className="text-sm font-medium leading-relaxed md:text-base">
-              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.5)">
+              <WaveHeading tone="light" settledColor="rgba(255,255,255,0.5)" sweep={0.9} letterDuration={0.35}>
                 {t("faq.subtitle")}
               </WaveHeading>
             </p>

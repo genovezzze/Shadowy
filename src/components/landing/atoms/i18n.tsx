@@ -103,7 +103,7 @@ const STRINGS = {
 
   // Pilot banner
   "pilotBanner.badge": { lv: "Pilots", en: "Pilot" },
-  "pilotBanner.heading": { lv: "Izmēģiniet pilotu bez riska", en: "Try the pilot with no risk" },
+  "pilotBanner.heading": { lv: "Izmēģiniet pilotu bez riska", en: "Try the pilot with no risk" },
   "pilotBanner.subtitle": {
     lv: "Aizpildiet formu, un mēs sazināsimies 1-2 darba dienu laikā un palīdzēsim uzsākt pilotu jūsu komandā",
     en: "Fill in the form and we'll get in touch within 1-2 business days and help you start the pilot in your team",

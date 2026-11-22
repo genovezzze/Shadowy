@@ -4,6 +4,7 @@ import * as React from "react";
 import { BarChart3, BrainCircuit, Check, Layers, Mic, type LucideIcon } from "lucide-react";
 import { useLocale, type Locale } from "@/components/landing/atoms/i18n";
 import { cn } from "@/lib/utils";
+import { SectionBadge } from "@/components/landing/atoms/landing-primitives";
 
 type L = Record<Locale, string>;
 
@@ -172,7 +173,7 @@ export function LandingApproach() {
     <section id="process" className="relative scroll-mt-20 bg-[var(--landing-paper)] px-4 py-16 md:px-8 md:py-28 xl:px-24">
       <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div className="lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:self-start">
-          <p className="text-xs font-semibold text-black/50">{locale === "lv" ? "Kā tas notiek" : "How it works"}</p>
+          <SectionBadge>{locale === "lv" ? "Kā tas notiek" : "How it works"}</SectionBadge>
           <h2 className="mt-4 text-[clamp(2.2rem,4.4vw,3.6rem)] font-light leading-[1.08] tracking-tight text-black">
             {locale === "lv" ? (
               <>

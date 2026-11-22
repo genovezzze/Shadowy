@@ -50,17 +50,43 @@ export function PixelWaveText({ text, className }: { text: string; className?: s
               <span className="inline-block" style={{ visibility: isPixel ? "hidden" : "visible" }}>
                 {character}
               </span>
-              {isPixel && (
-                <span
-                  style={{ fontFamily: pixelFont }}
-                  className="pointer-events-none absolute inset-0 flex items-center justify-center"
-                >
-                  {character}
-                </span>
-              )}
+              {isPixel && <PixelGlyph character={character} font={pixelFont} />}
             </span>
           );
         })}
+      </span>
+    </span>
+  );
+}
+
+/**
+ * The pixel letter over the real one, stretched to exactly the real letter's
+ * width. Pixel faces are monospaced, so a wide "m" left gaps on both sides and
+ * a narrow "i" crowded its neighbours; matching the width keeps the word tight.
+ */
+function PixelGlyph({ character, font }: { character: string; font: string }) {
+  const boxRef = React.useRef<HTMLSpanElement>(null);
+  const glyphRef = React.useRef<HTMLSpanElement>(null);
+  const [scale, setScale] = React.useState(1);
+
+  React.useLayoutEffect(() => {
+    const box = boxRef.current?.offsetWidth ?? 0;
+    const glyph = glyphRef.current?.offsetWidth ?? 0;
+    if (box > 0 && glyph > 0) setScale(box / glyph);
+  }, [character, font]);
+
+  return (
+    <span
+      ref={boxRef}
+      aria-hidden
+      className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-visible"
+    >
+      <span
+        ref={glyphRef}
+        className="inline-block whitespace-nowrap"
+        style={{ fontFamily: font, transform: `scaleX(${scale})`, transformOrigin: "center" }}
+      >
+        {character}
       </span>
     </span>
   );

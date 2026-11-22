@@ -206,7 +206,7 @@ function InfoSection({ title, items, id }: { title: string; items: readonly Info
 function PageBody() {
   const { locale } = useLocale();
   return (
-    <div className="min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
+    <div className="landing-type min-h-screen overflow-x-clip bg-white font-sans text-black antialiased">
       <LandingNav alwaysLight />
 
       <main className="overflow-x-hidden pt-28 md:pt-48">
@@ -256,10 +256,7 @@ function PageBody() {
 
         <section className="bg-black px-4 pb-32 md:px-8">
           <div className="flex flex-col items-center border-t border-white/10 py-20 text-center md:p-24">
-            <div className="mb-6 inline-flex size-14 items-center justify-center rounded-2xl bg-white/10">
-              <Image src="/shadowy.svg" alt="" width={24} height={24} className="size-6 opacity-70" />
-            </div>
-            <h2 className="mx-auto mb-6 max-w-3xl text-3xl font-bold leading-[1.05] tracking-tight text-white md:text-5xl">
+            <h2 className="mx-auto mb-6 max-w-4xl text-balance text-3xl font-bold leading-[1.05] tracking-tight text-white md:text-5xl">
               {T.finalHeading[locale]}
             </h2>
             <p className="mx-auto mb-10 max-w-2xl text-sm font-semibold leading-relaxed text-white/65 md:text-base">

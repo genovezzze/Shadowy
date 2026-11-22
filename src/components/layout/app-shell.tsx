@@ -9,6 +9,8 @@ interface AppShellProps {
   trialDaysLeft?: number | null;
   pendingCount?: number;
   unreadNotificationCount?: number;
+  /** Show the "Komandas vadība" module in the menu. */
+  teamTasksEnabled?: boolean;
   children: ReactNode;
 }
 
