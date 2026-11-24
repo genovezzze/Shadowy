@@ -144,8 +144,8 @@ export function RegistryImport({ people }: { people: { id: string; name: string 
       {done && (
         <div className="rounded-xl border border-black/[0.08] bg-black/[0.03] px-4 py-3 text-sm dark:border-white/[0.1] dark:bg-white/[0.04]">
           {done}{" "}
-          <Link href="/manager/uzdevumi/registrs" className="font-medium underline underline-offset-4">
-            Atvērt reģistru
+          <Link href="/manager/clients/atskaites" className="font-medium underline underline-offset-4">
+            Atvērt atskaites
           </Link>
         </div>
       )}

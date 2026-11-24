@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 import { sendWeeklyEmployeeDigest, sendEmptyWeekNudge, isDemoEmail } from "@/lib/email";
+import { previousReportWeek } from "@/lib/report-week";
 import {
   groupByCategory,
   groupByClient,
@@ -33,8 +34,8 @@ export async function GET(req: NextRequest) {
   }
   console.log("[cron] weekly-employee-digest started");
 
-  const weekAgo = new Date(Date.now() - 7 * 86400000);
-  const twoWeeksAgo = new Date(Date.now() - 14 * 86400000);
+  // Last calendar week, Monday to Sunday (Riga).
+  const week = previousReportWeek();
 
   const orgs = await prisma.organization.findMany({
     where: { emailWeeklySummary: true },
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
             organizationId: employee.organizationId,
             employeeId: employee.id,
             deletedAt: null,
-            workDate: { gte: weekAgo },
+            workDate: { gte: week.start, lt: week.end },
           },
           select: {
             title: true,
@@ -98,7 +99,7 @@ export async function GET(req: NextRequest) {
             organizationId: employee.organizationId,
             employeeId: employee.id,
             deletedAt: null,
-            workDate: { gte: twoWeeksAgo, lt: weekAgo },
+            workDate: { gte: week.prevStart, lt: week.start },
           },
           select: { durationMinutes: true },
         }),
@@ -138,6 +139,7 @@ export async function GET(req: NextRequest) {
           to: employee.email,
           employeeName: employee.name ?? "",
           orgName: org.name,
+          weekLabel: week.label,
           weekEntries: weekEntries.length,
           weekMinutes,
           helpedCount,

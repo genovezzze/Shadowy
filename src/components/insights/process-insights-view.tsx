@@ -26,19 +26,28 @@ function resolvedView(value?: string): InsightsView {
 export function ProcessInsightsView({
   insights,
   period,
+  from,
+  to,
   view: requestedView,
   entriesHref,
 }: {
   insights: ProcessInsightsResult;
   period: string;
+  /** Custom range bounds (yyyy-mm-dd), carried along in links. */
+  from?: string;
+  to?: string;
   view?: string;
   entriesHref: string;
 }) {
   const view = resolvedView(requestedView);
 
+  function periodParams(): Record<string, string> {
+    return period === "custom" && from && to ? { period, from, to } : { period };
+  }
+
   function tabHref(nextView: InsightsView) {
-    const params = new URLSearchParams();
-    if (period !== "30d") params.set("period", period);
+    const params = new URLSearchParams(periodParams());
+    if (period === "30d") params.delete("period");
     if (nextView !== "overview") params.set("view", nextView);
     const query = params.toString();
     return query ? `?${query}` : "?";
@@ -51,7 +60,7 @@ export function ProcessInsightsView({
   }
 
   function clientHref(client: ClientInsight) {
-    return client.id ? `/manager/clients/${client.id}/presentation?period=${period}` : null;
+    return client.id ? `/manager/clients/${client.id}/presentation?${new URLSearchParams(periodParams()).toString()}` : null;
   }
 
   function processHref(process: { key: string; categoryKey: string; label: string }) {

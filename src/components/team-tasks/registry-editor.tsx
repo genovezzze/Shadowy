@@ -95,7 +95,7 @@ function ColumnsEditor({
 }) {
   const [pending, startTransition] = useTransition();
   const [newName, setNewName] = useState("");
-  const [newDay, setNewDay] = useState("7");
+  const [newDay, setNewDay] = useState("");
 
   function run(action: () => Promise<{ ok: boolean; error?: string }>, after?: () => void) {
     onError(null);
@@ -111,7 +111,7 @@ function ColumnsEditor({
       <div className="mb-1 font-display text-[15px] font-medium">Atskaišu kolonnas</div>
       <p className="mb-4 text-[13px] text-muted-foreground">
         Kā Excel tabulas kolonnas. Termiņa diena attiecas uz visiem klientiem; ja tā iekrīt brīvdienā vai svētku dienā,
-        termiņš pārceļas uz nākamo darba dienu.
+        termiņš pārceļas uz nākamo darba dienu. Tukša diena - atskaitei nav termiņa, tā nekad nekļūst nokavēta.
       </p>
 
       {reportTypes.length === 0 && (
@@ -148,8 +148,8 @@ function ColumnsEditor({
           </Button>
         </div>
         <p className="mt-1.5 text-[12px] text-muted-foreground">
-          Pievieno tikai tās kolonnas, kuru vēl nav. Termiņi pēc VID: paziņojumi līdz 15., Alga līdz 17., PVN un UIN līdz
-          20., VSAOI līdz 23., DRN reizi ceturksnī līdz 15. Iekšējie darbi līdz 7. Visu var mainīt.
+          Pievieno tikai tās kolonnas, kuru vēl nav. Termiņš ir tikai četrām atskaitēm: Fiz.pers. paz. līdz 15., VSAOI līdz
+          17., PVN un UIN līdz 20. Pārējām termiņa nav. Tukša termiņa diena nozīmē - bez termiņa.
         </p>
       </div>
 
@@ -172,10 +172,10 @@ function ColumnsEditor({
         onSubmit={(e) => {
           e.preventDefault();
           run(
-            () => saveReportType(scope, { name: newName, dueDay: Number(newDay), active: true }),
+            () => saveReportType(scope, { name: newName, dueDay: Number(newDay) || 0, active: true }),
             () => {
               setNewName("");
-              setNewDay("7");
+              setNewDay("");
             },
           );
         }}
@@ -226,8 +226,8 @@ function ColumnRow({
   onMove: (dir: "up" | "down") => void;
 }) {
   const [name, setName] = useState(reportType.name);
-  const [day, setDay] = useState(String(reportType.dueDay));
-  const dirty = name.trim() !== reportType.name || Number(day) !== reportType.dueDay;
+  const [day, setDay] = useState(reportType.dueDay > 0 ? String(reportType.dueDay) : "");
+  const dirty = name.trim() !== reportType.name || (Number(day) || 0) !== reportType.dueDay;
 
   return (
     <li className={cn(APPLE_FILL, "flex flex-wrap items-center gap-2 rounded-xl px-2.5 py-1.5", !reportType.active && "opacity-60")}>
@@ -266,6 +266,7 @@ function ColumnRow({
           max={31}
           value={day}
           onChange={(e) => setDay(e.target.value)}
+          placeholder="-"
           aria-label="Termiņa diena"
           className="h-8 w-16 rounded-lg border border-input bg-background px-2 text-[13px] text-foreground"
         />
@@ -276,7 +277,7 @@ function ColumnRow({
           size="sm"
           variant="outline"
           disabled={pending || !name.trim()}
-          onClick={() => onSave({ name, dueDay: Number(day), active: reportType.active })}
+          onClick={() => onSave({ name, dueDay: Number(day) || 0, active: reportType.active })}
         >
           Saglabāt
         </Button>
@@ -417,7 +418,7 @@ function ClientMatrix({
                   className="min-w-[60px] border-b border-r border-black/[0.08] px-1.5 py-2 text-center text-[12px] font-medium leading-tight text-muted-foreground dark:border-white/[0.08]"
                 >
                   {rt.name}
-                  <span className="block text-[10px] font-normal">līdz {rt.dueDay}.</span>
+                  <span className="block text-[10px] font-normal">{rt.dueDay > 0 ? `līdz ${rt.dueDay}.` : "bez termiņa"}</span>
                 </th>
               ))}
             </tr>

@@ -86,6 +86,7 @@ export async function ensureTasksForPeriod(
       period: p.period,
       dueDate: p.dueDate,
       originalDueDate: p.dueDate,
+      hasDeadline: p.hasDeadline,
     })),
     skipDuplicates: true,
   });
@@ -107,6 +108,7 @@ export async function reconcilePeriod(organizationId: string, period: string): P
         reportTypeId: true,
         assigneeId: true,
         dueDate: true,
+        hasDeadline: true,
         status: true,
         comment: true,
       },
@@ -131,6 +133,7 @@ export async function reconcilePeriod(organizationId: string, period: string): P
               period: p.period,
               dueDate: p.dueDate,
               originalDueDate: p.dueDate,
+              hasDeadline: p.hasDeadline,
             })),
             skipDuplicates: true,
           }),
@@ -140,7 +143,7 @@ export async function reconcilePeriod(organizationId: string, period: string): P
     ...update.map((u) =>
       prisma.clientTask.updateMany({
         where: { id: u.id, organizationId },
-        data: { assigneeId: u.assigneeId, dueDate: u.dueDate, originalDueDate: u.dueDate },
+        data: { assigneeId: u.assigneeId, dueDate: u.dueDate, originalDueDate: u.dueDate, hasDeadline: u.hasDeadline },
       }),
     ),
   ]);
@@ -158,4 +161,34 @@ export async function syncTeamTasksAfterClientChange(organizationId: string): Pr
   } catch (error) {
     console.error("[team-tasks] sync after client change failed", error);
   }
+}
+
+/**
+ * Colleagues this person substitutes today: approved vacation or sick leave
+ * with them named as substitute. Resolved from the database for the session
+ * user only, so a URL can never claim a substitution.
+ */
+export async function activeSubstitutions(
+  session: { role: string; organizationId: string; userId: string },
+  today: Date = rigaToday(),
+): Promise<{ userId: string; name: string; endDate: Date }[]> {
+  if (session.role !== "EMPLOYEE") return [];
+  const rows = await prisma.absence.findMany({
+    where: {
+      organizationId: session.organizationId,
+      substituteId: session.userId,
+      status: "approved",
+      type: { in: ["vacation", "sick"] },
+      startDate: { lte: today },
+      endDate: { gte: today },
+    },
+    select: { userId: true, endDate: true, user: { select: { name: true } } },
+  });
+  return rows.map((r) => ({ userId: r.userId, name: r.user.name, endDate: r.endDate }));
+}
+
+/** Scope options for task queries made on behalf of the session user. */
+export async function taskScopeOpts(session: { role: string; organizationId: string; userId: string }) {
+  const subs = await activeSubstitutions(session);
+  return { substituteFor: subs.map((s) => s.userId) };
 }

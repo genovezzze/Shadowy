@@ -74,9 +74,9 @@ function Tile({
   );
 }
 
-function Card({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
+function Card({ title, note, children, className }: { title: string; note?: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn(METRIC_SURFACE, "p-4")}>
+    <section className={cn(METRIC_SURFACE, "p-4", className)}>
       <div className="font-display text-[15px] font-medium">{title}</div>
       {note && <p className="mt-0.5 text-[12px] text-muted-foreground">{note}</p>}
       <div className="mt-3">{children}</div>
@@ -118,7 +118,7 @@ export function TeamDashboard({
         </Tile>
         <Tile
           icon={<AlertCircle className={cn("h-4 w-4", dashboard.overdueTotal > 0 && LATE)} />}
-          label="Nokavēti"
+          label="Nokavētās atskaites"
           value={<span className={cn(dashboard.overdueTotal > 0 && LATE)}>{dashboard.overdueTotal}</span>}
           sub={dashboard.overdueTotal > 0 ? `Vecākais ${dashboard.oldestLateDays} d. pāri termiņam` : "Nekas nav nokavēts"}
         />
@@ -145,8 +145,8 @@ export function TeamDashboard({
       </div>
 
       {/* Two independent columns, so a short card never leaves a hole beside a tall one. */}
-      <div className="grid items-start gap-4 lg:grid-cols-2">
-        <div className="space-y-4">
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="flex flex-col gap-4">
           <Card title="Komanda" note="Kur vajag palīdzību vai pārdalīt darbu. Nav salīdzinājums starp kolēģiem.">
             {people.length === 0 ? (
               <p className="text-sm text-muted-foreground">Šomēnes vēl nav uzdevumu.</p>
@@ -182,7 +182,7 @@ export function TeamDashboard({
               </ul>
             )}
           </Card>
-          <Card title="Tuvākie termiņi" note="Nākamās 2 nedēļas, vēl nepabeigtās atskaites.">
+          <Card className="flex-1" title="Tuvākie termiņi" note="Nākamās 2 nedēļas, vēl nepabeigtās atskaites.">
             {dashboard.upcoming.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nākamajās 2 nedēļās termiņu nav.</p>
             ) : (
@@ -204,7 +204,7 @@ export function TeamDashboard({
             )}
           </Card>
         </div>
-        <div className="space-y-4">
+        <div className="flex flex-col gap-4">
           <Card title="Pa atskaitēm" note="Vispirms tās, kas atpaliek visvairāk.">
             {dashboard.byColumn.length === 0 ? (
               <p className="text-sm text-muted-foreground">Šomēnes vēl nav atskaišu.</p>
@@ -212,7 +212,7 @@ export function TeamDashboard({
               <ReportRows columns={dashboard.byColumn} />
             )}
           </Card>
-          <Card title="Nokavēti pa darbiniekiem" note="Atveriet, lai redzētu konkrētās atskaites.">
+          <Card className="flex-1" title="Nokavētās atskaites pa darbiniekiem" note="Atveriet, lai redzētu konkrētās atskaites.">
             {dashboard.overdueByPerson.length === 0 ? (
               <p className="text-sm text-muted-foreground">Nekas nav nokavēts.</p>
             ) : (

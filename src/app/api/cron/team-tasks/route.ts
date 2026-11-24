@@ -3,13 +3,14 @@ import { prisma } from "@/lib/db";
 import { isDemoEmail, sendTaskDigest, sendTeamOverdueDigest, type TaskDigestItem } from "@/lib/email";
 import { createNotification } from "@/lib/notifications";
 import { ensureTasksForPeriod } from "@/lib/team-tasks-server";
-import { daysLate, isoDay, isWorkingDay, periodOf, rigaToday, shortDate, taskPeople } from "@/lib/team-tasks";
+import { daysLate, isoDay, isWorkingDay, periodOf, reminderDays, rigaToday, shortDate, taskPeople } from "@/lib/team-tasks";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const SEND_DELAY_MS = 150; // Resend caps at 10 req/s
-const SOON_DAYS = 3;
+const DAY_MS = 86_400_000;
+const LV_WEEKDAYS = ["svētdien", "pirmdien", "otrdien", "trešdien", "ceturtdien", "piektdien", "sestdien"];
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -18,8 +19,10 @@ function sleep(ms: number) {
 /**
  * Daily "Komandas vadība" run, meant for ~07:00 Riga on working days:
  * 1. makes sure this month's tasks exist (the 1st of the month creates them);
- * 2. sends each person their late / today / next-days list (email + in-app);
- * 3. sends managers and admins the team's late tasks.
+ * 2. reminds each person of the reports due on the next working day, and once
+ *    of the ones whose deadline passed on the previous working day (the pilot
+ *    firm asked for one reminder the day before, not a countdown);
+ * 3. tells managers and admins about their people's newly late reports.
  *
  * Not in vercel.json yet: the Hobby plan allows two crons and both are taken.
  * Add `{ "path": "/api/cron/team-tasks", "schedule": "0 5 * * 1-5" }` after
@@ -35,8 +38,14 @@ export async function GET(req: NextRequest) {
 
   const today = rigaToday();
   const period = periodOf(today);
-  const soonLimit = new Date(today.getTime() + SOON_DAYS * 86_400_000);
   const workingDay = isWorkingDay(today);
+  const { dueIso, newlyLateIso } = reminderDays(today);
+  const dueDay = new Date(`${dueIso}T00:00:00.000Z`);
+  // "rīt" when the deadline is literally tomorrow, otherwise the weekday.
+  const dueLabel =
+    dueDay.getTime() - today.getTime() === DAY_MS
+      ? "rīt"
+      : `${LV_WEEKDAYS[dueDay.getUTCDay()]}, ${shortDate(dueDay)}`;
 
   const orgs = await prisma.organization.findMany({
     where: { teamTasksEnabled: true },
@@ -54,7 +63,12 @@ export async function GET(req: NextRequest) {
 
     const [openTasks, users] = await Promise.all([
       prisma.clientTask.findMany({
-        where: { organizationId: org.id, status: { not: "DONE" }, dueDate: { lte: soonLimit } },
+        where: {
+          organizationId: org.id,
+          status: { not: "DONE" },
+          hasDeadline: true,
+          dueDate: { gte: new Date(`${newlyLateIso}T00:00:00.000Z`), lt: new Date(dueDay.getTime() + DAY_MS) },
+        },
         select: {
           assigneeId: true,
           dueDate: true,
@@ -86,7 +100,8 @@ export async function GET(req: NextRequest) {
     const managerOf = new Map(users.map((u) => [u.id, u.managerId]));
     const nameOf = new Map(users.map((u) => [u.id, u.name]));
 
-    const todayIso = isoDay(today);
+    const isDue = (t: (typeof openTasks)[number]) => isoDay(t.dueDate) === dueIso;
+    const isNewlyLate = (t: (typeof openTasks)[number]) => isoDay(t.dueDate) === newlyLateIso;
     const item = (t: (typeof openTasks)[number]): TaskDigestItem => ({
       clientName: t.client.name,
       reportName: t.reportType.name,
@@ -97,16 +112,15 @@ export async function GET(req: NextRequest) {
 
     for (const user of users) {
       const mine = openTasks.filter((t) => peopleByTask.get(t)?.includes(user.id));
-      const overdue = mine.filter((t) => isoDay(t.dueDate) < todayIso).map(item);
-      const dueToday = mine.filter((t) => isoDay(t.dueDate) === todayIso).map(item);
-      const soon = mine.filter((t) => isoDay(t.dueDate) > todayIso).map(item);
+      const dueNext = mine.filter(isDue).map(item);
+      const newlyLate = mine.filter(isNewlyLate).map(item);
 
       // Managers and admins: the late tasks of the people they look after.
       const teamLate =
         user.role === "EMPLOYEE"
           ? []
           : openTasks
-              .filter((t) => isoDay(t.dueDate) < todayIso)
+              .filter(isNewlyLate)
               .filter((t) => {
                 const people = peopleByTask.get(t) ?? [];
                 if (people.includes(user.id)) return false; // already in their own list
@@ -115,24 +129,23 @@ export async function GET(req: NextRequest) {
               })
               .map(item);
 
-      if (overdue.length + dueToday.length + soon.length === 0 && teamLate.length === 0) continue;
+      if (dueNext.length + newlyLate.length === 0 && teamLate.length === 0) continue;
 
       const link = user.role === "EMPLOYEE" ? "/employee/uzdevumi" : "/manager/uzdevumi";
       try {
-        if (overdue.length + dueToday.length + soon.length > 0) {
+        if (dueNext.length + newlyLate.length > 0) {
           const parts = [
-            overdue.length ? `${overdue.length} nokavēti` : null,
-            dueToday.length ? `${dueToday.length} šodien` : null,
-            soon.length ? `${soon.length} drīz` : null,
+            dueNext.length ? `${dueLabel} termiņš ${dueNext.length}` : null,
+            newlyLate.length ? `${newlyLate.length} nokavētas` : null,
           ].filter(Boolean);
           await createNotification({
             organizationId: org.id,
             userId: user.id,
-            title: `Tavi uzdevumi: ${parts.join(", ")}`,
+            title: `Atskaites: ${parts.join(", ")}`,
             link,
           });
           if (user.email && !isDemoEmail(user.email)) {
-            await sendTaskDigest({ to: user.email, name: user.name, orgName: org.name, overdue, today: dueToday, soon, link });
+            await sendTaskDigest({ to: user.email, name: user.name, orgName: org.name, dueNext, dueLabel, newlyLate, link });
             sent++;
             await sleep(SEND_DELAY_MS);
           }
@@ -141,7 +154,7 @@ export async function GET(req: NextRequest) {
           await createNotification({
             organizationId: org.id,
             userId: user.id,
-            title: `Komandā ${teamLate.length} nokavēti uzdevumi`,
+            title: `Komandā ${teamLate.length} nokavētas atskaites`,
             link: "/manager/uzdevumi",
           });
           if (user.email && !isDemoEmail(user.email)) {

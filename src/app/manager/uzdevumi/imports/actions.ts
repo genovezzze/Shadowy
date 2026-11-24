@@ -126,7 +126,7 @@ export async function confirmRegistryImport(
 
   await reconcilePeriod(orgId, periodOf(rigaToday()));
   revalidatePath("/manager/uzdevumi");
-  revalidatePath("/manager/uzdevumi/registrs");
+  revalidatePath("/manager/clients/atskaites");
   revalidatePath("/employee/uzdevumi");
   revalidatePath("/manager/clients");
 

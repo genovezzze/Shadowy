@@ -17,6 +17,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Activity, AlertTriangle, CalendarDays, Clock, FileText, Gauge, History, TrendingUp, UserCog, Users } from "lucide-react";
 import { GettingStarted } from "@/components/dashboard/getting-started";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { comparisonWindows, rangeFilter, resolveDateRange } from "@/lib/date-range";
 import { TopBarSlot } from "@/components/layout/top-bar-slot";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { TeamHeatmap } from "@/components/dashboard/team-heatmap";
@@ -31,14 +32,6 @@ import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 
 const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 const HOURLY_RATE_EUR = 20;
-
-function getPeriodStart(period: string): Date | undefined {
-  const now = new Date();
-  if (period === "7d") return new Date(now.getTime() - 7 * 86400000);
-  if (period === "30d") return new Date(now.getTime() - 30 * 86400000);
-  if (period === "90d") return new Date(now.getTime() - 90 * 86400000);
-  return undefined;
-}
 
 function buildMonthlyData(entries: { createdAt: Date }[]) {
   const now = new Date();
@@ -56,13 +49,13 @@ function buildMonthlyData(entries: { createdAt: Date }[]) {
 export default async function AdminDashboard({
   searchParams,
 }: {
-  searchParams: { period?: string; clientMonth?: string };
+  searchParams: { period?: string; from?: string; to?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["ADMIN"]);
   const orgId = session.organizationId;
-  const period = searchParams?.period ?? "all";
-  const periodStart = getPeriodStart(period);
-  const periodFilter = periodStart ? { gte: periodStart } : undefined;
+  const range = resolveDateRange(searchParams, { defaultKey: "all" });
+  const period = range.key;
+  const periodFilter = rangeFilter(range);
   const clientMonth = resolveClientMonth(searchParams?.clientMonth);
 
   const twelveMonthsAgo = new Date(Date.now() - 365 * 86400000);
@@ -200,16 +193,14 @@ export default async function AdminDashboard({
   // Trend vs the previous, equally long window. For a fixed period we reuse its
   // length; for "all time" (no baseline) we fall back to the last 30 days vs the
   // 30 before that, so the arrow always has a clear meaning.
-  const deltaDays = period === "7d" ? 7 : period === "90d" ? 90 : 30;
-  const deltaLabel = `pret iepr. ${deltaDays} d.`;
-  const curWindowStart = new Date(Date.now() - deltaDays * 86400000);
-  const prevWindowStart = new Date(Date.now() - 2 * deltaDays * 86400000);
+  const windows = comparisonWindows(range);
+  const deltaLabel = windows.label;
   const [curWindowEntries, prevWindowEntries] = await Promise.all([
     prisma.invisibleWorkEntry.count({
-      where: { organizationId: orgId, createdAt: { gte: curWindowStart } },
+      where: { organizationId: orgId, createdAt: { gte: windows.current.start, lt: windows.current.end } },
     }),
     prisma.invisibleWorkEntry.count({
-      where: { organizationId: orgId, createdAt: { gte: prevWindowStart, lt: curWindowStart } },
+      where: { organizationId: orgId, createdAt: { gte: windows.previous.start, lt: windows.previous.end } },
     }),
   ]);
 
@@ -430,9 +421,8 @@ export default async function AdminDashboard({
     { label: "Kopā (viss laiks)", value: allTimeEntries },
   ];
 
-  const periodCaption =
-    period === "7d" ? "Pēdējās 7 dienas" : period === "30d" ? "Pēdējās 30 dienas" : period === "90d" ? "Pēdējās 90 dienas" : "Viss laiks";
-  const periodBadge = period === "all" ? "Viss" : period.replace("d", " d.");
+  const periodCaption = range.label.charAt(0).toUpperCase() + range.label.slice(1);
+  const periodBadge = range.badge;
 
   // Blocks inside a section sit in one column with an even gap; components that
   // carry their own outer margin elsewhere get it reset here.

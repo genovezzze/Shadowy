@@ -29,6 +29,7 @@ import {
   Pin,
   ListChecks,
   Lock,
+  CalendarOff,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { NotificationBell } from "./notification-bell";
@@ -251,14 +252,16 @@ function NavLink({
 // on for; everyone else sees it muted as "being built".
 const TEAM_TASKS_NAV: NavItem = { href: "/manager/uzdevumi", label: "Komandas vadība", icon: ListChecks, motion: "document" };
 const MY_TASKS_NAV: NavItem = { href: "/employee/uzdevumi", label: "Mani uzdevumi", icon: ListChecks, motion: "document" };
+const TEAM_ABSENCE_NAV: NavItem = { href: "/manager/prombutne", label: "Prombūtne", icon: CalendarOff, motion: "history" };
+const MY_ABSENCE_NAV: NavItem = { href: "/employee/prombutne", label: "Prombūtne", icon: CalendarOff, motion: "history" };
 
 const SOON_HINT = "Šī sadaļa tiek izstrādāta un drīzumā būs pieejama";
 
 /** Insert the module's entry right after "Pārskats". */
 function withTeamTasks(items: NavItem[], role: Role, enabled: boolean): NavItem[] {
-  const base = role === "EMPLOYEE" ? MY_TASKS_NAV : TEAM_TASKS_NAV;
-  const entry = enabled ? base : { ...base, soon: true };
-  return [items[0], entry, ...items.slice(1)];
+  const base = role === "EMPLOYEE" ? [MY_TASKS_NAV, MY_ABSENCE_NAV] : [TEAM_TASKS_NAV, TEAM_ABSENCE_NAV];
+  const entries = enabled ? base : base.map((item) => ({ ...item, soon: true }));
+  return [items[0], ...entries, ...items.slice(1)];
 }
 
 // Pages that are not in the menu but still deserve a name in the top bar.
@@ -272,7 +275,7 @@ const EXTRA_TITLES: { href: string; label: string }[] = [
   { href: "/manager/bonus-requests", label: "Bonusu pieprasījumi" },
   { href: "/manager/report", label: "Pilota atskaite" },
   { href: "/notifications", label: "Paziņojumi" },
-  { href: "/manager/uzdevumi/registrs", label: "Klientu reģistrs" },
+  { href: "/manager/clients/atskaites", label: "Atskaites un termiņi" },
   { href: "/employee/uzdevumi/tabula", label: "Mana tabula" },
   { href: "/manager/uzdevumi/imports", label: "Importēt no Excel" },
   { href: "/account", label: "Konts" },
@@ -288,6 +291,8 @@ export function pageTitleFor(pathname: string): string {
     ...EMPLOYEE_NAV,
     TEAM_TASKS_NAV,
     MY_TASKS_NAV,
+    TEAM_ABSENCE_NAV,
+    MY_ABSENCE_NAV,
     ...EXTRA_TITLES,
   ];
   let best: { href: string; label: string } | undefined;

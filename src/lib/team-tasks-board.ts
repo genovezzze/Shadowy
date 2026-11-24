@@ -26,6 +26,8 @@ export interface BoardCell {
   state: CellState;
   dueDate: string; // YYYY-MM-DD
   originalDueDate: string;
+  /** False: the report has no deadline; dueDate is only for ordering. */
+  hasDeadline: boolean;
   completedAt: string | null; // ISO
   comment: string | null;
   assigneeId: string | null;
@@ -50,6 +52,8 @@ export interface AttentionItem {
   daysLate: number;
   status: TaskStatus;
   assigneeName: string | null;
+  /** False when the viewer sees it only as a substitute for a colleague. */
+  mine: boolean;
 }
 
 export interface LoadItem {
@@ -121,12 +125,13 @@ const taskInclude = {
 export async function loadBoard(
   session: BoardSession,
   period: string,
-  opts: { today: Date; assigneeId?: string | null },
+  opts: { today: Date; assigneeId?: string | null; substituteFor?: string[] },
 ): Promise<BoardData> {
   // "Show one person": everything that person would see on their own sheet.
   const filter: Prisma.ClientTaskWhereInput = opts.assigneeId
     ? taskScopeForSession({ role: "EMPLOYEE", organizationId: session.organizationId, userId: opts.assigneeId })
     : {};
+  const scopeOpts = { substituteFor: opts.substituteFor ?? [] };
   const todayIso = isoDay(opts.today);
   const soonLimit = new Date(opts.today.getTime() + 3 * 86_400_000);
   // The dashboard's timeline looks two weeks ahead; the "soon" list keeps 3 days.
@@ -134,7 +139,7 @@ export async function loadBoard(
 
   const [tasks, reportTypes, lateTasks, soonTasks] = await Promise.all([
     prisma.clientTask.findMany({
-      where: scopedTaskWhere({ ...filter, period }, session),
+      where: scopedTaskWhere({ ...filter, period }, session, scopeOpts),
       include: taskInclude,
     }),
     prisma.reportType.findMany({
@@ -149,15 +154,16 @@ export async function loadBoard(
       select: { id: true, name: true, sortOrder: true, ownerUserId: true },
     }),
     prisma.clientTask.findMany({
-      where: scopedTaskWhere({ ...filter, status: { not: "DONE" }, dueDate: { lt: opts.today } }, session),
+      where: scopedTaskWhere({ ...filter, status: { not: "DONE" }, hasDeadline: true, dueDate: { lt: opts.today } }, session, scopeOpts),
       include: taskInclude,
       orderBy: [{ dueDate: "asc" }],
       take: 2000,
     }),
     prisma.clientTask.findMany({
       where: scopedTaskWhere(
-        { ...filter, status: { not: "DONE" }, dueDate: { gte: opts.today, lte: upcomingLimit } },
+        { ...filter, status: { not: "DONE" }, hasDeadline: true, dueDate: { gte: opts.today, lte: upcomingLimit } },
         session,
+        scopeOpts,
       ),
       include: taskInclude,
       orderBy: [{ dueDate: "asc" }],
@@ -213,6 +219,7 @@ export async function loadBoard(
       state: cellState(task, opts.today),
       dueDate: isoDay(task.dueDate),
       originalDueDate: isoDay(task.originalDueDate),
+      hasDeadline: task.hasDeadline,
       completedAt: task.completedAt?.toISOString() ?? null,
       comment: task.comment,
       assigneeId: task.assigneeId,
@@ -246,6 +253,10 @@ export async function loadBoard(
     daysLate: daysLate(task, opts.today),
     status: task.status,
     assigneeName: sharedNames(task),
+    mine:
+      task.reportType.ownerUserId === session.userId ||
+      task.assigneeId === session.userId ||
+      (!task.reportType.ownerUserId && task.client.assignments.some((a) => a.employeeId === session.userId)),
   });
 
   // Workload per person, alphabetical - a support signal, never a ranking.
@@ -300,7 +311,7 @@ export async function loadBoard(
     if (!stat) continue;
     stat.total++;
     if (task.status === "DONE") stat.done++;
-    else if (isoDay(task.dueDate) < todayIso) stat.overdue++;
+    else if (task.hasDeadline && isoDay(task.dueDate) < todayIso) stat.overdue++;
   }
 
   const byDate = new Map<string, Map<string, number>>();

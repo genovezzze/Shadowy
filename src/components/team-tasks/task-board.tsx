@@ -42,7 +42,7 @@ function liveCell(cell: BoardCell, o: Override | undefined, todayIso: string): L
     status,
     completedAt: o ? o.completedAt : cell.completedAt,
     comment: o && o.comment !== undefined ? o.comment : cell.comment,
-    late: status !== "DONE" && cell.dueDate < todayIso,
+    late: cell.hasDeadline && status !== "DONE" && cell.dueDate < todayIso,
   };
 }
 
@@ -164,7 +164,7 @@ export function TaskBoard({
           <div className="px-4 py-10 text-center text-sm text-muted-foreground">
             {mode === "mine"
               ? "Šim mēnesim jums nav atskaišu. Pārbaudiet, vai “Mana tabula” ir atzīmētas vajadzīgās atskaites."
-              : "Šim mēnesim nav atskaišu. Aizpildiet klientu reģistru, un uzdevumi izveidosies paši."}
+              : "Šim mēnesim nav atskaišu. Atzīmējiet tās sadaļā Klienti → Atskaites un termiņi, un uzdevumi izveidosies paši."}
           </div>
         ) : (
           <>
@@ -176,6 +176,7 @@ export function TaskBoard({
               onToggle={toggle}
               onEdit={(cell, column, client) => setEditing({ cell, column, client })}
               onOpenClient={setOpenClientId}
+              period={period}
             />
             <MobileList
               columns={data.columns}
@@ -236,7 +237,7 @@ function AttentionLists({
     <div className="grid gap-4 lg:grid-cols-2">
       {late.length > 0 && (
         <AttentionCard
-          title={`Nokavēti (${late.length})`}
+          title={`Nokavētās atskaites (${late.length})`}
           icon={<AlertCircle className="h-4 w-4 text-[#FF3B30] dark:text-[#FF453A]" />}
           items={late}
           mode={mode}
@@ -295,10 +296,16 @@ function AttentionCard({
             <div className="min-w-0 flex-1 text-[14px]">
               <span className="font-medium">{item.clientName}</span>
               <span className="text-muted-foreground"> · {item.reportName}</span>
-              {mode === "team" && (
+              {mode === "team" ? (
                 <span className="block truncate text-[12px] text-muted-foreground">
                   {item.assigneeName ?? "Nav atbildīgā"}
                 </span>
+              ) : (
+                !item.mine && (
+                  <span className="block truncate text-[12px] text-muted-foreground">
+                    aizvietojot: {item.assigneeName ?? "kolēģi"}
+                  </span>
+                )
               )}
             </div>
             <div
@@ -359,7 +366,11 @@ function cellClasses(cell: LiveCell): string {
 }
 
 function cellTitle(cell: LiveCell, columnName: string, clientName: string, mode: Mode): string {
-  const parts = [`${clientName} · ${columnName}`, STATUS_LABEL[cell.status], `Termiņš ${dm(cell.dueDate)}`];
+  const parts = [
+    `${clientName} · ${columnName}`,
+    STATUS_LABEL[cell.status],
+    cell.hasDeadline ? `Termiņš ${dm(cell.dueDate)}` : "Bez termiņa",
+  ];
   if (cell.late) parts.push("Nokavēts");
   if (mode === "team") parts.push(`Atbild: ${cell.assigneeName ?? "nav norādīts"}`);
   if (cell.comment) parts.push(`Teksts: ${cell.comment}`);
@@ -405,6 +416,7 @@ function Matrix({
   onToggle,
   onEdit,
   onOpenClient,
+  period,
 }: {
   columns: BoardColumn[];
   rows: BoardRow[];
@@ -413,6 +425,7 @@ function Matrix({
   onToggle: (c: LiveCell) => void;
   onEdit: (c: LiveCell, column: string, client: string) => void;
   onOpenClient: (id: string) => void;
+  period: string;
 }) {
   return (
     <div className="hidden overflow-x-auto md:block">
@@ -496,14 +509,7 @@ function Matrix({
                 );
               })}
               <td className="border-b border-black/[0.08] p-0 dark:border-white/[0.08]">
-                <button
-                  type="button"
-                  onClick={() => onOpenClient(row.clientId)}
-                  className="block h-11 w-full max-w-[260px] truncate px-3 text-left text-[12px] text-muted-foreground hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
-                  title={row.note ?? "Pievienot piezīmi"}
-                >
-                  {row.note ?? ""}
-                </button>
+                <InfoCell key={`${row.clientId}-${period}`} clientId={row.clientId} clientName={row.clientName} period={period} initial={row.note} />
               </td>
             </tr>
           ))}
@@ -563,7 +569,7 @@ function MobileList({
                 >
                   {done ? <Check className="h-3.5 w-3.5" /> : null}
                   {col.name}
-                  {!done && <span className="text-[11px] tabular-nums opacity-70">{dm(cell.dueDate)}</span>}
+                  {!done && cell.hasDeadline && <span className="text-[11px] tabular-nums opacity-70">{dm(cell.dueDate)}</span>}
                 </button>
               );
             })}
@@ -758,8 +764,8 @@ function TaskRow({
               cell.late ? "text-[#D70015] dark:text-[#FF6961]" : "text-muted-foreground",
             )}
           >
-            Termiņš {dm(cell.dueDate)}
-            {moved && ` (sākotnēji ${dm(cell.originalDueDate)})`}
+            {cell.hasDeadline ? `Termiņš ${dm(cell.dueDate)}` : "Bez termiņa"}
+            {cell.hasDeadline && moved && ` (sākotnēji ${dm(cell.originalDueDate)})`}
             {cell.late && " · nokavēts"}
             {cell.status === "DONE" && cell.completedAt && ` · pabeigts ${completedDm(cell.completedAt)}`}
             {mode === "team" && ` · ${cell.assigneeName ?? "nav atbildīgā"}`}
@@ -878,7 +884,7 @@ function CellEditorBody({
         {target.client} · {target.column}
       </Dialog.Title>
       <Dialog.Description className="mb-4 text-[13px] text-muted-foreground">
-        Termiņš {dm(cell.dueDate)}
+        {cell.hasDeadline ? `Termiņš ${dm(cell.dueDate)}` : "Bez termiņa"}
         {cell.late ? " · nokavēts" : ""}
       </Dialog.Description>
 
@@ -927,5 +933,83 @@ function CellEditorBody({
         </button>
       </div>
     </form>
+  );
+}
+
+// ── Info cell ──────────────────────────────────────────────────────────────
+
+/**
+ * The "Info" column, written straight in the sheet like in Excel: click,
+ * type, Enter or click away saves, Escape cancels.
+ */
+function InfoCell({
+  clientId,
+  clientName,
+  period,
+  initial,
+}: {
+  clientId: string;
+  clientName: string;
+  period: string;
+  initial: string | null;
+}) {
+  const [value, setValue] = useState(initial ?? "");
+  const [saved, setSaved] = useState(initial ?? "");
+  const [editing, setEditing] = useState(false);
+  const [error, setError] = useState(false);
+  const [, startTransition] = useTransition();
+
+  function commit() {
+    setEditing(false);
+    const next = value.trim();
+    if (next === saved.trim()) return;
+    const before = saved;
+    setSaved(next);
+    setValue(next);
+    setError(false);
+    startTransition(async () => {
+      const result = await setClientMonthNote(clientId, period, next);
+      if (!result.ok) {
+        setSaved(before);
+        setValue(before);
+        setError(true);
+      }
+    });
+  }
+
+  if (editing) {
+    return (
+      <input
+        autoFocus
+        value={value}
+        maxLength={500}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={commit}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+          if (e.key === "Escape") {
+            setValue(saved);
+            setEditing(false);
+          }
+        }}
+        aria-label={`${clientName}: Info`}
+        className="h-11 w-full min-w-[200px] bg-[#007AFF]/[0.06] px-3 text-[12px] outline-none ring-2 ring-inset ring-[#007AFF]/40"
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setEditing(true)}
+      className={cn(
+        "block h-11 w-full min-w-[200px] max-w-[280px] truncate px-3 text-left text-[12px] hover:bg-black/[0.03] dark:hover:bg-white/[0.04]",
+        saved ? "text-foreground/80" : "text-muted-foreground/50",
+        error && "text-destructive",
+      )}
+      title={error ? "Neizdevās saglabāt" : saved || "Klikšķiniet, lai rakstītu"}
+    >
+      {error ? "Neizdevās saglabāt" : saved || "+"}
+    </button>
   );
 }

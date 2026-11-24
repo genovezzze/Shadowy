@@ -1,3 +1,4 @@
+import { previousReportWeek } from "@/lib/report-week";
 import "server-only";
 import { prisma } from "@/lib/db";
 import type { sendWeeklyAdminReport, sendWeeklyManagerReport } from "@/lib/email";
@@ -65,9 +66,8 @@ export async function buildManagerWeeklyReport(
   managerId: string,
   opts: { now?: Date } = {},
 ): Promise<ManagerWeeklyReport | null> {
-  const now = opts.now ?? new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 86400000);
-  const twoWeeksAgo = new Date(now.getTime() - 14 * 86400000);
+  // Last calendar week, Monday to Sunday (Riga), by the day the work was done.
+  const week = previousReportWeek(opts.now ?? new Date());
 
   const manager = await prisma.user.findUnique({
     where: { id: managerId },
@@ -89,7 +89,7 @@ export async function buildManagerWeeklyReport(
         select: { id: true, name: true },
       }),
       prisma.invisibleWorkEntry.findMany({
-        where: { organizationId, managerId, status: "APPROVED", updatedAt: { gte: weekAgo } },
+        where: { organizationId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: week.start, lt: week.end } },
         select: {
           title: true,
           durationMinutes: true,
@@ -107,12 +107,13 @@ export async function buildManagerWeeklyReport(
           organizationId,
           managerId,
           status: "APPROVED",
-          updatedAt: { gte: twoWeeksAgo, lt: weekAgo },
+          deletedAt: null,
+          workDate: { gte: week.prevStart, lt: week.start },
         },
         select: { durationMinutes: true },
       }),
       prisma.invisibleWorkEntry.findMany({
-        where: { organizationId, managerId, deletedAt: null, workDate: { gte: weekAgo } },
+        where: { organizationId, managerId, deletedAt: null, workDate: { gte: week.start, lt: week.end } },
         select: { employeeId: true },
         distinct: ["employeeId"],
       }),
@@ -151,6 +152,7 @@ export async function buildManagerWeeklyReport(
 
   return {
     orgName: manager.organization.name,
+    weekLabel: week.label,
     pendingCount,
     weekEntries: weekApproved.length,
     weekMinutes,
@@ -197,9 +199,8 @@ export async function buildAdminWeeklyReport(
   organizationId: string,
   opts: { now?: Date } = {},
 ): Promise<AdminWeeklyReport | null> {
-  const now = opts.now ?? new Date();
-  const weekAgo = new Date(now.getTime() - 7 * 86400000);
-  const twoWeeksAgo = new Date(now.getTime() - 14 * 86400000);
+  // Last calendar week, Monday to Sunday (Riga), by the day the work was done.
+  const week = previousReportWeek(opts.now ?? new Date());
 
   const org = await prisma.organization.findUnique({
     where: { id: organizationId },
@@ -223,7 +224,7 @@ export async function buildAdminWeeklyReport(
           organizationId,
           status: "APPROVED",
           deletedAt: null,
-          updatedAt: { gte: weekAgo },
+          workDate: { gte: week.start, lt: week.end },
         },
         select: {
           title: true,
@@ -244,12 +245,12 @@ export async function buildAdminWeeklyReport(
           organizationId,
           status: "APPROVED",
           deletedAt: null,
-          updatedAt: { gte: twoWeeksAgo, lt: weekAgo },
+          workDate: { gte: week.prevStart, lt: week.start },
         },
         select: { durationMinutes: true },
       }),
       prisma.invisibleWorkEntry.findMany({
-        where: { organizationId, deletedAt: null, workDate: { gte: weekAgo } },
+        where: { organizationId, deletedAt: null, workDate: { gte: week.start, lt: week.end } },
         select: { employeeId: true },
         distinct: ["employeeId"],
       }),
@@ -347,6 +348,7 @@ export async function buildAdminWeeklyReport(
 
   return {
     orgName: org.name,
+    weekLabel: week.label,
     pendingCount,
     weekEntries: weekApproved.length,
     weekMinutes,

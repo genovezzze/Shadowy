@@ -1,6 +1,7 @@
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { comparisonWindows, customTrendBuckets, rangeFilter, resolveDateRange, sumIntoBuckets, type DateRange } from "@/lib/date-range";
 import { TopBarSlot } from "@/components/layout/top-bar-slot";
 import { CostCalculatorWidget } from "@/components/dashboard/cost-calculator-widget";
 import { HoursTrendChart } from "@/components/dashboard/hours-trend-chart";
@@ -28,21 +29,6 @@ import { StatTile } from "@/components/dashboard/stat-tile";
 import { OverviewSections, type OverviewSection } from "@/components/dashboard/overview-sections";
 
 const HOURLY_RATE_EUR = 20;
-
-function getPeriodStart(period: string): Date | undefined {
-  const now = new Date();
-  if (period === "7d") return new Date(now.getTime() - 7 * 86400000);
-  if (period === "30d") return new Date(now.getTime() - 30 * 86400000);
-  if (period === "90d") return new Date(now.getTime() - 90 * 86400000);
-  return undefined;
-}
-
-function periodLabel(period: string) {
-  if (period === "7d") return "nedēļa";
-  if (period === "30d") return "mēnesis";
-  if (period === "90d") return "ceturksnis";
-  return "viss laiks";
-}
 
 // ISO week key "YYYY-WNN"
 function weekKey(date: Date): string {
@@ -78,8 +64,17 @@ function isExtraEntry(e: ApprovedEntry): boolean {
 
 function buildWeeklyTrendData(
   entries: ApprovedEntry[],
-  period: string
+  range: DateRange
 ): { label: string; value: number }[] {
+  const period = range.key;
+  if (range.key === "custom" && range.start && range.end) {
+    return sumIntoBuckets(
+      customTrendBuckets(range.start, range.end),
+      entries.filter(isExtraEntry),
+      (e) => e.workDate,
+      (e) => e.durationMinutes,
+    );
+  }
   const now = Date.now();
   const LV_MONTHS = ["Jan", "Feb", "Mar", "Apr", "Mai", "Jūn", "Jūl", "Aug", "Sep", "Okt", "Nov", "Dec"];
 
@@ -220,14 +215,14 @@ function buildMonthlyData(entries: { createdAt: Date }[]) {
 export default async function ManagerDashboard({
   searchParams,
 }: {
-  searchParams: { period?: string; clientMonth?: string };
+  searchParams: { period?: string; from?: string; to?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
   const managerId = session.userId;
-  const period = searchParams?.period ?? "30d";
-  const periodStart = getPeriodStart(period);
-  const periodFilter = periodStart ? { gte: periodStart } : undefined;
+  const range = resolveDateRange(searchParams, { defaultKey: "30d" });
+  const period = range.key;
+  const periodFilter = rangeFilter(range);
   const clientMonth = resolveClientMonth(searchParams?.clientMonth);
 
   const eightWeeksAgo = new Date(Date.now() - 8 * 7 * 86400000);
@@ -374,18 +369,16 @@ export default async function ManagerDashboard({
   // Trend vs the previous, equally long window. For a fixed period we reuse its
   // length; for "all time" (no baseline) we fall back to the last 30 days vs the
   // 30 before that, so the arrow always has a clear meaning.
-  const deltaDays = period === "7d" ? 7 : period === "90d" ? 90 : 30;
-  const deltaLabel = `pret iepr. ${deltaDays} d.`;
-  const curWindowStart = new Date(Date.now() - deltaDays * 86400000);
-  const prevWindowStart = new Date(Date.now() - 2 * deltaDays * 86400000);
+  const windows = comparisonWindows(range);
+  const deltaLabel = windows.label;
   const [curHoursAgg, prevHoursAgg] = await Promise.all([
     prisma.invisibleWorkEntry.aggregate({
       _sum: { durationMinutes: true },
-      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: curWindowStart } },
+      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: windows.current.start, lt: windows.current.end } },
     }),
     prisma.invisibleWorkEntry.aggregate({
       _sum: { durationMinutes: true },
-      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: prevWindowStart, lt: curWindowStart } },
+      where: { organizationId: orgId, managerId, status: "APPROVED", deletedAt: null, workDate: { gte: windows.previous.start, lt: windows.previous.end } },
     }),
   ]);
   const curWindowHours = Math.round(((curHoursAgg._sum.durationMinutes ?? 0) / 60) * 10) / 10;
@@ -462,7 +455,7 @@ export default async function ManagerDashboard({
   const maxWorkload = workloadRows[0]?.hours ?? 0;
 
   // --- Analytics ---
-  const weeklyTrendData = buildWeeklyTrendData(approved, period);
+  const weeklyTrendData = buildWeeklyTrendData(approved, range);
   const employeeBreakdown = buildEmployeeBreakdown(approved);
   const patternCategory = findInterruptionPattern(approved);
   const avgApprovalDays = computeAvgApprovalDays(approved);
@@ -564,8 +557,8 @@ export default async function ManagerDashboard({
     };
   });
 
-  const periodCaption = periodLabel(period);
-  const periodBadge = period === "all" ? "Viss" : period.replace("d", " d.");
+  const periodCaption = range.label;
+  const periodBadge = range.badge;
 
   // Blocks inside a section sit in one column with an even gap; components that
   // carry their own outer margin elsewhere get it reset here.

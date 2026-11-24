@@ -55,6 +55,8 @@ export interface DateInputProps {
   required?: boolean;
   disabled?: boolean;
   className?: string;
+  /** Which edge the calendar pops out from; "right" for fields near the right edge. */
+  align?: "left" | "right";
 }
 
 export function DateInput({
@@ -68,6 +70,7 @@ export function DateInput({
   required,
   disabled,
   className,
+  align = "left",
 }: DateInputProps) {
   const [internal, setInternal] = React.useState(defaultValue);
   const value = controlled ?? internal;
@@ -207,7 +210,10 @@ export function DateInput({
         <div
           role="dialog"
           aria-label="Kalendārs"
-          className="absolute left-0 top-full z-50 mt-1.5 w-[17.5rem] rounded-xl border border-border bg-card p-3 text-foreground shadow-lg"
+          className={cn(
+            "absolute top-full z-50 mt-1.5 w-[17.5rem] rounded-xl border border-border bg-card p-3 text-foreground shadow-lg",
+            align === "right" ? "right-0" : "left-0"
+          )}
         >
           <div className="mb-2 flex items-center justify-between">
             <button

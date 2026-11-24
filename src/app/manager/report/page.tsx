@@ -7,38 +7,20 @@ import { addMonthlyMinutes, clientMonthOptions, resolveClientMonth, sumMonthlyOv
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { ReportPrintButton } from "@/components/report/report-print-button";
 import { PeriodTabs } from "@/components/dashboard/period-tabs";
+import { rangeFilter, reportBuckets, resolveDateRange } from "@/lib/date-range";
 import { InvisibleWorkCostPanel } from "@/components/dashboard/invisible-work-cost-panel";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { AlertTriangle, CheckCircle2, Clock, TrendingUp, Users, FileText } from "lucide-react";
-
-function getPeriodStart(period: string): Date {
-  const now = new Date();
-  if (period === "7d") return new Date(now.getTime() - 7 * 86400000);
-  if (period === "90d") return new Date(now.getTime() - 90 * 86400000);
-  return new Date(now.getTime() - 30 * 86400000); // default 30d
-}
-
-function getPeriodLabel(period: string) {
-  if (period === "7d") return "7 dienas";
-  if (period === "90d") return "90 dienas";
-  return "30 dienas";
-}
 
 function fmtDate(d: Date) {
   return d.toLocaleDateString("lv-LV", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-function buildWeeklyData(entries: { createdAt: Date }[], from: Date) {
-  const weeks: { label: string; count: number }[] = [];
-  const now = new Date();
-  let cursor = new Date(from);
-  while (cursor < now) {
-    const end = new Date(Math.min(cursor.getTime() + 7 * 86400000, now.getTime()));
-    const count = entries.filter((e) => e.createdAt >= cursor && e.createdAt < end).length;
-    weeks.push({ label: `${cursor.getDate().toString().padStart(2, "0")}.${(cursor.getMonth() + 1).toString().padStart(2, "0")}`, count });
-    cursor = end;
-  }
-  return weeks;
+function buildWeeklyData(entries: { workDate: Date }[], from: Date, to: Date) {
+  return reportBuckets(from, to).map((b) => ({
+    label: b.label,
+    count: entries.filter((e) => e.workDate >= b.start && e.workDate < b.end).length,
+  }));
 }
 
 function generateRecommendations(data: {
@@ -106,13 +88,14 @@ function generateRecommendations(data: {
 export default async function ManagerReportPage({
   searchParams,
 }: {
-  searchParams: { period?: string; clientMonth?: string };
+  searchParams: { period?: string; from?: string; to?: string; clientMonth?: string };
 }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
   const orgId = session.organizationId;
   const managerId = session.userId;
-  const period = searchParams?.period ?? "30d";
-  const periodStart = getPeriodStart(period);
+  const range = resolveDateRange(searchParams, { defaultKey: "30d" });
+  const period = range.key;
+  const periodFilter = rangeFilter(range);
   const now = new Date();
   const clientMonth = resolveClientMonth(searchParams?.clientMonth, now);
 
@@ -122,7 +105,8 @@ export default async function ManagerReportPage({
       select: { id: true, name: true, workRole: { select: { duties: { select: { text: true } } } } },
     }),
     prisma.invisibleWorkEntry.findMany({
-      where: { organizationId: orgId, managerId, createdAt: { gte: periodStart } },
+      // By the day the work was done, like the overview; deleted entries are out.
+      where: { organizationId: orgId, managerId, deletedAt: null, ...(periodFilter ? { workDate: periodFilter } : {}) },
       select: {
         id: true,
         title: true,
@@ -132,6 +116,7 @@ export default async function ManagerReportPage({
         durationMinutes: true,
         status: true,
         createdAt: true,
+        workDate: true,
         employeeId: true,
         isOutsideRole: true,
         employee: { select: { id: true, name: true } },
@@ -243,7 +228,12 @@ export default async function ManagerReportPage({
   const topCategoryPct = topCats[0] ? Math.round((topCats[0][1] / totalApproved) * 100) : 0;
 
   // Weekly activity
-  const weeklyData = buildWeeklyData(allEntries, periodStart);
+  // All time starts at the first entry; a range in the future ends today.
+  const periodStart =
+    range.start ?? allEntries.reduce<Date>((min, e) => (e.workDate < min ? e.workDate : min), now);
+  const periodEnd = range.end && range.end < now ? range.end : now;
+  const periodLastDay = range.end ? new Date(range.end.getTime() - 86400000) : now;
+  const weeklyData = buildWeeklyData(allEntries, periodStart, periodEnd);
   const maxWeekCount = Math.max(...weeklyData.map((w) => w.count), 1);
 
   // Approval rate
@@ -323,10 +313,10 @@ export default async function ManagerReportPage({
           <h1 className="font-display text-[26px] font-medium leading-tight">Pilota atskaite</h1>
           <p className="text-sm text-muted-foreground mt-2">{org?.name} · {session.name}</p>
           <p className="text-sm text-muted-foreground">
-            {fmtDate(periodStart)} - {fmtDate(now)}
+            {fmtDate(periodStart)} - {fmtDate(periodLastDay)}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <PeriodTabs current={period} />
           <ReportPrintButton />
         </div>
@@ -341,7 +331,7 @@ export default async function ManagerReportPage({
               {org?.name} · Vadītājs: {session.name}
             </p>
             <p className="text-sm text-gray-500">
-              Periods: {fmtDate(periodStart)} - {fmtDate(now)} ({getPeriodLabel(period)})
+              Periods: {fmtDate(periodStart)} - {fmtDate(periodLastDay)} ({range.label})
             </p>
           </div>
           <p className="text-xs text-gray-400">Ģenerēts: {fmtDate(now)}</p>

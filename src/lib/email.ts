@@ -303,6 +303,8 @@ export async function sendWeeklyManagerReport(opts: {
   to: string;
   managerName: string;
   orgName: string;
+  /** The reported calendar week, e.g. "16.-22. novembris". */
+  weekLabel: string;
   pendingCount: number;
   weekEntries: number;
   weekMinutes: number;
@@ -319,7 +321,7 @@ export async function sendWeeklyManagerReport(opts: {
   entriesHref: string;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
-  const subject = `Shadowy - iknedēļas pārskats`;
+  const subject = `Shadowy - iknedēļas pārskats (${opts.weekLabel})`;
 
   const listSection = (title: string, rows: string) =>
     rows
@@ -371,7 +373,7 @@ export async function sendWeeklyManagerReport(opts: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <div style="margin-bottom:24px">
         <h2 style="margin:0 0 4px">Iknedēļas pārskats</h2>
-        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · Sveiks, ${escapeHtml(opts.managerName)}!</p>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · ${escapeHtml(opts.weekLabel)} · Sveiks, ${escapeHtml(opts.managerName)}!</p>
       </div>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
@@ -451,6 +453,8 @@ export async function sendWeeklyAdminReport(opts: {
   to: string;
   adminName: string;
   orgName: string;
+  /** The reported calendar week, e.g. "16.-22. novembris". */
+  weekLabel: string;
   pendingCount: number;
   weekEntries: number;
   weekMinutes: number;
@@ -469,7 +473,7 @@ export async function sendWeeklyAdminReport(opts: {
   entriesHref: string;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
-  const subject = `Shadowy - organizācijas pārskats par pagājušo nedēļu`;
+  const subject = `Shadowy - organizācijas pārskats (${opts.weekLabel})`;
 
   const listSection = (title: string, rows: string) =>
     rows
@@ -522,7 +526,7 @@ export async function sendWeeklyAdminReport(opts: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <div style="margin-bottom:24px">
         <h2 style="margin:0 0 4px">Organizācijas pārskats</h2>
-        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · par pagājušo nedēļu · Sveiks, ${escapeHtml(opts.adminName)}!</p>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · ${escapeHtml(opts.weekLabel)} · Sveiks, ${escapeHtml(opts.adminName)}!</p>
       </div>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
@@ -745,6 +749,8 @@ export async function sendWeeklyEmployeeDigest(opts: {
   to: string;
   employeeName: string;
   orgName: string;
+  /** The reported calendar week, e.g. "16.-22. novembris". */
+  weekLabel: string;
   weekEntries: number;
   weekMinutes: number;
   helpedCount: number;
@@ -758,7 +764,7 @@ export async function sendWeeklyEmployeeDigest(opts: {
   entryListMoreCount: number;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
-  const subject = `Shadowy - tava nedēļa`;
+  const subject = `Shadowy - tava nedēļa (${opts.weekLabel})`;
 
   const listSection = (title: string, rows: string) =>
     rows
@@ -815,7 +821,7 @@ export async function sendWeeklyEmployeeDigest(opts: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:520px">
       <div style="margin-bottom:24px">
         <h2 style="margin:0 0 4px">Tava nedēļa</h2>
-        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · Sveiks, ${escapeHtml(opts.employeeName)}!</p>
+        <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)} · ${escapeHtml(opts.weekLabel)} · Sveiks, ${escapeHtml(opts.employeeName)}!</p>
       </div>
 
       <table style="width:100%;border-collapse:collapse;margin-bottom:8px">
@@ -934,21 +940,28 @@ function taskDigestList(items: TaskDigestItem[], opts: { showAssignee?: boolean;
 }
 
 /** Morning list for one person: late, due today, due in the next days. */
+/**
+ * The reminder a person gets the working day before a deadline, plus a single
+ * note the first working day after one was missed. Nothing is sent otherwise:
+ * the pilot firm found countdown reminders days ahead annoying.
+ */
 export async function sendTaskDigest(opts: {
   to: string;
   name: string;
   orgName: string;
-  overdue: TaskDigestItem[];
-  today: TaskDigestItem[];
-  soon: TaskDigestItem[];
+  /** Reports due on the next working day. */
+  dueNext: TaskDigestItem[];
+  /** "rīt" or e.g. "pirmdien, 30.11." */
+  dueLabel: string;
+  /** Reports whose deadline passed on the previous working day. */
+  newlyLate: TaskDigestItem[];
   link: string;
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
   const parts: string[] = [];
-  if (opts.overdue.length) parts.push(`${opts.overdue.length} nokavēti`);
-  if (opts.today.length) parts.push(`${opts.today.length} šodien`);
-  if (opts.soon.length) parts.push(`${opts.soon.length} tuvākajās dienās`);
-  const subject = `Shadowy - tavi uzdevumi: ${parts.join(", ")}`;
+  if (opts.dueNext.length) parts.push(`${opts.dueLabel} termiņš ${opts.dueNext.length} atskaitēm`);
+  if (opts.newlyLate.length) parts.push(`${opts.newlyLate.length} nokavētas`);
+  const subject = `Shadowy - ${parts.join(", ")}`;
 
   const section = (title: string, items: TaskDigestItem[], late = false) =>
     items.length
@@ -959,21 +972,20 @@ export async function sendTaskDigest(opts: {
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:560px">
       <h2 style="margin:0 0 4px">Labrīt, ${escapeHtml(opts.name)}!</h2>
       <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)}</p>
-      ${section("Nokavēti", opts.overdue, true)}
-      ${section("Termiņš šodien", opts.today)}
-      ${section("Termiņš tuvākajās dienās", opts.soon)}
+      ${section(`Termiņš ${escapeHtml(opts.dueLabel)}`, opts.dueNext)}
+      ${section("Nokavētās atskaites", opts.newlyLate, true)}
       <p style="margin-top:24px">
         <a href="${appUrl}${opts.link}" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">
           Atvērt uzdevumus →
         </a>
       </p>
-      <p style="color:#aaa;font-size:12px;margin-top:24px">Shadowy · Komandas vadība. Sūtām tikai darba dienās, kad ir ko atgādināt.</p>
+      <p style="color:#aaa;font-size:12px;margin-top:24px">Shadowy · Komandas vadība. Atgādinām vienu darba dienu pirms termiņa.</p>
     </div>
   `;
   await sendEmail(opts.to, subject, html);
 }
 
-/** Daily overview of late tasks for a manager - who may need a hand. */
+/** Reports that just went past their deadline, for a manager - who may need a hand. */
 export async function sendTeamOverdueDigest(opts: {
   to: string;
   name: string;
@@ -981,12 +993,12 @@ export async function sendTeamOverdueDigest(opts: {
   overdue: TaskDigestItem[];
 }): Promise<void> {
   const appUrl = getSiteUrl("http://localhost:3000");
-  const subject = `Shadowy - komandā ${opts.overdue.length} nokavēti uzdevumi`;
+  const subject = `Shadowy - komandā ${opts.overdue.length} nokavētas atskaites`;
   const html = `
     <div style="font-family:system-ui,sans-serif;line-height:1.6;max-width:560px">
       <h2 style="margin:0 0 4px">Labrīt, ${escapeHtml(opts.name)}!</h2>
       <p style="color:#888;margin:0;font-size:14px">${escapeHtml(opts.orgName)}</p>
-      <p style="color:#333;font-size:14px">Šīs atskaites ir pāri termiņam. Varbūt kādam vajag palīdzību vai darbu var pārdalīt.</p>
+      <p style="color:#333;font-size:14px">Šo atskaišu termiņš beidzās iepriekšējā darba dienā. Varbūt kādam vajag palīdzību vai darbu var pārdalīt.</p>
       ${taskDigestList(opts.overdue, { showAssignee: true, late: true })}
       <p style="margin-top:24px">
         <a href="${appUrl}/manager/uzdevumi" style="display:inline-block;padding:10px 20px;background:#18181b;color:#fff;border-radius:8px;text-decoration:none;font-weight:500">

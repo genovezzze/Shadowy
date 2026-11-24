@@ -46,8 +46,8 @@ export function SheetOnboarding({ clientCount }: { clientCount: number }) {
           <LayoutGrid className="h-5 w-5 text-[#007AFF]" />
           <span className="text-[15px] font-medium">{pending ? "Veido..." : "Pamata veidne"}</span>
           <span className="text-[13px] text-muted-foreground">
-            11 kolonnas: PB rēķ., KASE, Banka, Alga, PVN, UIN, VSAOI, Fiz.pers. paz. un citas. Termiņi pēc VID: PVN un
-            UIN līdz 20., Alga līdz 17., VSAOI līdz 23.
+            11 kolonnas: PB rēķ., KASE, Banka, Alga, PVN, UIN, VSAOI, Fiz.pers. paz. un citas. Termiņš tikai četrām:
+            Fiz.pers. paz. līdz 15., VSAOI līdz 17., PVN un UIN līdz 20.
           </span>
         </button>
         <button type="button" onClick={() => startFromTemplate("extended")} disabled={pending} className={card}>

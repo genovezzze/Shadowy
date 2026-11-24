@@ -11,6 +11,7 @@ import {
   periodLabel,
   planTasks,
   reconcileTasks,
+  reminderDays,
   resolveAssignee,
   rigaToday,
   scopedTaskWhere,
@@ -53,6 +54,28 @@ describe("Latvian holidays", () => {
     expect(isWorkingDay(utcDay(2026, 11, 7))).toBe(false); // Saturday
     expect(isWorkingDay(utcDay(2026, 11, 18))).toBe(false);
     expect(isWorkingDay(utcDay(2026, 11, 19))).toBe(true);
+  });
+});
+
+describe("reminderDays", () => {
+  it("reminds the working day before a deadline", () => {
+    // Thursday 19.11.2026 -> PVN/UIN deadline Friday 20.11.
+    expect(reminderDays(utcDay(2026, 11, 19)).dueIso).toBe("2026-11-20");
+  });
+
+  it("reminds a Monday deadline on Friday", () => {
+    expect(reminderDays(utcDay(2026, 11, 13)).dueIso).toBe("2026-11-16");
+  });
+
+  it("skips public holidays in both directions", () => {
+    // 18.11 is a holiday: on 17.11 the next deadline day is 19.11,
+    // and on 19.11 the newly-late day is 17.11.
+    expect(reminderDays(utcDay(2026, 11, 17)).dueIso).toBe("2026-11-19");
+    expect(reminderDays(utcDay(2026, 11, 19)).newlyLateIso).toBe("2026-11-17");
+  });
+
+  it("reports a deadline missed on Friday once, on Monday", () => {
+    expect(reminderDays(utcDay(2026, 11, 23)).newlyLateIso).toBe("2026-11-20");
   });
 });
 
@@ -165,6 +188,7 @@ function existing(over: Partial<ExistingTask> = {}): ExistingTask {
     reportTypeId: "pvn",
     assigneeId: "anna",
     dueDate: utcDay(2026, 10, 7),
+    hasDeadline: true,
     status: "NOT_STARTED",
     comment: null,
     ...over,
@@ -195,9 +219,27 @@ describe("reconcileTasks", () => {
   it("follows a new responsible on open tasks but leaves finished ones alone", () => {
     const replanned = planTasks([report({ responsibleUserId: "ilze" })], "2026-10", USERS);
     expect(reconcileTasks(replanned, [existing()]).update).toEqual([
-      { id: "t1", assigneeId: "ilze", dueDate: utcDay(2026, 10, 7) },
+      { id: "t1", assigneeId: "ilze", dueDate: utcDay(2026, 10, 7), hasDeadline: true },
     ]);
     expect(reconcileTasks(replanned, [existing({ status: "DONE" })]).update).toEqual([]);
+  });
+});
+
+describe("reports without a deadline", () => {
+  it("plan a task at the month's end that is never late", () => {
+    const [task] = planTasks([report({ reportType: { dueDay: 0, active: true } })], "2026-10", USERS);
+    expect(task.hasDeadline).toBe(false);
+    expect(isoDay(task.dueDate)).toBe("2026-10-31");
+    const longAfter = utcDay(2027, 3, 1);
+    expect(cellState({ status: "NOT_STARTED", dueDate: task.dueDate, hasDeadline: false }, longAfter)).toBe("todo");
+    expect(daysLate({ status: "NOT_STARTED", dueDate: task.dueDate, hasDeadline: false }, longAfter)).toBe(0);
+  });
+
+  it("follows a column switched to 'no deadline' on open tasks", () => {
+    const replanned = planTasks([report({ reportType: { dueDay: 0, active: true } })], "2026-10", USERS);
+    expect(reconcileTasks(replanned, [existing()]).update).toEqual([
+      { id: "t1", assigneeId: "anna", dueDate: utcDay(2026, 10, 31), hasDeadline: false },
+    ]);
   });
 });
 
@@ -263,6 +305,32 @@ describe("task access scope", () => {
   });
 });
 
+describe("substitution", () => {
+  it("adds the absent colleague's tasks for the substitute, nobody else's", () => {
+    const scope = taskScopeForSession(
+      { role: "EMPLOYEE", organizationId: "org-1", userId: "anna" },
+      { substituteFor: ["ilze"] },
+    );
+    expect(scope).toEqual({
+      organizationId: "org-1",
+      OR: [
+        { assigneeId: { in: ["anna", "ilze"] } },
+        { reportType: { ownerUserId: { in: ["anna", "ilze"] } } },
+        {
+          reportType: { ownerUserId: null },
+          client: { assignments: { some: { employeeId: { in: ["anna", "ilze"] } } } },
+        },
+      ],
+    });
+  });
+
+  it("is the plain scope without substitutions", () => {
+    expect(taskScopeForSession({ role: "EMPLOYEE", organizationId: "org-1", userId: "anna" }, { substituteFor: [] })).toEqual(
+      EMPLOYEE_ANNA,
+    );
+  });
+});
+
 describe("personal columns and shared tasks", () => {
   it("gives a personal column's task to its owner", () => {
     const r = report({ reportType: { dueDay: 7, active: true, ownerUserId: "zane" } });
@@ -284,9 +352,15 @@ describe("ready-made sheet", () => {
     const day = (name: string) => LV_REPORT_TEMPLATE.find((c) => c.name === name)?.dueDay;
     expect(day("PVN")).toBe(20);
     expect(day("UIN")).toBe(20);
-    expect(day("Alga")).toBe(17);
-    expect(day("VSAOI")).toBe(23);
+    expect(day("VSAOI")).toBe(17);
     expect(day("Fiz.pers. paz.")).toBe(15);
+  });
+
+  it("gives a deadline only to VSAOI, Fiz.pers. paz., PVN and UIN", () => {
+    const withDeadline = LV_REPORT_TEMPLATE.filter((c) => c.dueDay > 0).map((c) => c.name).sort();
+    expect(withDeadline).toEqual(["Fiz.pers. paz.", "PVN", "UIN", "VSAOI"]);
+    const extended = LV_REPORT_TEMPLATE_EXTENDED.filter((c) => c.dueDay > 0).map((c) => c.name).sort();
+    expect(extended).toEqual(["FP paz.", "PVN", "UIN", "VSAO"]);
   });
 
   it("has no duplicate columns", () => {
@@ -296,10 +370,10 @@ describe("ready-made sheet", () => {
     }
   });
 
-  it("makes DRN quarterly by the 15th in the extended sheet", () => {
+  it("makes DRN quarterly, without a deadline, in the extended sheet", () => {
     const drn = LV_REPORT_TEMPLATE_EXTENDED.find((c) => c.name === "DRN");
-    expect(drn).toEqual({ name: "DRN", dueDay: 15, frequency: "quarterly" });
-    expect(LV_REPORT_TEMPLATE_EXTENDED.find((c) => c.name === "VSAO")?.dueDay).toBe(23);
+    expect(drn).toEqual({ name: "DRN", dueDay: 0, frequency: "quarterly" });
+    expect(LV_REPORT_TEMPLATE_EXTENDED.find((c) => c.name === "VSAO")?.dueDay).toBe(17);
   });
 
   it("matches column names loosely", () => {

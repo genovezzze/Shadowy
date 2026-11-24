@@ -2,18 +2,11 @@ import "server-only";
 import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { buildProcessInsights, type InsightEntry } from "@/lib/process-insights";
+import { comparisonWindows, resolveDateRange, type DateRange } from "@/lib/date-range";
 
-export const INSIGHT_PERIODS = new Set(["7d", "30d", "90d", "all"]);
-
-export function resolveInsightPeriod(value?: string) {
-  return value && INSIGHT_PERIODS.has(value) ? value : "30d";
-}
-
-function periodDays(period: string) {
-  if (period === "7d") return 7;
-  if (period === "90d") return 90;
-  if (period === "30d") return 30;
-  return null;
+/** Insights default to the last 30 days. */
+export function resolveInsightRange(params?: { period?: string; from?: string; to?: string }): DateRange {
+  return resolveDateRange(params, { defaultKey: "30d" });
 }
 
 function mapEntry(entry: {
@@ -47,16 +40,15 @@ function mapEntry(entry: {
 export async function getProcessInsights({
   organizationId,
   managerId,
-  period,
+  range,
 }: {
   organizationId: string;
   managerId?: string;
-  period: string;
+  range: DateRange;
 }) {
-  const days = periodDays(period);
   const now = new Date();
-  const currentStart = days ? new Date(now.getTime() - days * 86400000) : null;
-  const previousStart = days ? new Date(now.getTime() - days * 2 * 86400000) : null;
+  // All time has nothing to compare against.
+  const windows = range.start ? comparisonWindows(range, now) : null;
 
   const baseWhere: Prisma.InvisibleWorkEntryWhereInput = {
     organizationId,
@@ -81,16 +73,16 @@ export async function getProcessInsights({
     prisma.invisibleWorkEntry.findMany({
       where: {
         ...baseWhere,
-        ...(currentStart ? { workDate: { gte: currentStart, lte: now } } : {}),
+        ...(windows ? { workDate: { gte: windows.current.start, lt: windows.current.end } } : {}),
       },
       select,
       orderBy: { workDate: "desc" },
     }),
-    days && currentStart && previousStart
+    windows
       ? prisma.invisibleWorkEntry.findMany({
           where: {
             ...baseWhere,
-            workDate: { gte: previousStart, lt: currentStart },
+            workDate: { gte: windows.previous.start, lt: windows.previous.end },
           },
           select,
         })

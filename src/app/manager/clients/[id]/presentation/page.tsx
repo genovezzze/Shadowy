@@ -5,7 +5,8 @@ import { ArrowLeft } from "lucide-react";
 import { requireUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { buildProcessInsights, type InsightEntry } from "@/lib/process-insights";
-import { resolveInsightPeriod } from "@/lib/process-insights-data";
+import { resolveInsightRange } from "@/lib/process-insights-data";
+import { comparisonWindows } from "@/lib/date-range";
 import { categoryLabel, normalizeCategoryKey } from "@/lib/work-insights";
 import { formatDurationLV, slugify } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
@@ -21,13 +22,6 @@ import { Button } from "@/components/ui/button";
 const FALLBACK_HOURLY_RATE = 20;
 /** Examples shown per work area — enough to recognise the work, short enough to read. */
 const EXAMPLES_PER_GROUP = 4;
-
-function periodDays(period: string) {
-  if (period === "7d") return 7;
-  if (period === "30d") return 30;
-  if (period === "90d") return 90;
-  return null;
-}
 
 function monthKey(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
@@ -54,7 +48,7 @@ function money(value: number) {
 
 const shortDate = new Intl.DateTimeFormat("lv-LV", { day: "2-digit", month: "2-digit", year: "numeric" });
 
-function periodLabel(period: string, start: Date | null, end: Date) {
+function periodLabel(start: Date | null, end: Date) {
   if (!start) return "Visa sadarbības vēsture";
   return `${shortDate.format(start)}-${shortDate.format(end)}`;
 }
@@ -74,8 +68,8 @@ function documentNumber(clientName: string, date: Date) {
   return `${code}-${stamp}`;
 }
 
-function reportTitle(clientName: string, period: string, start: Date | null, end: Date) {
-  return `Sadarbības pārskats · ${clientName} · ${periodLabel(period, start, end)}`;
+function reportTitle(clientName: string, start: Date | null, end: Date) {
+  return `Sadarbības pārskats · ${clientName} · ${periodLabel(start, end)}`;
 }
 
 export async function generateMetadata({
@@ -83,7 +77,7 @@ export async function generateMetadata({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { period?: string };
+  searchParams: { period?: string; from?: string; to?: string };
 }): Promise<Metadata> {
   const session = await requireUser(["MANAGER", "ADMIN"]);
   const client = await prisma.client.findFirst({
@@ -92,12 +86,11 @@ export async function generateMetadata({
   });
   if (!client) return { title: { absolute: "Sadarbības pārskats" } };
 
-  const period = resolveInsightPeriod(searchParams?.period);
-  const days = periodDays(period);
+  const range = resolveInsightRange(searchParams);
   const now = new Date();
-  const start = days ? new Date(now.getTime() - days * 86400000) : null;
+  const lastDay = range.end ? new Date(range.end.getTime() - 86400000) : now;
 
-  return { title: { absolute: reportTitle(client.name, period, start, now) } };
+  return { title: { absolute: reportTitle(client.name, range.start ?? null, lastDay) } };
 }
 
 export default async function ClientPresentationPage({
@@ -105,14 +98,16 @@ export default async function ClientPresentationPage({
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { period?: string };
+  searchParams: { period?: string; from?: string; to?: string };
 }) {
   const session = await requireUser(["MANAGER", "ADMIN"]);
-  const period = resolveInsightPeriod(searchParams?.period);
-  const days = periodDays(period);
+  const range = resolveInsightRange(searchParams);
+  const period = range.key;
   const now = new Date();
-  const currentStart = days ? new Date(now.getTime() - days * 86400000) : null;
-  const previousStart = days ? new Date(now.getTime() - days * 2 * 86400000) : null;
+  // All time has nothing to compare against.
+  const windows = range.start ? comparisonWindows(range, now) : null;
+  const currentStart = windows?.current.start ?? null;
+  const lastDay = range.end ? new Date(range.end.getTime() - 86400000) : now;
 
   const client = await prisma.client.findFirst({
     where: { id: params.id, organizationId: session.organizationId },
@@ -153,13 +148,13 @@ export default async function ClientPresentationPage({
 
   const [entries, previousEntries, sixMonthEntries] = await Promise.all([
     prisma.invisibleWorkEntry.findMany({
-      where: { ...entryWhere, ...(currentStart ? { workDate: { gte: currentStart, lte: now } } : {}) },
+      where: { ...entryWhere, ...(windows ? { workDate: { gte: windows.current.start, lt: windows.current.end } } : {}) },
       select: entrySelect,
       orderBy: { workDate: "desc" },
     }),
-    days && currentStart && previousStart
+    windows
       ? prisma.invisibleWorkEntry.findMany({
-          where: { ...entryWhere, workDate: { gte: previousStart, lt: currentStart } },
+          where: { ...entryWhere, workDate: { gte: windows.previous.start, lt: windows.previous.end } },
           select: entrySelect,
         })
       : Promise.resolve([]),
@@ -316,7 +311,7 @@ export default async function ClientPresentationPage({
         organizationName={client.organization.name}
         clientName={client.name}
         documentNumber={documentNumber(client.name, now)}
-        periodLabel={periodLabel(period, currentStart, now)}
+        periodLabel={periodLabel(currentStart, lastDay)}
         generatedAt={shortDate.format(now)}
         totalMinutes={totalMinutes}
         entryCount={entries.length}

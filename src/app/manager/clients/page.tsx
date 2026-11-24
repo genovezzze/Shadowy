@@ -5,7 +5,8 @@ import { ClientList } from "@/components/clients/client-list";
 import { LinkEntriesButton } from "@/components/clients/link-entries-button";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, ListChecks } from "lucide-react";
+import { isTeamTasksEnabled } from "@/lib/team-tasks-server";
 import { clientMonthOptions, resolveClientMonth } from "@/lib/client-month";
 import { ClientMonthSelector } from "@/components/dashboard/client-month-selector";
 import { buildClientMatrix } from "@/lib/client-matrix";
@@ -87,6 +88,16 @@ export default async function ManagerClientsPage({
     assignedEmployeeIds: c.assignments.map((a) => a.employeeId),
   }));
 
+  const teamTasks = await isTeamTasksEnabled(session.organizationId);
+  const reportsButton = teamTasks ? (
+    <Button asChild variant="outline" size="sm">
+      <Link href="/manager/clients/atskaites">
+        <ListChecks className="h-4 w-4" />
+        Atskaites un termiņi
+      </Link>
+    </Button>
+  ) : null;
+
   return (
     <>
       <PageHeader
@@ -95,6 +106,7 @@ export default async function ManagerClientsPage({
         actions={
           session.role === "ADMIN" ? (
             <div className="flex items-center gap-2">
+              {reportsButton}
               <LinkEntriesButton />
               <Button asChild variant="outline" size="sm">
                 <Link href="/admin/clients/import">
@@ -103,7 +115,9 @@ export default async function ManagerClientsPage({
                 </Link>
               </Button>
             </div>
-          ) : null
+          ) : (
+            reportsButton
+          )
         }
       />
       <ClientMonthSelector selectedMonth={clientMonth.key} options={availableClientMonths} />

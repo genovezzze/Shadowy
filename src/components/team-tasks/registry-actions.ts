@@ -36,7 +36,7 @@ type Ctx = NonNullable<Awaited<ReturnType<typeof registryContext>>>;
 async function afterRegistryChange(orgId: string) {
   await reconcilePeriod(orgId, periodOf(rigaToday()));
   revalidatePath("/manager/uzdevumi");
-  revalidatePath("/manager/uzdevumi/registrs");
+  revalidatePath("/manager/clients/atskaites");
   revalidatePath("/employee/uzdevumi");
   revalidatePath("/employee/uzdevumi/tabula");
 }
@@ -102,7 +102,8 @@ async function nameTaken(ctx: Ctx, name: string, exceptId?: string) {
 const reportTypeSchema = z.object({
   id: z.string().optional(),
   name: z.string().trim().min(1).max(40),
-  dueDay: z.number().int().min(1).max(31),
+  // 0 = no deadline.
+  dueDay: z.number().int().min(0).max(31),
   active: z.boolean(),
 });
 
@@ -110,7 +111,7 @@ export async function saveReportType(scope: RegistryScope, input: z.input<typeof
   const ctx = await registryContext(scope);
   if (!ctx) return DENIED;
   const parsed = reportTypeSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Pārbaudiet nosaukumu un termiņa dienu (1-31)." };
+  if (!parsed.success) return { ok: false, error: "Pārbaudiet nosaukumu un termiņa dienu (1-31 vai tukšs - bez termiņa)." };
   const { id, name, dueDay, active } = parsed.data;
 
   if (await nameTaken(ctx, name, id)) return { ok: false, error: `Kolonna “${name}” jau ir.` };
@@ -199,7 +200,7 @@ export async function moveReportType(scope: RegistryScope, id: string, direction
     ),
   );
   revalidatePath("/manager/uzdevumi");
-  revalidatePath("/manager/uzdevumi/registrs");
+  revalidatePath("/manager/clients/atskaites");
   revalidatePath("/employee/uzdevumi");
   revalidatePath("/employee/uzdevumi/tabula");
   return { ok: true };

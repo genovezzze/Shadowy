@@ -25,9 +25,9 @@ export default async function RegistryImportPage() {
         title="Importēt no Excel"
         description="Augšupielādējiet mēneša atskaišu tabulu: rindās klienti, kolonnās atskaites, pelēka šūna - atskaite nav vajadzīga. Pirms saglabāšanas varēsiet visu pārbaudīt."
         actions={
-          <Link href="/manager/uzdevumi/registrs" className={APPLE_PILL}>
+          <Link href="/manager/clients/atskaites" className={APPLE_PILL}>
             <ArrowLeft className="h-3.5 w-3.5" />
-            Uz reģistru
+            Uz atskaitēm
           </Link>
         }
       />

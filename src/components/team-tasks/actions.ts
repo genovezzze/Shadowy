@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
 import { requireUser } from "@/lib/auth";
-import { isTeamTasksEnabled } from "@/lib/team-tasks-server";
+import { isTeamTasksEnabled, taskScopeOpts } from "@/lib/team-tasks-server";
 import { isPeriod, scopedTaskWhere } from "@/lib/team-tasks";
 
 type Result = { ok: true } | { ok: false; error: string };
@@ -31,7 +31,7 @@ export async function setTaskStatus(taskId: string, status: string): Promise<Res
   if (!parsed.success || typeof taskId !== "string") return { ok: false, error: "Nepareizs statuss." };
 
   const task = await prisma.clientTask.findFirst({
-    where: scopedTaskWhere({ id: taskId }, session),
+    where: scopedTaskWhere({ id: taskId }, session, await taskScopeOpts(session)),
     select: { id: true, status: true },
   });
   if (!task) return NOT_FOUND;
@@ -70,7 +70,7 @@ export async function setTaskCell(
   }
 
   const task = await prisma.clientTask.findFirst({
-    where: scopedTaskWhere({ id: taskId }, session),
+    where: scopedTaskWhere({ id: taskId }, session, await taskScopeOpts(session)),
     select: { id: true, status: true },
   });
   if (!task) return NOT_FOUND;
@@ -96,7 +96,7 @@ export async function setTaskComment(taskId: string, comment: string): Promise<R
   const text = typeof comment === "string" ? comment.trim().slice(0, 500) : "";
 
   const task = await prisma.clientTask.findFirst({
-    where: scopedTaskWhere({ id: taskId }, session),
+    where: scopedTaskWhere({ id: taskId }, session, await taskScopeOpts(session)),
     select: { id: true },
   });
   if (!task) return NOT_FOUND;
@@ -118,7 +118,7 @@ export async function setClientMonthNote(clientId: string, period: string, text:
   const value = typeof text === "string" ? text.trim().slice(0, 500) : "";
 
   const visible = await prisma.clientTask.findFirst({
-    where: scopedTaskWhere({ clientId, period }, session),
+    where: scopedTaskWhere({ clientId, period }, session, await taskScopeOpts(session)),
     select: { id: true },
   });
   if (!visible) return { ok: false, error: "Klients nav atrasts." };

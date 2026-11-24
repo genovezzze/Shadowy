@@ -119,6 +119,27 @@ export function nextWorkingDay(date: Date): Date {
   return d;
 }
 
+/** The last working day strictly before the date. */
+export function previousWorkingDay(date: Date): Date {
+  let d = addDays(date, -1);
+  while (!isWorkingDay(d)) d = addDays(d, -1);
+  return d;
+}
+
+/**
+ * Which deadlines today's reminder is about. The pilot firm asked for one
+ * reminder the working day before a deadline, not a countdown (reminders days
+ * ahead "annoy"), plus a single note the first working day after a deadline
+ * was missed. Deadlines already sit on working days, so a Monday deadline is
+ * reminded on Friday.
+ */
+export function reminderDays(today: Date): { dueIso: string; newlyLateIso: string } {
+  return {
+    dueIso: isoDay(nextWorkingDay(addDays(today, 1))),
+    newlyLateIso: isoDay(previousWorkingDay(today)),
+  };
+}
+
 // ── Periods ────────────────────────────────────────────────────────────────
 
 const PERIOD_RE = /^(\d{4})-(0[1-9]|1[0-2])$/;
@@ -209,7 +230,22 @@ export interface PlannedTask {
   reportTypeId: string;
   assigneeId: string | null;
   period: string;
+  /** For a task without deadline: the month's last day, only for ordering. */
   dueDate: Date;
+  hasDeadline: boolean;
+}
+
+/** A deadline day of 0 means "no deadline" (internal work like KASE or Banka). */
+export const NO_DEADLINE = 0;
+
+export function hasDeadlineDay(dueDay: number | null | undefined): boolean {
+  return dueDay != null && dueDay > 0;
+}
+
+/** The month's last calendar day: where a no-deadline task sits for ordering. */
+export function lastDayOf(period: string): Date {
+  const { year, month } = parsePeriod(period);
+  return new Date(Date.UTC(year, month, 0));
 }
 
 /**
@@ -243,12 +279,15 @@ export function planTasks(
     if (report.client.status !== "active") continue;
     if (!report.reportType.active) continue;
     if (!isDueInPeriod(report.frequency, period)) continue;
+    const day = report.dueDay ?? report.reportType.dueDay;
+    const withDeadline = hasDeadlineDay(day);
     planned.push({
       clientId: report.clientId,
       reportTypeId: report.reportTypeId,
       assigneeId: resolveAssignee(report, validUserIds),
       period,
-      dueDate: dueDateFor(period, report.dueDay ?? report.reportType.dueDay),
+      dueDate: withDeadline ? dueDateFor(period, day) : lastDayOf(period),
+      hasDeadline: withDeadline,
     });
   }
   return planned;
@@ -260,6 +299,7 @@ export interface ExistingTask {
   reportTypeId: string;
   assigneeId: string | null;
   dueDate: Date;
+  hasDeadline: boolean;
   status: TaskStatus;
   comment: string | null;
 }
@@ -277,7 +317,7 @@ export function reconcileTasks(planned: PlannedTask[], existing: ExistingTask[])
 
   const create = planned.filter((p) => !existingKeys.has(taskKey(p.clientId, p.reportTypeId)));
   const remove: string[] = [];
-  const update: { id: string; assigneeId: string | null; dueDate: Date }[] = [];
+  const update: { id: string; assigneeId: string | null; dueDate: Date; hasDeadline: boolean }[] = [];
 
   for (const task of existing) {
     const plan = plannedByKey.get(taskKey(task.clientId, task.reportTypeId));
@@ -286,8 +326,12 @@ export function reconcileTasks(planned: PlannedTask[], existing: ExistingTask[])
       continue;
     }
     if (task.status === "DONE") continue;
-    if (task.assigneeId !== plan.assigneeId || isoDay(task.dueDate) !== isoDay(plan.dueDate)) {
-      update.push({ id: task.id, assigneeId: plan.assigneeId, dueDate: plan.dueDate });
+    if (
+      task.assigneeId !== plan.assigneeId ||
+      isoDay(task.dueDate) !== isoDay(plan.dueDate) ||
+      task.hasDeadline !== plan.hasDeadline
+    ) {
+      update.push({ id: task.id, assigneeId: plan.assigneeId, dueDate: plan.dueDate, hasDeadline: plan.hasDeadline });
     }
   }
 
@@ -298,19 +342,25 @@ export function reconcileTasks(planned: PlannedTask[], existing: ExistingTask[])
 
 export type CellState = "todo" | "progress" | "done" | "overdue";
 
-/** Late = past its deadline (Riga day) and not finished. Derived, never stored. */
-export function isOverdue(task: { status: TaskStatus; dueDate: Date }, today: Date): boolean {
+type TaskTiming = { status: TaskStatus; dueDate: Date; hasDeadline?: boolean };
+
+/**
+ * Late = past its deadline (Riga day) and not finished. Derived, never stored.
+ * A task without a deadline is never late.
+ */
+export function isOverdue(task: TaskTiming, today: Date): boolean {
+  if (task.hasDeadline === false) return false;
   return task.status !== "DONE" && isoDay(task.dueDate) < isoDay(today);
 }
 
-export function cellState(task: { status: TaskStatus; dueDate: Date }, today: Date): CellState {
+export function cellState(task: TaskTiming, today: Date): CellState {
   if (task.status === "DONE") return "done";
   if (isOverdue(task, today)) return "overdue";
   return task.status === "IN_PROGRESS" ? "progress" : "todo";
 }
 
 /** Whole days a task is late (0 when on time). */
-export function daysLate(task: { status: TaskStatus; dueDate: Date }, today: Date): number {
+export function daysLate(task: TaskTiming, today: Date): number {
   if (!isOverdue(task, today)) return 0;
   return Math.round((today.getTime() - task.dueDate.getTime()) / 86_400_000);
 }
@@ -336,11 +386,19 @@ export function shortDate(date: Date): string {
  * - MANAGER: their own and unassigned tasks, plus everything of the people
  *   they manage (same rules as for those people).
  */
-export function taskScopeForSession(session: {
-  role: Role;
-  organizationId: string;
-  userId: string;
-}): Prisma.ClientTaskWhereInput {
+export function taskScopeForSession(
+  session: {
+    role: Role;
+    organizationId: string;
+    userId: string;
+  },
+  /**
+   * People this employee substitutes today (approved vacation or sick leave,
+   * resolved by the caller from the session, never from the URL). Their tasks
+   * become visible and editable as if they were the employee's own.
+   */
+  opts: { substituteFor?: string[] } = {},
+): Prisma.ClientTaskWhereInput {
   const org = session.organizationId;
   const me = session.userId;
   if (session.role === "ADMIN") return { organizationId: org };
@@ -360,12 +418,23 @@ export function taskScopeForSession(session: {
       ],
     };
   }
+  const people = [me, ...(opts.substituteFor ?? []).filter((id) => id && id !== me)];
+  if (people.length === 1) {
+    return {
+      organizationId: org,
+      OR: [
+        { assigneeId: me },
+        { reportType: { ownerUserId: me } },
+        { reportType: { ownerUserId: null }, client: { assignments: { some: { employeeId: me } } } },
+      ],
+    };
+  }
   return {
     organizationId: org,
     OR: [
-      { assigneeId: me },
-      { reportType: { ownerUserId: me } },
-      { reportType: { ownerUserId: null }, client: { assignments: { some: { employeeId: me } } } },
+      { assigneeId: { in: people } },
+      { reportType: { ownerUserId: { in: people } } },
+      { reportType: { ownerUserId: null }, client: { assignments: { some: { employeeId: { in: people } } } } },
     ],
   };
 }
@@ -389,19 +458,13 @@ export function taskPeople(task: {
 export function scopedTaskWhere(
   filter: Prisma.ClientTaskWhereInput,
   session: { role: Role; organizationId: string; userId: string },
+  opts: { substituteFor?: string[] } = {},
 ): Prisma.ClientTaskWhereInput {
-  return { AND: [filter, taskScopeForSession(session)] };
+  return { AND: [filter, taskScopeForSession(session, opts)] };
 }
 
 // ── Ready-made sheet ───────────────────────────────────────────────────────
 
-/**
- * "Gatavā veidne": the columns of a typical Latvian bookkeeping firm's monthly
- * sheet. Deadlines follow VID where there is one (checked 2026-11): PVN and
- * UIN returns by the 20th, the employer's report (DDZ) by the 17th, VSAOI and
- * IIN payment by the 23rd, the payout notice for individuals by the 15th.
- * Internal work without a legal date gets the 7th.
- */
 export interface TemplateColumn {
   name: string;
   dueDay: number;
@@ -409,45 +472,50 @@ export interface TemplateColumn {
   frequency?: ReportFrequency;
 }
 
+/**
+ * "Gatavā veidne": the columns of a typical Latvian bookkeeping firm's monthly
+ * sheet. Only four reports carry a deadline, as the pilot firm works them
+ * (set 2026-11-23): Fiz.pers. paz. by the 15th, VSAOI by the 17th, PVN and UIN
+ * by the 20th. The rest have no deadline and never turn late.
+ */
 export const LV_REPORT_TEMPLATE: TemplateColumn[] = [
-  { name: "PB rēķ.", dueDay: 7 },
-  { name: "Debitoru rēķini", dueDay: 7 },
-  { name: "KASE", dueDay: 7 },
-  { name: "Banka", dueDay: 7 },
+  { name: "PB rēķ.", dueDay: NO_DEADLINE },
+  { name: "Debitoru rēķini", dueDay: NO_DEADLINE },
+  { name: "KASE", dueDay: NO_DEADLINE },
+  { name: "Banka", dueDay: NO_DEADLINE },
   { name: "Fiz.pers. paz.", dueDay: 15 },
-  { name: "Alga", dueDay: 17 },
+  { name: "Alga", dueDay: NO_DEADLINE },
   { name: "PVN", dueDay: 20 },
   { name: "UIN", dueDay: 20 },
-  { name: "VSAOI", dueDay: 23 },
-  { name: "Nodokļi", dueDay: 23 },
-  { name: "PL", dueDay: 7 },
+  { name: "VSAOI", dueDay: 17 },
+  { name: "Nodokļi", dueDay: NO_DEADLINE },
+  { name: "PL", dueDay: NO_DEADLINE },
 ];
 
 /**
  * The extended sheet: payroll, non-residents, natural resources tax and
- * statistics on top of the basics. VSAOI payment by the 23rd, non-resident and
- * payout notices by the 15th, PVN and UIN by the 20th, DRN quarterly by the
- * 15th. Internal work gets the 7th.
+ * statistics on top of the basics. Same rule: only VSAO (17th), FP paz.
+ * (15th), PVN and UIN (20th) carry a deadline; DRN and PL Q come quarterly.
  */
 export const LV_REPORT_TEMPLATE_EXTENDED: TemplateColumn[] = [
-  { name: "Rēķ.", dueDay: 7 },
-  { name: "VSAO", dueDay: 23 },
-  { name: "Nosūtīta alga", dueDay: 7 },
-  { name: "IIeN nerez.", dueDay: 15 },
+  { name: "Rēķ.", dueDay: NO_DEADLINE },
+  { name: "VSAO", dueDay: 17 },
+  { name: "Nosūtīta alga", dueDay: NO_DEADLINE },
+  { name: "IIeN nerez.", dueDay: NO_DEADLINE },
   { name: "PVN", dueDay: 20 },
   { name: "UIN", dueDay: 20 },
-  { name: "Atbrīvots/Pieņemts", dueDay: 7 },
+  { name: "Atbrīvots/Pieņemts", dueDay: NO_DEADLINE },
   { name: "FP paz.", dueDay: 15 },
-  { name: "Rēķini", dueDay: 7 },
-  { name: "Kvīšu gr.", dueDay: 7 },
-  { name: "DRN", dueDay: 15, frequency: "quarterly" },
-  { name: "Op. bilance", dueDay: 7 },
-  { name: "Statistika", dueDay: 7 },
-  { name: "Bank", dueDay: 7 },
-  { name: "PL Q", dueDay: 7, frequency: "quarterly" },
-  { name: "Debitori", dueDay: 7 },
-  { name: "Kreditori", dueDay: 7 },
-  { name: "Lauksaimnieki", dueDay: 15 },
+  { name: "Rēķini", dueDay: NO_DEADLINE },
+  { name: "Kvīšu gr.", dueDay: NO_DEADLINE },
+  { name: "DRN", dueDay: NO_DEADLINE, frequency: "quarterly" },
+  { name: "Op. bilance", dueDay: NO_DEADLINE },
+  { name: "Statistika", dueDay: NO_DEADLINE },
+  { name: "Bank", dueDay: NO_DEADLINE },
+  { name: "PL Q", dueDay: NO_DEADLINE, frequency: "quarterly" },
+  { name: "Debitori", dueDay: NO_DEADLINE },
+  { name: "Kreditori", dueDay: NO_DEADLINE },
+  { name: "Lauksaimnieki", dueDay: NO_DEADLINE },
 ];
 
 export const REPORT_TEMPLATES = {
